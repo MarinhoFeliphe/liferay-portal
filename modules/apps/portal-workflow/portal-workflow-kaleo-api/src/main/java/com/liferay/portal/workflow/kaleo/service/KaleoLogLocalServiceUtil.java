@@ -104,6 +104,31 @@ public class KaleoLogLocalServiceUtil {
 						previousKaleoTaskAssignmentInstances,
 			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
 				kaleoTaskInstanceToken,
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance
+				kaleoTaskAssignmentInstance,
+			String comment, Map<String, Serializable> workflowContext,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addTaskAssignmentKaleoLog(
+			previousKaleoTaskAssignmentInstances, kaleoTaskInstanceToken,
+			kaleoTaskAssignmentInstance, comment, workflowContext,
+			serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addTaskAssignmentKaleoLog(List, KaleoTaskInstanceToken,
+	 KaleoTaskAssignmentInstance, String, Map, ServiceContext)}}
+	 */
+	@Deprecated
+	public static KaleoLog addTaskAssignmentKaleoLog(
+			List
+				<com.liferay.portal.workflow.kaleo.model.
+					KaleoTaskAssignmentInstance>
+						previousKaleoTaskAssignmentInstances,
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
+				kaleoTaskInstanceToken,
 			String comment, Map<String, Serializable> workflowContext,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
@@ -111,6 +136,22 @@ public class KaleoLogLocalServiceUtil {
 		return getService().addTaskAssignmentKaleoLog(
 			previousKaleoTaskAssignmentInstances, kaleoTaskInstanceToken,
 			comment, workflowContext, serviceContext);
+	}
+
+	public static List<KaleoLog> addTaskAssignmentKaleoLogs(
+			List
+				<com.liferay.portal.workflow.kaleo.model.
+					KaleoTaskAssignmentInstance>
+						previousTaskAssignmentInstances,
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
+				kaleoTaskInstanceToken,
+			String comment, Map<String, Serializable> workflowContext,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addTaskAssignmentKaleoLogs(
+			previousTaskAssignmentInstances, kaleoTaskInstanceToken, comment,
+			workflowContext, serviceContext);
 	}
 
 	public static KaleoLog addTaskCompletionKaleoLog(
