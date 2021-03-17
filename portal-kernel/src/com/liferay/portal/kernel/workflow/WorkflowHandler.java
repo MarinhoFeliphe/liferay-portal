@@ -68,6 +68,10 @@ public interface WorkflowHandler<T> {
 			long workflowTaskId, ServiceContext serviceContext)
 		throws PortalException;
 
+	public String getURLNotificationRedirect(
+		long workflowTaskId, ServiceContext serviceContext)
+		throws PortalException;
+
 	public PortletURL getURLViewDiffs(
 		long classPK, LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse);
