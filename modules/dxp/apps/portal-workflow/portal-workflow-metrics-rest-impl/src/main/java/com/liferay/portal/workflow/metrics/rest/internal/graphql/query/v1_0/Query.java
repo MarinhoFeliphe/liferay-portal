@@ -37,6 +37,7 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ProcessMetric;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ReindexStatus;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Role;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLA;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLAResult;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Task;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TaskBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TimeRange;
@@ -51,6 +52,7 @@ import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ReindexStatusResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.RoleResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResource;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResultResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.TaskResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.TimeRangeResource;
 
@@ -160,6 +162,14 @@ public class Query {
 
 		_slaResourceComponentServiceObjects =
 			slaResourceComponentServiceObjects;
+	}
+
+	public static void setSLAResultResourceComponentServiceObjects(
+		ComponentServiceObjects<SLAResultResource>
+			slaResultResourceComponentServiceObjects) {
+
+		_slaResultResourceComponentServiceObjects =
+			slaResultResourceComponentServiceObjects;
 	}
 
 	public static void setTaskResourceComponentServiceObjects(
@@ -334,23 +344,6 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processLastSLACheckDate(processId: ___){}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public Date processLastSLACheckDate(
-			@GraphQLName("processId") Long processId)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_processResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			processResource -> processResource.getProcessLastSLACheckDate(
-				processId));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processTitle(processId: ___){}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
@@ -468,6 +461,24 @@ public class Query {
 		return _applyComponentServiceObjects(
 			_slaResourceComponentServiceObjects, this::_populateResourceContext,
 			slaResource -> slaResource.getSLA(slaId));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processLastSLAResult(completed: ___, processId: ___){dateOverdue, id, lastCheckDate, name, onTime, remainingTime, status}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public SLAResult processLastSLAResult(
+			@GraphQLName("processId") Long processId,
+			@GraphQLName("completed") Boolean completed)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_slaResultResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			slaResultResource -> slaResultResource.getProcessLastSLAResult(
+				processId, completed));
 	}
 
 	/**
@@ -628,6 +639,29 @@ public class Query {
 	}
 
 	@GraphQLTypeExtension(Process.class)
+	public class GetProcessLastSLAResultTypeExtension {
+
+		public GetProcessLastSLAResultTypeExtension(Process process) {
+			_process = process;
+		}
+
+		@GraphQLField
+		public SLAResult lastSLAResult(
+				@GraphQLName("completed") Boolean completed)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_slaResultResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				slaResultResource -> slaResultResource.getProcessLastSLAResult(
+					_process.getId(), completed));
+		}
+
+		private Process _process;
+
+	}
+
+	@GraphQLTypeExtension(Process.class)
 	public class GetProcessTaskTypeExtension {
 
 		public GetProcessTaskTypeExtension(Process process) {
@@ -641,26 +675,6 @@ public class Query {
 				Query.this::_populateResourceContext,
 				taskResource -> taskResource.getProcessTask(
 					_process.getId(), taskId));
-		}
-
-		private Process _process;
-
-	}
-
-	@GraphQLTypeExtension(Process.class)
-	public class GetProcessLastSLACheckDateTypeExtension {
-
-		public GetProcessLastSLACheckDateTypeExtension(Process process) {
-			_process = process;
-		}
-
-		@GraphQLField
-		public Date lastSLACheckDate() throws Exception {
-			return _applyComponentServiceObjects(
-				_processResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				processResource -> processResource.getProcessLastSLACheckDate(
-					_process.getId()));
 		}
 
 		private Process _process;
@@ -1170,6 +1184,39 @@ public class Query {
 
 	}
 
+	@GraphQLName("SLAResultPage")
+	public class SLAResultPage {
+
+		public SLAResultPage(Page slaResultPage) {
+			actions = slaResultPage.getActions();
+
+			items = slaResultPage.getItems();
+			lastPage = slaResultPage.getLastPage();
+			page = slaResultPage.getPage();
+			pageSize = slaResultPage.getPageSize();
+			totalCount = slaResultPage.getTotalCount();
+		}
+
+		@GraphQLField
+		protected Map<String, Map> actions;
+
+		@GraphQLField
+		protected java.util.Collection<SLAResult> items;
+
+		@GraphQLField
+		protected long lastPage;
+
+		@GraphQLField
+		protected long page;
+
+		@GraphQLField
+		protected long pageSize;
+
+		@GraphQLField
+		protected long totalCount;
+
+	}
+
 	@GraphQLName("TaskPage")
 	public class TaskPage {
 
@@ -1405,6 +1452,19 @@ public class Query {
 		slaResource.setRoleLocalService(_roleLocalService);
 	}
 
+	private void _populateResourceContext(SLAResultResource slaResultResource)
+		throws Exception {
+
+		slaResultResource.setContextAcceptLanguage(_acceptLanguage);
+		slaResultResource.setContextCompany(_company);
+		slaResultResource.setContextHttpServletRequest(_httpServletRequest);
+		slaResultResource.setContextHttpServletResponse(_httpServletResponse);
+		slaResultResource.setContextUriInfo(_uriInfo);
+		slaResultResource.setContextUser(_user);
+		slaResultResource.setGroupLocalService(_groupLocalService);
+		slaResultResource.setRoleLocalService(_roleLocalService);
+	}
+
 	private void _populateResourceContext(TaskResource taskResource)
 		throws Exception {
 
@@ -1453,6 +1513,8 @@ public class Query {
 		_roleResourceComponentServiceObjects;
 	private static ComponentServiceObjects<SLAResource>
 		_slaResourceComponentServiceObjects;
+	private static ComponentServiceObjects<SLAResultResource>
+		_slaResultResourceComponentServiceObjects;
 	private static ComponentServiceObjects<TaskResource>
 		_taskResourceComponentServiceObjects;
 	private static ComponentServiceObjects<TimeRangeResource>

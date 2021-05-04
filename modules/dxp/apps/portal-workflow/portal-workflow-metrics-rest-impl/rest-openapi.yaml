@@ -427,6 +427,9 @@ components:
                 id:
                     format: int64
                     type: integer
+                lastCheckDate:
+                    format: date-time
+                    type: string
                 name:
                     type: string
                 onTime:
@@ -1120,9 +1123,9 @@ paths:
                     description:
                         ""
             tags: ["Instance"]
-    "/processes/{processId}/last-sla-check-date":
+    "/processes/{processId}/last-sla-result":
         get:
-            operationId: getProcessLastSLACheckDate
+            operationId: getProcessLastSLAResult
             parameters:
                 - in: path
                   name: processId
@@ -1130,20 +1133,22 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: completed
+                  schema:
+                      type: boolean
             responses:
                 200:
                     content:
                         application/json:
                             schema:
-                                format: date-time
-                                type: string
+                                $ref: "#/components/schemas/SLAResult"
                         application/xml:
                             schema:
-                                format: date-time
-                                type: string
+                                $ref: "#/components/schemas/SLAResult"
                     description:
                         ""
-            tags: ["Process"]
+            tags: ["SLAResult"]
     "/processes/{processId}/metrics":
         get:
             operationId: getProcessMetric

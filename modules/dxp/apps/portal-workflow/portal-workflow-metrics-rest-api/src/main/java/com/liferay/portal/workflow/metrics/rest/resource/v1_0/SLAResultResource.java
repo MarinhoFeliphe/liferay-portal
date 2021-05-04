@@ -17,7 +17,7 @@ package com.liferay.portal.workflow.metrics.rest.resource.v1_0;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLAResult;
 
 import java.util.Locale;
 
@@ -26,7 +26,6 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -41,30 +40,14 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @Generated("")
 @ProviderType
-public interface ProcessResource {
+public interface SLAResultResource {
 
 	public static Builder builder() {
 		return FactoryHolder.factory.create();
 	}
 
-	public Process postProcess(Process process) throws Exception;
-
-	public Response postProcessBatch(String callbackURL, Object object)
+	public SLAResult getProcessLastSLAResult(Long processId, Boolean completed)
 		throws Exception;
-
-	public void deleteProcess(Long processId) throws Exception;
-
-	public Response deleteProcessBatch(String callbackURL, Object object)
-		throws Exception;
-
-	public Process getProcess(Long processId) throws Exception;
-
-	public void putProcess(Long processId, Process process) throws Exception;
-
-	public Response putProcessBatch(String callbackURL, Object object)
-		throws Exception;
-
-	public String getProcessTitle(Long processId) throws Exception;
 
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
@@ -100,7 +83,7 @@ public interface ProcessResource {
 	@ProviderType
 	public interface Builder {
 
-		public ProcessResource build();
+		public SLAResultResource build();
 
 		public Builder checkPermissions(boolean checkPermissions);
 

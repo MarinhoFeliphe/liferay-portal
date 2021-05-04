@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.metrics.rest.internal.resource.v1_0;
 
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -34,8 +33,8 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
-import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
-import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLAResult;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResultResource;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -56,18 +55,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.validation.constraints.NotNull;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -76,228 +70,49 @@ import javax.ws.rs.core.UriInfo;
  */
 @Generated("")
 @Path("/v1.0")
-public abstract class BaseProcessResourceImpl
-	implements EntityModelResource, ProcessResource,
-			   VulcanBatchEngineTaskItemDelegate<Process> {
+public abstract class BaseSLAResultResourceImpl
+	implements EntityModelResource, SLAResultResource,
+			   VulcanBatchEngineTaskItemDelegate<SLAResult> {
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes' -d $'{"active": ___, "dateCreated": ___, "dateModified": ___, "description": ___, "id": ___, "name": ___, "title_i18n": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
-	 */
-	@Consumes({"application/json", "application/xml"})
-	@Override
-	@Path("/processes")
-	@POST
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "Process")})
-	public Process postProcess(Process process) throws Exception {
-		return new Process();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/batch'  -u 'test@liferay.com:test'
-	 */
-	@Consumes("application/json")
-	@Override
-	@Parameters(
-		value = {@Parameter(in = ParameterIn.QUERY, name = "callbackURL")}
-	)
-	@Path("/processes/batch")
-	@POST
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Process")})
-	public Response postProcessBatch(
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
-			Object object)
-		throws Exception {
-
-		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
-			contextAcceptLanguage);
-		vulcanBatchEngineImportTaskResource.setContextCompany(contextCompany);
-		vulcanBatchEngineImportTaskResource.setContextHttpServletRequest(
-			contextHttpServletRequest);
-		vulcanBatchEngineImportTaskResource.setContextUriInfo(contextUriInfo);
-		vulcanBatchEngineImportTaskResource.setContextUser(contextUser);
-
-		Response.ResponseBuilder responseBuilder = Response.accepted();
-
-		return responseBuilder.entity(
-			vulcanBatchEngineImportTaskResource.postImportTask(
-				Process.class.getName(), callbackURL, null, object)
-		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/{processId}'  -u 'test@liferay.com:test'
-	 */
-	@DELETE
-	@Override
-	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "processId")})
-	@Path("/processes/{processId}")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "Process")})
-	public void deleteProcess(
-			@NotNull @Parameter(hidden = true) @PathParam("processId") Long
-				processId)
-		throws Exception {
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/batch'  -u 'test@liferay.com:test'
-	 */
-	@Consumes("application/json")
-	@DELETE
-	@Override
-	@Parameters(
-		value = {@Parameter(in = ParameterIn.QUERY, name = "callbackURL")}
-	)
-	@Path("/processes/batch")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Process")})
-	public Response deleteProcessBatch(
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
-			Object object)
-		throws Exception {
-
-		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
-			contextAcceptLanguage);
-		vulcanBatchEngineImportTaskResource.setContextCompany(contextCompany);
-		vulcanBatchEngineImportTaskResource.setContextHttpServletRequest(
-			contextHttpServletRequest);
-		vulcanBatchEngineImportTaskResource.setContextUriInfo(contextUriInfo);
-		vulcanBatchEngineImportTaskResource.setContextUser(contextUser);
-
-		Response.ResponseBuilder responseBuilder = Response.accepted();
-
-		return responseBuilder.entity(
-			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Process.class.getName(), callbackURL, object)
-		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/{processId}'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/{processId}/last-sla-result'  -u 'test@liferay.com:test'
 	 */
 	@GET
 	@Override
-	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "processId")})
-	@Path("/processes/{processId}")
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.PATH, name = "processId"),
+			@Parameter(in = ParameterIn.QUERY, name = "completed")
+		}
+	)
+	@Path("/processes/{processId}/last-sla-result")
 	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "Process")})
-	public Process getProcess(
-			@NotNull @Parameter(hidden = true) @PathParam("processId") Long
-				processId)
-		throws Exception {
-
-		return new Process();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/{processId}' -d $'{"active": ___, "dateCreated": ___, "dateModified": ___, "description": ___, "id": ___, "name": ___, "title_i18n": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
-	 */
-	@Consumes({"application/json", "application/xml"})
-	@Override
-	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "processId")})
-	@Path("/processes/{processId}")
-	@Produces({"application/json", "application/xml"})
-	@PUT
-	@Tags(value = {@Tag(name = "Process")})
-	public void putProcess(
+	@Tags(value = {@Tag(name = "SLAResult")})
+	public SLAResult getProcessLastSLAResult(
 			@NotNull @Parameter(hidden = true) @PathParam("processId") Long
 				processId,
-			Process process)
-		throws Exception {
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/batch'  -u 'test@liferay.com:test'
-	 */
-	@Consumes("application/json")
-	@Override
-	@Parameters(
-		value = {@Parameter(in = ParameterIn.QUERY, name = "callbackURL")}
-	)
-	@Path("/processes/batch")
-	@Produces("application/json")
-	@PUT
-	@Tags(value = {@Tag(name = "Process")})
-	public Response putProcessBatch(
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
-			Object object)
+			@Parameter(hidden = true) @QueryParam("completed") Boolean
+				completed)
 		throws Exception {
 
-		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
-			contextAcceptLanguage);
-		vulcanBatchEngineImportTaskResource.setContextCompany(contextCompany);
-		vulcanBatchEngineImportTaskResource.setContextHttpServletRequest(
-			contextHttpServletRequest);
-		vulcanBatchEngineImportTaskResource.setContextUriInfo(contextUriInfo);
-		vulcanBatchEngineImportTaskResource.setContextUser(contextUser);
-
-		Response.ResponseBuilder responseBuilder = Response.accepted();
-
-		return responseBuilder.entity(
-			vulcanBatchEngineImportTaskResource.putImportTask(
-				Process.class.getName(), callbackURL, object)
-		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/{processId}/title'  -u 'test@liferay.com:test'
-	 */
-	@GET
-	@Override
-	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "processId")})
-	@Path("/processes/{processId}/title")
-	@Produces("text/plain")
-	@Tags(value = {@Tag(name = "Process")})
-	public String getProcessTitle(
-			@NotNull @Parameter(hidden = true) @PathParam("processId") Long
-				processId)
-		throws Exception {
-
-		return StringPool.BLANK;
+		return new SLAResult();
 	}
 
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			java.util.Collection<Process> processes,
+			java.util.Collection<SLAResult> slaResults,
 			Map<String, Serializable> parameters)
 		throws Exception {
-
-		for (Process process : processes) {
-			postProcess(process);
-		}
 	}
 
 	@Override
 	public void delete(
-			java.util.Collection<Process> processes,
+			java.util.Collection<SLAResult> slaResults,
 			Map<String, Serializable> parameters)
 		throws Exception {
-
-		for (Process process : processes) {
-			deleteProcess(process.getId());
-		}
 	}
 
 	@Override
@@ -316,7 +131,7 @@ public abstract class BaseProcessResourceImpl
 	}
 
 	@Override
-	public Page<Process> read(
+	public Page<SLAResult> read(
 			Filter filter, Pagination pagination, Sort[] sorts,
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
@@ -348,16 +163,9 @@ public abstract class BaseProcessResourceImpl
 
 	@Override
 	public void update(
-			java.util.Collection<Process> processes,
+			java.util.Collection<SLAResult> slaResults,
 			Map<String, Serializable> parameters)
 		throws Exception {
-
-		for (Process process : processes) {
-			putProcess(
-				process.getId() != null ? process.getId() :
-					(Long)parameters.get("processId"),
-				process);
-		}
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

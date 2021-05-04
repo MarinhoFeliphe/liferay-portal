@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -44,11 +43,11 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
+import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.SLAResult;
 import com.liferay.portal.workflow.metrics.rest.client.http.HttpInvoker;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
-import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.ProcessResource;
-import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.ProcessSerDes;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.SLAResultResource;
+import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.SLAResultSerDes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -84,7 +83,7 @@ import org.junit.Test;
  * @generated
  */
 @Generated("")
-public abstract class BaseProcessResourceTestCase {
+public abstract class BaseSLAResultResourceTestCase {
 
 	@ClassRule
 	@Rule
@@ -105,11 +104,11 @@ public abstract class BaseProcessResourceTestCase {
 		testCompany = CompanyLocalServiceUtil.getCompany(
 			testGroup.getCompanyId());
 
-		_processResource.setContextCompany(testCompany);
+		_slaResultResource.setContextCompany(testCompany);
 
-		ProcessResource.Builder builder = ProcessResource.builder();
+		SLAResultResource.Builder builder = SLAResultResource.builder();
 
-		processResource = builder.authentication(
+		slaResultResource = builder.authentication(
 			"test@liferay.com", "test"
 		).locale(
 			LocaleUtil.getDefault()
@@ -140,13 +139,13 @@ public abstract class BaseProcessResourceTestCase {
 			}
 		};
 
-		Process process1 = randomProcess();
+		SLAResult slaResult1 = randomSLAResult();
 
-		String json = objectMapper.writeValueAsString(process1);
+		String json = objectMapper.writeValueAsString(slaResult1);
 
-		Process process2 = ProcessSerDes.toDTO(json);
+		SLAResult slaResult2 = SLAResultSerDes.toDTO(json);
 
-		Assert.assertTrue(equals(process1, process2));
+		Assert.assertTrue(equals(slaResult1, slaResult2));
 	}
 
 	@Test
@@ -166,10 +165,10 @@ public abstract class BaseProcessResourceTestCase {
 			}
 		};
 
-		Process process = randomProcess();
+		SLAResult slaResult = randomSLAResult();
 
-		String json1 = objectMapper.writeValueAsString(process);
-		String json2 = ProcessSerDes.toJSON(process);
+		String json1 = objectMapper.writeValueAsString(slaResult);
+		String json2 = SLAResultSerDes.toJSON(slaResult);
 
 		Assert.assertEquals(
 			objectMapper.readTree(json1), objectMapper.readTree(json2));
@@ -179,36 +178,31 @@ public abstract class BaseProcessResourceTestCase {
 	public void testEscapeRegexInStringFields() throws Exception {
 		String regex = "^[0-9]+(\\.[0-9]{1,2})\"?";
 
-		Process process = randomProcess();
+		SLAResult slaResult = randomSLAResult();
 
-		process.setDescription(regex);
-		process.setName(regex);
-		process.setTitle(regex);
-		process.setVersion(regex);
+		slaResult.setName(regex);
 
-		String json = ProcessSerDes.toJSON(process);
+		String json = SLAResultSerDes.toJSON(slaResult);
 
 		Assert.assertFalse(json.contains(regex));
 
-		process = ProcessSerDes.toDTO(json);
+		slaResult = SLAResultSerDes.toDTO(json);
 
-		Assert.assertEquals(regex, process.getDescription());
-		Assert.assertEquals(regex, process.getName());
-		Assert.assertEquals(regex, process.getTitle());
-		Assert.assertEquals(regex, process.getVersion());
+		Assert.assertEquals(regex, slaResult.getName());
 	}
 
 	@Test
-	public void testPostProcess() throws Exception {
-		Process randomProcess = randomProcess();
+	public void testGetProcessLastSLAResult() throws Exception {
+		SLAResult postSLAResult = testGetProcessLastSLAResult_addSLAResult();
 
-		Process postProcess = testPostProcess_addProcess(randomProcess);
+		SLAResult getSLAResult = slaResultResource.getProcessLastSLAResult(
+			null, null);
 
-		assertEquals(randomProcess, postProcess);
-		assertValid(postProcess);
+		assertEquals(postSLAResult, getSLAResult);
+		assertValid(getSLAResult);
 	}
 
-	protected Process testPostProcess_addProcess(Process process)
+	protected SLAResult testGetProcessLastSLAResult_addSLAResult()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -216,94 +210,28 @@ public abstract class BaseProcessResourceTestCase {
 	}
 
 	@Test
-	public void testDeleteProcess() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Process process = testDeleteProcess_addProcess();
-
-		assertHttpResponseStatusCode(
-			204, processResource.deleteProcessHttpResponse(process.getId()));
-
-		assertHttpResponseStatusCode(
-			404, processResource.getProcessHttpResponse(process.getId()));
-
-		assertHttpResponseStatusCode(
-			404, processResource.getProcessHttpResponse(0L));
-	}
-
-	protected Process testDeleteProcess_addProcess() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLDeleteProcess() throws Exception {
-		Process process = testGraphQLProcess_addProcess();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteProcess",
-						new HashMap<String, Object>() {
-							{
-								put("processId", process.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteProcess"));
-
-		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"process",
-					new HashMap<String, Object>() {
-						{
-							put("processId", process.getId());
-						}
-					},
-					new GraphQLField("id"))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	@Test
-	public void testGetProcess() throws Exception {
-		Process postProcess = testGetProcess_addProcess();
-
-		Process getProcess = processResource.getProcess(postProcess.getId());
-
-		assertEquals(postProcess, getProcess);
-		assertValid(getProcess);
-	}
-
-	protected Process testGetProcess_addProcess() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetProcess() throws Exception {
-		Process process = testGraphQLProcess_addProcess();
+	public void testGraphQLGetProcessLastSLAResult() throws Exception {
+		SLAResult slaResult = testGraphQLSLAResult_addSLAResult();
 
 		Assert.assertTrue(
 			equals(
-				process,
-				ProcessSerDes.toDTO(
+				slaResult,
+				SLAResultSerDes.toDTO(
 					JSONUtil.getValueAsString(
 						invokeGraphQLQuery(
 							new GraphQLField(
-								"process",
+								"processLastSLAResult",
 								new HashMap<String, Object>() {
 									{
-										put("processId", process.getId());
+										put("processId", null);
 									}
 								},
 								getGraphQLFields())),
-						"JSONObject/data", "Object/process"))));
+						"JSONObject/data", "Object/processLastSLAResult"))));
 	}
 
 	@Test
-	public void testGraphQLGetProcessNotFound() throws Exception {
+	public void testGraphQLGetProcessLastSLAResultNotFound() throws Exception {
 		Long irrelevantProcessId = RandomTestUtil.randomLong();
 
 		Assert.assertEquals(
@@ -311,7 +239,7 @@ public abstract class BaseProcessResourceTestCase {
 			JSONUtil.getValueAsString(
 				invokeGraphQLQuery(
 					new GraphQLField(
-						"process",
+						"processLastSLAResult",
 						new HashMap<String, Object>() {
 							{
 								put("processId", irrelevantProcessId);
@@ -322,30 +250,7 @@ public abstract class BaseProcessResourceTestCase {
 				"Object/code"));
 	}
 
-	@Test
-	public void testPutProcess() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Process process = testPutProcess_addProcess();
-
-		assertHttpResponseStatusCode(
-			204,
-			processResource.putProcessHttpResponse(process.getId(), process));
-
-		assertHttpResponseStatusCode(
-			404, processResource.putProcessHttpResponse(0L, process));
-	}
-
-	protected Process testPutProcess_addProcess() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetProcessTitle() throws Exception {
-		Assert.assertTrue(false);
-	}
-
-	protected Process testGraphQLProcess_addProcess() throws Exception {
+	protected SLAResult testGraphQLSLAResult_addSLAResult() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
@@ -358,35 +263,35 @@ public abstract class BaseProcessResourceTestCase {
 			expectedHttpResponseStatusCode, actualHttpResponse.getStatusCode());
 	}
 
-	protected void assertEquals(Process process1, Process process2) {
+	protected void assertEquals(SLAResult slaResult1, SLAResult slaResult2) {
 		Assert.assertTrue(
-			process1 + " does not equal " + process2,
-			equals(process1, process2));
+			slaResult1 + " does not equal " + slaResult2,
+			equals(slaResult1, slaResult2));
 	}
 
 	protected void assertEquals(
-		List<Process> processes1, List<Process> processes2) {
+		List<SLAResult> slaResults1, List<SLAResult> slaResults2) {
 
-		Assert.assertEquals(processes1.size(), processes2.size());
+		Assert.assertEquals(slaResults1.size(), slaResults2.size());
 
-		for (int i = 0; i < processes1.size(); i++) {
-			Process process1 = processes1.get(i);
-			Process process2 = processes2.get(i);
+		for (int i = 0; i < slaResults1.size(); i++) {
+			SLAResult slaResult1 = slaResults1.get(i);
+			SLAResult slaResult2 = slaResults2.get(i);
 
-			assertEquals(process1, process2);
+			assertEquals(slaResult1, slaResult2);
 		}
 	}
 
 	protected void assertEqualsIgnoringOrder(
-		List<Process> processes1, List<Process> processes2) {
+		List<SLAResult> slaResults1, List<SLAResult> slaResults2) {
 
-		Assert.assertEquals(processes1.size(), processes2.size());
+		Assert.assertEquals(slaResults1.size(), slaResults2.size());
 
-		for (Process process1 : processes1) {
+		for (SLAResult slaResult1 : slaResults1) {
 			boolean contains = false;
 
-			for (Process process2 : processes2) {
-				if (equals(process1, process2)) {
+			for (SLAResult slaResult2 : slaResults2) {
+				if (equals(slaResult1, slaResult2)) {
 					contains = true;
 
 					break;
@@ -394,38 +299,30 @@ public abstract class BaseProcessResourceTestCase {
 			}
 
 			Assert.assertTrue(
-				processes2 + " does not contain " + process1, contains);
+				slaResults2 + " does not contain " + slaResult1, contains);
 		}
 	}
 
-	protected void assertValid(Process process) throws Exception {
+	protected void assertValid(SLAResult slaResult) throws Exception {
 		boolean valid = true;
 
-		if (process.getDateCreated() == null) {
-			valid = false;
-		}
-
-		if (process.getDateModified() == null) {
-			valid = false;
-		}
-
-		if (process.getId() == null) {
+		if (slaResult.getId() == null) {
 			valid = false;
 		}
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("active", additionalAssertFieldName)) {
-				if (process.getActive() == null) {
+			if (Objects.equals("dateOverdue", additionalAssertFieldName)) {
+				if (slaResult.getDateOverdue() == null) {
 					valid = false;
 				}
 
 				continue;
 			}
 
-			if (Objects.equals("description", additionalAssertFieldName)) {
-				if (process.getDescription() == null) {
+			if (Objects.equals("lastCheckDate", additionalAssertFieldName)) {
+				if (slaResult.getLastCheckDate() == null) {
 					valid = false;
 				}
 
@@ -433,31 +330,31 @@ public abstract class BaseProcessResourceTestCase {
 			}
 
 			if (Objects.equals("name", additionalAssertFieldName)) {
-				if (process.getName() == null) {
+				if (slaResult.getName() == null) {
 					valid = false;
 				}
 
 				continue;
 			}
 
-			if (Objects.equals("title", additionalAssertFieldName)) {
-				if (process.getTitle() == null) {
+			if (Objects.equals("onTime", additionalAssertFieldName)) {
+				if (slaResult.getOnTime() == null) {
 					valid = false;
 				}
 
 				continue;
 			}
 
-			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
-				if (process.getTitle_i18n() == null) {
+			if (Objects.equals("remainingTime", additionalAssertFieldName)) {
+				if (slaResult.getRemainingTime() == null) {
 					valid = false;
 				}
 
 				continue;
 			}
 
-			if (Objects.equals("version", additionalAssertFieldName)) {
-				if (process.getVersion() == null) {
+			if (Objects.equals("status", additionalAssertFieldName)) {
+				if (slaResult.getStatus() == null) {
 					valid = false;
 				}
 
@@ -472,12 +369,12 @@ public abstract class BaseProcessResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<Process> page) {
+	protected void assertValid(Page<SLAResult> page) {
 		boolean valid = false;
 
-		java.util.Collection<Process> processes = page.getItems();
+		java.util.Collection<SLAResult> slaResults = page.getItems();
 
-		int size = processes.size();
+		int size = slaResults.size();
 
 		if ((page.getLastPage() > 0) && (page.getPage() > 0) &&
 			(page.getPageSize() > 0) && (page.getTotalCount() > 0) &&
@@ -498,7 +395,7 @@ public abstract class BaseProcessResourceTestCase {
 
 		for (Field field :
 				ReflectionUtil.getDeclaredFields(
-					com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process.
+					com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLAResult.
 						class)) {
 
 			if (!ArrayUtil.contains(
@@ -546,48 +443,18 @@ public abstract class BaseProcessResourceTestCase {
 		return new String[0];
 	}
 
-	protected boolean equals(Process process1, Process process2) {
-		if (process1 == process2) {
+	protected boolean equals(SLAResult slaResult1, SLAResult slaResult2) {
+		if (slaResult1 == slaResult2) {
 			return true;
 		}
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("active", additionalAssertFieldName)) {
+			if (Objects.equals("dateOverdue", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
-						process1.getActive(), process2.getActive())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						process1.getDateCreated(), process2.getDateCreated())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("dateModified", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						process1.getDateModified(),
-						process2.getDateModified())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("description", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						process1.getDescription(), process2.getDescription())) {
+						slaResult1.getDateOverdue(),
+						slaResult2.getDateOverdue())) {
 
 					return false;
 				}
@@ -596,7 +463,20 @@ public abstract class BaseProcessResourceTestCase {
 			}
 
 			if (Objects.equals("id", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(process1.getId(), process2.getId())) {
+				if (!Objects.deepEquals(
+						slaResult1.getId(), slaResult2.getId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("lastCheckDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						slaResult1.getLastCheckDate(),
+						slaResult2.getLastCheckDate())) {
+
 					return false;
 				}
 
@@ -605,7 +485,7 @@ public abstract class BaseProcessResourceTestCase {
 
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
-						process1.getName(), process2.getName())) {
+						slaResult1.getName(), slaResult2.getName())) {
 
 					return false;
 				}
@@ -613,9 +493,9 @@ public abstract class BaseProcessResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("title", additionalAssertFieldName)) {
+			if (Objects.equals("onTime", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
-						process1.getTitle(), process2.getTitle())) {
+						slaResult1.getOnTime(), slaResult2.getOnTime())) {
 
 					return false;
 				}
@@ -623,20 +503,20 @@ public abstract class BaseProcessResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
-				if (!equals(
-						(Map)process1.getTitle_i18n(),
-						(Map)process2.getTitle_i18n())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("version", additionalAssertFieldName)) {
+			if (Objects.equals("remainingTime", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
-						process1.getVersion(), process2.getVersion())) {
+						slaResult1.getRemainingTime(),
+						slaResult2.getRemainingTime())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("status", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						slaResult1.getStatus(), slaResult2.getStatus())) {
 
 					return false;
 				}
@@ -681,13 +561,13 @@ public abstract class BaseProcessResourceTestCase {
 	protected java.util.Collection<EntityField> getEntityFields()
 		throws Exception {
 
-		if (!(_processResource instanceof EntityModelResource)) {
+		if (!(_slaResultResource instanceof EntityModelResource)) {
 			throw new UnsupportedOperationException(
 				"Resource is not an instance of EntityModelResource");
 		}
 
 		EntityModelResource entityModelResource =
-			(EntityModelResource)_processResource;
+			(EntityModelResource)_slaResultResource;
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
@@ -716,7 +596,7 @@ public abstract class BaseProcessResourceTestCase {
 	}
 
 	protected String getFilterString(
-		EntityField entityField, String operator, Process process) {
+		EntityField entityField, String operator, SLAResult slaResult) {
 
 		StringBundler sb = new StringBundler();
 
@@ -728,12 +608,7 @@ public abstract class BaseProcessResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
-		if (entityFieldName.equals("active")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("dateCreated")) {
+		if (entityFieldName.equals("dateOverdue")) {
 			if (operator.equals("between")) {
 				sb = new StringBundler();
 
@@ -742,13 +617,13 @@ public abstract class BaseProcessResourceTestCase {
 				sb.append(" gt ");
 				sb.append(
 					_dateFormat.format(
-						DateUtils.addSeconds(process.getDateCreated(), -2)));
+						DateUtils.addSeconds(slaResult.getDateOverdue(), -2)));
 				sb.append(" and ");
 				sb.append(entityFieldName);
 				sb.append(" lt ");
 				sb.append(
 					_dateFormat.format(
-						DateUtils.addSeconds(process.getDateCreated(), 2)));
+						DateUtils.addSeconds(slaResult.getDateOverdue(), 2)));
 				sb.append(")");
 			}
 			else {
@@ -758,47 +633,8 @@ public abstract class BaseProcessResourceTestCase {
 				sb.append(operator);
 				sb.append(" ");
 
-				sb.append(_dateFormat.format(process.getDateCreated()));
+				sb.append(_dateFormat.format(slaResult.getDateOverdue()));
 			}
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("dateModified")) {
-			if (operator.equals("between")) {
-				sb = new StringBundler();
-
-				sb.append("(");
-				sb.append(entityFieldName);
-				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(process.getDateModified(), -2)));
-				sb.append(" and ");
-				sb.append(entityFieldName);
-				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(process.getDateModified(), 2)));
-				sb.append(")");
-			}
-			else {
-				sb.append(entityFieldName);
-
-				sb.append(" ");
-				sb.append(operator);
-				sb.append(" ");
-
-				sb.append(_dateFormat.format(process.getDateModified()));
-			}
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("description")) {
-			sb.append("'");
-			sb.append(String.valueOf(process.getDescription()));
-			sb.append("'");
 
 			return sb.toString();
 		}
@@ -808,33 +644,59 @@ public abstract class BaseProcessResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("lastCheckDate")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							slaResult.getLastCheckDate(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(slaResult.getLastCheckDate(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(slaResult.getLastCheckDate()));
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("name")) {
 			sb.append("'");
-			sb.append(String.valueOf(process.getName()));
+			sb.append(String.valueOf(slaResult.getName()));
 			sb.append("'");
 
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("title")) {
-			sb.append("'");
-			sb.append(String.valueOf(process.getTitle()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("title_i18n")) {
+		if (entityFieldName.equals("onTime")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("version")) {
-			sb.append("'");
-			sb.append(String.valueOf(process.getVersion()));
-			sb.append("'");
+		if (entityFieldName.equals("remainingTime")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
-			return sb.toString();
+		if (entityFieldName.equals("status")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		throw new IllegalArgumentException(
@@ -878,33 +740,30 @@ public abstract class BaseProcessResourceTestCase {
 			invoke(queryGraphQLField.toString()));
 	}
 
-	protected Process randomProcess() throws Exception {
-		return new Process() {
+	protected SLAResult randomSLAResult() throws Exception {
+		return new SLAResult() {
 			{
-				active = RandomTestUtil.randomBoolean();
-				dateCreated = RandomTestUtil.nextDate();
-				dateModified = RandomTestUtil.nextDate();
-				description = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
+				dateOverdue = RandomTestUtil.nextDate();
 				id = RandomTestUtil.randomLong();
+				lastCheckDate = RandomTestUtil.nextDate();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				title = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				version = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				onTime = RandomTestUtil.randomBoolean();
+				remainingTime = RandomTestUtil.randomLong();
 			}
 		};
 	}
 
-	protected Process randomIrrelevantProcess() throws Exception {
-		Process randomIrrelevantProcess = randomProcess();
+	protected SLAResult randomIrrelevantSLAResult() throws Exception {
+		SLAResult randomIrrelevantSLAResult = randomSLAResult();
 
-		return randomIrrelevantProcess;
+		return randomIrrelevantSLAResult;
 	}
 
-	protected Process randomPatchProcess() throws Exception {
-		return randomProcess();
+	protected SLAResult randomPatchSLAResult() throws Exception {
+		return randomSLAResult();
 	}
 
-	protected ProcessResource processResource;
+	protected SLAResultResource slaResultResource;
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
@@ -981,7 +840,7 @@ public abstract class BaseProcessResourceTestCase {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		BaseProcessResourceTestCase.class);
+		BaseSLAResultResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 
@@ -999,7 +858,7 @@ public abstract class BaseProcessResourceTestCase {
 
 	@Inject
 	private
-		com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource
-			_processResource;
+		com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResultResource
+			_slaResultResource;
 
 }
