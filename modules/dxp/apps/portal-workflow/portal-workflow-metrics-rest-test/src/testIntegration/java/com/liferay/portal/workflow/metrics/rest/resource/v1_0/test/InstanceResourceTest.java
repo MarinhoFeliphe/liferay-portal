@@ -278,7 +278,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		Page<Instance> page = instanceResource.getProcessInstancesPage(
 			_process.getId(), assigneeIds, classPKs, completed, null, null,
-			null, null, Pagination.of(1, 2));
+			null, null, Pagination.of(1, 2), null);
 
 		unsafeTriConsumer.accept(instance1, instance2, page);
 	}
