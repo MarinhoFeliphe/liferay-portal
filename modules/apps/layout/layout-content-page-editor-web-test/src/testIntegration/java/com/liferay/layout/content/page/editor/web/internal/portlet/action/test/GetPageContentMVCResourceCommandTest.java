@@ -142,11 +142,10 @@ public class GetPageContentMVCResourceCommandTest {
 		JSONObject jsonObject = jsonArray.getJSONObject(0);
 
 		Assert.assertEquals(
-			assetListEntry.getTitle(), jsonObject.getString("title"));
-
-		Assert.assertEquals(
 			assetListEntry.getAssetListEntryId(),
 			jsonObject.getLong("classPK"));
+		Assert.assertEquals(
+			assetListEntry.getTitle(), jsonObject.getString("title"));
 	}
 
 	@Test
@@ -196,10 +195,9 @@ public class GetPageContentMVCResourceCommandTest {
 		JSONObject jsonObject = jsonArray.getJSONObject(0);
 
 		Assert.assertEquals(
-			fileEntry.getTitle(), jsonObject.getString("title"));
-
-		Assert.assertEquals(
 			fileEntry.getFileEntryId(), jsonObject.getLong("classPK"));
+		Assert.assertEquals(
+			fileEntry.getTitle(), jsonObject.getString("title"));
 	}
 
 	@Test
@@ -242,11 +240,10 @@ public class GetPageContentMVCResourceCommandTest {
 		JSONObject jsonObject = jsonArray.getJSONObject(0);
 
 		Assert.assertEquals(
+			journalArticle.getResourcePrimKey(), jsonObject.getLong("classPK"));
+		Assert.assertEquals(
 			journalArticle.getTitle(LocaleUtil.US),
 			jsonObject.getString("title"));
-
-		Assert.assertEquals(
-			journalArticle.getResourcePrimKey(), jsonObject.getLong("classPK"));
 	}
 
 	@Test
@@ -293,11 +290,10 @@ public class GetPageContentMVCResourceCommandTest {
 		JSONObject jsonObject = jsonArray.getJSONObject(0);
 
 		Assert.assertEquals(
+			journalArticle.getResourcePrimKey(), jsonObject.getLong("classPK"));
+		Assert.assertEquals(
 			journalArticle.getTitle(LocaleUtil.US),
 			jsonObject.getString("title"));
-
-		Assert.assertEquals(
-			journalArticle.getResourcePrimKey(), jsonObject.getLong("classPK"));
 	}
 
 	@Test
