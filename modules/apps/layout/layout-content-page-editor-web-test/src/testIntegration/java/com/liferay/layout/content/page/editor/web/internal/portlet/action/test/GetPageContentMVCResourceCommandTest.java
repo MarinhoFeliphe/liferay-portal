@@ -395,6 +395,9 @@ public class GetPageContentMVCResourceCommandTest {
 		MockLiferayResourceRequest mockLiferayResourceRequest =
 			new MockLiferayResourceRequest();
 
+		mockLiferayResourceRequest.setAttribute(
+			JavaConstants.JAVAX_PORTLET_CONFIG, null);
+
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setCompany(_company);
@@ -409,9 +412,6 @@ public class GetPageContentMVCResourceCommandTest {
 
 		mockLiferayResourceRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, themeDisplay);
-
-		mockLiferayResourceRequest.setAttribute(
-			JavaConstants.JAVAX_PORTLET_CONFIG, null);
 
 		return mockLiferayResourceRequest;
 	}
