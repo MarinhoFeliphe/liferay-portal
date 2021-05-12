@@ -17,7 +17,7 @@ package com.liferay.poshi.runner.util;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,8 +92,8 @@ public class JSONUtil {
 				"Invalid JSON path " + jsonPath + " in " + jsonString);
 		}
 
-		if (object instanceof ArrayList) {
-			ArrayList<Object> list = (ArrayList)object;
+		if (object instanceof List) {
+			List<Object> list = (List)object;
 
 			if (list.size() == 1) {
 				object = list.get(0);
