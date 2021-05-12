@@ -64,7 +64,7 @@ public class DSEnvelopeManagerTest {
 		documentsList.add(
 			new DSDocument() {
 				{
-					documentBase64 = encode;
+					data = encode;
 					dsDocumentId = "1";
 					name = "Document 1";
 				}
@@ -76,7 +76,7 @@ public class DSEnvelopeManagerTest {
 			new DSRecipient() {
 				{
 					dsRecipientId = "1";
-					email = "joseabelenda@gmail.com";
+					emailAddress = "joseabelenda@gmail.com";
 					name = "José Abelenda";
 				}
 			});
@@ -85,10 +85,10 @@ public class DSEnvelopeManagerTest {
 			TestPropsValues.getGroupId(),
 			new DSEnvelope() {
 				{
-					documents = documentsList;
+					dsDocuments = documentsList;
+					dsRecipients = recipientsList;
 					emailBlurb = "Please, sign the documents";
 					emailSubject = "New " + System.currentTimeMillis();
-					recipients = recipientsList;
 					status = "sent";
 				}
 			});
