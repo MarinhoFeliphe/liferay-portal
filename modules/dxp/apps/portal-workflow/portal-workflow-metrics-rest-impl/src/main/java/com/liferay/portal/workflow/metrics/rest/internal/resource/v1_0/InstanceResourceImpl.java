@@ -892,62 +892,46 @@ public class InstanceResourceImpl
 					task.get("assigneeType"), User.class.getName())) {
 
 				for (Object assigneeId : (List<?>)task.get("assigneeIds")) {
-					Assignee assignee = AssigneeUtil.toAssignee(
-						_language, _portal,
-						ResourceBundleUtil.getModuleAndPortalResourceBundle(
-							contextAcceptLanguage.getPreferredLocale(),
-							InstanceResourceImpl.class),
-						GetterUtil.getLong(assigneeId),
-						_userLocalService::fetchUser);
-
-					if (assignee != null) {
-						assignees.add(assignee);
-					}
+					assignees.add(
+						AssigneeUtil.toAssignee(
+							_language, _portal,
+							ResourceBundleUtil.getModuleAndPortalResourceBundle(
+								contextAcceptLanguage.getPreferredLocale(),
+								InstanceResourceImpl.class),
+							GetterUtil.getLong(assigneeId),
+							_userLocalService::fetchUser));
 				}
 			}
 			else if (Objects.equals(
 						task.get("assigneeType"), Role.class.getName())) {
 
-				long[] groupIds = contextUser.getGroupIds();
-				boolean reviewer = false;
-				List<Role> roles = new ArrayList<>();
+				List<Long> userRoleIds = ListUtil.concat(
+					Stream.of(
+						ListUtil.fromArray(contextUser.getGroupIds())
+					).flatMap(
+						List::stream
+					).map(
+						groupId -> ListUtil.concat(
+							roleLocalService.getUserGroupRoles(
+								contextUser.getUserId(), groupId),
+							roleLocalService.getUserGroupGroupRoles(
+								contextUser.getUserId(), groupId))
+					).flatMap(
+						List::stream
+					).map(
+						Role::getRoleId
+					).collect(
+						Collectors.toList()
+					),
+					ListUtil.fromArray(contextUser.getRoleIds()));
 
-				for (long groupId : groupIds) {
-					roles.addAll(
-						roleLocalService.getUserGroupRoles(
-							contextUser.getUserId(), groupId));
-
-					roles.addAll(
-						roleLocalService.getUserGroupGroupRoles(
-							contextUser.getUserId(), groupId));
-				}
-
-				for (Object assigneeId : (List<?>)task.get("assigneeIds")) {
-					if (ArrayUtil.contains(
-							contextUser.getRoleIds(),
-							GetterUtil.getLong(assigneeId))) {
-
-						reviewer = true;
-
-						break;
-					}
-
-					for (Role role : roles) {
-						if (role.getRoleId() == GetterUtil.getLong(
-								assigneeId)) {
-
-							reviewer = true;
-
-							break;
-						}
-					}
-
-					if (reviewer) {
-						break;
-					}
-				}
-
-				assignees.add(_createAssignee(reviewer));
+				assignees.add(
+					_createAssignee(
+						!Collections.disjoint(
+							userRoleIds,
+							ListUtil.toList(
+								(List<?>)task.get("assigneeIds"),
+								GetterUtil::getLong))));
 			}
 
 			taskNames.add(
