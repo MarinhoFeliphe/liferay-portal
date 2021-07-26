@@ -31,6 +31,7 @@ import com.liferay.portal.workflow.metrics.search.index.TaskWorkflowMetricsIndex
 
 import java.time.Duration;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -49,8 +50,10 @@ public class TaskWorkflowMetricsIndexerImpl
 	extends BaseWorkflowMetricsIndexer implements TaskWorkflowMetricsIndexer {
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 *    #addTask(Map, Map, Map, String, String, long, long, boolean, Date, Long, Date, boolean, Date, long, Date, String, long, long, String, long, long)}}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addTask(Map,
+	 *             Map, Map, String, String, long, long, boolean, Date, Long,
+	 *             Date, boolean, Date, long, Date, String, long, long, String,
+	 *             long, long)}}
 	 */
 	@Deprecated
 	@Override
@@ -196,28 +199,37 @@ public class TaskWorkflowMetricsIndexerImpl
 	@Override
 	public Document addTask(
 		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
-		Map<Long, Long> assigneeGroupIds, String assigneeType, String className,
-		long classPK, long companyId, boolean completed, Date completionDate,
-		Long completionUserId, Date createDate, boolean instanceCompleted,
-		Date instanceCompletionDate, long instanceId, Date modifiedDate,
-		String name, long nodeId, long processId, String processVersion,
-		long taskId, long userId) {
+		Map<Long, List<Long>> assigneeGroupIds, String assigneeType,
+		String className, long classPK, long companyId, boolean completed,
+		Date completionDate, Long completionUserId, Date createDate,
+		boolean instanceCompleted, Date instanceCompletionDate, long instanceId,
+		Date modifiedDate, String name, long nodeId, long processId,
+		String processVersion, long taskId, long userId) {
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
-		List<Long> assigneeGroupValues = ListUtil.fromCollection(
-			assigneeGroupIds.values());
+		List<Long> assigneeIds = new ArrayList<>();
+		List<Long> groupIds = new ArrayList<>();
 
-		Long[] groupIds = assigneeGroupValues.toArray(new Long[0]);
+		for (Map.Entry<Long, List<Long>> assigneeId :
+				assigneeGroupIds.entrySet()) {
 
-		List<Long> assigneeGroupKeys = ListUtil.fromCollection(
-			assigneeGroupIds.keySet());
+			if (assigneeId.getValue() != null) {
+				for (Long groupId : assigneeId.getValue()) {
+					assigneeIds.add(assigneeId.getKey());
+					groupIds.add(groupId);
+				}
+			}
+			else {
+				assigneeIds.add(assigneeId.getKey());
+			}
+		}
 
-		Long[] assigneeIds = assigneeGroupKeys.toArray(new Long[0]);
-
-		documentBuilder.setLongs("assigneeIds", assigneeIds);
-
-		documentBuilder.setString("assigneeType", assigneeType);
+		if (!assigneeIds.isEmpty()) {
+			documentBuilder.setLongs(
+				"assigneeIds", assigneeIds.toArray(new Long[0]));
+			documentBuilder.setString("assigneeType", assigneeType);
+		}
 
 		documentBuilder.setString(
 			"className", className
@@ -314,13 +326,14 @@ public class TaskWorkflowMetricsIndexerImpl
 								() -> {
 									if (!Objects.equals(
 											assigneeType,
-											User.class.getName())) {
+											User.class.getName()) ||
+										assigneeIds.isEmpty()) {
 
 										return null;
 									}
 
 									User user = _userLocalService.fetchUser(
-										assigneeIds[0]);
+										assigneeIds.get(0));
 
 									return user.getFullName();
 								}

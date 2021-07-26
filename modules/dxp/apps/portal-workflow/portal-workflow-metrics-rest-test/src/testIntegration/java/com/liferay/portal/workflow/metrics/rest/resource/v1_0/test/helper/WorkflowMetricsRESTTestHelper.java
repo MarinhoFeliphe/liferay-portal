@@ -276,10 +276,16 @@ public class WorkflowMetricsRESTTestHelper {
 				overdueInstanceCount--;
 			}
 
+			Map<Long, List<Long>> assigneeGroupIds = new HashMap<>();
+
+			for (long roleId : user.getRoleIds()) {
+				assigneeGroupIds.put(roleId, null);
+			}
+
 			addTask(
-				assignee, companyId, nodeMetric.getDurationAvg(), instance,
-				node.getName(), node.getId(), processId, version,
-				user.getRoleIds(), taskId);
+				assignee, assigneeGroupIds, companyId,
+				nodeMetric.getDurationAvg(), instance, node.getName(),
+				node.getId(), processId, version, taskId);
 
 			if (instance.getCompleted()) {
 				completeInstance(companyId, instance);
@@ -482,8 +488,8 @@ public class WorkflowMetricsRESTTestHelper {
 
 		Map<Long, List<Long>> assigneeGroupIds = new HashMap<>();
 
-		for (long role : user.getRoleIds()) {
-			assigneeGroupIds.put(role, null);
+		for (long roleId : user.getRoleIds()) {
+			assigneeGroupIds.put(roleId, null);
 		}
 
 		return addTask(
@@ -543,9 +549,7 @@ public class WorkflowMetricsRESTTestHelper {
 			assigneeType = User.class.getName();
 		}
 		else {
-			Long[] assigneeIds = ArrayUtil.toArray(user.getRoleIds());
-
-			for (Long assigneeId : assigneeIds) {
+			for (Long assigneeId : user.getRoleIds()) {
 				assigneeGroupIds.put(assigneeId, null);
 			}
 		}
@@ -631,7 +635,6 @@ public class WorkflowMetricsRESTTestHelper {
 		if ((assignee != null) && (assignee.getId() != null) &&
 			(assignee.getId() != -1L)) {
 
-			assigneeIds = new Long[] {assignee.getId()};
 			assigneeType = User.class.getName();
 			newAssigneeGroupIds.put(assignee.getId(), null);
 		}
@@ -675,19 +678,20 @@ public class WorkflowMetricsRESTTestHelper {
 			List<Long> assigneeIds = ListUtil.fromCollection(
 				newAssigneeGroupIds.keySet());
 
-			if (!assigneeIds.isEmpty()) {
-				_taskWorkflowMetricsIndexer.updateTask(
-					_createLocalizationMap(task.getAssetTitle()),
-					_createLocalizationMap(task.getAssetType()),
-					newAssigneeGroupIds, assigneeType, companyId, new Date(),
-					task.getId(), 0);
+			_taskWorkflowMetricsIndexer.updateTask(
+				_createLocalizationMap(task.getAssetTitle()),
+				_createLocalizationMap(task.getAssetType()),
+				newAssigneeGroupIds, assigneeType, companyId, new Date(),
+				task.getId(), 0);
 
-		_assertCount(
-			_taskWorkflowMetricsIndexNameBuilder.getIndexName(companyId),
-			"assigneeIds", assigneeIds[0], "assigneeType", assigneeType,
-			"companyId", companyId, "deleted", false, "instanceId",
-			instance.getId(), "processId", task.getProcessId(), "nodeId",
-			task.getNodeId(), "name", task.getName(), "taskId", task.getId());
+			_assertCount(
+				_taskWorkflowMetricsIndexNameBuilder.getIndexName(companyId),
+				"assigneeIds", assigneeIds.get(0), "assigneeType", assigneeType,
+				"companyId", companyId, "deleted", false, "instanceId",
+				instance.getId(), "processId", task.getProcessId(), "nodeId",
+				task.getNodeId(), "name", task.getName(), "taskId",
+				task.getId());
+		}
 
 		if (task.getCompleted()) {
 			_taskWorkflowMetricsIndexer.completeTask(
