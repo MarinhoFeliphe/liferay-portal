@@ -26,6 +26,13 @@ import java.util.Map;
  */
 public interface TaskWorkflowMetricsIndexer {
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addTask(Map,
+	 *             Map, Map, String, String, long, long, boolean, Date, Long,
+	 *             Date, boolean, Date, long, Date, String, long, long, String,
+	 *             long, long)}}
+	 */
+	@Deprecated
 	public Document addTask(
 		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
 		Long[] assigneeIds, String assigneeType, String className, long classPK,
@@ -50,9 +57,19 @@ public interface TaskWorkflowMetricsIndexer {
 
 	public void deleteTask(long companyId, long taskId);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #updateTask(Map,
+	 *             Map, Map, String, long, Date, long, long)}}
+	 */
+	@Deprecated
 	public Document updateTask(
 		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
 		Long[] assigneeIds, String assigneeType, long companyId,
 		Date modifiedDate, long taskId, long userId);
+
+	public Document updateTask(
+		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
+		Map<Long, List<Long>> assigneeGroupIds, String assigneeType,
+		long companyId, Date modifiedDate, long taskId, long userId);
 
 }
