@@ -677,9 +677,27 @@ public class WorkflowMetricsRESTTestHelper {
 				return null;
 			});
 
+		assigneeGroupIds = new HashMap<>();
+
+		if (groupIds != null) {
+			for (int count = 0; count < assigneeIds.length; count++) {
+				if (count < groupIds.length) {
+					assigneeGroupIds.put(assigneeIds[count], groupIds[count]);
+				}
+				else {
+					assigneeGroupIds.put(assigneeIds[count], null);
+				}
+			}
+		}
+		else {
+			for (Long assigneeId : assigneeIds) {
+				assigneeGroupIds.put(assigneeId, null);
+			}
+		}
+
 		_taskWorkflowMetricsIndexer.updateTask(
 			_createLocalizationMap(task.getAssetTitle()),
-			_createLocalizationMap(task.getAssetType()), assigneeIds,
+			_createLocalizationMap(task.getAssetType()), assigneeGroupIds,
 			assigneeType, companyId, new Date(), task.getId(), 0);
 
 		_assertCount(
