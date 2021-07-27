@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
@@ -626,7 +627,6 @@ public class WorkflowMetricsRESTTestHelper {
 			Instance instance, Task task)
 		throws Exception {
 
-		Long[] assigneeIds = ArrayUtil.toArray(roleIds);
 		String assigneeType = Role.class.getName();
 		Map<Long, List<Long>> newAssigneeGroupIds = new HashMap<>();
 

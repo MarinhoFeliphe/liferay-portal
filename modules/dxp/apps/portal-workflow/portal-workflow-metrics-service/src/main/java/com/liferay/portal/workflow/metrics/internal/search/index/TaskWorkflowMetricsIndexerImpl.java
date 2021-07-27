@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -441,8 +440,8 @@ public class TaskWorkflowMetricsIndexerImpl
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 *    #updateTask(Map, Map, Map, String, long, Date, long, long)}}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #updateTask(Map,
+	 *             Map, Map, String, long, Date, long, long)}}
 	 */
 	@Deprecated
 	@Override
@@ -546,24 +545,33 @@ public class TaskWorkflowMetricsIndexerImpl
 	@Override
 	public Document updateTask(
 		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
-		Map<Long, Long> assigneeGroupIds, String assigneeType, long companyId,
-		Date modifiedDate, long taskId, long userId) {
+		Map<Long, List<Long>> assigneeGroupIds, String assigneeType,
+		long companyId, Date modifiedDate, long taskId, long userId) {
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
-		List<Long> assigneeGroupValues = ListUtil.fromCollection(
-			assigneeGroupIds.values());
+		List<Long> assigneeIds = new ArrayList<>();
+		List<Long> groupIds = new ArrayList<>();
 
-		Long[] groupIds = assigneeGroupValues.toArray(new Long[0]);
+		for (Map.Entry<Long, List<Long>> assigneeId :
+				assigneeGroupIds.entrySet()) {
 
-		List<Long> assigneeGroupKeys = ListUtil.fromCollection(
-			assigneeGroupIds.keySet());
+			if (assigneeId.getValue() != null) {
+				for (Long groupId : assigneeId.getValue()) {
+					assigneeIds.add(assigneeId.getKey());
+					groupIds.add(groupId);
+				}
+			}
+			else {
+				assigneeIds.add(assigneeId.getKey());
+			}
+		}
 
-		Long[] assigneeIds = assigneeGroupKeys.toArray(new Long[0]);
-
-		documentBuilder.setLongs("assigneeIds", assigneeIds);
-
-		documentBuilder.setString("assigneeType", assigneeType);
+		if (!assigneeIds.isEmpty()) {
+			documentBuilder.setLongs(
+				"assigneeIds", assigneeIds.toArray(new Long[0]));
+			documentBuilder.setString("assigneeType", assigneeType);
+		}
 
 		documentBuilder.setLong(
 			"companyId", companyId
@@ -620,8 +628,10 @@ public class TaskWorkflowMetricsIndexerImpl
 					"assigneeIds", assigneeIds
 				);
 
-				if (Objects.equals(assigneeType, User.class.getName())) {
-					User user = _userLocalService.fetchUser(assigneeIds[0]);
+				if (Objects.equals(assigneeType, User.class.getName()) &&
+					!assigneeIds.isEmpty()) {
+
+					User user = _userLocalService.fetchUser(assigneeIds.get(0));
 
 					scriptBuilder.putParameter(
 						"assigneeName", user.getFullName());
