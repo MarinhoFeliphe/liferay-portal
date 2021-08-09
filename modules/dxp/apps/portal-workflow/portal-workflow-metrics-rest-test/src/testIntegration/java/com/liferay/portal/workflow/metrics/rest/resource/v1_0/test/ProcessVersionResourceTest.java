@@ -66,7 +66,8 @@ public class ProcessVersionResourceTest
 	@Test
 	public void testGetProcessProcessVersionsPage() throws Exception {
 		Page<ProcessVersion> page =
-			processVersionResource.getProcessProcessVersionsPage(_process.getId());
+			processVersionResource.getProcessProcessVersionsPage(
+				_process.getId());
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(
