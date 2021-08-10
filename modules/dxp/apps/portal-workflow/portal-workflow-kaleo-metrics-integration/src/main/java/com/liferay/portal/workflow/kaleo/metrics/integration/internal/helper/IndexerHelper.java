@@ -27,11 +27,15 @@ import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
+import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -93,6 +97,22 @@ public class IndexerHelper {
 		}
 
 		return localizationMap;
+	}
+
+	public Map<Long, List<Long>> createAssigneeGroupIdsMap(
+		List<KaleoTaskAssignmentInstance> kaleoTaskAssignmentInstances) {
+
+		return Stream.of(
+			kaleoTaskAssignmentInstances
+		).flatMap(
+			List::stream
+		).collect(
+			Collectors.groupingBy(
+				KaleoTaskAssignmentInstance::getAssigneeClassPK,
+				Collectors.mapping(
+					KaleoTaskAssignmentInstance::getGroupId,
+					Collectors.toList()))
+		);
 	}
 
 	private AssetRenderer<?> _getAssetRenderer(String className, long classPK) {

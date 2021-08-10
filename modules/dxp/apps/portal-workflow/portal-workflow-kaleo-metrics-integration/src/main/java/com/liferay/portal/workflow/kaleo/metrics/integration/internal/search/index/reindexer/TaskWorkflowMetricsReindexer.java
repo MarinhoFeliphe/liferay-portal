@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.IndexerHelper;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
@@ -34,7 +33,6 @@ import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetric
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -93,22 +91,6 @@ public class TaskWorkflowMetricsReindexer implements WorkflowMetricsReindexer {
 							kaleoTaskInstanceToken.
 								getKaleoTaskInstanceTokenId());
 
-				Long[] assigneeIds = Optional.ofNullable(
-					kaleoTaskAssignmentInstances
-				).filter(
-					ListUtil::isNotEmpty
-				).map(
-					List::stream
-				).map(
-					stream -> stream.map(
-						KaleoTaskAssignmentInstance::getAssigneeClassPK
-					).toArray(
-						Long[]::new
-					)
-				).orElseGet(
-					() -> null
-				);
-
 				String assigneeType = Stream.of(
 					kaleoTaskAssignmentInstances
 				).flatMap(
@@ -128,8 +110,9 @@ public class TaskWorkflowMetricsReindexer implements WorkflowMetricsReindexer {
 					_indexerHelper.createAssetTypeLocalizationMap(
 						kaleoTaskInstanceToken.getClassName(),
 						kaleoTaskInstanceToken.getGroupId()),
-					assigneeIds, assigneeType,
-					kaleoTaskInstanceToken.getClassName(),
+					_indexerHelper.createAssigneeGroupIdsMap(
+						kaleoTaskAssignmentInstances),
+					assigneeType, kaleoTaskInstanceToken.getClassName(),
 					kaleoTaskInstanceToken.getClassPK(),
 					kaleoTaskInstanceToken.getCompanyId(),
 					kaleoTaskInstanceToken.isCompleted(),
