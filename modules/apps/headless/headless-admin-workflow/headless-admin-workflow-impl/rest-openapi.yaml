@@ -78,6 +78,23 @@ components:
                     readOnly: true
                     type: string
             type: object
+        Node:
+            description:
+                Represents a node in a workflow.
+            properties:
+                label:
+                    readOnly: true
+                    type: string
+                name:
+                    readOnly: true
+                    type: string
+                type:
+                    description:
+                        The workflow's node types.
+                    enum: [CONDITION, FORK, INITIAL_STATE, JOIN, JOIN_XOR, STATE, TASK, TERMINAL_STATE]
+                    readOnly: true
+                    type: string
+            type: object
         ObjectReviewed:
             description:
                 Represents the resource modified by the current workflow.
@@ -198,6 +215,11 @@ components:
                     type: string
                 name:
                     type: string
+                nodes:
+                    items:
+                        $ref: "#/components/schemas/Node"
+                    readOnly: true
+                    type: array
                 title:
                     type: string
                 title_i18n:
