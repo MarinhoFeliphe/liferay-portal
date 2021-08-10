@@ -224,6 +224,41 @@ public class WorkflowDefinitionResourceTest
 				}
 			});
 		workflowDefinition.setVersion("1");
+		workflowDefinition.setTransitions(
+			new Transition[] {
+				new Transition() {
+					{
+						label = "Review";
+						name = "review";
+						sourceNodeName = "created";
+						targetNodeName = "review";
+					}
+				},
+				new Transition() {
+					{
+						label = "Approve";
+						name = "approve";
+						sourceNodeName = "review";
+						targetNodeName = "approved";
+					}
+				},
+				new Transition() {
+					{
+						label = "Reject";
+						name = "reject";
+						sourceNodeName = "review";
+						targetNodeName = "update";
+					}
+				},
+				new Transition() {
+					{
+						label = "Resubmit";
+						name = "resubmit";
+						sourceNodeName = "update";
+						targetNodeName = "review";
+					}
+				}
+			});
 
 		return workflowDefinition;
 	}
