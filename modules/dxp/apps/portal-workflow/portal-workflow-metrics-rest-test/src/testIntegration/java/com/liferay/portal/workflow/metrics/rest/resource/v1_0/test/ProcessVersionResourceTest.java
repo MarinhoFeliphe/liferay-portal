@@ -106,7 +106,6 @@ public class ProcessVersionResourceTest
 			});
 	}
 
-	@Override
 	@Test
 	public void testGraphQLGetProcessProcessVersionsPage() throws Exception {
 		BaseProcessVersionResourceTestCase.GraphQLField graphQLField =
