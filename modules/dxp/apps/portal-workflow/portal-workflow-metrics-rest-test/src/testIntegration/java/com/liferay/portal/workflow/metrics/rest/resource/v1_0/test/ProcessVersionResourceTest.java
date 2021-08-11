@@ -15,16 +15,12 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.ProcessVersion;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
-import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.ProcessVersionSerDes;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.Arrays;
@@ -104,33 +100,6 @@ public class ProcessVersionResourceTest
 
 				return null;
 			});
-	}
-
-	@Test
-	public void testGraphQLGetProcessProcessVersionsPage() throws Exception {
-		BaseProcessVersionResourceTestCase.GraphQLField graphQLField =
-			new BaseProcessVersionResourceTestCase.GraphQLField(
-				"processProcessVersions",
-				HashMapBuilder.<String, Object>put(
-					"processId", _process.getId()
-				).build(),
-				new BaseProcessVersionResourceTestCase.GraphQLField(
-					"items", getGraphQLFields()));
-
-		JSONObject processVersionsJSONObject = JSONUtil.getValueAsJSONObject(
-			invokeGraphQLQuery(graphQLField), "JSONObject/data",
-			"JSONObject/processProcessVersions");
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(
-				new ProcessVersion() {
-					{
-						name = "1.0";
-					}
-				}),
-			Arrays.asList(
-				ProcessVersionSerDes.toDTOs(
-					processVersionsJSONObject.getString("items"))));
 	}
 
 	@Override
