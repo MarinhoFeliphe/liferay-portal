@@ -198,11 +198,12 @@ definition {
 
 		PortletEntry.inputTitle(title = "DM Title Test");
 
-		DMDocument.selectColorRGB(
-			blueValue = "0",
+		DERenderer.inputDataInColorField(
+			colorSelectionMethod = "RGB",
 			fieldLabel = "Color",
-			greenValue = "0",
-			redValue = "255");
+			valueBlue = "248",
+			valueGreen = "110",
+			valueRed = "0");
 
 		Button.clickPublish();
 
@@ -210,10 +211,9 @@ definition {
 			menuItem = "Edit",
 			rowEntry = "DM Title Test");
 
-		AssertTextEquals(
-			key_fieldLabel = "Color",
-			locator1 = "DDMField#COLOR_PICKER_GENERAL_INPUT",
-			value1 = "ff0000");
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			value = "006ef8");
 	}
 
 	@description = "This test validates the set of searchable property on the color field."

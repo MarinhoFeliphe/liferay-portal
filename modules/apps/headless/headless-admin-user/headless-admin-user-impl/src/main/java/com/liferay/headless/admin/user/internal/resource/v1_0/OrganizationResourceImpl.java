@@ -19,7 +19,9 @@ import com.liferay.headless.admin.user.dto.v1_0.Location;
 import com.liferay.headless.admin.user.dto.v1_0.Organization;
 import com.liferay.headless.admin.user.dto.v1_0.OrganizationContactInformation;
 import com.liferay.headless.admin.user.dto.v1_0.Service;
+import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.internal.dto.v1_0.converter.OrganizationResourceDTOConverter;
+import com.liferay.headless.admin.user.internal.dto.v1_0.converter.UserResourceDTOConverter;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderCountryUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderEmailAddressUtil;
@@ -29,6 +31,8 @@ import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderRegi
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderWebsiteUtil;
 import com.liferay.headless.admin.user.internal.odata.entity.v1_0.OrganizationEntityModel;
 import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
+import com.liferay.headless.admin.user.resource.v1_0.RoleResource;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Address;
@@ -38,6 +42,7 @@ import com.liferay.portal.kernel.model.ListTypeConstants;
 import com.liferay.portal.kernel.model.OrgLabor;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.Phone;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.Website;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
@@ -49,7 +54,9 @@ import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.search.generic.WildcardQueryImpl;
 import com.liferay.portal.kernel.service.OrgLaborLocalService;
 import com.liferay.portal.kernel.service.OrganizationService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -59,10 +66,12 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.fields.NestedField;
+import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
-import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.text.DateFormat;
@@ -87,10 +96,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/organization.properties",
-	scope = ServiceScope.PROTOTYPE, service = OrganizationResource.class
+	scope = ServiceScope.PROTOTYPE,
+	service = {NestedFieldSupport.class, OrganizationResource.class}
 )
 public class OrganizationResourceImpl
-	extends BaseOrganizationResourceImpl implements EntityModelResource {
+	extends BaseOrganizationResourceImpl implements NestedFieldSupport {
 
 	@Override
 	public void deleteOrganization(String organizationId) throws Exception {
@@ -129,6 +139,25 @@ public class OrganizationResourceImpl
 		throws Exception {
 
 		return _toOrganization(organizationId);
+	}
+
+	@NestedField(parentClass = Organization.class, value = "childOrganizations")
+	@Override
+	public Page<Organization> getOrganizationChildOrganizationsPage(
+			String organizationId, Boolean flatten, String search,
+			Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		return _getOrganizationsPage(
+			HashMapBuilder.put(
+				"get",
+				addAction(
+					"VIEW", "getOrganizationChildOrganizationsPage",
+					com.liferay.portal.kernel.model.Organization.class.
+						getName(),
+					_getServiceBuilderOrganizationId(organizationId))
+			).build(),
+			organizationId, flatten, filter, search, pagination, sorts);
 	}
 
 	@Override
@@ -198,22 +227,68 @@ public class OrganizationResourceImpl
 	}
 
 	@Override
-	public void postUserAccountByEmailAddress(
+	public UserAccount postUserAccountByEmailAddress(
 			String organizationId, String emailAddress)
 		throws Exception {
 
-		_organizationService.addUserOrganizationByEmailAddress(
-			emailAddress, _getServiceBuilderOrganizationId(organizationId));
+		User user = _organizationService.addOrganizationUserByEmailAddress(
+			emailAddress, _getServiceBuilderOrganizationId(organizationId),
+			new ServiceContext() {
+				{
+					setCompanyId(contextCompany.getCompanyId());
+					setLanguageId(
+						contextAcceptLanguage.getPreferredLanguageId());
+					setUserId(contextUser.getUserId());
+				}
+			});
+
+		return _userResourceDTOConverter.toDTO(
+			new DefaultDTOConverterContext(
+				contextAcceptLanguage.isAcceptAllLanguages(), null,
+				_dtoConverterRegistry, user.getUserId(),
+				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
+				contextUser),
+			user);
 	}
 
 	@Override
-	public void postUserAccountsByEmailAddress(
-			String organizationId, String[] emailAddresses)
+	public Page<UserAccount> postUserAccountsByEmailAddress(
+			String organizationId, String organizationRoleIds,
+			String[] emailAddresses)
 		throws Exception {
 
-		for (String emailAddress : emailAddresses) {
-			postUserAccountByEmailAddress(organizationId, emailAddress);
+		List<UserAccount> userAccounts = transformToList(
+			emailAddresses,
+			emailAddress -> postUserAccountByEmailAddress(
+				organizationId, emailAddress));
+
+		if (Validator.isNull(organizationRoleIds)) {
+			return Page.of(userAccounts);
 		}
+
+		String[] organizationRoleIdsArray = StringUtil.split(
+			organizationRoleIds, CharPool.COMMA);
+
+		for (UserAccount userAccount : userAccounts) {
+			for (String organizationRoleId : organizationRoleIdsArray) {
+				_roleResource.postOrganizationRoleUserAccountAssociation(
+					GetterUtil.getLong(organizationRoleId), userAccount.getId(),
+					GetterUtil.getLong(organizationId));
+			}
+		}
+
+		return Page.of(
+			transform(
+				userAccounts,
+				userAccount -> _userResourceDTOConverter.toDTO(
+					new DefaultDTOConverterContext(
+						contextAcceptLanguage.isAcceptAllLanguages(), null,
+						_dtoConverterRegistry, userAccount.getId(),
+						contextAcceptLanguage.getPreferredLocale(),
+						contextUriInfo, contextUser),
+					_userService.getUserByEmailAddress(
+						contextCompany.getCompanyId(),
+						userAccount.getEmailAddress()))));
 	}
 
 	@Override
@@ -272,6 +347,20 @@ public class OrganizationResourceImpl
 			if (organizationContactInformation.getWebUrls() != null) {
 				existingOrganizationContactInformation.setWebUrls(
 					organizationContactInformation.getWebUrls());
+			}
+		}
+
+		Organization parentOrganization = organization.getParentOrganization();
+
+		if (parentOrganization != null) {
+			try {
+				existingOrganization.setParentOrganization(
+					_toOrganization(parentOrganization.getId()));
+			}
+			catch (Exception exception) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(exception, exception);
+				}
 			}
 		}
 
@@ -515,6 +604,10 @@ public class OrganizationResourceImpl
 	private Organization _toOrganization(String organizationId)
 		throws Exception {
 
+		if (Validator.isBlank(organizationId)) {
+			return null;
+		}
+
 		return _organizationResourceDTOConverter.toDTO(
 			_getDTOConverterContext(organizationId));
 	}
@@ -631,6 +724,9 @@ public class OrganizationResourceImpl
 		new OrganizationEntityModel();
 
 	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
 	private OrganizationResourceDTOConverter _organizationResourceDTOConverter;
 
 	@Reference
@@ -638,5 +734,14 @@ public class OrganizationResourceImpl
 
 	@Reference
 	private OrgLaborLocalService _orgLaborLocalService;
+
+	@Reference
+	private RoleResource _roleResource;
+
+	@Reference
+	private UserResourceDTOConverter _userResourceDTOConverter;
+
+	@Reference
+	private UserService _userService;
 
 }

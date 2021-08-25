@@ -147,21 +147,9 @@ public class ElasticsearchSearchEngineInformation
 						null, true));
 
 				if (!Validator.isBlank(localClusterNodesString)) {
-					StringBundler sb = new StringBundler(11);
-
-					sb.append("Remote Cluster");
-					sb.append(StringPool.SPACE);
-					sb.append(StringPool.EQUAL);
-					sb.append(StringPool.SPACE);
-					sb.append(clusterNodesString);
-					sb.append(StringPool.COMMA_AND_SPACE);
-					sb.append("Local Cluster");
-					sb.append(StringPool.SPACE);
-					sb.append(StringPool.EQUAL);
-					sb.append(StringPool.SPACE);
-					sb.append(localClusterNodesString);
-
-					clusterNodesString = sb.toString();
+					clusterNodesString = StringBundler.concat(
+						"Remote Cluster = ", clusterNodesString,
+						", Local Cluster = ", localClusterNodesString);
 				}
 			}
 
@@ -177,15 +165,7 @@ public class ElasticsearchSearchEngineInformation
 		String vendor = elasticsearchSearchEngine.getVendor();
 
 		if (operationModeResolver.isDevelopmentModeEnabled()) {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(vendor);
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append("Sidecar");
-			sb.append(StringPool.CLOSE_PARENTHESIS);
-
-			return sb.toString();
+			return vendor + " (Sidecar)";
 		}
 
 		return vendor;
@@ -317,48 +297,25 @@ public class ElasticsearchSearchEngineInformation
 
 			Stream<NodeInformation> stream = nodeInformations.stream();
 
-			String nodesString = stream.map(
-				nodeInfo -> {
-					StringBundler sb = new StringBundler(5);
-
-					sb.append(nodeInfo.getName());
-					sb.append(StringPool.SPACE);
-					sb.append(StringPool.OPEN_PARENTHESIS);
-					sb.append(nodeInfo.getVersion());
-					sb.append(StringPool.CLOSE_PARENTHESIS);
-
-					return sb.toString();
-				}
-			).collect(
-				Collectors.joining(StringPool.COMMA_AND_SPACE)
-			);
-
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(clusterName);
-			sb.append(StringPool.COLON);
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.OPEN_BRACKET);
-			sb.append(nodesString);
-			sb.append(StringPool.CLOSE_BRACKET);
-
-			return sb.toString();
+			return StringBundler.concat(
+				clusterName, StringPool.COLON, StringPool.SPACE,
+				StringPool.OPEN_BRACKET,
+				stream.map(
+					nodeInfo -> StringBundler.concat(
+						nodeInfo.getName(), StringPool.SPACE,
+						StringPool.OPEN_PARENTHESIS, nodeInfo.getVersion(),
+						StringPool.CLOSE_PARENTHESIS)
+				).collect(
+					Collectors.joining(StringPool.COMMA_AND_SPACE)
+				),
+				StringPool.CLOSE_BRACKET);
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn("Unable to get node information", exception);
 			}
 
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append("Error");
-			sb.append(StringPool.COLON);
-			sb.append(StringPool.SPACE);
-			sb.append(exception.toString());
-			sb.append(StringPool.CLOSE_PARENTHESIS);
-
-			return sb.toString();
+			return StringBundler.concat("(Error: ", exception.toString(), ")");
 		}
 	}
 

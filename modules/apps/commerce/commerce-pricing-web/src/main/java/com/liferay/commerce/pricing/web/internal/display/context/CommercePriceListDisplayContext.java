@@ -114,7 +114,7 @@ public class CommercePriceListDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return commerceCatalogService.searchCommerceCatalogs(
+		return commerceCatalogService.search(
 			themeDisplay.getCompanyId(), null, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
@@ -310,23 +310,16 @@ public class CommercePriceListDisplayContext
 	}
 
 	public String getPriceListsApiUrl(String portletName) {
-		StringBundler filterSB = new StringBundler(4);
+		String encodedFilter = URLCodec.encodeURL(
+			StringBundler.concat(
+				"type eq '", getCommercePriceListType(portletName),
+				StringPool.APOSTROPHE),
+			true);
 
-		filterSB.append("type eq ");
-		filterSB.append(StringPool.APOSTROPHE);
-		filterSB.append(getCommercePriceListType(portletName));
-		filterSB.append(StringPool.APOSTROPHE);
-
-		String encodedFilter = URLCodec.encodeURL(filterSB.toString(), true);
-
-		StringBundler apiUrlSB = new StringBundler(4);
-
-		apiUrlSB.append(PortalUtil.getPortalURL(httpServletRequest));
-		apiUrlSB.append("/o/headless-commerce-admin-pricing/v2.0/price-lists");
-		apiUrlSB.append("?filter=");
-		apiUrlSB.append(encodedFilter);
-
-		return apiUrlSB.toString();
+		return StringBundler.concat(
+			PortalUtil.getPortalURL(httpServletRequest),
+			"/o/headless-commerce-admin-pricing/v2.0/price-lists?filter=",
+			encodedFilter);
 	}
 
 	public String getPriceModifierCategoriesApiUrl() throws PortalException {

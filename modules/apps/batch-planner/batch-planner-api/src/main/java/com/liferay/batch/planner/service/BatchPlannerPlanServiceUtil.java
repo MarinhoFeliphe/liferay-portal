@@ -17,6 +17,8 @@ package com.liferay.batch.planner.service;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.portal.kernel.exception.PortalException;
 
+import java.util.List;
+
 /**
  * Provides the remote service utility for BatchPlannerPlan. This utility wraps
  * <code>com.liferay.batch.planner.service.impl.BatchPlannerPlanServiceImpl</code> and is an
@@ -52,10 +54,27 @@ public class BatchPlannerPlanServiceUtil {
 		return getService().deleteBatchPlannerPlan(batchPlannerPlanId);
 	}
 
+	public static BatchPlannerPlan fetchBatchPlannerPlan(
+			long batchPlannerPlanId)
+		throws PortalException {
+
+		return getService().fetchBatchPlannerPlan(batchPlannerPlanId);
+	}
+
 	public static BatchPlannerPlan getBatchPlannerPlan(long batchPlannerPlanId)
 		throws PortalException {
 
 		return getService().getBatchPlannerPlan(batchPlannerPlanId);
+	}
+
+	public static List<BatchPlannerPlan> getBatchPlannerPlans(
+		long companyId, int start, int end) {
+
+		return getService().getBatchPlannerPlans(companyId, start, end);
+	}
+
+	public static int getBatchPlannerPlansCount(long companyId) {
+		return getService().getBatchPlannerPlansCount(companyId);
 	}
 
 	/**

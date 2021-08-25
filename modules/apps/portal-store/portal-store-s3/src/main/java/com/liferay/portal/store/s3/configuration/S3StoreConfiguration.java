@@ -38,7 +38,10 @@ public interface S3StoreConfiguration {
 	)
 	public String secretKey();
 
-	@Meta.AD(description = "bucket-name-help", name = "bucket-name")
+	@Meta.AD(
+		description = "set-the-bucket-name-used-by-s3-to-store-files",
+		name = "bucket-name"
+	)
 	public String bucketName();
 
 	@Meta.AD(
@@ -133,13 +136,15 @@ public interface S3StoreConfiguration {
 	public int multipartUploadThreshold();
 
 	@Meta.AD(
-		description = "proxy-host-help", name = "proxy-host", required = false
+		description = "set-the-proxy-host-the-client-uses-to-connect",
+		name = "proxy-host", required = false
 	)
 	public String proxyHost();
 
 	@Meta.AD(
-		deflt = "12345", description = "proxy-port-help", name = "proxy-port",
-		required = false
+		deflt = "12345",
+		description = "set-the-proxy-port-the-client-uses-to-connect",
+		name = "proxy-port", required = false
 	)
 	public int proxyPort();
 
@@ -157,8 +162,8 @@ public interface S3StoreConfiguration {
 	public String proxyUsername();
 
 	@Meta.AD(
-		description = "proxy-password-help", name = "proxy-password",
-		required = false, type = Meta.Type.Password
+		description = "set-the-proxy-password-to-use-if-connecting-through-a-proxy",
+		name = "proxy-password", required = false, type = Meta.Type.Password
 	)
 	public String proxyPassword();
 

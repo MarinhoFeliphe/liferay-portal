@@ -15,9 +15,11 @@
 package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectDefinitionServiceUtil;
+import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -28,11 +30,9 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -147,6 +147,25 @@ public class ObjectDefinitionServiceTest {
 		_testPublishCustomObjectDefinition(_user);
 	}
 
+	@Test
+	public void testUpdateCustomObjectDefinition() throws Exception {
+		try {
+			_testUpdateCustomObjectDefinition(_defaultUser);
+
+			Assert.fail();
+		}
+		catch (PrincipalException.MustHavePermission principalException) {
+			String message = principalException.getMessage();
+
+			Assert.assertTrue(
+				message.contains(
+					"User " + _defaultUser.getUserId() +
+						" must have UPDATE permission for"));
+		}
+
+		_testUpdateCustomObjectDefinition(_user);
+	}
+
 	private ObjectDefinition _addCustomObjectDefinition(User user)
 		throws Exception {
 
@@ -161,7 +180,8 @@ public class ObjectDefinitionServiceTest {
 			user.getUserId(), objectDefinition.getObjectDefinitionId());*/
 
 		return ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
-			user.getUserId(), _labelMap, "Test", null);
+			user.getUserId(), _labelMap, "Test", null, null, _pluralLabelMap,
+			ObjectDefinitionConstants.SCOPE_COMPANY, null);
 	}
 
 	private void _setUser(User user) {
@@ -179,7 +199,8 @@ public class ObjectDefinitionServiceTest {
 
 			objectDefinition =
 				ObjectDefinitionServiceUtil.addCustomObjectDefinition(
-					_labelMap, "Test", null);
+					_labelMap, "Test", null, null, _pluralLabelMap,
+					ObjectDefinitionConstants.SCOPE_COMPANY, null);
 
 			objectDefinition =
 				ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
@@ -243,7 +264,9 @@ public class ObjectDefinitionServiceTest {
 
 			objectDefinition =
 				ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
-					user.getUserId(), _labelMap, "Test", null);
+					user.getUserId(), _labelMap, "Test", null, null,
+					_pluralLabelMap, ObjectDefinitionConstants.SCOPE_COMPANY,
+					null);
 
 			objectDefinition =
 				ObjectDefinitionServiceUtil.publishCustomObjectDefinition(
@@ -257,11 +280,40 @@ public class ObjectDefinitionServiceTest {
 		}
 	}
 
+	private void _testUpdateCustomObjectDefinition(User user) throws Exception {
+		ObjectDefinition objectDefinition = null;
+
+		try {
+			_setUser(user);
+
+			objectDefinition =
+				ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
+					user.getUserId(), _labelMap, "Test", null, null,
+					_pluralLabelMap, ObjectDefinitionConstants.SCOPE_COMPANY,
+					null);
+
+			objectDefinition =
+				ObjectDefinitionServiceUtil.updateCustomObjectDefinition(
+					objectDefinition.getObjectDefinitionId(),
+					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
+					null, LocalizedMapUtil.getLocalizedMap("Ables"),
+					objectDefinition.getScope());
+		}
+		finally {
+			if (objectDefinition != null) {
+				ObjectDefinitionLocalServiceUtil.deleteObjectDefinition(
+					objectDefinition);
+			}
+		}
+	}
+
 	private User _defaultUser;
-	private final Map<Locale, String> _labelMap = Collections.singletonMap(
-		LocaleUtil.US, "Test");
+	private final Map<Locale, String> _labelMap =
+		LocalizedMapUtil.getLocalizedMap("Test");
 	private String _originalName;
 	private PermissionChecker _originalPermissionChecker;
+	private final Map<Locale, String> _pluralLabelMap =
+		LocalizedMapUtil.getLocalizedMap("Tests");
 	private User _user;
 
 	@Inject(type = UserLocalService.class)

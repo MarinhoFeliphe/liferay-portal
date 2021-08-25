@@ -56,8 +56,8 @@ public class CPDefinitionDiagramEntryWrapper
 		attributes.put("CPInstanceUuid", getCPInstanceUuid());
 		attributes.put("CProductId", getCProductId());
 		attributes.put("diagram", isDiagram());
-		attributes.put("number", getNumber());
 		attributes.put("quantity", getQuantity());
+		attributes.put("sequence", getSequence());
 		attributes.put("sku", getSku());
 
 		return attributes;
@@ -126,16 +126,16 @@ public class CPDefinitionDiagramEntryWrapper
 			setDiagram(diagram);
 		}
 
-		Integer number = (Integer)attributes.get("number");
-
-		if (number != null) {
-			setNumber(number);
-		}
-
 		Integer quantity = (Integer)attributes.get("quantity");
 
 		if (quantity != null) {
 			setQuantity(quantity);
+		}
+
+		String sequence = (String)attributes.get("sequence");
+
+		if (sequence != null) {
+			setSequence(sequence);
 		}
 
 		String sku = (String)attributes.get("sku");
@@ -233,16 +233,6 @@ public class CPDefinitionDiagramEntryWrapper
 	}
 
 	/**
-	 * Returns the number of this cp definition diagram entry.
-	 *
-	 * @return the number of this cp definition diagram entry
-	 */
-	@Override
-	public int getNumber() {
-		return model.getNumber();
-	}
-
-	/**
 	 * Returns the primary key of this cp definition diagram entry.
 	 *
 	 * @return the primary key of this cp definition diagram entry
@@ -260,6 +250,16 @@ public class CPDefinitionDiagramEntryWrapper
 	@Override
 	public int getQuantity() {
 		return model.getQuantity();
+	}
+
+	/**
+	 * Returns the sequence of this cp definition diagram entry.
+	 *
+	 * @return the sequence of this cp definition diagram entry
+	 */
+	@Override
+	public String getSequence() {
+		return model.getSequence();
 	}
 
 	/**
@@ -398,16 +398,6 @@ public class CPDefinitionDiagramEntryWrapper
 	}
 
 	/**
-	 * Sets the number of this cp definition diagram entry.
-	 *
-	 * @param number the number of this cp definition diagram entry
-	 */
-	@Override
-	public void setNumber(int number) {
-		model.setNumber(number);
-	}
-
-	/**
 	 * Sets the primary key of this cp definition diagram entry.
 	 *
 	 * @param primaryKey the primary key of this cp definition diagram entry
@@ -425,6 +415,16 @@ public class CPDefinitionDiagramEntryWrapper
 	@Override
 	public void setQuantity(int quantity) {
 		model.setQuantity(quantity);
+	}
+
+	/**
+	 * Sets the sequence of this cp definition diagram entry.
+	 *
+	 * @param sequence the sequence of this cp definition diagram entry
+	 */
+	@Override
+	public void setSequence(String sequence) {
+		model.setSequence(sequence);
 	}
 
 	/**

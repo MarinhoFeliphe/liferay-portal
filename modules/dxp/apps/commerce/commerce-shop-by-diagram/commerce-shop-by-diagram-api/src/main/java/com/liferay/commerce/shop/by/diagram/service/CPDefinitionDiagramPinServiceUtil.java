@@ -39,12 +39,12 @@ public class CPDefinitionDiagramPinServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.commerce.shop.by.diagram.service.impl.CPDefinitionDiagramPinServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static CPDefinitionDiagramPin addCPDefinitionDiagramPin(
-			long userId, long cpDefinitionId, int number, double positionX,
-			double positionY)
+			long cpDefinitionId, double positionX, double positionY,
+			String sequence)
 		throws PortalException {
 
 		return getService().addCPDefinitionDiagramPin(
-			userId, cpDefinitionId, number, positionX, positionY);
+			cpDefinitionId, positionX, positionY, sequence);
 	}
 
 	public static void deleteCPDefinitionDiagramPin(
@@ -85,12 +85,12 @@ public class CPDefinitionDiagramPinServiceUtil {
 	}
 
 	public static CPDefinitionDiagramPin updateCPDefinitionDiagramPin(
-			long cpDefinitionDiagramPinId, int number, double positionX,
-			double positionY)
+			long cpDefinitionDiagramPinId, double positionX, double positionY,
+			String sequence)
 		throws PortalException {
 
 		return getService().updateCPDefinitionDiagramPin(
-			cpDefinitionDiagramPinId, number, positionX, positionY);
+			cpDefinitionDiagramPinId, positionX, positionY, sequence);
 	}
 
 	public static CPDefinitionDiagramPinService getService() {

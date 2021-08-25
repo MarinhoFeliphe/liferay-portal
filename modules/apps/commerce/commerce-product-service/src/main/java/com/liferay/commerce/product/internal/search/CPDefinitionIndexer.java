@@ -219,12 +219,13 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 
 			if (commerceChannelId > 0) {
 				channelFilterEnableBooleanFilter.addTerm(
-					CPField.CHANNEL_GROUP_IDS,
+					CPField.COMMERCE_CHANNEL_GROUP_IDS,
 					String.valueOf(commerceChannelId), BooleanClauseOccur.MUST);
 			}
 			else {
 				channelFilterEnableBooleanFilter.addTerm(
-					CPField.CHANNEL_GROUP_IDS, "-1", BooleanClauseOccur.MUST);
+					CPField.COMMERCE_CHANNEL_GROUP_IDS, "-1",
+					BooleanClauseOccur.MUST);
 			}
 
 			channelBooleanFilter.add(
@@ -432,7 +433,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			CPField.SHORT_DESCRIPTION,
 			cpDefinition.getShortDescription(cpDefinitionDefaultLanguageId));
 
-		List<Long> channelGroupIds = new ArrayList<>();
+		List<Long> commerceChannelGroupIds = new ArrayList<>();
 
 		for (CommerceChannelRel commerceChannelRel :
 				_commerceChannelRelLocalService.getCommerceChannelRels(
@@ -443,11 +444,12 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			CommerceChannel commerceChannel =
 				commerceChannelRel.getCommerceChannel();
 
-			channelGroupIds.add(commerceChannel.getGroupId());
+			commerceChannelGroupIds.add(commerceChannel.getGroupId());
 		}
 
 		document.addNumber(
-			CPField.CHANNEL_GROUP_IDS, ArrayUtil.toLongArray(channelGroupIds));
+			CPField.COMMERCE_CHANNEL_GROUP_IDS,
+			ArrayUtil.toLongArray(commerceChannelGroupIds));
 
 		List<CommerceAccountGroupRel> commerceAccountGroupRels =
 			_commerceAccountGroupRelService.getCommerceAccountGroupRels(
@@ -864,7 +866,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 	}
 
 	protected void reindexCPDefinitions(long companyId) throws PortalException {
-		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpDefinitionLocalService.getIndexableActionableDynamicQuery();
 
 		indexableActionableDynamicQuery.setCompanyId(companyId);

@@ -54,6 +54,11 @@
 	<td>//td[contains(., '${key_AvailablePropertyName}')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>AVAILABLE_NO_PROPERTIES_FOUND</td>
+	<td>//span[contains(@class,'title') and text()='No Properties Found']</td>
+	<td></td>
+</tr>
 <!-- GENERIC CHECKBOX -->
 <tr>
 	<td>AC_GENERIC_CHECKBOX</td>
@@ -100,13 +105,23 @@
 </tr>
 <!-- SYNC CONTACT DATA SCREEN -->
 <tr>
-	<td>SYNC_CONTACTS_OPTION</td>
-	<td>//fieldset//*[contains(@href, 'synced-contact-data')]</td>
+	<td>FIELD_NAME_CHECKBOX</td>
+	<td>//td/input[contains(@value, '${key_fieldName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SYNCED_CONTACT_DATA_USER_TAB</td>
+	<td>//li[contains(@class, 'nav-item') and contains(.,'User')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SYNC_ALL_CONTACTS_TOGGLE</td>
 	<td>//*[contains(@class, 'toggle-switch-check')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SYNC_CONTACTS_OPTION</td>
+	<td>//fieldset//*[contains(@href, 'synced-contact-data')]</td>
 	<td></td>
 </tr>
 </tbody>

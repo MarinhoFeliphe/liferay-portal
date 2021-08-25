@@ -40,6 +40,7 @@ public abstract class BaseStringConcatenationCheck extends BaseCheck {
 		String text = fullIdent.getText();
 
 		if ((text.startsWith("CharPool.") || text.startsWith("StringPool.")) &&
+			!text.endsWith(".DEFAULT_CHARSET_NAME") &&
 			!text.endsWith(".NEW_LINE") && !text.endsWith(".NO_BREAK_SPACE") &&
 			!text.endsWith(".TAB")) {
 
@@ -97,7 +98,8 @@ public abstract class BaseStringConcatenationCheck extends BaseCheck {
 				literalString1.charAt(literalString1.length() - 1));
 		}
 
-		if (literalString2.startsWith(StringPool.SPACE) ||
+		if ((literalString1.endsWith(StringPool.NEW_LINE) &&
+			 literalString2.startsWith(StringPool.SPACE)) ||
 			(!literalString1.endsWith(StringPool.SPACE) &&
 			 literalString2.matches("^[-:;.].*"))) {
 

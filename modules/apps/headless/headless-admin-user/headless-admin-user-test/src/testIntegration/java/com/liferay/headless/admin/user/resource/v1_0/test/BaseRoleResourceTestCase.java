@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.liferay.headless.admin.user.client.dto.v1_0.Role;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.pagination.Pagination;
 import com.liferay.headless.admin.user.client.resource.v1_0.RoleResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.RoleSerDes;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -32,7 +33,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -197,7 +197,54 @@ public abstract class BaseRoleResourceTestCase {
 
 	@Test
 	public void testGetRolesPage() throws Exception {
-		Assert.assertTrue(false);
+		Page<Role> page = roleResource.getRolesPage(null, Pagination.of(1, 2));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		Role role1 = testGetRolesPage_addRole(randomRole());
+
+		Role role2 = testGetRolesPage_addRole(randomRole());
+
+		page = roleResource.getRolesPage(null, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(role1, role2), (List<Role>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetRolesPageWithPagination() throws Exception {
+		Role role1 = testGetRolesPage_addRole(randomRole());
+
+		Role role2 = testGetRolesPage_addRole(randomRole());
+
+		Role role3 = testGetRolesPage_addRole(randomRole());
+
+		Page<Role> page1 = roleResource.getRolesPage(null, Pagination.of(1, 2));
+
+		List<Role> roles1 = (List<Role>)page1.getItems();
+
+		Assert.assertEquals(roles1.toString(), 2, roles1.size());
+
+		Page<Role> page2 = roleResource.getRolesPage(null, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Role> roles2 = (List<Role>)page2.getItems();
+
+		Assert.assertEquals(roles2.toString(), 1, roles2.size());
+
+		Page<Role> page3 = roleResource.getRolesPage(null, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(role1, role2, role3), (List<Role>)page3.getItems());
+	}
+
+	protected Role testGetRolesPage_addRole(Role role) throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1079,8 +1126,8 @@ public abstract class BaseRoleResourceTestCase {
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseRoleResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseRoleResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

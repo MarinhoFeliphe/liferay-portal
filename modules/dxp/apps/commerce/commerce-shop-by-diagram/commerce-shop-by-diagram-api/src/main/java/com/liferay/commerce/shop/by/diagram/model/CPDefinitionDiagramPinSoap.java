@@ -43,9 +43,9 @@ public class CPDefinitionDiagramPinSoap implements Serializable {
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setCPDefinitionId(model.getCPDefinitionId());
-		soapModel.setNumber(model.getNumber());
 		soapModel.setPositionX(model.getPositionX());
 		soapModel.setPositionY(model.getPositionY());
+		soapModel.setSequence(model.getSequence());
 
 		return soapModel;
 	}
@@ -164,14 +164,6 @@ public class CPDefinitionDiagramPinSoap implements Serializable {
 		_CPDefinitionId = CPDefinitionId;
 	}
 
-	public int getNumber() {
-		return _number;
-	}
-
-	public void setNumber(int number) {
-		_number = number;
-	}
-
 	public double getPositionX() {
 		return _positionX;
 	}
@@ -188,6 +180,14 @@ public class CPDefinitionDiagramPinSoap implements Serializable {
 		_positionY = positionY;
 	}
 
+	public String getSequence() {
+		return _sequence;
+	}
+
+	public void setSequence(String sequence) {
+		_sequence = sequence;
+	}
+
 	private long _CPDefinitionDiagramPinId;
 	private long _companyId;
 	private long _userId;
@@ -195,8 +195,8 @@ public class CPDefinitionDiagramPinSoap implements Serializable {
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _CPDefinitionId;
-	private int _number;
 	private double _positionX;
 	private double _positionY;
+	private String _sequence;
 
 }

@@ -13,8 +13,8 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {cleanup, render} from '@testing-library/react';
-import {PageProvider} from 'data-engine-js-components-web';
+import {cleanup, fireEvent, render} from '@testing-library/react';
+import {FormProvider} from 'data-engine-js-components-web';
 import React from 'react';
 
 import SearchLocation from '../../../src/main/resources/META-INF/resources/SearchLocation/SearchLocation.es';
@@ -22,9 +22,9 @@ import SearchLocation from '../../../src/main/resources/META-INF/resources/Searc
 const globalLanguageDirection = Liferay.Language.direction;
 
 const SearchLocationWithProvider = (props) => (
-	<PageProvider value={{editingLanguageId: 'en_US'}}>
+	<FormProvider value={{editingLanguageId: 'en_US', viewMode: true}}>
 		<SearchLocation {...props} />
-	</PageProvider>
+	</FormProvider>
 );
 
 const defaultConfig = {
@@ -41,9 +41,9 @@ const defaultConfig = {
 	},
 	layout: ['one-column'],
 	name: 'test_search_location_field',
+	onBlur: jest.fn(),
 	onChange: jest.fn(),
 	readOnly: false,
-	viewMode: true,
 	visibleFields: ['address', 'city', 'country', 'postal-code', 'state'],
 };
 
@@ -300,5 +300,60 @@ describe('Field Search Location', () => {
 			.item(0);
 
 		expect(!!googlePlacesScriptElement).toBe(true);
+	});
+
+	it('shows error message only for empty fields that triggered the onBlur or onChange event', () => {
+		const {container} = render(
+			<SearchLocationWithProvider
+				{...defaultConfig}
+				displayErrors={true}
+				errorMessage="This field is required."
+				valid={false}
+				value='{"address": "Address"}'
+			/>
+		);
+
+		const address = container.querySelector(
+			'input[name="test_search_location_field#address"]'
+		);
+
+		fireEvent.blur(address);
+
+		const city = container.querySelector(
+			'input[name="test_search_location_field#city"]'
+		);
+
+		fireEvent.change(city, {
+			target: {
+				value: 'City',
+			},
+		});
+
+		const country = container.querySelector(
+			'input[name="test_search_location_field#country"]'
+		);
+
+		fireEvent.blur(country);
+
+		expect(
+			container.getElementsByClassName('form-feedback-group').length
+		).toBe(2);
+	});
+
+	it('shows error message for all empty fields if page validation failed', () => {
+		const {container} = render(
+			<SearchLocationWithProvider
+				{...defaultConfig}
+				displayErrors={true}
+				errorMessage="This field is required."
+				pageValidationFailed={true}
+				valid={false}
+				value='{"address": "Address"}'
+			/>
+		);
+
+		expect(
+			container.getElementsByClassName('form-feedback-group').length
+		).toBe(5);
 	});
 });

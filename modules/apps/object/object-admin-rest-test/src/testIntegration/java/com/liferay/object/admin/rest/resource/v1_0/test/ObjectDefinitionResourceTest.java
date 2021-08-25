@@ -24,8 +24,9 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.Inject;
+
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -114,17 +115,16 @@ public class ObjectDefinitionResourceTest
 		ObjectDefinition objectDefinition = super.randomObjectDefinition();
 
 		objectDefinition.setLabel(
-			HashMapBuilder.put(
-				"en_US", "A" + objectDefinition.getName()
-			).build());
+			Collections.singletonMap(
+				"en_US", "A" + objectDefinition.getName()));
 		objectDefinition.setName("A" + objectDefinition.getName());
+		objectDefinition.setPluralLabel(
+			Collections.singletonMap(
+				"en_US", "A" + objectDefinition.getName()));
 
 		ObjectField objectField = new ObjectField();
 
-		objectField.setLabel(
-			HashMapBuilder.put(
-				"en_US", "Column"
-			).build());
+		objectField.setLabel(Collections.singletonMap("en_US", "Column"));
 		objectField.setName("column");
 		objectField.setType("String");
 
@@ -165,6 +165,13 @@ public class ObjectDefinitionResourceTest
 	@Override
 	protected ObjectDefinition
 			testPostObjectDefinitionPublish_addObjectDefinition()
+		throws Exception {
+
+		return _addObjectDefinition(randomObjectDefinition());
+	}
+
+	@Override
+	protected ObjectDefinition testPutObjectDefinition_addObjectDefinition()
 		throws Exception {
 
 		return _addObjectDefinition(randomObjectDefinition());

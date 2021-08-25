@@ -43,14 +43,12 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -612,12 +610,6 @@ public class CPDefinitionDiagramPinPersistenceImpl
 		"cpDefinitionDiagramPin.CPDefinitionId = ?";
 
 	public CPDefinitionDiagramPinPersistenceImpl() {
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("number", "number_");
-
-		setDBColumnNames(dbColumnNames);
-
 		setModelClass(CPDefinitionDiagramPin.class);
 
 		setModelImplClass(CPDefinitionDiagramPinImpl.class);
@@ -1139,11 +1131,6 @@ public class CPDefinitionDiagramPinPersistenceImpl
 	}
 
 	@Override
-	public Set<String> getBadColumnNames() {
-		return _badColumnNames;
-	}
-
-	@Override
 	protected EntityCache getEntityCache() {
 		return entityCache;
 	}
@@ -1271,9 +1258,6 @@ public class CPDefinitionDiagramPinPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPDefinitionDiagramPinPersistenceImpl.class);
 
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"number"});
-
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
@@ -1385,7 +1369,7 @@ public class CPDefinitionDiagramPinPersistenceImpl
 			long orderByColumnsBitmask = 0;
 
 			orderByColumnsBitmask |=
-				CPDefinitionDiagramPinModelImpl.getColumnBitmask("number_");
+				CPDefinitionDiagramPinModelImpl.getColumnBitmask("sequence");
 
 			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
 		}

@@ -36,12 +36,12 @@ public class CPDefinitionDiagramPinServiceWrapper
 	@Override
 	public com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramPin
 			addCPDefinitionDiagramPin(
-				long userId, long cpDefinitionId, int number, double positionX,
-				double positionY)
+				long cpDefinitionId, double positionX, double positionY,
+				String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionDiagramPinService.addCPDefinitionDiagramPin(
-			userId, cpDefinitionId, number, positionX, positionY);
+			cpDefinitionId, positionX, positionY, sequence);
 	}
 
 	@Override
@@ -93,12 +93,12 @@ public class CPDefinitionDiagramPinServiceWrapper
 	@Override
 	public com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramPin
 			updateCPDefinitionDiagramPin(
-				long cpDefinitionDiagramPinId, int number, double positionX,
-				double positionY)
+				long cpDefinitionDiagramPinId, double positionX,
+				double positionY, String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionDiagramPinService.updateCPDefinitionDiagramPin(
-			cpDefinitionDiagramPinId, number, positionX, positionY);
+			cpDefinitionDiagramPinId, positionX, positionY, sequence);
 	}
 
 	@Override

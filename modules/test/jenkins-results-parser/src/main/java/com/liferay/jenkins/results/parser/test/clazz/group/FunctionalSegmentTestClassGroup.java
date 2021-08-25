@@ -81,6 +81,19 @@ public class FunctionalSegmentTestClassGroup extends SegmentTestClassGroup {
 	}
 
 	@Override
+	public String getSlaveLabel() {
+		Properties poshiProperties = getPoshiProperties();
+
+		String slaveLabel = poshiProperties.getProperty("slave.label");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(slaveLabel)) {
+			return slaveLabel;
+		}
+
+		return super.getSlaveLabel();
+	}
+
+	@Override
 	public String getTestCasePropertiesContent() {
 		StringBuilder sb = new StringBuilder();
 

@@ -8,17 +8,25 @@ definition {
 	property testray.main.component.name = "Analytics Cloud";
 
 	setUp {
-		ACUtils.launchAC();
+		task ("Copy the token from AC") {
+			ACUtils.launchAC();
 
-		ACSettings.takeTokenFromAnalyticsCloud();
+			ACSettings.takeTokenFromAnalyticsCloud();
+		}
 
-		TestCase.setUpPortalInstance();
+		task ("Set up instance and sign in DXP") {
+			TestCase.setUpPortalInstance();
 
-		ACUtils.launchDXP();
+			ACUtils.launchDXP();
+		}
 
-		ACUtils.addSiteAndPage();
+		task ("Add a new site with a public widget page") {
+			ACUtils.addSiteAndPage();
+		}
 
-		ACUtils.createDMAndAddToPage();
+		task ("Create a Document And Media") {
+			ACUtils.createDMAndAddToPage();
+		}
 	}
 
 	tearDown {
@@ -37,12 +45,56 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8419 | Test Summary: Document asset appears on list shows pages that the document exists on"
-	@ignore = "true"
 	@priority = "5"
 	test AssertAppearsOnListShowsPagesDocumentsExists {
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		// TODO LRAC-8419 AssertAppearsOnListShowsPagesDocumentsExists
+		task ("Visit the document") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
 
+			DMNavigator.gotoDocumentPG(dmDocumentTitle = "DM AC Title");
+		}
+
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch to new property in AC and go to DM tab") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToAssets();
+
+			ACNavigation.switchTab(tabName = "Documents and Media");
+		}
+
+		task ("Go to the docuemnt overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+
+			ACNavigation.openItem(itemName = "DM AC Title");
+		}
+
+		task ("Assert appears on metric") {
+			var fileEntryId = JSONDocument.getFileEntryId(
+				dmDocumentTitle = "DM AC Title",
+				groupName = "Site Name");
+
+			var portalURL = PropsUtil.get("portal.url");
+			var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+			ACAssets.viewAssetAppearsOnMetric(
+				canonicalURL = "${portalURL}/web/site-name/ac-page/-/document_library",
+				canonicalURLSuffix = "/view_file/${fileEntryId}",
+				cardTitle = "Asset Appears On",
+				pageNmae = "AC Page - Site Name - ${siteName}");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8394 | Test Summary: Assert 180 day time filter in Documents and Media"
@@ -55,12 +107,83 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8402 | Test Summary: Documents audience card shows expected amount of know and anonymous individuals"
-	@ignore = "true"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInDM {
+		task ("Connect the DXP to AC") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
 
-		// TODO LRAC-8402 AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInDM
+		task ("Add 2 more new users") {
+			for (var name : list "ac,liferay") {
+				JSONUser.addUser(
+					userEmailAddress = "${name}@liferay.com",
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
+			}
+		}
 
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Log in and download the document") {
+			for (var name : list "ac,liferay") {
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${name}@liferay.com",
+					userLoginFullName = "${name} ${name}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+
+				DMDocument.downloadPG(dmDocumentTitle = "DM AC Title");
+
+				Pause(locator1 = "5000");
+			}
+		}
+
+		task ("Download the document with anonymous user") {
+			User.logoutPG();
+
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+
+			DMDocument.downloadPG(dmDocumentTitle = "DM AC Title");
+		}
+
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch to new property in AC and go to Documents and Media tab") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToAssets();
+
+			ACNavigation.switchTab(tabName = "Documents and Media");
+		}
+
+		task ("Go to the Documents And Media overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+		}
+
+		task ("Open document by name") {
+			ACNavigation.openItem(itemName = "Document_1.jpg");
+		}
+
+		task ("Assert views by download number of know and anoymous users") {
+			ACUtils.assertAudienceCard(
+				index = "1",
+				percentageList = "66.67%,33.33%");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8403 | Test Summary: Documents audience card shows expected amount of segmented and unsegmented individuals"
@@ -212,21 +335,103 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8415 | Test Summary: Documents downloads by technology card shows downloads by the expected browser"
-	@ignore = "true"
 	@priority = "5"
 	test DocumentsTechnologyCardShowsViewsByExpectedBrowser {
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		// TODO LRAC-8415 DocumentsTechnologyCardShowsViewsByExpectedBrowser
+		task ("Download the document") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
 
+			DMDocument.downloadPG(dmDocumentTitle = "DM AC Title");
+		}
+
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch to new property in AC and go to DM tab") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToAssets();
+
+			ACNavigation.switchTab(tabName = "Documents and Media");
+		}
+
+		task ("Go to the docuemnt overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+
+			ACNavigation.openItem(itemName = "Document_1.jpg");
+		}
+
+		task ("Assert downloads by browsers metric") {
+			ACNavigation.switchTabInCard(tabName = "Browsers");
+
+			ACAssets.viewViewsByTechnologyTabActive(
+				cardTitle = "Downloads by Technology",
+				tabName = "Browsers");
+
+			ACAssets.viewTechnologyBrowsersMetric(
+				browserMetricValue = "Chrome",
+				cardTitle = "Downloads by Technology",
+				cssValue = "rgb(75, 155, 255)",
+				percentageMetricValue = "100%");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8414 | Test Summary: Documents downloads by technology card shows downloads by the expected device"
-	@ignore = "true"
 	@priority = "5"
 	test DocumentsTechnologyCardShowsViewsByExpectedDevice {
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		// TODO LRAC-8414 DocumentsTechnologyCardShowsViewsByExpectedDevice
+		task ("Download the document") {
+			for (var n : list "1,2") {
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
 
+				DMDocument.downloadPG(dmDocumentTitle = "DM AC Title");
+			}
+		}
+
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch to new property in AC and go to DM tab") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToAssets();
+
+			ACNavigation.switchTab(tabName = "Documents and Media");
+		}
+
+		task ("Go to the docuemnt overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+
+			ACNavigation.openItem(itemName = "DM AC Title");
+		}
+
+		task ("Assert downloads by devices metric") {
+			ACAssets.viewTechnologyDeviceViewsAndPercentage(
+				actionValue = "2 Downloads",
+				cardTitle = "Downloads by Technology",
+				deviceName = "Desktop",
+				percentageValue = "100%");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8118 | Test Summary: Document known individuals list shows the individuals who have viewed the documents"

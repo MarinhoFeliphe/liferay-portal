@@ -64,12 +64,12 @@ public class CPDefinitionDiagramEntryTable
 	public final Column<CPDefinitionDiagramEntryTable, Boolean> diagram =
 		createColumn(
 			"diagram", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
-	public final Column<CPDefinitionDiagramEntryTable, Integer> number =
-		createColumn(
-			"number_", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
 	public final Column<CPDefinitionDiagramEntryTable, Integer> quantity =
 		createColumn(
 			"quantity", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
+	public final Column<CPDefinitionDiagramEntryTable, String> sequence =
+		createColumn(
+			"sequence", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<CPDefinitionDiagramEntryTable, String> sku =
 		createColumn("sku", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 

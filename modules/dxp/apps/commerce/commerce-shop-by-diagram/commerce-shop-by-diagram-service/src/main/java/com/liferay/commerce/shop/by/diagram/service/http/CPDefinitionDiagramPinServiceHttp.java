@@ -54,9 +54,8 @@ public class CPDefinitionDiagramPinServiceHttp {
 	public static
 		com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramPin
 				addCPDefinitionDiagramPin(
-					HttpPrincipal httpPrincipal, long userId,
-					long cpDefinitionId, int number, double positionX,
-					double positionY)
+					HttpPrincipal httpPrincipal, long cpDefinitionId,
+					double positionX, double positionY, String sequence)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -66,8 +65,7 @@ public class CPDefinitionDiagramPinServiceHttp {
 				_addCPDefinitionDiagramPinParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, cpDefinitionId, number, positionX,
-				positionY);
+				methodKey, cpDefinitionId, positionX, positionY, sequence);
 
 			Object returnObj = null;
 
@@ -270,7 +268,7 @@ public class CPDefinitionDiagramPinServiceHttp {
 		com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramPin
 				updateCPDefinitionDiagramPin(
 					HttpPrincipal httpPrincipal, long cpDefinitionDiagramPinId,
-					int number, double positionX, double positionY)
+					double positionX, double positionY, String sequence)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -280,8 +278,8 @@ public class CPDefinitionDiagramPinServiceHttp {
 				_updateCPDefinitionDiagramPinParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, cpDefinitionDiagramPinId, number, positionX,
-				positionY);
+				methodKey, cpDefinitionDiagramPinId, positionX, positionY,
+				sequence);
 
 			Object returnObj = null;
 
@@ -316,9 +314,7 @@ public class CPDefinitionDiagramPinServiceHttp {
 		CPDefinitionDiagramPinServiceHttp.class);
 
 	private static final Class<?>[] _addCPDefinitionDiagramPinParameterTypes0 =
-		new Class[] {
-			long.class, long.class, int.class, double.class, double.class
-		};
+		new Class[] {long.class, double.class, double.class, String.class};
 	private static final Class<?>[]
 		_deleteCPDefinitionDiagramPinParameterTypes1 = new Class[] {long.class};
 	private static final Class<?>[] _getCPDefinitionDiagramPinParameterTypes2 =
@@ -331,7 +327,7 @@ public class CPDefinitionDiagramPinServiceHttp {
 		};
 	private static final Class<?>[]
 		_updateCPDefinitionDiagramPinParameterTypes5 = new Class[] {
-			long.class, int.class, double.class, double.class
+			long.class, double.class, double.class, String.class
 		};
 
 }

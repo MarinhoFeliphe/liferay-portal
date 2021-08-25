@@ -17,6 +17,9 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+		else {
+			ObjectAdmin.deleteAllCustomObjectsViaAPI();
+		}
 	}
 
 	@description = "LPS-135548 - Verify that user can view custom objects"
@@ -24,9 +27,12 @@ definition {
 	test ViewCustomObjects {
 		property portal.acceptance = "true";
 
-		ObjectAdmin.openObjectAdmin();
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		ObjectAdmin.createCustomObject(name = "CustomObject");
+		ObjectAdmin.openObjectAdmin();
 
 		ObjectAdmin.viewCustomObject(name = "CustomObject");
 	}

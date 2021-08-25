@@ -353,6 +353,42 @@ public class OrganizationLocalServiceImpl
 			false, false, false);
 	}
 
+	@Override
+	public User addOrganizationUserByEmailAddress(
+			String emailAddress, long organizationId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Organization organization = organizationPersistence.findByPrimaryKey(
+			organizationId);
+
+		User user = userLocalService.fetchUserByEmailAddress(
+			serviceContext.getCompanyId(), emailAddress);
+
+		if (user == null) {
+			Group group = organization.getGroup();
+
+			long[] groupIds = {group.getGroupId()};
+
+			if (serviceContext.getScopeGroupId() > 0) {
+				groupIds = ArrayUtil.append(
+					groupIds, serviceContext.getScopeGroupId());
+			}
+
+			user = userLocalService.addUserWithWorkflow(
+				serviceContext.getUserId(), serviceContext.getCompanyId(), true,
+				StringPool.BLANK, StringPool.BLANK, true, StringPool.BLANK,
+				emailAddress, 0, StringPool.BLANK, serviceContext.getLocale(),
+				emailAddress, StringPool.BLANK, emailAddress, 0, 0, true, 1, 1,
+				1970, StringPool.BLANK, groupIds, null, null, null, true,
+				serviceContext);
+		}
+
+		addUserOrganization(user.getUserId(), organizationId);
+
+		return user;
+	}
+
 	/**
 	 * Assigns the password policy to the organizations, removing any other
 	 * currently assigned password policies.
@@ -2243,17 +2279,16 @@ public class OrganizationLocalServiceImpl
 	protected long[] getReindexOrganizationIds(Organization organization)
 		throws PortalException {
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(StringPool.FORWARD_SLASH);
-		sb.append(organization.getOrganizationId());
-		sb.append(StringPool.FORWARD_SLASH);
-
 		List<Organization> organizations =
 			organizationPersistence.findByC_LikeT(
 				organization.getCompanyId(),
-				CustomSQLUtil.keywords(sb.toString())[0], QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, new OrganizationNameComparator(true));
+				CustomSQLUtil.keywords(
+					StringBundler.concat(
+						StringPool.FORWARD_SLASH,
+						organization.getOrganizationId(),
+						StringPool.FORWARD_SLASH))[0],
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new OrganizationNameComparator(true));
 
 		long[] organizationIds = new long[organizations.size()];
 

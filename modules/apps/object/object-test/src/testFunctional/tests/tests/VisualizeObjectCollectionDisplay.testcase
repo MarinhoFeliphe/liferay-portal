@@ -17,6 +17,9 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+		else {
+			ObjectAdmin.deleteAllCustomObjectsViaAPI();
+		}
 	}
 
 	@description = "LPS-133865 - Verify if the fields from an Object are displayed to be mapped on a fragment"
@@ -30,13 +33,20 @@ definition {
 	}
 
 	@description = "LPS-133865 - Verify if the Object is displayed to be selected as Collection Provider on the Collection Display fragment"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test ObjectDisplayedToCollectionProdiver {
 		property portal.acceptance = "true";
 
-		// TODO LPS-137101 ObjectDisplayedToCollectionProdiver pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		VisualizeObjectCollectionDisplay.openObjectCollectionProvider();
+
+		VisualizeObjectCollectionDisplay.viewObjectCollectionProvider();
 	}
 
 	@description = "LPS-133865 - Verify if the Object entries are rendered inside the Collection Display fragment"

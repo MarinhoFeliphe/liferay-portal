@@ -32,7 +32,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -192,6 +191,62 @@ public abstract class BaseSkuResourceTestCase {
 		Assert.assertEquals(regex, sku.getBasePriceFormatted());
 		Assert.assertEquals(regex, sku.getBasePromoPriceFormatted());
 		Assert.assertEquals(regex, sku.getName());
+	}
+
+	@Test
+	public void testGetDiscountSkuSku() throws Exception {
+		Sku postSku = testGetDiscountSkuSku_addSku();
+
+		Sku getSku = skuResource.getDiscountSkuSku(null);
+
+		assertEquals(postSku, getSku);
+		assertValid(getSku);
+	}
+
+	protected Sku testGetDiscountSkuSku_addSku() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetDiscountSkuSku() throws Exception {
+		Sku sku = testGraphQLSku_addSku();
+
+		Assert.assertTrue(
+			equals(
+				sku,
+				SkuSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"discountSkuSku",
+								new HashMap<String, Object>() {
+									{
+										put("discountSkuId", null);
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/discountSkuSku"))));
+	}
+
+	@Test
+	public void testGraphQLGetDiscountSkuSkuNotFound() throws Exception {
+		Long irrelevantDiscountSkuId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"discountSkuSku",
+						new HashMap<String, Object>() {
+							{
+								put("discountSkuId", irrelevantDiscountSkuId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
 	}
 
 	@Test
@@ -778,8 +833,8 @@ public abstract class BaseSkuResourceTestCase {
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseSkuResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseSkuResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

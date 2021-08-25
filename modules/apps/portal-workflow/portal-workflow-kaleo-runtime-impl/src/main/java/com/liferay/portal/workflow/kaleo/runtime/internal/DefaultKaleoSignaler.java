@@ -14,25 +14,28 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal;
 
+import com.liferay.petra.concurrent.NoticeableFuture;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
 import com.liferay.portal.workflow.kaleo.runtime.KaleoSignaler;
-import com.liferay.portal.workflow.kaleo.runtime.constants.KaleoRuntimeDestinationNames;
 import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
 import com.liferay.portal.workflow.kaleo.runtime.internal.node.NodeExecutorFactory;
+import com.liferay.portal.workflow.kaleo.runtime.internal.petra.executor.GraphWalkerPortalExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.util.ExecutionContextHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -53,15 +56,33 @@ public class DefaultKaleoSignaler
 			String transitionName, ExecutionContext executionContext)
 		throws PortalException {
 
+		signalEntry(transitionName, executionContext, false);
+	}
+
+	@Override
+	public void signalEntry(
+			String transitionName, ExecutionContext executionContext,
+			boolean waitForCompletion)
+		throws PortalException {
+
 		KaleoInstanceToken kaleoInstanceToken =
 			executionContext.getKaleoInstanceToken();
 
 		executionContext.setTransitionName(transitionName);
 
-		PathElement startPathElement = new PathElement(
-			null, kaleoInstanceToken.getCurrentKaleoNode(), executionContext);
+		_signal(
+			new PathElement(
+				null, kaleoInstanceToken.getCurrentKaleoNode(),
+				executionContext),
+			waitForCompletion);
+	}
 
-		_sendPathElement(startPathElement);
+	@Override
+	public void signalExecute(
+			KaleoNode currentKaleoNode, ExecutionContext executionContext)
+		throws PortalException {
+
+		signalExecute(currentKaleoNode, executionContext, false);
 	}
 
 	@Override
@@ -70,7 +91,8 @@ public class DefaultKaleoSignaler
 		rollbackFor = Exception.class
 	)
 	public void signalExecute(
-			KaleoNode currentKaleoNode, ExecutionContext executionContext)
+			KaleoNode currentKaleoNode, ExecutionContext executionContext,
+			boolean waitForCompletion)
 		throws PortalException {
 
 		NodeExecutor nodeExecutor = _nodeExecutorFactory.getNodeExecutor(
@@ -84,7 +106,7 @@ public class DefaultKaleoSignaler
 		_executionContextHelper.checkKaleoInstanceComplete(executionContext);
 
 		for (PathElement remainingPathElement : remainingPathElements) {
-			_sendPathElement(remainingPathElement);
+			_signal(remainingPathElement, waitForCompletion);
 		}
 	}
 
@@ -93,31 +115,52 @@ public class DefaultKaleoSignaler
 			String transitionName, ExecutionContext executionContext)
 		throws PortalException {
 
+		signalExit(transitionName, executionContext, false);
+	}
+
+	@Override
+	public void signalExit(
+			String transitionName, ExecutionContext executionContext,
+			boolean waitForCompletion)
+		throws PortalException {
+
 		KaleoInstanceToken kaleoInstanceToken =
 			executionContext.getKaleoInstanceToken();
 
 		executionContext.setTransitionName(transitionName);
 
-		PathElement pathElement = new PathElement(
-			kaleoInstanceToken.getCurrentKaleoNode(), null, executionContext);
-
-		_sendPathElement(pathElement);
+		_signal(
+			new PathElement(
+				kaleoInstanceToken.getCurrentKaleoNode(), null,
+				executionContext),
+			waitForCompletion);
 	}
 
-	private void _sendPathElement(PathElement pathElement) {
-		Message message = new Message();
+	private void _signal(PathElement pathElement, boolean waitForCompletion) {
+		NoticeableFuture<?> noticeableFuture =
+			_graphWalkerPortalExecutor.execute(pathElement);
 
-		message.setPayload(pathElement);
-
-		_messageBus.sendMessage(
-			KaleoRuntimeDestinationNames.KALEO_GRAPH_WALKER, message);
+		if (waitForCompletion || PortalRunMode.isTestMode()) {
+			try {
+				noticeableFuture.get();
+			}
+			catch (ExecutionException executionException) {
+				_log.error(executionException, executionException);
+			}
+			catch (InterruptedException interruptedException) {
+				_log.error(interruptedException, interruptedException);
+			}
+		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DefaultKaleoSignaler.class);
 
 	@Reference
 	private ExecutionContextHelper _executionContextHelper;
 
 	@Reference
-	private MessageBus _messageBus;
+	private GraphWalkerPortalExecutor _graphWalkerPortalExecutor;
 
 	@Reference
 	private NodeExecutorFactory _nodeExecutorFactory;

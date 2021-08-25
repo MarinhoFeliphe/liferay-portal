@@ -33,12 +33,12 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Text",
+		DEBuilder.addField(
+			fieldLabel = "Text",
 			fieldName = "Text");
 
 		WebContentStructures.saveCP();
@@ -51,7 +51,7 @@ definition {
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
 
-		DataEngine.assertFieldNotPresent(fieldFieldLabel = "Color");
+		DEBuilder.assertFieldNotPresent(fieldLabel = "Color");
 	}
 
 	@description = "This is a test for LRQA-68657. This test verifies that is possible to duplicate the field."
@@ -61,8 +61,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
 		DataEngine.duplicate(fieldFieldLabel = "Color");
@@ -87,8 +87,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
 		DataEngine.editFieldTip(
@@ -117,6 +117,225 @@ definition {
 			fieldName = "Color");
 	}
 
+	@description = "This is a test for LRQA-69447. This test verifies that upon duplicating a repeatable field, inputted data on both fields persists."
+	@priority = "5"
+	test CanInputDataOnDuplicatedField {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Color",
+			fieldName = "Color");
+
+		DataEngine.toggleFieldRepeatable(fieldFieldLabel = "Color");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DataEngine.addRepeatableField(fieldLabel = "Color");
+
+		DERenderer.inputDataInColorField(
+			fieldLabel = "Color",
+			index = "1",
+			value = "006EF8");
+
+		DERenderer.inputDataInColorField(
+			fieldLabel = "Color",
+			index = "2",
+			value = "FF21A0");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			index = "1",
+			value = "006EF8");
+
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			index = "2",
+			value = "FF21A0");
+	}
+
+	@description = "This is a test for LRQA-69447. This test verifies that is possible to remove a duplicated field (repeatable)."
+	@priority = "4"
+	test CanRemoveDuplicatedField {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Color",
+			fieldName = "Color");
+
+		DataEngine.toggleFieldRepeatable(fieldFieldLabel = "Color");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DataEngine.addRepeatableField(fieldLabel = "Color");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.removeRepeatableField(fieldLabel = "Color");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DEBuilder.assertFieldNotPresent(
+			fieldLabel = "Color",
+			index = "2");
+	}
+
+	@description = "This is a test for LRQA-69447. This test verifies that chosen color persists."
+	@priority = "5"
+	test CanSelectColor {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Color",
+			fieldName = "Color");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInColorField(
+			fieldLabel = "Color",
+			value = "006EF8");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			value = "006EF8");
+	}
+
+	@description = "This is a test for LRQA-69447. This test verifies that is possible to choose color by HEX."
+	@priority = "5"
+	test CanSelectColorByHEX {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Color",
+			fieldName = "Color");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInColorField(
+			colorSelectionMethod = "HEX",
+			fieldLabel = "Color",
+			value = "006EF8");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			value = "006ef8");
+	}
+
+	@description = "This is a test for LRQA-69447. This test verifies that is possible to choose color by choosing RGB values by clicking on the drop icon."
+	@priority = "5"
+	test CanSelectColorByRGB {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Color",
+			fieldName = "Color");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInColorField(
+			colorSelectionMethod = "RGB",
+			fieldLabel = "Color",
+			valueBlue = "248",
+			valueGreen = "110",
+			valueRed = "0");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			value = "006ef8");
+	}
+
+	@description = "This is a test for LRQA-69447. This test verifies that is possible to choose color by clicking on the color square."
+	@priority = "5"
+	test CanSelectColorBySwatch {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Color",
+			fieldName = "Color");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInColorField(
+			colorSelectionMethod = "Swatch",
+			fieldLabel = "Color",
+			value = "006EF8");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInColorField(
+			fieldLabel = "Color",
+			value = "006EF8");
+	}
+
 	@description = "This is a test for LRQA-68657. This test verifies that Default Searchable property is 'Disable' when System Setting is left unchecked"
 	@priority = "3"
 	test CanSetDefaultSearchablePropertyToDisable {
@@ -142,8 +361,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
 		DataEngine.viewFieldSearchable(
@@ -176,8 +395,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
 		DataEngine.viewFieldSearchable(
@@ -192,8 +411,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
 		DataEngine.editFieldTip(
@@ -217,8 +436,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Color",
+		DEBuilder.addField(
+			fieldLabel = "Color",
 			fieldName = "Color");
 
 		DataEngine.toggleShowLabel(fieldLabel = "Color");
@@ -227,7 +446,7 @@ definition {
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
 
-		DataEngine.assertFieldNotPresent(fieldFieldLabel = "Color");
+		DEBuilder.assertFieldNotPresent(fieldLabel = "Color");
 
 		DataEngine.toggleShowLabel();
 

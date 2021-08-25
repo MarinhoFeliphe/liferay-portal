@@ -14,6 +14,9 @@
 
 package com.liferay.site.initializer.extender.internal;
 
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
+import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.fragment.importer.FragmentsImporter;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
@@ -21,7 +24,9 @@ import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.site.initializer.SiteInitializer;
+import com.liferay.style.book.zip.processor.StyleBookEntryZipProcessor;
 
 import javax.servlet.ServletContext;
 
@@ -36,18 +41,27 @@ public class SiteInitializerRegistrar {
 
 	public SiteInitializerRegistrar(
 		Bundle bundle, BundleContext bundleContext,
+		DDMStructureLocalService ddmStructureLocalService,
+		DDMTemplateLocalService ddmTemplateLocalService,
+		DefaultDDMStructureHelper defaultDDMStructureHelper,
 		DocumentResource.Factory documentResourceFactory,
 		FragmentsImporter fragmentsImporter, JSONFactory jsonFactory,
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
+		Portal portal, StyleBookEntryZipProcessor styleBookEntryZipProcessor,
 		TaxonomyVocabularyResource.Factory taxonomyVocabularyResourceFactory,
 		UserLocalService userLocalService) {
 
 		_bundle = bundle;
 		_bundleContext = bundleContext;
+		_ddmStructureLocalService = ddmStructureLocalService;
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+		_defaultDDMStructureHelper = defaultDDMStructureHelper;
 		_documentResourceFactory = documentResourceFactory;
 		_fragmentsImporter = fragmentsImporter;
 		_jsonFactory = jsonFactory;
 		_objectDefinitionResourceFactory = objectDefinitionResourceFactory;
+		_portal = portal;
+		_styleBookEntryZipProcessor = styleBookEntryZipProcessor;
 		_taxonomyVocabularyResourceFactory = taxonomyVocabularyResourceFactory;
 		_userLocalService = userLocalService;
 	}
@@ -60,9 +74,12 @@ public class SiteInitializerRegistrar {
 		_serviceRegistration = _bundleContext.registerService(
 			SiteInitializer.class,
 			new BundleSiteInitializer(
-				_bundle, _documentResourceFactory, _fragmentsImporter,
-				_jsonFactory, _objectDefinitionResourceFactory, _servletContext,
-				_taxonomyVocabularyResourceFactory, _userLocalService),
+				_bundle, _ddmStructureLocalService, _ddmTemplateLocalService,
+				_defaultDDMStructureHelper, _documentResourceFactory,
+				_fragmentsImporter, _jsonFactory,
+				_objectDefinitionResourceFactory, _portal, _servletContext,
+				_styleBookEntryZipProcessor, _taxonomyVocabularyResourceFactory,
+				_userLocalService),
 			MapUtil.singletonDictionary(
 				"site.initializer.key", _bundle.getSymbolicName()));
 	}
@@ -73,13 +90,18 @@ public class SiteInitializerRegistrar {
 
 	private final Bundle _bundle;
 	private final BundleContext _bundleContext;
+	private final DDMStructureLocalService _ddmStructureLocalService;
+	private final DDMTemplateLocalService _ddmTemplateLocalService;
+	private final DefaultDDMStructureHelper _defaultDDMStructureHelper;
 	private final DocumentResource.Factory _documentResourceFactory;
 	private final FragmentsImporter _fragmentsImporter;
 	private final JSONFactory _jsonFactory;
 	private final ObjectDefinitionResource.Factory
 		_objectDefinitionResourceFactory;
+	private final Portal _portal;
 	private ServiceRegistration<?> _serviceRegistration;
 	private ServletContext _servletContext;
+	private final StyleBookEntryZipProcessor _styleBookEntryZipProcessor;
 	private final TaxonomyVocabularyResource.Factory
 		_taxonomyVocabularyResourceFactory;
 	private final UserLocalService _userLocalService;

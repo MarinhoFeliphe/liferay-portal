@@ -47,8 +47,8 @@ public class CPDefinitionDiagramEntrySoap implements Serializable {
 		soapModel.setCPInstanceUuid(model.getCPInstanceUuid());
 		soapModel.setCProductId(model.getCProductId());
 		soapModel.setDiagram(model.isDiagram());
-		soapModel.setNumber(model.getNumber());
 		soapModel.setQuantity(model.getQuantity());
+		soapModel.setSequence(model.getSequence());
 		soapModel.setSku(model.getSku());
 
 		return soapModel;
@@ -197,20 +197,20 @@ public class CPDefinitionDiagramEntrySoap implements Serializable {
 		_diagram = diagram;
 	}
 
-	public int getNumber() {
-		return _number;
-	}
-
-	public void setNumber(int number) {
-		_number = number;
-	}
-
 	public int getQuantity() {
 		return _quantity;
 	}
 
 	public void setQuantity(int quantity) {
 		_quantity = quantity;
+	}
+
+	public String getSequence() {
+		return _sequence;
+	}
+
+	public void setSequence(String sequence) {
+		_sequence = sequence;
 	}
 
 	public String getSku() {
@@ -231,8 +231,8 @@ public class CPDefinitionDiagramEntrySoap implements Serializable {
 	private String _CPInstanceUuid;
 	private long _CProductId;
 	private boolean _diagram;
-	private int _number;
 	private int _quantity;
+	private String _sequence;
 	private String _sku;
 
 }

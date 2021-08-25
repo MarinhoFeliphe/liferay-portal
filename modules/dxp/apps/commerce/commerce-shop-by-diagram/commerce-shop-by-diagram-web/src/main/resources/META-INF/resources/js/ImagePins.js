@@ -77,27 +77,29 @@ const ImagePins = ({
 
 		svg.call(zoom);
 
-		svg.on('dblclick.zoom', () => {
-			const x =
-				(d3event.offsetX - transform.current.x) / transform.current.k;
-			const y =
-				(d3event.offsetY - transform.current.y) / transform.current.k;
-
-			setCpins(
-				cPins.concat({
-					cx: x,
-					cy: y,
-					draggable: true,
-					fill: `#${addNewPinState.fill}`,
-					id: cPins.length,
-					label: `new${cPins.length}`,
-					linked_to_sku: 'sku',
-					quantity: 0,
-					r: addNewPinState.radius,
-					sku: addNewPinState.sku,
-				})
-			);
-		});
+		if (isAdmin) {
+			svg.on('dblclick.zoom', () => {
+				const x =
+					(d3event.offsetX - transform.current.x) /
+					transform.current.k;
+				const y =
+					(d3event.offsetY - transform.current.y) /
+					transform.current.k;
+				setCpins(
+					cPins.concat({
+						cx: x,
+						cy: y,
+						draggable: true,
+						fill: `#${addNewPinState.fill}`,
+						label: '',
+						linked_to_sku: 'sku',
+						quantity: 0,
+						r: addNewPinState.radius,
+						sku: addNewPinState.sku,
+					})
+				);
+			});
+		}
 
 		if (resetZoom) {
 			setResetZoom(false);
@@ -226,8 +228,7 @@ const ImagePins = ({
 					cy: 50,
 					draggable: true,
 					fill: '#' + addNewPinState.fill,
-					id: cPins.length,
-					label: 'new' + cPins.length,
+					label: '',
 					linked_to_sku: 'sku',
 					quantity: 0,
 					r: addNewPinState.radius,
@@ -288,10 +289,10 @@ const ImagePins = ({
 				.attr('cy', (attr) => attr.cy)
 				.attr('id', (attr) => attr.id)
 				.attr('label', (attr) => attr.label)
-				.attr('fill', (attr) => attr.fill)
+				.attr('fill', () => `#${addNewPinState.fill}`)
 				.attr('linked_to_sku', (attr) => attr.linked_to_sku)
 				.attr('quantity', (attr) => attr.quantity)
-				.attr('r', (attr) => attr.r)
+				.attr('r', () => addNewPinState.radius)
 				.attr('sku', (attr) => attr.sku)
 				.attr('id', (attr) => attr.id)
 				.attr('class', 'circle_pin')
@@ -299,10 +300,9 @@ const ImagePins = ({
 				.call(dragHandler);
 
 			cont.append('circle')
-				.attr('r', (attr) => attr.r)
 				.attr('fill', () => '#ffffff')
-				.attr('r', (attr) => attr.r)
-				.attr('stroke', (attr) => attr.fill)
+				.attr('r', () => addNewPinState.radius)
+				.attr('stroke', () => `#${addNewPinState.fill}`)
 				.attr('stroke-width', 2);
 
 			cont.append('text')

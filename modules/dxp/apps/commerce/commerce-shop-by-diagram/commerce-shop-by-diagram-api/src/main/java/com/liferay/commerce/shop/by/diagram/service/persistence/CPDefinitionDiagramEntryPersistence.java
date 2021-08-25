@@ -186,57 +186,57 @@ public interface CPDefinitionDiagramEntryPersistence
 	public int countByCPDefinitionId(long CPDefinitionId);
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or throws a <code>NoSuchCPDefinitionDiagramEntryException</code> if it could not be found.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or throws a <code>NoSuchCPDefinitionDiagramEntryException</code> if it could not be found.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the matching cp definition diagram entry
 	 * @throws NoSuchCPDefinitionDiagramEntryException if a matching cp definition diagram entry could not be found
 	 */
-	public CPDefinitionDiagramEntry findByCPDI_N(
-			long CPDefinitionId, int number)
+	public CPDefinitionDiagramEntry findByCPDI_S(
+			long CPDefinitionId, String sequence)
 		throws NoSuchCPDefinitionDiagramEntryException;
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the matching cp definition diagram entry, or <code>null</code> if a matching cp definition diagram entry could not be found
 	 */
-	public CPDefinitionDiagramEntry fetchByCPDI_N(
-		long CPDefinitionId, int number);
+	public CPDefinitionDiagramEntry fetchByCPDI_S(
+		long CPDefinitionId, String sequence);
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching cp definition diagram entry, or <code>null</code> if a matching cp definition diagram entry could not be found
 	 */
-	public CPDefinitionDiagramEntry fetchByCPDI_N(
-		long CPDefinitionId, int number, boolean useFinderCache);
+	public CPDefinitionDiagramEntry fetchByCPDI_S(
+		long CPDefinitionId, String sequence, boolean useFinderCache);
 
 	/**
-	 * Removes the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; from the database.
+	 * Removes the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; from the database.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the cp definition diagram entry that was removed
 	 */
-	public CPDefinitionDiagramEntry removeByCPDI_N(
-			long CPDefinitionId, int number)
+	public CPDefinitionDiagramEntry removeByCPDI_S(
+			long CPDefinitionId, String sequence)
 		throws NoSuchCPDefinitionDiagramEntryException;
 
 	/**
-	 * Returns the number of cp definition diagram entries where CPDefinitionId = &#63; and number = &#63;.
+	 * Returns the number of cp definition diagram entries where CPDefinitionId = &#63; and sequence = &#63;.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the number of matching cp definition diagram entries
 	 */
-	public int countByCPDI_N(long CPDefinitionId, int number);
+	public int countByCPDI_S(long CPDefinitionId, String sequence);
 
 	/**
 	 * Caches the cp definition diagram entry in the entity cache if it is enabled.

@@ -5,6 +5,10 @@ definition {
 	}
 
 	macro connectDXPtoAnalyticsCloud {
+		if (!(isSet(siteName))) {
+			siteName = "Liferay DXP";
+		}
+
 		ACDXPSettings.goToInstanceSettingsAC();
 
 		Click(locator1 = "ACDXPSettings#TOKEN_INPUT_FIELD");
@@ -31,20 +35,12 @@ definition {
 	macro createCombinedProperties {
 		var siteName = "${siteName}";
 
-		Click(locator1 = "ACDXPSettings#AC_GENERIC_ADD_OR_CONFIRMATION_BUTTON");
+		LexiconEntry.gotoAdd();
 
 		Click(locator1 = "ACDXPSettings#COMBINATED_PROPERTY_OPTION");
 
 		if (isSet(siteName)) {
-			Click(locator1 = "ACDXPSettings#SYNCED_SITES_SEARCH_FIELD");
-
-			Type(
-				locator1 = "ACDXPSettings#SYNCED_SITES_SEARCH_FIELD",
-				value1 = "${siteName}");
-
-			KeyPress(
-				locator1 = "ACDXPSettings#SYNCED_SITES_SEARCH_FIELD",
-				value1 = "\ENTER");
+			ACDXPSettings.searchACItem(searchItem = "${siteName}");
 		}
 
 		Click(locator1 = "ACDXPSettings#AC_GENERIC_CHECKBOX");
@@ -71,9 +67,11 @@ definition {
 	macro disconnectDXPFromAnalyticsCloud {
 		ACDXPSettings.goToInstanceSettingsAC();
 
-		ClickNoError(locator1 = "ACDXPSettings#CONNECT_DISCONNECT_BUTTON");
+		if (IsElementPresent(locator1 = "ACDXPSettings#AC_GENERIC_CANCEL_BUTTON")) {
+			ClickNoError(locator1 = "ACDXPSettings#CONNECT_DISCONNECT_BUTTON");
 
-		AssertConfirm.assertConfirmationNoError(value1 = "Are you sure you want to disconnect your Analytics Cloud workspace from this DXP instance?");
+			AssertConfirm.assertConfirmationNoError(value1 = "Are you sure you want to disconnect your Analytics Cloud workspace from this DXP instance?");
+		}
 	}
 
 	macro getAssignedPropertyName {
@@ -91,25 +89,7 @@ definition {
 
 		var assignedPropertyName = selenium.getText("//tr[@data-qa-id='row'][contains(.,'${siteName}')]//td[contains(@class,'assigned-property-column')]");
 
-		Click(locator1 = "ACDXPSettings#AC_GENERIC_CANCEL_BUTTON");
-
-		return "${assignedPropertyName}";
-	}
-
-	macro getSiteAssignedPropertyName {
-		ACDXPSettings.goToInstanceSettingsAC();
-
-		ACDXPSettings.navToSyncedSitesMenu();
-
-		LexiconEntry.gotoAdd();
-
-		WaitForVisible(
-			key_tableEntry = "${siteName}",
-			locator1 = "LexiconTable#TABLE_ENTRY");
-
-		var assignedPropertyName = selenium.getText("//tr[@data-qa-id='row'][contains(.,'${siteName}')]//td[contains(@class,'assigned-property-column')]");
-
-		Click(locator1 = "ACDXPSettings#AC_GENERIC_CANCEL_BUTTON");
+		ACNavigation.clickCancelButton();
 
 		return "${assignedPropertyName}";
 	}
@@ -130,6 +110,18 @@ definition {
 
 	macro navToSyncedSitesMenu {
 		Click(locator1 = "ACDXPSettings#SYNCED_SITES_NAV_SIDEBAR");
+	}
+
+	macro searchACItem {
+		Click(locator1 = "ACDXPSettings#SYNCED_SITES_SEARCH_FIELD");
+
+		Type(
+			locator1 = "ACDXPSettings#SYNCED_SITES_SEARCH_FIELD",
+			value1 = "${searchItem}");
+
+		KeyPress(
+			locator1 = "ACDXPSettings#SYNCED_SITES_SEARCH_FIELD",
+			value1 = "\ENTER");
 	}
 
 	macro selectAvailableProperties {
@@ -158,6 +150,30 @@ definition {
 		ACDXPSettings.navToSyncedContactDataMenu();
 
 		ACDXPSettings.syncContactData();
+	}
+
+	macro syncNewUserData {
+		ACDXPSettings.goToInstanceSettingsAC();
+
+		ACDXPSettings.navToSyncedContactDataMenu();
+
+		Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
+
+		Check.checkToggleSwitch(locator1 = "ACDXPSettings#SYNC_ALL_CONTACTS_TOGGLE");
+
+		Click(locator1 = "ACDXPSettings#AC_GENERIC_ADD_OR_CONFIRMATION_BUTTON");
+
+		Click(locator1 = "ACDXPSettings#SYNCED_CONTACT_DATA_USER_TAB");
+
+		for (var fieldName : list "${fieldNameList}") {
+			Check(
+				key_fieldName = "${fieldName}",
+				locator1 = "ACDXPSettings#FIELD_NAME_CHECKBOX");
+		}
+
+		Click(locator1 = "ACDXPSettings#AC_GENERIC_ADD_OR_CONFIRMATION_BUTTON");
+
+		Alert.viewSuccessMessage();
 	}
 
 }

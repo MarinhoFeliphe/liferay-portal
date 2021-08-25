@@ -50,22 +50,8 @@ public class CommerceOrderServiceImpl extends CommerceOrderServiceBaseImpl {
 
 	@Override
 	public CommerceOrder addCommerceOrder(
-			long userId, long groupId, long commerceAccountId,
-			long commerceCurrencyId)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId,
-			CommerceOrderActionKeys.ADD_COMMERCE_ORDER);
-
-		return commerceOrderLocalService.addCommerceOrder(
-			userId, groupId, commerceAccountId, commerceCurrencyId);
-	}
-
-	@Override
-	public CommerceOrder addCommerceOrder(
 			long groupId, long commerceAccountId, long commerceCurrencyId,
-			long shippingAddressId, String purchaseOrderNumber)
+			long commerceOrderTypeId)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -74,28 +60,13 @@ public class CommerceOrderServiceImpl extends CommerceOrderServiceBaseImpl {
 
 		return commerceOrderLocalService.addCommerceOrder(
 			getUserId(), groupId, commerceAccountId, commerceCurrencyId,
-			shippingAddressId, purchaseOrderNumber);
-	}
-
-	@Override
-	public CommerceOrder addCommerceOrder(
-			long groupId, long commerceAccountId, long shippingAddressId,
-			String purchaseOrderNumber)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId,
-			CommerceOrderActionKeys.ADD_COMMERCE_ORDER);
-
-		return commerceOrderLocalService.addCommerceOrder(
-			getUserId(), groupId, commerceAccountId, shippingAddressId,
-			purchaseOrderNumber);
+			commerceOrderTypeId);
 	}
 
 	@Override
 	public CommerceOrder addOrUpdateCommerceOrder(
-			String externalReferenceCode, long userId, long groupId,
-			long commerceAccountId, long commerceCurrencyId,
+			String externalReferenceCode, long groupId, long commerceAccountId,
+			long commerceCurrencyId, long commerceOrderTypeId,
 			long billingAddressId, long shippingAddressId,
 			String commercePaymentMethodKey, long commerceShippingMethodId,
 			String shippingOptionName, String purchaseOrderNumber,
@@ -124,20 +95,21 @@ public class CommerceOrderServiceImpl extends CommerceOrderServiceBaseImpl {
 		}
 
 		return commerceOrderLocalService.addOrUpdateCommerceOrder(
-			externalReferenceCode, userId, groupId, commerceAccountId,
-			commerceCurrencyId, billingAddressId, shippingAddressId,
-			commercePaymentMethodKey, commerceShippingMethodId,
-			shippingOptionName, purchaseOrderNumber, subtotal, shippingAmount,
-			taxAmount, total, subtotalWithTaxAmount, shippingWithTaxAmount,
-			totalWithTaxAmount, paymentStatus, orderDateMonth, orderDateDay,
-			orderDateYear, orderDateHour, orderDateMinute, orderStatus,
-			advanceStatus, commerceContext, serviceContext);
+			externalReferenceCode, getUserId(), groupId, commerceAccountId,
+			commerceCurrencyId, commerceOrderTypeId, billingAddressId,
+			shippingAddressId, commercePaymentMethodKey,
+			commerceShippingMethodId, shippingOptionName, purchaseOrderNumber,
+			subtotal, shippingAmount, taxAmount, total, subtotalWithTaxAmount,
+			shippingWithTaxAmount, totalWithTaxAmount, paymentStatus,
+			orderDateMonth, orderDateDay, orderDateYear, orderDateHour,
+			orderDateMinute, orderStatus, advanceStatus, commerceContext,
+			serviceContext);
 	}
 
 	@Override
 	public CommerceOrder addOrUpdateCommerceOrder(
-			String externalReferenceCode, long userId, long groupId,
-			long commerceAccountId, long commerceCurrencyId,
+			String externalReferenceCode, long groupId, long commerceAccountId,
+			long commerceCurrencyId, long commerceOrderTypeId,
 			long billingAddressId, long shippingAddressId,
 			String commercePaymentMethodKey, long commerceShippingMethodId,
 			String shippingOptionName, String purchaseOrderNumber,
@@ -150,13 +122,13 @@ public class CommerceOrderServiceImpl extends CommerceOrderServiceBaseImpl {
 		throws PortalException {
 
 		return commerceOrderService.addOrUpdateCommerceOrder(
-			externalReferenceCode, userId, groupId, commerceAccountId,
-			commerceCurrencyId, billingAddressId, shippingAddressId,
-			commercePaymentMethodKey, commerceShippingMethodId,
-			shippingOptionName, purchaseOrderNumber, subtotal, shippingAmount,
-			taxAmount, total, subtotalWithTaxAmount, shippingWithTaxAmount,
-			totalWithTaxAmount, paymentStatus, 0, 0, 0, 0, 0, orderStatus,
-			advanceStatus, commerceContext, serviceContext);
+			externalReferenceCode, groupId, commerceAccountId,
+			commerceCurrencyId, commerceOrderTypeId, billingAddressId,
+			shippingAddressId, commercePaymentMethodKey,
+			commerceShippingMethodId, shippingOptionName, purchaseOrderNumber,
+			subtotal, shippingAmount, taxAmount, total, subtotalWithTaxAmount,
+			shippingWithTaxAmount, totalWithTaxAmount, paymentStatus, 0, 0, 0,
+			0, 0, orderStatus, advanceStatus, commerceContext, serviceContext);
 	}
 
 	@Override

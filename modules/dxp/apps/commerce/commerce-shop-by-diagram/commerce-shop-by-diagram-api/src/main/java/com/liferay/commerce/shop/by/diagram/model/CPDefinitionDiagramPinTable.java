@@ -55,15 +55,15 @@ public class CPDefinitionDiagramPinTable
 	public final Column<CPDefinitionDiagramPinTable, Long> CPDefinitionId =
 		createColumn(
 			"CPDefinitionId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
-	public final Column<CPDefinitionDiagramPinTable, Integer> number =
-		createColumn(
-			"number_", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
 	public final Column<CPDefinitionDiagramPinTable, Double> positionX =
 		createColumn(
 			"positionX", Double.class, Types.DOUBLE, Column.FLAG_DEFAULT);
 	public final Column<CPDefinitionDiagramPinTable, Double> positionY =
 		createColumn(
 			"positionY", Double.class, Types.DOUBLE, Column.FLAG_DEFAULT);
+	public final Column<CPDefinitionDiagramPinTable, String> sequence =
+		createColumn(
+			"sequence", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 
 	private CPDefinitionDiagramPinTable() {
 		super("CPDefinitionDiagramPin", CPDefinitionDiagramPinTable::new);

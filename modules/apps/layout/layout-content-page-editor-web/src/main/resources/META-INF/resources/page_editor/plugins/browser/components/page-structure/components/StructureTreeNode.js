@@ -23,6 +23,7 @@ import {fromControlsId} from '../../../../../app/components/layout-data-items/Co
 import {ITEM_ACTIVATION_ORIGINS} from '../../../../../app/config/constants/itemActivationOrigins';
 import {ITEM_TYPES} from '../../../../../app/config/constants/itemTypes';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../app/config/constants/layoutDataItemTypes';
+import {config} from '../../../../../app/config/index';
 import {
 	useActivationOrigin,
 	useActiveItemId,
@@ -55,6 +56,7 @@ import {
 } from '../../../../../app/utils/drag-and-drop/useDragAndDrop';
 import getFirstControlsId from '../../../../../app/utils/getFirstControlsId';
 import getMappingFieldsKey from '../../../../../app/utils/getMappingFieldsKey';
+import updateItemStyle from '../../../../../app/utils/updateItemStyle';
 
 const HOVER_EXPAND_DELAY = 1000;
 
@@ -136,6 +138,7 @@ export default function StructureTreeNode({node}) {
 		<MemoizedStructureTreeNodeContent
 			activationOrigin={isSelected ? activationOrigin : null}
 			isActive={node.activable && isSelected}
+			isDisabled={node.disabled}
 			isHovered={node.id === fromControlsId(hoveredItemId)}
 			isMapped={node.mapped}
 			isSelected={isSelected}
@@ -164,6 +167,7 @@ const MemoizedStructureTreeNodeContent = React.memo(
 function StructureTreeNodeContent({
 	activationOrigin,
 	isActive,
+	isDisabled,
 	isHovered,
 	isMapped,
 	isSelected,
@@ -172,10 +176,12 @@ function StructureTreeNodeContent({
 	const canUpdatePageStructure = useSelector(selectCanUpdatePageStructure);
 	const dispatch = useDispatch();
 	const hoverItem = useHoverItem();
-	const isDisabled = !node.activable || node.disabled;
 	const nodeRef = useRef();
 	const layoutDataRef = useRef();
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
+	const selectedViewportSize = useSelector(
+		(state) => state.selectedViewportSize
+	);
 	const selectItem = useSelectItem();
 
 	useSelector((store) => {
@@ -183,6 +189,8 @@ function StructureTreeNodeContent({
 
 		return null;
 	});
+
+	const isActivable = node.activable && node.itemType !== ITEM_TYPES.editable;
 
 	const item = {
 		children: node.children,
@@ -242,7 +250,7 @@ function StructureTreeNodeContent({
 
 	return (
 		<div
-			aria-disabled={isDisabled}
+			aria-disabled={isDisabled || !isActivable}
 			aria-selected={isActive}
 			className={classNames('page-editor__page-structure__tree-node', {
 				'drag-over-bottom':
@@ -252,9 +260,9 @@ function StructureTreeNodeContent({
 				'drag-over-top':
 					isOverTarget && targetPosition === TARGET_POSITIONS.TOP,
 				dragged: isDraggingSource,
-				'page-editor__page-structure__tree-node--activable':
-					node.activable && node.itemType !== ITEM_TYPES.editable,
+				'page-editor__page-structure__tree-node--activable': isActivable,
 				'page-editor__page-structure__tree-node--active': isActive,
+				'page-editor__page-structure__tree-node--disabled': isDisabled,
 				'page-editor__page-structure__tree-node--hovered': isHovered,
 				'page-editor__page-structure__tree-node--mapped': isMapped,
 			})}
@@ -282,7 +290,7 @@ function StructureTreeNodeContent({
 					event.target.focus();
 
 					const itemId = getFirstControlsId({
-						itemId: node.id,
+						item: node,
 						layoutData: layoutDataRef.current,
 					});
 
@@ -300,6 +308,7 @@ function StructureTreeNodeContent({
 
 			<NameLabel
 				disabled={node.disabled}
+				hidden={node.hidden || node.hiddenAncestor}
 				icon={node.icon}
 				isActive={isActive}
 				isMapped={isMapped}
@@ -307,21 +316,38 @@ function StructureTreeNodeContent({
 				ref={nodeRef}
 			/>
 
-			{node.removable && canUpdatePageStructure && (
-				<RemoveButton node={node} visible={isHovered || isSelected} />
-			)}
+			<div>
+				{(node.removable || node.hidden) &&
+					config.fragmentsHidingEnabled && (
+						<VisibilityButton
+							dispatch={dispatch}
+							node={node}
+							segmentsExperienceId={segmentsExperienceId}
+							selectedViewportSize={selectedViewportSize}
+							visible={node.hidden || isHovered || isSelected}
+						/>
+					)}
+
+				{node.removable && canUpdatePageStructure && (
+					<RemoveButton
+						node={node}
+						visible={isHovered || isSelected}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }
 
 const NameLabel = React.forwardRef(
-	({disabled, icon, isActive, isMapped, name}, ref) => (
+	({disabled, hidden, icon, isActive, isMapped, name}, ref) => (
 		<div
 			className={classNames(
 				'page-editor__page-structure__tree-node__name',
 				{
 					'page-editor__page-structure__tree-node__name--active': isActive,
 					'page-editor__page-structure__tree-node__name--disabled': disabled,
+					'page-editor__page-structure__tree-node__name--hidden': hidden,
 					'page-editor__page-structure__tree-node__name--mapped': isMapped,
 				}
 			)}
@@ -333,6 +359,45 @@ const NameLabel = React.forwardRef(
 		</div>
 	)
 );
+
+const VisibilityButton = ({
+	dispatch,
+	node,
+	segmentsExperienceId,
+	selectedViewportSize,
+	visible,
+}) => {
+	return (
+		<ClayButton
+			aria-label={Liferay.Util.sub(
+				node.hidden
+					? Liferay.Language.get('show-x')
+					: Liferay.Language.get('hide-x'),
+				[node.name]
+			)}
+			className={classNames(
+				'page-editor__page-structure__tree-node__visibility-button',
+				{
+					'page-editor__page-structure__tree-node__visibility-button--visible': visible,
+				}
+			)}
+			disabled={node.disabled}
+			displayType="unstyled"
+			onClick={() =>
+				updateItemStyle({
+					dispatch,
+					itemId: node.id,
+					segmentsExperienceId,
+					selectedViewportSize,
+					styleName: 'display',
+					styleValue: node.hidden ? 'block' : 'none',
+				})
+			}
+		>
+			<ClayIcon symbol={node.hidden ? 'hidden' : 'view'} />
+		</ClayButton>
+	);
+};
 
 const RemoveButton = ({node, visible}) => {
 	const dispatch = useDispatch();

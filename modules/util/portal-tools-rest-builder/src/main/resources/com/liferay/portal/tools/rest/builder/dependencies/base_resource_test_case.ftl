@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -1385,7 +1384,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 			}
 		</#if>
 
-		<#if freeMarkerTool.hasHTTPMethod(javaMethodSignature, "delete") && stringUtil.equals(freeMarkerTool.getGraphQLPropertyName(javaMethodSignature, javaMethodSignatures), "delete" + schemaName)>
+		<#if configYAML.generateGraphQL && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "delete") && stringUtil.equals(freeMarkerTool.getGraphQLPropertyName(javaMethodSignature, javaMethodSignatures), "delete" + schemaName)>
 			@Test
 			public void testGraphQL${javaMethodSignature.methodName?cap_first}() throws Exception {
 				<#if !properties?keys?seq_contains("id")>
@@ -1445,7 +1444,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 					</#if>
 				</#if>
 			}
-		<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "get") && javaMethodSignature.returnType?contains("Page<") && stringUtil.equals(freeMarkerTool.getGraphQLPropertyName(javaMethodSignature, javaMethodSignatures), schemaVarNames)>
+		<#elseif configYAML.generateGraphQL && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "get") && javaMethodSignature.returnType?contains("Page<") && stringUtil.equals(freeMarkerTool.getGraphQLPropertyName(javaMethodSignature, javaMethodSignatures), schemaVarNames)>
 			@Test
 			public void testGraphQL${javaMethodSignature.methodName?cap_first}() throws Exception {
 				<#if !properties?keys?seq_contains("id")>
@@ -1505,7 +1504,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 					assertEqualsIgnoringOrder(Arrays.asList(${schemaVarName}1, ${schemaVarName}2), Arrays.asList((${schemaName}SerDes.toDTOs(${schemaVarNames}JSONObject.getString("items")))));
 				</#if>
 			}
-		<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "get") && javaMethodSignature.returnType?ends_with(schemaName)>
+		<#elseif configYAML.generateGraphQL && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "get") && javaMethodSignature.returnType?ends_with(schemaName)>
 			@Test
 			public void testGraphQL${javaMethodSignature.methodName?cap_first}() throws Exception {
 				<#if properties?keys?seq_contains("id")>
@@ -1602,7 +1601,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 					Assert.assertTrue(true);
 				</#if>
 				}
-		<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "post") && stringUtil.equals(javaMethodSignature.methodName, "postSite" + schemaName) && !freeMarkerTool.hasRequestBodyMediaType(javaMethodSignature, "multipart/form-data")>
+		<#elseif configYAML.generateGraphQL && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "post") && stringUtil.equals(javaMethodSignature.methodName, "postSite" + schemaName) && !freeMarkerTool.hasRequestBodyMediaType(javaMethodSignature, "multipart/form-data")>
 			@Test
 			public void testGraphQL${javaMethodSignature.methodName?cap_first}() throws Exception {
 				${schemaName} random${schemaName} = random${schemaName}();
@@ -2429,7 +2428,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(Base${schemaName}ResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log = LogFactoryUtil.getLog(Base${schemaName}ResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

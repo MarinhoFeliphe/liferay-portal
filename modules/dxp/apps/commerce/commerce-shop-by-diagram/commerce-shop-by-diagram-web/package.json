@@ -7,6 +7,7 @@
 		"@clayui/drop-down": "3.32.0",
 		"@clayui/form": "3.32.0",
 		"@clayui/icon": "3.32.0",
+		"@clayui/loading-indicator": "3.32.0",
 		"@clayui/modal": "3.32.0",
 		"@clayui/slider": "3.32.0",
 		"@liferay/frontend-js-react-web": "*",
@@ -28,7 +29,7 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"coverage": "liferay-npm-scripts test --coverage --silent --verbose",
 		"format": "liferay-npm-scripts fix",
-		"test": "liferay-npm-scripts test",
+		"test": "liferay-npm-scripts test --passWithNoTests",
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
 	"version": "1.0.11"

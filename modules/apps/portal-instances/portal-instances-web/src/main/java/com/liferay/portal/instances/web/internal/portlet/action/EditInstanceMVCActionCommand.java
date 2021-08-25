@@ -14,15 +14,12 @@
 
 package com.liferay.portal.instances.web.internal.portlet.action;
 
-import com.liferay.portal.instances.initializer.PortalInstanceInitializer;
-import com.liferay.portal.instances.initializer.PortalInstanceInitializerRegistry;
 import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.instances.web.internal.constants.PortalInstancesPortletKeys;
 import com.liferay.portal.kernel.exception.CompanyMxException;
 import com.liferay.portal.kernel.exception.CompanyVirtualHostException;
 import com.liferay.portal.kernel.exception.CompanyWebIdException;
 import com.liferay.portal.kernel.exception.NoSuchCompanyException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredCompanyException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,10 +34,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import java.util.Collections;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -157,34 +151,13 @@ public class EditInstanceMVCActionCommand extends BaseMVCActionCommand {
 			Company company = _companyService.addCompany(
 				webId, virtualHostname, mx, false, maxUsers, active);
 
+			String siteInitializerKey = ParamUtil.getString(
+				actionRequest, "siteInitializerKey");
 			ServletContext servletContext =
 				(ServletContext)actionRequest.getAttribute(WebKeys.CTX);
 
 			_portalInstancesLocalService.initializePortalInstance(
-				servletContext, company.getWebId());
-
-			// Initialize instance with portal instance initializer
-
-			String portalInstanceInitializerKey = ParamUtil.getString(
-				actionRequest, "portalInstanceInitializerKey");
-
-			if (Validator.isNotNull(portalInstanceInitializerKey)) {
-				PortalInstanceInitializer portalInstanceInitializer =
-					_portalInstanceInitializerRegistry.
-						getPortalInstanceInitializer(
-							portalInstanceInitializerKey);
-
-				if (portalInstanceInitializer == null) {
-					throw new PortalException(
-						"Invalid portal instance initializer key " +
-							portalInstanceInitializerKey);
-				}
-
-				portalInstanceInitializer.initialize(
-					company.getCompanyId(),
-					_portal.getHttpServletRequest(actionRequest),
-					Collections.emptyMap());
-			}
+				company.getCompanyId(), siteInitializerKey, servletContext);
 		}
 		else {
 
@@ -208,10 +181,6 @@ public class EditInstanceMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortalInstanceInitializerRegistry
-		_portalInstanceInitializerRegistry;
 
 	@Reference
 	private PortalInstancesLocalService _portalInstancesLocalService;

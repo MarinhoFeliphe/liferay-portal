@@ -73,6 +73,28 @@ public class JSONStorageEntryLocalServiceImpl
 
 	@Override
 	public List<Long> getClassPKs(
+		long companyId, long classNameId, int start, int end) {
+
+		return jsonStorageEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.selectDistinct(
+				JSONStorageEntryTable.INSTANCE.classPK
+			).from(
+				JSONStorageEntryTable.INSTANCE
+			).where(
+				JSONStorageEntryTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					JSONStorageEntryTable.INSTANCE.classNameId.eq(classNameId)
+				)
+			).orderBy(
+				JSONStorageEntryTable.INSTANCE.classPK.ascending()
+			).limit(
+				start, end
+			));
+	}
+
+	@Override
+	public List<Long> getClassPKs(
 		long companyId, long classNameId, Object[] pathParts, Object value,
 		int start, int end) {
 
@@ -86,6 +108,22 @@ public class JSONStorageEntryLocalServiceImpl
 				JSONStorageEntryTable.INSTANCE.classPK.ascending()
 			).limit(
 				start, end
+			));
+	}
+
+	@Override
+	public int getClassPKsCount(long companyId, long classNameId) {
+		return jsonStorageEntryPersistence.dslQueryCount(
+			DSLQueryFactoryUtil.countDistinct(
+				JSONStorageEntryTable.INSTANCE.classPK
+			).from(
+				JSONStorageEntryTable.INSTANCE
+			).where(
+				JSONStorageEntryTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					JSONStorageEntryTable.INSTANCE.classNameId.eq(classNameId)
+				)
 			));
 	}
 
@@ -253,6 +291,11 @@ public class JSONStorageEntryLocalServiceImpl
 			).and(
 				JSONStorageEntryTable.INSTANCE.valueLong.eq(valueLong)
 			);
+		}
+		else if (value == null) {
+			predicate = predicate.and(
+				JSONStorageEntryTable.INSTANCE.type.eq(
+					JSONStorageEntryConstants.TYPE_NULL));
 		}
 		else {
 			JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();

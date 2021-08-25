@@ -49,8 +49,9 @@ public class ObjectDefinitionServiceImpl
 
 	@Override
 	public ObjectDefinition addCustomObjectDefinition(
-			Map<Locale, String> labelMap, String name,
-			List<ObjectField> objectFields)
+			Map<Locale, String> labelMap, String name, String panelAppOrder,
+			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
+			String scope, List<ObjectField> objectFields)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -58,7 +59,8 @@ public class ObjectDefinitionServiceImpl
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
 
 		return _objectDefinitionLocalService.addCustomObjectDefinition(
-			getUserId(), labelMap, name, objectFields);
+			getUserId(), labelMap, name, panelAppOrder, panelCategoryKey,
+			pluralLabelMap, scope, objectFields);
 	}
 
 	@Override
@@ -89,6 +91,14 @@ public class ObjectDefinitionServiceImpl
 	}
 
 	@Override
+	public List<ObjectDefinition> getObjectDefinitions(
+		long companyId, int start, int end) {
+
+		return objectDefinitionPersistence.findByCompanyId(
+			companyId, start, end);
+	}
+
+	@Override
 	public int getObjectDefinitionsCount() throws PortalException {
 		return _objectDefinitionLocalService.getObjectDefinitionsCount();
 	}
@@ -112,6 +122,21 @@ public class ObjectDefinitionServiceImpl
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			getUserId(), objectDefinitionId);
+	}
+
+	@Override
+	public ObjectDefinition updateCustomObjectDefinition(
+			Long objectDefinitionId, Map<Locale, String> labelMap, String name,
+			String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, String scope)
+		throws PortalException {
+
+		_objectDefinitionModelResourcePermission.check(
+			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
+
+		return _objectDefinitionLocalService.updateCustomObjectDefinition(
+			objectDefinitionId, labelMap, name, panelAppOrder, panelCategoryKey,
+			pluralLabelMap, scope);
 	}
 
 	@Reference

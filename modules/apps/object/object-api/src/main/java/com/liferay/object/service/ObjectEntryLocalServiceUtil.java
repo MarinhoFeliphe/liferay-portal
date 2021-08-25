@@ -291,10 +291,11 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static List<ObjectEntry> getObjectEntries(
-			long objectDefinitionId, int start, int end)
+			long groupId, long objectDefinitionId, int start, int end)
 		throws PortalException {
 
-		return getService().getObjectEntries(objectDefinitionId, start, end);
+		return getService().getObjectEntries(
+			groupId, objectDefinitionId, start, end);
 	}
 
 	/**
@@ -337,8 +338,10 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getObjectEntriesCount();
 	}
 
-	public static int getObjectEntriesCount(long objectDefinitionId) {
-		return getService().getObjectEntriesCount(objectDefinitionId);
+	public static int getObjectEntriesCount(
+		long groupId, long objectDefinitionId) {
+
+		return getService().getObjectEntriesCount(groupId, objectDefinitionId);
 	}
 
 	/**
@@ -417,11 +420,12 @@ public class ObjectEntryLocalServiceUtil {
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
 		<ObjectEntry> searchObjectEntries(
-				long objectDefinitionId, String keywords, int cur, int delta)
+				long groupId, long objectDefinitionId, String keywords, int cur,
+				int delta)
 			throws PortalException {
 
 		return getService().searchObjectEntries(
-			objectDefinitionId, keywords, cur, delta);
+			groupId, objectDefinitionId, keywords, cur, delta);
 	}
 
 	public static void updateAsset(

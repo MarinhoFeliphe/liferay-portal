@@ -55,6 +55,20 @@ public class CustomElementsPortletDescriptorLocalServiceWrapper
 			addCustomElementsPortletDescriptor(customElementsPortletDescriptor);
 	}
 
+	@Override
+	public com.liferay.custom.elements.model.CustomElementsPortletDescriptor
+			addCustomElementsPortletDescriptor(
+				String cssURLs, String htmlElementName, boolean instanceable,
+				String name, String properties,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _customElementsPortletDescriptorLocalService.
+			addCustomElementsPortletDescriptor(
+				cssURLs, htmlElementName, instanceable, name, properties,
+				serviceContext);
+	}
+
 	/**
 	 * Creates a new custom elements portlet descriptor with the primary key. Does not add the custom elements portlet descriptor to the database.
 	 *
@@ -92,12 +106,15 @@ public class CustomElementsPortletDescriptorLocalServiceWrapper
 	 *
 	 * @param customElementsPortletDescriptor the custom elements portlet descriptor
 	 * @return the custom elements portlet descriptor that was removed
+	 * @throws PortalException
 	 */
 	@Override
 	public com.liferay.custom.elements.model.CustomElementsPortletDescriptor
-		deleteCustomElementsPortletDescriptor(
-			com.liferay.custom.elements.model.CustomElementsPortletDescriptor
-				customElementsPortletDescriptor) {
+			deleteCustomElementsPortletDescriptor(
+				com.liferay.custom.elements.model.
+					CustomElementsPortletDescriptor
+						customElementsPortletDescriptor)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _customElementsPortletDescriptorLocalService.
 			deleteCustomElementsPortletDescriptor(
@@ -136,6 +153,16 @@ public class CustomElementsPortletDescriptorLocalServiceWrapper
 
 		return _customElementsPortletDescriptorLocalService.
 			deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public void deployCustomElementsPortletDescriptor(
+		com.liferay.custom.elements.model.CustomElementsPortletDescriptor
+			customElementsPortletDescriptor) {
+
+		_customElementsPortletDescriptorLocalService.
+			deployCustomElementsPortletDescriptor(
+				customElementsPortletDescriptor);
 	}
 
 	@Override
@@ -388,6 +415,36 @@ public class CustomElementsPortletDescriptorLocalServiceWrapper
 			primaryKeyObj);
 	}
 
+	@Override
+	public java.util.List
+		<com.liferay.custom.elements.model.CustomElementsPortletDescriptor>
+				search(
+					long companyId, String keywords, int start, int end,
+					com.liferay.portal.kernel.search.Sort sort)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _customElementsPortletDescriptorLocalService.search(
+			companyId, keywords, start, end, sort);
+	}
+
+	@Override
+	public int searchCount(long companyId, String keywords)
+		throws com.liferay.portal.kernel.search.SearchException {
+
+		return _customElementsPortletDescriptorLocalService.searchCount(
+			companyId, keywords);
+	}
+
+	@Override
+	public void undeployCustomElementsPortletDescriptor(
+		com.liferay.custom.elements.model.CustomElementsPortletDescriptor
+			customElementsPortletDescriptor) {
+
+		_customElementsPortletDescriptorLocalService.
+			undeployCustomElementsPortletDescriptor(
+				customElementsPortletDescriptor);
+	}
+
 	/**
 	 * Updates the custom elements portlet descriptor in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -407,6 +464,21 @@ public class CustomElementsPortletDescriptorLocalServiceWrapper
 		return _customElementsPortletDescriptorLocalService.
 			updateCustomElementsPortletDescriptor(
 				customElementsPortletDescriptor);
+	}
+
+	@Override
+	public com.liferay.custom.elements.model.CustomElementsPortletDescriptor
+			updateCustomElementsPortletDescriptor(
+				long customElementsSourceId, String cssURLs,
+				String htmlElementName, boolean instanceable, String name,
+				String properties,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _customElementsPortletDescriptorLocalService.
+			updateCustomElementsPortletDescriptor(
+				customElementsSourceId, cssURLs, htmlElementName, instanceable,
+				name, properties, serviceContext);
 	}
 
 	@Override

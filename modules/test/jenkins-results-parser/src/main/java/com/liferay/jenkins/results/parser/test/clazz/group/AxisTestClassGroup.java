@@ -81,6 +81,14 @@ public class AxisTestClassGroup extends BaseTestClassGroup {
 		return _segmentTestClassGroup;
 	}
 
+	public String getSlaveLabel() {
+		if (_segmentTestClassGroup != null) {
+			return _segmentTestClassGroup.getSlaveLabel();
+		}
+
+		return _batchTestClassGroup.getSlaveLabel();
+	}
+
 	public File getTestBaseDir() {
 		return null;
 	}

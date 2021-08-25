@@ -77,8 +77,8 @@ public interface CPDefinitionDiagramPinLocalService
 		CPDefinitionDiagramPin cpDefinitionDiagramPin);
 
 	public CPDefinitionDiagramPin addCPDefinitionDiagramPin(
-			long userId, long cpDefinitionId, int number, double positionX,
-			double positionY)
+			long userId, long cpDefinitionId, double positionX,
+			double positionY, String sequence)
 		throws PortalException;
 
 	/**
@@ -290,8 +290,8 @@ public interface CPDefinitionDiagramPinLocalService
 		CPDefinitionDiagramPin cpDefinitionDiagramPin);
 
 	public CPDefinitionDiagramPin updateCPDefinitionDiagramPin(
-			long cpDefinitionDiagramPinId, int number, double positionX,
-			double positionY)
+			long cpDefinitionDiagramPinId, double positionX, double positionY,
+			String sequence)
 		throws PortalException;
 
 }

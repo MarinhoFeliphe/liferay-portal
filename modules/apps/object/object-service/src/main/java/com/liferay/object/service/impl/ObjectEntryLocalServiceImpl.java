@@ -18,12 +18,15 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetLinkLocalService;
+import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.scope.ObjectScopeProvider;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.base.ObjectEntryLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
@@ -118,6 +121,11 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException {
 
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		_validateGroupId(groupId, objectDefinition.getScope());
+
 		long objectEntryId = counterLocalService.increment();
 
 		_insertIntoTable(
@@ -143,10 +151,6 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
 
 		objectEntry = objectEntryPersistence.update(objectEntry);
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(
-				objectEntry.getObjectDefinitionId());
 
 		_resourceLocalService.addResources(
 			objectEntry.getCompanyId(), objectEntry.getGroupId(),
@@ -259,17 +263,16 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public List<ObjectEntry> getObjectEntries(
-			long objectDefinitionId, int start, int end)
+			long groupId, long objectDefinitionId, int start, int end)
 		throws PortalException {
 
-		return objectEntryPersistence.findByObjectDefinitionId(
-			objectDefinitionId, start, end);
+		return objectEntryPersistence.findByG_ODI(
+			groupId, objectDefinitionId, start, end);
 	}
 
 	@Override
-	public int getObjectEntriesCount(long objectDefinitionId) {
-		return objectEntryPersistence.countByObjectDefinitionId(
-			objectDefinitionId);
+	public int getObjectEntriesCount(long groupId, long objectDefinitionId) {
+		return objectEntryPersistence.countByG_ODI(groupId, objectDefinitionId);
 	}
 
 	@Override
@@ -401,11 +404,16 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public BaseModelSearchResult<ObjectEntry> searchObjectEntries(
-			long objectDefinitionId, String keywords, int cur, int delta)
+			long groupId, long objectDefinitionId, String keywords, int cur,
+			int delta)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(
+				objectDefinition.getScope());
 
 		SearchRequestBuilder searchRequestBuilder =
 			_searchRequestBuilderFactory.builder();
@@ -428,6 +436,14 @@ public class ObjectEntryLocalServiceImpl
 					"objectDefinitionId",
 					objectDefinition.getObjectDefinitionId());
 				searchContext.setCompanyId(objectDefinition.getCompanyId());
+
+				if (objectScopeProvider.isGroupAware()) {
+					searchContext.setGroupIds(new long[] {groupId});
+				}
+				else {
+					searchContext.setGroupIds(new long[] {0});
+				}
+
 				searchContext.setKeywords(keywords);
 			}
 		);
@@ -507,6 +523,7 @@ public class ObjectEntryLocalServiceImpl
 			objectEntryId, values);
 
 		objectEntry.setModifiedDate(serviceContext.getModifiedDate(null));
+		objectEntry.setValues(null);
 
 		objectEntry = objectEntryPersistence.update(objectEntry);
 
@@ -1112,6 +1129,20 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _validateGroupId(long groupId, String scope)
+		throws PortalException {
+
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(scope);
+
+		if (!objectScopeProvider.isValidGroupId(groupId)) {
+			throw new ObjectDefinitionScopeException(
+				StringBundler.concat(
+					"Group ID ", groupId, " is not valid for scope \"", scope,
+					"\""));
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryLocalServiceImpl.class);
 
@@ -1135,6 +1166,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;
+
+	@Reference
+	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;

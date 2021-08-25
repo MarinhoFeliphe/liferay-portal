@@ -184,20 +184,6 @@ public interface CPDefinitionDiagramPinModel
 	public void setCPDefinitionId(long CPDefinitionId);
 
 	/**
-	 * Returns the number of this cp definition diagram pin.
-	 *
-	 * @return the number of this cp definition diagram pin
-	 */
-	public int getNumber();
-
-	/**
-	 * Sets the number of this cp definition diagram pin.
-	 *
-	 * @param number the number of this cp definition diagram pin
-	 */
-	public void setNumber(int number);
-
-	/**
 	 * Returns the position x of this cp definition diagram pin.
 	 *
 	 * @return the position x of this cp definition diagram pin
@@ -224,5 +210,20 @@ public interface CPDefinitionDiagramPinModel
 	 * @param positionY the position y of this cp definition diagram pin
 	 */
 	public void setPositionY(double positionY);
+
+	/**
+	 * Returns the sequence of this cp definition diagram pin.
+	 *
+	 * @return the sequence of this cp definition diagram pin
+	 */
+	@AutoEscape
+	public String getSequence();
+
+	/**
+	 * Sets the sequence of this cp definition diagram pin.
+	 *
+	 * @param sequence the sequence of this cp definition diagram pin
+	 */
+	public void setSequence(String sequence);
 
 }

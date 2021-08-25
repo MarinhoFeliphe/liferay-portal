@@ -44,7 +44,6 @@ import com.liferay.layout.seo.model.LayoutSEOEntry;
 import com.liferay.layout.seo.model.LayoutSEOSite;
 import com.liferay.layout.seo.service.LayoutSEOEntryLocalServiceUtil;
 import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
-import com.liferay.layout.seo.web.internal.configuration.util.FFSEOInlineFieldMappingConfigurationUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -65,8 +64,10 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
 import java.util.HashMap;
@@ -337,7 +338,7 @@ public class LayoutsSEODisplayContext {
 		).put(
 			"openGraphDescription",
 			_selLayout.getTypeSettingsProperty(
-				"mapped-openGraphDescription", "description")
+				"mapped-openGraphDescription", "${description}")
 		).put(
 			"openGraphImage",
 			_selLayout.getTypeSettingsProperty("mapped-openGraphImage", null)
@@ -346,7 +347,8 @@ public class LayoutsSEODisplayContext {
 			_selLayout.getTypeSettingsProperty("mapped-openGraphImageAlt", null)
 		).put(
 			"openGraphTitle",
-			_selLayout.getTypeSettingsProperty("mapped-openGraphTitle", "title")
+			_selLayout.getTypeSettingsProperty(
+				"mapped-openGraphTitle", "${title}")
 		).build();
 	}
 
@@ -423,9 +425,10 @@ public class LayoutsSEODisplayContext {
 		).put(
 			"description",
 			_selLayout.getTypeSettingsProperty(
-				"mapped-description", "description")
+				"mapped-description", "${description}")
 		).put(
-			"title", _selLayout.getTypeSettingsProperty("mapped-title", "title")
+			"title",
+			_selLayout.getTypeSettingsProperty("mapped-title", "${title}")
 		).build();
 	}
 
@@ -471,12 +474,13 @@ public class LayoutsSEODisplayContext {
 		return HashMapBuilder.<String, Object>put(
 			"defaultLanguageId", _selLayout.getDefaultLanguageId()
 		).put(
-			"ffSEOInlineFieldMappingEnabled",
-			FFSEOInlineFieldMappingConfigurationUtil.enabled()
-		).put(
 			"fields",
 			infoForm.getAllInfoFields(
 			).stream(
+			).filter(
+				infoField -> !StringUtil.startsWith(
+					infoField.getName(),
+					PortletDisplayTemplate.DISPLAY_STYLE_PREFIX)
 			).map(
 				infoField -> JSONUtil.put(
 					"key", infoField.getName()

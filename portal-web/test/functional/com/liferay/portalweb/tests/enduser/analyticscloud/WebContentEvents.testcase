@@ -2,19 +2,55 @@
 definition {
 
 	property analytics.cloud.enabled = "true";
+	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property minimum.slave.ram = "32";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Analytics Cloud";
 
 	setUp {
-		ACUtils.launchAC();
+		task ("Copy the token from AC") {
+			ACUtils.launchAC();
 
-		ACSettings.takeTokenFromAnalyticsCloud();
+			ACSettings.takeTokenFromAnalyticsCloud();
+		}
 
-		TestCase.setUpPortalInstance();
+		task ("Set up instance and sign in DXP") {
+			TestCase.setUpPortalInstance();
 
-		ACUtils.launchDXP();
+			ACUtils.launchDXP();
+		}
+
+		task ("Add a new site with a public widget page") {
+			ACUtils.addSiteAndPage();
+		}
+
+		task ("Add a Web Content Display to page and display a web content") {
+			ACUtils.createWCAndAddToPage(
+				webContentContent = '''<div data-analytics-asset-type='custom' data-analytics-asset-id='analytics-portal' data-analytics-asset-category='AC' data-analytics-asset-title='Custom Asset Analytics Cloud'>%0A<h1> What's your favorite portal? </h1>%0A</div>''',
+				webContentTitle = "Custom Asset AC Title");
+		}
+
+		task ("Connect the DXP to AC") {
+			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
+
+		task ("Add a new user") {
+			JSONUser.addUser(
+				userEmailAddress = "userea@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
 	}
 
 	tearDown {
@@ -26,25 +62,185 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
+			JSONUser.tearDownNonAdminUsers();
+		}
+
 		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8706 | Test Summary: Check webContentClicked triggers and check its properties (see reference document in comments)"
-	@ignore = "true"
 	@priority = "5"
-	test CheckWebContentClickedAndCheckProperties {
+	test CheckWebContentClickedProperties {
+		property proxy.server.enabled = "true";
 
-		// TODO LRAC-8706 CheckWebContentClickedAndCheckProperties pending implementation
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
+		task ("Get articleId of web content") {
+			var articleId = JSONWebcontentSetter.setArticleId(
+				groupName = "Site Name",
+				title = "Custom Asset AC Title");
+		}
+
+		task ("Sign out") {
+			UserBar.signOut();
+		}
+
+		task ("Get the Property ID in AC") {
+			ACUtils.launchAC();
+
+			ACNavigation.goToSettings();
+
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${propertyName}");
+		}
+
+		task ("Get the DXP Instance ID in AC") {
+			var dataSourceName = StringUtil.extractFirst("${propertyName}", "Combined");
+			var dataSourceName = StringUtil.trim("${dataSourceName}");
+
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+		}
+
+		task ("Sign in as new user") {
+			ACUtils.launchDXP(userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Start Har recording") {
+			ProxyUtil.startHarRecording("webContentClicked");
+		}
+
+		task ("View the site page") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+		}
+
+		task ("Click the content in Web Content Display") {
+			Click(
+				key_content = '''//h1[normalize-space(text())="What's your favorite portal?"]''',
+				locator1 = "WCD#WEB_CONTENT_CONTENT_ANY");
+		}
+
+		task ("Wait for sending requests") {
+			Pause(locator1 = "5000");
+		}
+
+		task ("View the articleId of webContentClicked event") {
+			ACUtils.assertEventPropertyValue(
+				applicationId = "WebContent",
+				eventId = "webContentClicked",
+				property = "articleId",
+				value = "${articleId}");
+		}
+
+		task ("View the title of webContentClicked event") {
+			ACUtils.assertEventPropertyValue(
+				applicationId = "WebContent",
+				eventId = "webContentClicked",
+				property = "title",
+				value = "Custom Asset AC Title");
+		}
+
+		task ("View the tagName of webContentClicked event") {
+			ACUtils.assertEventPropertyValue(
+				applicationId = "WebContent",
+				eventId = "webContentClicked",
+				property = "tagName",
+				value = "h1");
+		}
+
+		task ("View the request common properties value") {
+			ACUtils.assertRequestCommonPropertiesValue(
+				expectedChannelId = "${expectedChannelId}",
+				expectedDataSourceId = "${expectedDataSourceId}");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8707 | Test Summary: Check webContentViewed triggers and check its properties (see reference document in comments)"
-	@ignore = "true"
 	@priority = "5"
-	test CheckWebContentViewedAndCheckProperties {
+	test CheckWebContentViewedProperties {
+		property proxy.server.enabled = "true";
 
-		// TODO LRAC-8707 CheckWebContentViewedAndCheckProperties pending implementation
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
+		task ("Get articleId of web content") {
+			var articleId = JSONWebcontentSetter.setArticleId(
+				groupName = "Site Name",
+				title = "Custom Asset AC Title");
+		}
+
+		task ("Sign out") {
+			UserBar.signOut();
+		}
+
+		task ("Get the Property ID in AC") {
+			ACUtils.launchAC();
+
+			ACNavigation.goToSettings();
+
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${propertyName}");
+		}
+
+		task ("Get the DXP Instance ID in AC") {
+			var dataSourceName = StringUtil.extractFirst("${propertyName}", "Combined");
+			var dataSourceName = StringUtil.trim("${dataSourceName}");
+
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+		}
+
+		task ("Sign in as new user") {
+			ACUtils.launchDXP(userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Start Har recording") {
+			ProxyUtil.startHarRecording("webContentViewed");
+		}
+
+		task ("View the site page") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+		}
+
+		task ("Wait for sending requests") {
+			Pause(locator1 = "10000");
+		}
+
+		task ("View the articleId of webContentViewed event") {
+			ACUtils.assertEventPropertyValue(
+				applicationId = "WebContent",
+				eventId = "webContentViewed",
+				property = "articleId",
+				value = "${articleId}");
+		}
+
+		task ("View the title of webContentViewed event") {
+			ACUtils.assertEventPropertyValue(
+				applicationId = "WebContent",
+				eventId = "webContentViewed",
+				property = "title",
+				value = "Custom Asset AC Title");
+		}
+
+		task ("View the numberOfWords of webContentViewed event") {
+			ACUtils.assertEventPropertyValue(
+				applicationId = "WebContent",
+				eventId = "webContentViewed",
+				property = "numberOfWords",
+				value = "4");
+		}
+
+		task ("View the request common properties value") {
+			ACUtils.assertRequestCommonPropertiesValue(
+				expectedChannelId = "${expectedChannelId}",
+				expectedDataSourceId = "${expectedDataSourceId}");
+		}
 	}
 
 }

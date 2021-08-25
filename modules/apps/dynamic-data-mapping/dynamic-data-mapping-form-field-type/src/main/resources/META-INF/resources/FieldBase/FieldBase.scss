@@ -8,6 +8,10 @@
 	& &-text-small {
 		font-size: 0.875rem;
 	}
+
+	&[data-field-name='layout'] {
+		padding-bottom: 80px;
+	}
 }
 
 .lfr-ddm-legend {

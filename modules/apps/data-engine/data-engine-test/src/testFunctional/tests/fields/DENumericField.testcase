@@ -33,12 +33,12 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Text",
+		DEBuilder.addField(
+			fieldLabel = "Text",
 			fieldName = "Text");
 
 		WebContentStructures.saveCP();
@@ -51,7 +51,7 @@ definition {
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
 
-		DataEngine.assertFieldNotPresent(fieldFieldLabel = "Numeric");
+		DEBuilder.assertFieldNotPresent(fieldLabel = "Numeric");
 	}
 
 	@description = "This is a test for LRQA-68600. This test verifies that is possible to duplicate the field"
@@ -61,8 +61,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.duplicate(fieldFieldLabel = "Numeric");
@@ -80,6 +80,46 @@ definition {
 			fieldName = "Numeric");
 	}
 
+	@description = "This is a test for LRQA-69098. This test verifies that edited data persists"
+	@priority = "5"
+	test CanEditData {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "123");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "456");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "456");
+	}
+
 	@description = "This is a test for LRQA-68600. This test verifies that Label and Help text can be edited"
 	@priority = "5"
 	test CanEditLabelPlaceholderAndHelpText {
@@ -87,8 +127,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.editFieldTip(
@@ -120,6 +160,262 @@ definition {
 			fieldPlaceholder = "Placeholder Text Edited");
 	}
 
+	@description = "This is a test for LRQA-69098. This test verifies that input data on an Decimal Numeric field persists."
+	@priority = "5"
+	test CanInputDataOnDecimalType {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		DataEngine.editNumericType(
+			fieldLabel = "Numeric",
+			fieldNumericType = "Decimal");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "1.23");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "1.23");
+	}
+
+	@description = "This is a test for LRQA-69098. This test verifies that upon duplicating a repeatable field, inputted data on both fields persists."
+	@priority = "5"
+	test CanInputDataOnDuplicatedField {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		DataEngine.toggleFieldRepeatable(fieldFieldLabel = "Numeric");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DataEngine.addRepeatableField(fieldLabel = "Numeric");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			index = "1",
+			value = "123");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			index = "2",
+			value = "456");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			index = "1",
+			value = "123");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			index = "2",
+			value = "456");
+	}
+
+	@description = "This is a test for LRQA-69098. This test verifies that input data on an Integer Numeric field persists."
+	@priority = "5"
+	test CanInputDataOnIntergerType {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "123");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "123");
+	}
+
+	@description = "This is a test for LRQA-69098. This test verifies that decimal round numbers are displayed with the decimal round part on a Numeric field."
+	@priority = "4"
+	test CanInputRoundDecimalNumbers {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		DataEngine.editNumericType(
+			fieldLabel = "Numeric",
+			fieldNumericType = "Decimal");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "1.00");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "1.00");
+	}
+
+	@description = "This is a test for LRQA-69098. This test verifies that is not possible to publish the Web Content with a required field blank."
+	@priority = "4"
+	test CanNotPublishBlankRequiredField {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		DataEngine.editFieldRequired(fieldFieldLabel = "Numeric");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		Button.clickPublish();
+
+		FormViewBuilder.validateObjectLabelOptionTextIsShown(text = "This field is required.");
+	}
+
+	@description = "This is a test for LRQA-69098. This test verifies that is possible to remove a duplicated field (repeatable)."
+	@priority = "4"
+	test CanRemoveDuplicatedField {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		DataEngine.toggleFieldRepeatable(fieldFieldLabel = "Numeric");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DataEngine.addRepeatableField(fieldLabel = "Numeric");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.removeRepeatableField(fieldLabel = "Numeric");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DEBuilder.assertFieldNotPresent(
+			fieldLabel = "Numeric",
+			index = "2");
+	}
+
+	@description = "This is a test for LRQA-69098. This test verifies that is possible to remove inputted data from the field."
+	@priority = "4"
+	test CanRemoveInputtedData {
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Title");
+
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
+			fieldName = "Numeric");
+
+		WebContentStructures.saveCP();
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Title");
+
+		PortletEntry.inputTitle(title = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "123");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.inputDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "");
+
+		Button.clickPublish();
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+		DERenderer.assertDataInNumericField(
+			fieldLabel = "Numeric",
+			value = "");
+	}
+
 	@description = "This is a test for LRQA-68600. This test verifies that Numeric field can be set as Decimal or Integer"
 	@priority = "5"
 	test CanSetDecimalOrInteger {
@@ -127,8 +423,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.editNumericType(
@@ -181,8 +477,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.viewFieldSearchable(
@@ -215,8 +511,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.viewFieldSearchable(
@@ -231,8 +527,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.editFieldTip(
@@ -258,8 +554,8 @@ definition {
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
-		DataEngine.addField(
-			fieldFieldLabel = "Numeric",
+		DEBuilder.addField(
+			fieldLabel = "Numeric",
 			fieldName = "Numeric");
 
 		DataEngine.toggleShowLabel(fieldLabel = "Numeric");
@@ -268,7 +564,7 @@ definition {
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
 
-		DataEngine.assertFieldNotPresent(fieldFieldLabel = "Numeric");
+		DEBuilder.assertFieldNotPresent(fieldLabel = "Numeric");
 
 		DataEngine.toggleShowLabel();
 

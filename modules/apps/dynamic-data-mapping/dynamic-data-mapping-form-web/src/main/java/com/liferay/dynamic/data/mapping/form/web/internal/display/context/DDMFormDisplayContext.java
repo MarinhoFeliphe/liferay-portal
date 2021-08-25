@@ -607,6 +607,13 @@ public class DDMFormDisplayContext {
 		return false;
 	}
 
+	public boolean isSharedURL() {
+		ThemeDisplay themeDisplay = getThemeDisplay();
+
+		return StringUtil.contains(
+			themeDisplay.getURLCurrent(), "shared", StringPool.FORWARD_SLASH);
+	}
+
 	public boolean isShowConfigurationIcon() throws PortalException {
 		if (_showConfigurationIcon != null) {
 			return _showConfigurationIcon;
@@ -937,14 +944,6 @@ public class DDMFormDisplayContext {
 			ddmFormInstance.getSettingsModel();
 
 		return ddmFormInstanceSettings.published();
-	}
-
-	protected boolean isSharedURL() {
-		ThemeDisplay themeDisplay = getThemeDisplay();
-
-		String urlCurrent = themeDisplay.getURLCurrent();
-
-		return urlCurrent.contains("/shared");
 	}
 
 	private HttpServletRequest _getHttpServletRequest() {

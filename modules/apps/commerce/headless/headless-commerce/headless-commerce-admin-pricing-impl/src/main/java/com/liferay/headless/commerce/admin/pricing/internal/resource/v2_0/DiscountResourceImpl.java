@@ -219,15 +219,14 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 		ServiceContext serviceContext =
 			_serviceContextHelper.getServiceContext();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			discount.getDisplayDate(), serviceContext.getTimeZone());
-
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			discount.getExpirationDate(), serviceContext.getTimeZone());
 
 		CommerceDiscount commerceDiscount =
 			_commerceDiscountService.addOrUpdateCommerceDiscount(
-				discount.getExternalReferenceCode(), contextUser.getUserId(),
+				discount.getExternalReferenceCode(),
 				GetterUtil.getLong(discount.getId()), discount.getTitle(),
 				discount.getTarget(),
 				GetterUtil.getBoolean(discount.getUseCouponCode()),
@@ -303,33 +302,6 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 		).build();
 	}
 
-	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
-		if (date == null) {
-			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
-		}
-
-		Calendar calendar = CalendarFactoryUtil.getCalendar(
-			date.getTime(), timeZone);
-
-		return new DateConfig(calendar);
-	}
-
-	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
-		if (date == null) {
-			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
-				timeZone);
-
-			expirationCalendar.add(Calendar.MONTH, 1);
-
-			return new DateConfig(expirationCalendar);
-		}
-
-		Calendar calendar = CalendarFactoryUtil.getCalendar(
-			date.getTime(), timeZone);
-
-		return new DateConfig(calendar);
-	}
-
 	private Discount _toDiscount(CommerceDiscount commerceDiscount)
 		throws Exception {
 
@@ -348,6 +320,33 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 				contextUriInfo, contextUser));
 	}
 
+	private DateConfig _toDisplayDateConfig(Date date, TimeZone timeZone) {
+		if (date == null) {
+			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
+		}
+
+		Calendar calendar = CalendarFactoryUtil.getCalendar(
+			date.getTime(), timeZone);
+
+		return new DateConfig(calendar);
+	}
+
+	private DateConfig _toExpirationDateConfig(Date date, TimeZone timeZone) {
+		if (date == null) {
+			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
+				timeZone);
+
+			expirationCalendar.add(Calendar.MONTH, 1);
+
+			return new DateConfig(expirationCalendar);
+		}
+
+		Calendar calendar = CalendarFactoryUtil.getCalendar(
+			date.getTime(), timeZone);
+
+		return new DateConfig(calendar);
+	}
+
 	private CommerceDiscount _updateDiscount(
 			CommerceDiscount commerceDiscount, Discount discount)
 		throws Exception {
@@ -355,10 +354,10 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 		ServiceContext serviceContext =
 			_serviceContextHelper.getServiceContext();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			discount.getDisplayDate(), serviceContext.getTimeZone());
 
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			discount.getExpirationDate(), serviceContext.getTimeZone());
 
 		commerceDiscount = _commerceDiscountService.updateCommerceDiscount(

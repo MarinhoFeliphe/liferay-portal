@@ -51,7 +51,7 @@ LowLevelSearchOptionsPortletPreferences lowLevelSearchOptionsPortletPreferences 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:fieldset-group>
 			<aui:fieldset>
-				<aui:select helpMessage="connection-id-help" label="connection-id" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_CONNECTION_ID) %>">
+				<aui:select helpMessage="select-the-connection-id-of-the-connection-that-will-be-used-to-perform-the-search" label="connection-id" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_CONNECTION_ID) %>">
 
 					<%
 					for (String connectionId : configurationDisplayContext.getConnectionIds()) {
@@ -73,7 +73,7 @@ LowLevelSearchOptionsPortletPreferences lowLevelSearchOptionsPortletPreferences 
 
 				<aui:input helpMessage="contributors-to-exclude-help" label="contributors-to-exclude" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_CONTRIBUTORS_TO_EXCLUDE) %>" type="text" value="<%= lowLevelSearchOptionsPortletPreferences.getContributorsToExcludeString() %>" />
 
-				<aui:input helpMessage="federated-search-key-help" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= lowLevelSearchOptionsPortletPreferences.getFederatedSearchKeyString() %>" />
+				<aui:input helpMessage="enter-the-key-of-an-alternate-search-this-widget-is-participating-on-if-not-set-widget-participates-on-default-search" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= lowLevelSearchOptionsPortletPreferences.getFederatedSearchKeyString() %>" />
 			</aui:fieldset>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>

@@ -27,6 +27,16 @@ definition {
 	@refactordone
 	@uitest
 	test CanAddInlineImage {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
 
 		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
@@ -161,6 +171,16 @@ definition {
 			key_coverImageName = "Document_1.jpg",
 			locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED");
 
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		Navigator.gotoPage(pageName = "Blogs Page");
 
 		AssertElementNotPresent(
@@ -242,6 +262,16 @@ definition {
 
 		PortletEntry.publish();
 
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		Navigator.gotoPage(pageName = "Blogs Page");
 
 		AssertVisible(
@@ -291,6 +321,18 @@ definition {
 	@refactordone
 	@uitest
 	test CanUploadAndPublishCoverImage {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+
 		Blogs.addEntryWithUploadedCoverImage(
 			coverImageName = "Document_1",
 			entryContent = "Blogs Entry Content",
@@ -352,6 +394,18 @@ definition {
 	@priority = "3"
 	@refactorneeded
 	test CanViewCaptionFieldAfterRemovingSmallImage {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+
 		Blogs.addEntryWithUploadedCoverImage(
 			captionField = "true",
 			coverImageName = "Document_1",
@@ -443,6 +497,16 @@ definition {
 				entryTitle = "Blogs Entry${n} Title",
 				groupName = "Guest");
 		}
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 

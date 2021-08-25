@@ -40,8 +40,6 @@ import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -132,19 +130,14 @@ public class UpgradeKaleoDefinitionVersionTest {
 			long companyId, long groupId, String name, int version)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("insert into KaleoDefinition (kaleoDefinitionId, groupId, ");
-		sb.append("companyId, userId, userName, createDate, modifiedDate, ");
-		sb.append("name, title, description, content, version, active_, ");
-		sb.append("startKaleoNodeId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ");
-		sb.append("?, ?, ?, ?)");
-
-		String sql = sb.toString();
-
 		try (Connection connection = DataAccess.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement(
-				sql)) {
+				StringBundler.concat(
+					"insert into KaleoDefinition (kaleoDefinitionId, groupId, ",
+					"companyId, userId, userName, createDate, modifiedDate, ",
+					"name, title, description, content, version, active_, ",
+					"startKaleoNodeId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ",
+					"?, ?, ?, ?)"))) {
 
 			preparedStatement.setLong(1, RandomTestUtil.randomLong());
 			preparedStatement.setLong(2, groupId);
@@ -210,14 +203,7 @@ public class UpgradeKaleoDefinitionVersionTest {
 	}
 
 	private void _setUpUpgradeKaleoDefinitionVersion() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		UpgradeStepRegistrator upgradeStepRegistror = registry.getService(
-			registry.getServiceReference(
-				"com.liferay.portal.workflow.kaleo.internal.upgrade." +
-					"KaleoServiceUpgrade"));
-
-		upgradeStepRegistror.register(
+		_upgradeStepRegistrator.register(
 			new UpgradeStepRegistrator.Registry() {
 
 				@Override
@@ -255,5 +241,10 @@ public class UpgradeKaleoDefinitionVersionTest {
 	private UpgradeProcess _kaleoDefinitionVersionUpgradeProcess;
 	private String _name;
 	private Timestamp _timestamp;
+
+	@Inject(
+		filter = "component.name=com.liferay.portal.workflow.kaleo.internal.upgrade.KaleoServiceUpgrade"
+	)
+	private UpgradeStepRegistrator _upgradeStepRegistrator;
 
 }

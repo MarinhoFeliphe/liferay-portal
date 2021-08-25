@@ -96,6 +96,10 @@ public class AccountSelectorTag extends IncludeTag {
 				(CommerceContext)parentHttpServletRequest.getAttribute(
 					CommerceWebKeys.COMMERCE_CONTEXT);
 
+			httpServletRequest.setAttribute(
+				"liferay-commerce:account-selector:commerceChannelId",
+				commerceContext.getCommerceChannelId());
+
 			CommerceAccount commerceAccount =
 				commerceContext.getCommerceAccount();
 
@@ -122,7 +126,7 @@ public class AccountSelectorTag extends IncludeTag {
 						commerceAccount.getName());
 
 				httpServletRequest.setAttribute(
-					"liferay-commerce:account-selector:currentAccount",
+					"liferay-commerce:account-selector:currentCommerceAccount",
 					currentCommerceAccountModel);
 			}
 
@@ -144,7 +148,7 @@ public class AccountSelectorTag extends IncludeTag {
 						workflowStatusModel);
 
 				httpServletRequest.setAttribute(
-					"liferay-commerce:account-selector:currentOrder",
+					"liferay-commerce:account-selector:currentCommerceOrder",
 					currentCommerceOrderModel);
 			}
 

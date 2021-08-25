@@ -23,6 +23,8 @@
 		<column method-name="DBTableName" name="dbTableName" type="String" />
 		<column localized="true" name="label" type="String" />
 		<column name="name" type="String" />
+		<column name="panelAppOrder" type="String" />
+		<column name="panelCategoryKey" type="String" />
 		<column method-name="PKObjectFieldDBColumnName" name="pkObjectFieldDBColumnName" type="String" />
 		<column method-name="PKObjectFieldName" name="pkObjectFieldName" type="String" />
 		<column localized="true" name="pluralLabel" type="String" />
@@ -89,6 +91,10 @@
 		<!-- Finder methods -->
 
 		<finder name="ObjectDefinitionId" return-type="Collection">
+			<finder-column name="objectDefinitionId" />
+		</finder>
+		<finder name="G_ODI" return-type="Collection">
+			<finder-column name="groupId" />
 			<finder-column name="objectDefinitionId" />
 		</finder>
 		<finder name="G_C_ERC" return-type="ObjectEntry">
@@ -212,6 +218,8 @@
 		<exception>DuplicateObjectField</exception>
 		<exception>ObjectDefinitionLabel</exception>
 		<exception>ObjectDefinitionName</exception>
+		<exception>ObjectDefinitionPluralLabel</exception>
+		<exception>ObjectDefinitionScope</exception>
 		<exception>ObjectDefinitionStatus</exception>
 		<exception>ObjectDefinitionVersion</exception>
 		<exception>ObjectEntryValues</exception>

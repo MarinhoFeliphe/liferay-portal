@@ -56,12 +56,12 @@ public class CustomElementsSourceLocalServiceWrapper
 	@Override
 	public com.liferay.custom.elements.model.CustomElementsSource
 			addCustomElementsSource(
-				long userId, String htmlElementName, String name, String url,
+				long userId, String htmlElementName, String name, String urls,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _customElementsSourceLocalService.addCustomElementsSource(
-			userId, htmlElementName, name, url, serviceContext);
+			userId, htmlElementName, name, urls, serviceContext);
 	}
 
 	/**
@@ -394,16 +394,20 @@ public class CustomElementsSourceLocalServiceWrapper
 	@Override
 	public java.util.List
 		<com.liferay.custom.elements.model.CustomElementsSource> search(
-			String keywords, int start, int end,
-			com.liferay.portal.kernel.search.Sort sort) {
+				long companyId, String keywords, int start, int end,
+				com.liferay.portal.kernel.search.Sort sort)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _customElementsSourceLocalService.search(
-			keywords, start, end, sort);
+			companyId, keywords, start, end, sort);
 	}
 
 	@Override
-	public int searchCount(String keywords) {
-		return _customElementsSourceLocalService.searchCount(keywords);
+	public int searchCount(long companyId, String keywords)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _customElementsSourceLocalService.searchCount(
+			companyId, keywords);
 	}
 
 	/**
@@ -430,12 +434,13 @@ public class CustomElementsSourceLocalServiceWrapper
 	public com.liferay.custom.elements.model.CustomElementsSource
 			updateCustomElementsSource(
 				long customElementsSourceId, String htmlElementName,
-				String name, String url,
+				String name, String urls,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _customElementsSourceLocalService.updateCustomElementsSource(
-			customElementsSourceId, htmlElementName, name, url, serviceContext);
+			customElementsSourceId, htmlElementName, name, urls,
+			serviceContext);
 	}
 
 	@Override

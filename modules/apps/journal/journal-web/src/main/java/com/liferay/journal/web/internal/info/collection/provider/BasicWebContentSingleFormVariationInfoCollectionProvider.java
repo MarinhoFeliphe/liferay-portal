@@ -160,8 +160,6 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 	}
 
 	private SearchContext _buildSearchContext(CollectionQuery collectionQuery) {
-		Pagination pagination = collectionQuery.getPagination();
-
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setAndSearch(true);
@@ -204,7 +202,10 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 
 		searchContext.setCompanyId(serviceContext.getCompanyId());
 
+		Pagination pagination = collectionQuery.getPagination();
+
 		searchContext.setEnd(pagination.getEnd());
+
 		searchContext.setGroupIds(
 			new long[] {serviceContext.getScopeGroupId()});
 
@@ -230,7 +231,7 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 		return searchContext;
 	}
 
-	private InfoField _getAssetTagsInfoField() {
+	private InfoField<?> _getAssetTagsInfoField() {
 		List<SelectInfoFieldType.Option> options = new ArrayList<>();
 
 		ServiceContext serviceContext =
@@ -248,7 +249,7 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 					assetTag.getName(), assetTag.getName()));
 		}
 
-		InfoField.FinalStep finalStep = InfoField.builder(
+		InfoField.FinalStep<?> finalStep = InfoField.builder(
 		).infoFieldType(
 			SelectInfoFieldType.INSTANCE
 		).name(

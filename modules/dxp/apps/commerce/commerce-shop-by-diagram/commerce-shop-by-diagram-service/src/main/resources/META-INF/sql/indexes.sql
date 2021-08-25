@@ -1,4 +1,4 @@
-create unique index IX_F7B5A9B2 on CPDefinitionDiagramEntry (CPDefinitionId, number_);
+create unique index IX_C8D3E29 on CPDefinitionDiagramEntry (CPDefinitionId, sequence[$COLUMN_LENGTH:75$]);
 
 create index IX_CD3A657 on CPDefinitionDiagramPin (CPDefinitionId);
 

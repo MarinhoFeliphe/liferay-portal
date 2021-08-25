@@ -12,6 +12,36 @@
 <tbody>
 <!-- GENERAL CARDS -->
 <tr>
+	<td>CARD_FILTER_BY_DAY_ACTIVE</td>
+	<td>//button[contains(@class,'interval-option') and contains(@class,'active') and text()='D']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CARD_FILTER_BY_DAY</td>
+	<td>//button[contains(@class,'interval-option') and text()='D']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CARD_FILTER_BY_WEEK_ACTIVE</td>
+	<td>//button[contains(@class,'interval-option') and contains(@class,'active') and text()='W']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CARD_FILTER_BY_WEEK</td>
+	<td>//button[contains(@class,'interval-option') and text()='W']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CARD_FILTER_BY_MONTH_ACTIVE</td>
+	<td>//button[contains(@class,'interval-option') and contains(@class,'active') and text()='M']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CARD_FILTER_BY_MONTH</td>
+	<td>//button[contains(@class,'interval-option') and text()='M']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CARD_TITLE</td>
 	<td>//h5[@class='card-title'and text()='${key_cardTitle}']</td>
 	<td></td>
@@ -27,8 +57,33 @@
 	<td></td>
 </tr>
 <tr>
+	<td>GEOMAP_CONTAINER</td>
+	<td>//div[contains(@class,'card-root')][.//h5[contains(@class,'card-title')][normalize-space(text())='${key_cardTitle}']]//div[contains(@class,'geomap-container')]${element}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GEOMAP_TABLE_TEXT</td>
+	<td>//div[contains(@class,'card-root')][.//h5[contains(@class,'card-title')][normalize-space(text())='${key_cardTitle}']]//table[contains(@class,'geomap-table')]//td[contains(@class,'text-${position}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>METRIC_BAR</td>
+	<td>//div[contains(@class,'card-root')][.//h5[contains(@class,'card-title')][normalize-space(text())='${key_cardTitle}']]//tbody[.//td[contains(@class,'name')][normalize-space()='${entryName}']]//div[contains(@class,'metric-bar-root')]//div[contains(@class,'bar')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>METRIC_VALUE</td>
 	<td>//div[contains(@class,'card-root')][.//h5[contains(@class,'card-title')][normalize-space(text())='${key_cardTitle}']]//li[contains(@class,'card-tab')][.//*[normalize-space(text())='${key_metricName}']]//div[contains(@class,'metric-value')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NO_RESULTS_TITLE</td>
+	<td>//h4[@class='no-results-title' and contains(.,'${key_cardTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_ENTRY_INFO</td>
+	<td>//div[contains(@class,'card-root')][.//h5[contains(@class,'card-title')][normalize-space(text())='${key_cardTitle}']]//tbody//td[contains(@class,'name')][normalize-space()='${entryName}']//following-sibling::td[contains(@class,'table-${column}')][normalize-space()='${entryInfo}']</td>
 	<td></td>
 </tr>
 <tr>

@@ -62,12 +62,12 @@ public class CustomElementsSourceLocalServiceUtil {
 	}
 
 	public static CustomElementsSource addCustomElementsSource(
-			long userId, String htmlElementName, String name, String url,
+			long userId, String htmlElementName, String name, String urls,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCustomElementsSource(
-			userId, htmlElementName, name, url, serviceContext);
+			userId, htmlElementName, name, urls, serviceContext);
 	}
 
 	/**
@@ -345,14 +345,17 @@ public class CustomElementsSourceLocalServiceUtil {
 	}
 
 	public static List<CustomElementsSource> search(
-		String keywords, int start, int end,
-		com.liferay.portal.kernel.search.Sort sort) {
+			long companyId, String keywords, int start, int end,
+			com.liferay.portal.kernel.search.Sort sort)
+		throws PortalException {
 
-		return getService().search(keywords, start, end, sort);
+		return getService().search(companyId, keywords, start, end, sort);
 	}
 
-	public static int searchCount(String keywords) {
-		return getService().searchCount(keywords);
+	public static int searchCount(long companyId, String keywords)
+		throws PortalException {
+
+		return getService().searchCount(companyId, keywords);
 	}
 
 	/**
@@ -373,12 +376,13 @@ public class CustomElementsSourceLocalServiceUtil {
 
 	public static CustomElementsSource updateCustomElementsSource(
 			long customElementsSourceId, String htmlElementName, String name,
-			String url,
+			String urls,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateCustomElementsSource(
-			customElementsSourceId, htmlElementName, name, url, serviceContext);
+			customElementsSourceId, htmlElementName, name, urls,
+			serviceContext);
 	}
 
 	public static CustomElementsSourceLocalService getService() {

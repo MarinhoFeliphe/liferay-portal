@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -61,13 +59,9 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 
 		int quantity = ParamUtil.getInteger(actionRequest, "quantity");
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CommerceInventoryWarehouseItem.class.getName(), actionRequest);
-
 		_commerceInventoryWarehouseItemService.
 			addCommerceInventoryWarehouseItem(
-				serviceContext.getUserId(), commerceInventoryWarehouseId, sku,
-				quantity);
+				commerceInventoryWarehouseId, sku, quantity);
 	}
 
 	protected void deleteCommerceInventoryWarehouse(ActionRequest actionRequest)
@@ -132,13 +126,9 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 					commerceInventoryWarehouseId, sku);
 
 		if (commerceInventoryWarehouseItem == null) {
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				CommerceInventoryWarehouseItem.class.getName(), actionRequest);
-
 			_commerceInventoryWarehouseItemService.
 				addCommerceInventoryWarehouseItem(
-					serviceContext.getUserId(), commerceInventoryWarehouseId,
-					sku, quantity);
+					commerceInventoryWarehouseId, sku, quantity);
 		}
 		else {
 			_commerceInventoryWarehouseItemService.

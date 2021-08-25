@@ -52,9 +52,9 @@ public class CPDefinitionDiagramPinWrapper
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("CPDefinitionId", getCPDefinitionId());
-		attributes.put("number", getNumber());
 		attributes.put("positionX", getPositionX());
 		attributes.put("positionY", getPositionY());
+		attributes.put("sequence", getSequence());
 
 		return attributes;
 	}
@@ -104,12 +104,6 @@ public class CPDefinitionDiagramPinWrapper
 			setCPDefinitionId(CPDefinitionId);
 		}
 
-		Integer number = (Integer)attributes.get("number");
-
-		if (number != null) {
-			setNumber(number);
-		}
-
 		Double positionX = (Double)attributes.get("positionX");
 
 		if (positionX != null) {
@@ -120,6 +114,12 @@ public class CPDefinitionDiagramPinWrapper
 
 		if (positionY != null) {
 			setPositionY(positionY);
+		}
+
+		String sequence = (String)attributes.get("sequence");
+
+		if (sequence != null) {
+			setSequence(sequence);
 		}
 	}
 
@@ -181,16 +181,6 @@ public class CPDefinitionDiagramPinWrapper
 	}
 
 	/**
-	 * Returns the number of this cp definition diagram pin.
-	 *
-	 * @return the number of this cp definition diagram pin
-	 */
-	@Override
-	public int getNumber() {
-		return model.getNumber();
-	}
-
-	/**
 	 * Returns the position x of this cp definition diagram pin.
 	 *
 	 * @return the position x of this cp definition diagram pin
@@ -218,6 +208,16 @@ public class CPDefinitionDiagramPinWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	 * Returns the sequence of this cp definition diagram pin.
+	 *
+	 * @return the sequence of this cp definition diagram pin
+	 */
+	@Override
+	public String getSequence() {
+		return model.getSequence();
 	}
 
 	/**
@@ -306,16 +306,6 @@ public class CPDefinitionDiagramPinWrapper
 	}
 
 	/**
-	 * Sets the number of this cp definition diagram pin.
-	 *
-	 * @param number the number of this cp definition diagram pin
-	 */
-	@Override
-	public void setNumber(int number) {
-		model.setNumber(number);
-	}
-
-	/**
 	 * Sets the position x of this cp definition diagram pin.
 	 *
 	 * @param positionX the position x of this cp definition diagram pin
@@ -343,6 +333,16 @@ public class CPDefinitionDiagramPinWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	 * Sets the sequence of this cp definition diagram pin.
+	 *
+	 * @param sequence the sequence of this cp definition diagram pin
+	 */
+	@Override
+	public void setSequence(String sequence) {
+		model.setSequence(sequence);
 	}
 
 	/**

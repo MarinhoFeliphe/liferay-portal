@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>PopulateObjectFormsConfiguration</title>
+</head>
+
+<body>
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><td rowspan="1" colspan="3">PopulateObjectFormsConfiguration</td></tr>
+</thead>
+
+<tbody>
+	<tr>
+		<td>OPEN_FORM_SETTINGS</td>
+		<td>//button[@class='btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-sm lfr-ddm-button lfr-ddm-settings-button']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DEFAULT_STORAGE_TYPE</td>
+		<td>//div[(@class='option-selected') and contains(text(),'Default')]/../../div[@class='form-control results-chosen select-field-trigger']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DISPLAY_SELECT_OBJECT</td>
+		<td>//button[@label='${key_label}']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DEFAULT_SELECT_OBJECT</td>
+		<td>//div[(@class='form-builder-select-field input-group-container')and contains(.,'Choose an Option')]/div[@class='form-control results-chosen select-field-trigger']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>BUTTON_SETTINGS_FORM</td>
+		<td>//button[@class='btn btn-primary']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>BUTTON_SAVE_FORM</td>
+		<td>//button[contains(.,'Save') and not (contains(@class,'disabled'))]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>BUTTON_PUBLISH_FORM</td>
+		<td>//button[@class='btn btn-primary btn-sm lfr-ddm-button lfr-ddm-publish-button']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>UNMAPPED_ERROR_MODAL_TITLE</td>
+		<td>//div[@class='modal-title' and contains(text(),'Unmapped Object Required Fields')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>UNMAPPED_ERROR_MODAL_BODY</td>
+		<td>//div[@class='modal-body']//p[contains(text(),'All fields in this form must be mapped to a field in the object.')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>UNMAPPED_ERROR_PANEL_TITLE</td>
+		<td>//span[@class='panel-title' and contains(text(),'Unmapped Form Fields')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>UNMAPPED_ERROR_PANEL_BODY</td>
+		<td>//strong[@class='text-capitalize' and contains(text(),'${key_fieldType}')]/following-sibling::ol//li[contains(text(),'${key_fieldLabel}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>CLOSE_UNMAPPED_ERROR</td>
+		<td>//button[@class='btn btn-secondary']</td>
+		<td></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

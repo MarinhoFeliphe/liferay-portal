@@ -2914,6 +2914,7 @@ log.sanitizer.enabled=false</echo>
 
 	<macrodef name="run-modules-integration-test">
 		<attribute default="tomcat" name="app.server.type" />
+		<attribute default="" name="aws.store.enabled" />
 		<attribute name="database.type" />
 		<attribute default="${database.@{database.type}.version}" name="database.version" />
 		<attribute default="" name="refreshdependencies" />
@@ -2944,6 +2945,7 @@ log.sanitizer.enabled=false</echo>
 							</antcall>
 
 							<antcall if:set="env.JENKINS_HOME" inheritAll="false" target="prepare-portal-ext-properties">
+								<param name="aws.store.enabled" value="@{aws.store.enabled}" />
 								<param name="database.type" value="@{database.type}" />
 							</antcall>
 
@@ -5527,6 +5529,34 @@ log.sanitizer.enabled=false</echo>
 		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="5.7" />
 	</target>
 
+	<target name="modules-integration-aws-s3-mysql57-jdk8">
+		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
+
+		<tstamp>
+			<format pattern="yyyyMMddkkmmssSSS" property="aws.bucket.id" />
+		</tstamp>
+
+		<ant antfile="build-test-aws-s3.xml" target="configure-aws-cli" />
+
+		<prepare-aws-s3-configuration />
+
+		<ant antfile="build-test-aws-s3.xml" target="create-s3-bucket" />
+
+		<trycatch>
+			<try>
+				<run-modules-integration-test
+					aws.store.enabled="true"
+					database.type="mysql"
+					database.version="5.7"
+				/>
+			</try>
+
+			<finally>
+				<ant antfile="build-test-aws-s3.xml" target="delete-s3-bucket" />
+			</finally>
+		</trycatch>
+	</target>
+
 	<target name="modules-integration-bundle-db2111-jdk8">
 		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
 
@@ -6381,9 +6411,9 @@ ${output.content}</echo>
 
 								<wait-for-license-activation />
 
-								<antcall inheritall="false" target="run-selenium-test">
+								<!--<antcall inheritall="false" target="run-selenium-test">
 									<param name="test.class" value="CommerceLicense#ViewCommerceEnabled" />
-								</antcall>
+								</antcall>-->
 							</try>
 
 							<finally>

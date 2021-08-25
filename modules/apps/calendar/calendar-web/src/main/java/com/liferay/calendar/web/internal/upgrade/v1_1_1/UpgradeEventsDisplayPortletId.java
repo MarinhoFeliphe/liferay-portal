@@ -45,7 +45,7 @@ public class UpgradeEventsDisplayPortletId extends BasePortletIdUpgradeProcess {
 	}
 
 	protected void deleteResourcePermissions(
-			final String oldRootPortletId, final String newRootPortletId)
+			String oldRootPortletId, String newRootPortletId)
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -81,8 +81,7 @@ public class UpgradeEventsDisplayPortletId extends BasePortletIdUpgradeProcess {
 	}
 
 	protected long getResourcePermissionsCount(
-			final long companyId, final String name, final int scope,
-			final long roleId)
+			long companyId, String name, int scope, long roleId)
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -113,7 +112,7 @@ public class UpgradeEventsDisplayPortletId extends BasePortletIdUpgradeProcess {
 
 	@Override
 	protected void updateInstanceablePortletPreferences(
-			final String oldRootPortletId, final String newRootPortletId)
+			String oldRootPortletId, String newRootPortletId)
 		throws Exception {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -172,28 +171,24 @@ public class UpgradeEventsDisplayPortletId extends BasePortletIdUpgradeProcess {
 		_portletPreferencesLocalService.updatePortletPreferences(
 			portletPreferences);
 
-		StringBundler sb = new StringBundler(12);
-
-		sb.append("<portlet-preferences>");
-		sb.append(String.format(_PREFERENCE_FORMAT, "defaultView", "agenda"));
-		sb.append(
-			String.format(
-				_PREFERENCE_FORMAT, "displaySchedulerHeader", "false"));
-		sb.append(
-			String.format(_PREFERENCE_FORMAT, "displaySchedulerOnly", "true"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "eventsPerPage", "10"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "maxDaysDisplayed", "1"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "showAgendaView", "true"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "showDayView", "false"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "showMonthView", "false"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "showWeekView", "false"));
-		sb.append(String.format(_PREFERENCE_FORMAT, "showUserEvents", "false"));
-		sb.append("</portlet-preferences>");
-
 		_portletPreferencesLocalService.updatePreferences(
 			portletPreferences.getOwnerId(), portletPreferences.getOwnerType(),
 			portletPreferences.getPlid(), portletPreferences.getPortletId(),
-			sb.toString());
+			StringBundler.concat(
+				"<portlet-preferences>",
+				String.format(_PREFERENCE_FORMAT, "defaultView", "agenda"),
+				String.format(
+					_PREFERENCE_FORMAT, "displaySchedulerHeader", "false"),
+				String.format(
+					_PREFERENCE_FORMAT, "displaySchedulerOnly", "true"),
+				String.format(_PREFERENCE_FORMAT, "eventsPerPage", "10"),
+				String.format(_PREFERENCE_FORMAT, "maxDaysDisplayed", "1"),
+				String.format(_PREFERENCE_FORMAT, "showAgendaView", "true"),
+				String.format(_PREFERENCE_FORMAT, "showDayView", "false"),
+				String.format(_PREFERENCE_FORMAT, "showMonthView", "false"),
+				String.format(_PREFERENCE_FORMAT, "showWeekView", "false"),
+				String.format(_PREFERENCE_FORMAT, "showUserEvents", "false"),
+				"</portlet-preferences>"));
 	}
 
 	@Override

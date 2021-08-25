@@ -125,16 +125,13 @@ public class LinksToLayoutsExportImportContentProcessor
 
 				String oldLinkToLayout = matcher.group(0);
 
-				StringBundler sb = new StringBundler(3);
-
-				sb.append(type);
-				sb.append(StringPool.AT);
-				sb.append(layout.getPlid());
-
 				String newLinkToLayout = StringUtil.replace(
-					oldLinkToLayout, type, sb.toString());
+					oldLinkToLayout, type,
+					StringBundler.concat(
+						type, StringPool.AT, layout.getPlid()));
 
 				oldLinksToLayout.add(oldLinkToLayout);
+
 				newLinksToLayout.add(newLinkToLayout);
 
 				Element entityElement = portletDataContext.getExportDataElement(

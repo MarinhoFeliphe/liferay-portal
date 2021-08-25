@@ -137,8 +137,8 @@ public class ObjectFieldLocalServiceImpl
 	@Override
 	public ObjectField updateCustomObjectField(
 			long objectFieldId, boolean indexed, boolean indexedAsKeyword,
-			String indexedLanguageId, Map<Locale, String> labelMap,
-			boolean required)
+			String indexedLanguageId, Map<Locale, String> labelMap, String name,
+			boolean required, String type)
 		throws PortalException {
 
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
@@ -152,17 +152,24 @@ public class ObjectFieldLocalServiceImpl
 			throw new ObjectDefinitionStatusException();
 		}
 
-		_validateIndexed(
-			indexed, indexedAsKeyword, indexedLanguageId,
-			objectField.getType());
-
 		_validateLabel(labelMap, LocaleUtil.getSiteDefault());
+
+		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+
+		if (objectDefinition.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+			return objectFieldPersistence.update(objectField);
+		}
+
+		_validateIndexed(indexed, indexedAsKeyword, indexedLanguageId, type);
+		_validateName(objectFieldId, objectDefinition, name);
+		validateType(type);
 
 		objectField.setIndexed(indexed);
 		objectField.setIndexedAsKeyword(indexedAsKeyword);
 		objectField.setIndexedLanguageId(indexedLanguageId);
-		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+		objectField.setName(name);
 		objectField.setRequired(required);
+		objectField.setType(type);
 
 		return objectFieldPersistence.update(objectField);
 	}
@@ -186,7 +193,7 @@ public class ObjectFieldLocalServiceImpl
 
 		_validateIndexed(indexed, indexedAsKeyword, indexedLanguageId, type);
 		_validateLabel(labelMap, LocaleUtil.getSiteDefault());
-		_validateName(objectDefinition, name);
+		_validateName(0, objectDefinition, name);
 		validateType(type);
 
 		ObjectField objectField = objectFieldPersistence.create(
@@ -268,7 +275,8 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
-	private void _validateName(ObjectDefinition objectDefinition, String name)
+	private void _validateName(
+			long objectFieldId, ObjectDefinition objectDefinition, String name)
 		throws PortalException {
 
 		if (Validator.isNull(name)) {
@@ -304,7 +312,9 @@ public class ObjectFieldLocalServiceImpl
 		ObjectField objectField = objectFieldPersistence.fetchByODI_N(
 			objectDefinition.getObjectDefinitionId(), name);
 
-		if (objectField != null) {
+		if ((objectField != null) &&
+			(objectField.getObjectFieldId() != objectFieldId)) {
+
 			throw new DuplicateObjectFieldException("Duplicate name " + name);
 		}
 	}

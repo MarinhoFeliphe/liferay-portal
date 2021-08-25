@@ -87,6 +87,12 @@ definition {
 
 		LexiconEntry.gotoAdd();
 
+		if (isSet(headerTitle)) {
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "${headerTitle}");
+		}
+
 		if (isSet(publishTemplateName)) {
 			var key_publishTemplateName = "${publishTemplateName}";
 
@@ -197,6 +203,14 @@ definition {
 			value1 = "${sitePagesVariationName}");
 
 		if (isSet(copySitePagesVariationName)) {
+			MouseOver(
+				key_tooltipInfo = "Only the latest version marked as ready for publish process is copied.",
+				locator1 = "Staging#STAGING_TOOLTIP");
+
+			AssertVisible(
+				key_content = "Only the latest version marked as ready for publish process is copied.",
+				locator1 = "Tooltip#FLOATING_TOOLTIP_CONTENT");
+
 			Select(
 				locator1 = "StagingManageVariations#ADD_SITE_PAGES_VARIATION_COPY_PAGES_SELECT",
 				value1 = "${copySitePagesVariationName}");
@@ -304,6 +318,20 @@ definition {
 			value1 = "${sitePagesVariationMenulistName}");
 	}
 
+	macro clickPublishToLiveButton {
+		if ("${remoteStaging}" == "true") {
+			ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON");
+		}
+		else if (isSet(scheduleProcess)) {
+			AssertClick(
+				locator1 = "StagingPublishToLive#ADD_EVENT_BUTTON",
+				value1 = "Add Event");
+		}
+		else {
+			ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON");
+		}
+	}
+
 	macro configurePublishToLive {
 		if (IsElementPresent.isElementPresentAfterWait(locator1 = "StagingPublishToLive#SWITCH_TO_ADVANCED_PUBLICATION")) {
 			AssertClick.assertPartialTextClickAt(
@@ -384,6 +412,64 @@ definition {
 		}
 	}
 
+	macro configureScheduleTime {
+		Click(locator1 = "StagingPublishToLive#DATE_SCHEDULE_RADIO");
+
+		if (isSet(scheduleTitleName)) {
+			Type(
+				locator1 = "StagingPublishToLive#DATE_SCHEDULE_TITLE_FIELD",
+				value1 = "${scheduleTitleName}");
+		}
+
+		var displayDateHour = selenium.getAttribute("//input[contains(@id,'schedulerStartDateHour')]@value");
+		var displayDateHourLength = StringUtil.length("${displayDateHour}");
+
+		if ("${displayDateHourLength}" == "1") {
+			var displayDateHour = "0${displayDateHour}";
+		}
+
+		var displayDateAMPM = selenium.getAttribute("//input[contains(@id,'schedulerStartDateAmPm')]@value");
+		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "0", "AM");
+		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "1", "PM");
+		var displayDateMinute = selenium.getAttribute("//input[contains(@id,'schedulerStartDateMinute')]@value");
+		var displayDateMinuteFuture = ${displayDateMinute} + 3;
+		var displayDateMinuteFutureLength = StringUtil.length("${displayDateMinuteFuture}");
+
+		if ("${displayDateMinuteFutureLength}" == "1") {
+			var displayDateMinuteFuture = "0${displayDateMinuteFuture}";
+		}
+
+		var displayDate = "${displayDateHour}:${displayDateMinuteFuture} ${displayDateAMPM}";
+
+		Type(
+			locator1 = "StagingPublishToLive#DATE_SCHEDULE_TIME_INPUT",
+			value1 = "${displayDate}");
+
+		if (isSet(endByDate)) {
+			Check(locator1 = "StagingPublishToLive#DATE_SCHEDULE_END_DATE_END_BY_RADIO");
+
+			var endByDateDay = selenium.getAttribute("//input[contains(@id,'schedulerEndDateDay')]@value");
+
+			if ("${endByDateDayLength}" == "1") {
+				var endByDateDay = "0${endByDateDay}";
+			}
+
+			var endByDateMonth = selenium.getAttribute("//input[contains(@id,'schedulerEndDateMonth')]@value");
+
+			if ("${endByDateMonthLength}" == "1") {
+				var endByDateMonth = "0${endByDateMonth}";
+			}
+
+			var endByDateYear = selenium.getAttribute("//input[contains(@id,'schedulerEndDateYear')]@value");
+			var endByDateYearFuture = ${endByDateYear} + 5;
+			var endByDay = "${endByDateMonth}/${endByDateDay}/${endByDateYearFuture}";
+
+			Type(
+				locator1 = "StagingPublishToLive#DATE_SCHEDULE_END_DATE_INPUT",
+				value1 = "${endByDay}");
+		}
+	}
+
 	macro copyFromLive {
 		Portlet.gotoPortletOptions(
 			portletName = "${portletName}",
@@ -460,6 +546,18 @@ definition {
 		Alert.viewSuccessMessage();
 
 		IFrame.closeFrame();
+	}
+
+	macro deletePublishTask {
+		LexiconEntry.gotoEntryMenuItemNoError(
+			menuItem = "Clear",
+			rowEntry = "${publicationTitle}");
+
+		Alert.viewSuccessMessage();
+
+		AssertElementNotPresent(
+			locator1 = "Staging#PROCESS_TITLE",
+			value1 = "${publicationTitle}");
 	}
 
 	macro deletePublishTemplate {
@@ -576,6 +674,16 @@ definition {
 		SelectFrame(locator1 = "IFrame#METADATA_SETS_IFRAME");
 	}
 
+	macro gotoNavTab {
+		var key_tabName = "${tabName}";
+
+		if (IsElementNotPresent(locator1 = "StagingPublishToLive#ACTIVE_TAB_NAME")) {
+			Click(locator1 = "StagingPublishToLive#TAB_NAME");
+		}
+
+		AssertElementPresent(locator1 = "StagingPublishToLive#ACTIVE_TAB_NAME");
+	}
+
 	macro gotoPublishToLive {
 		if ((IsElementNotPresent(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON")) && (IsElementPresent(locator1 = "Icon#STAGING"))) {
 			Click(locator1 = "Icon#STAGING");
@@ -673,7 +781,11 @@ definition {
 	}
 
 	macro publishCustomPublication {
-		Staging.addCustomPublication();
+		Staging.addCustomPublication(headerTitle = "${headerTitle}");
+
+		if (isSet(scheduleProcess)) {
+			Staging.configureScheduleTime();
+		}
 
 		if ("${rangeAll}" == "true") {
 			Click(locator1 = "Radio#CHOOSE_CONTENT_ALL_CHANGE");
@@ -689,27 +801,16 @@ definition {
 			}
 		}
 
-		if ("${remoteStaging}" == "true") {
-			ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON");
-		}
-		else {
-			ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_CUSTOM_PUBLICATION");
-		}
+		Staging.clickPublishToLiveButton(
+			failureExpected = "${failureExpected}",
+			remoteStaging = "${remoteStaging}",
+			scheduleProcess = "${scheduleProcess}");
 
-		while (IsElementNotPresent(locator1 = "Staging#PROCESS_RESULT")) {
-			Pause(locator1 = "1000");
-		}
-
-		if (isSet(failureExpected)) {
-			AssertTextEquals(
-				locator1 = "Staging#PROCESS_RESULT",
-				value1 = "FAILED");
-		}
-		else {
-			AssertTextEquals(
-				locator1 = "Staging#PROCESS_RESULT",
-				value1 = "Successful");
-		}
+		Staging.viewProcessResult(
+			failureExpected = "${failureExpected}",
+			inProcess = "${inProcess}",
+			scheduleProcess = "${scheduleProcess}",
+			validateErrorMessage = "${validateErrorMessage}");
 	}
 
 	macro publishToLive {
@@ -717,29 +818,12 @@ definition {
 			PortletEntry.inputName(name = "${publicationName}");
 		}
 
-		if ("${remoteStaging}" == "true") {
-			ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON");
-		}
-		else {
-			ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON");
-		}
+		Staging.clickPublishToLiveButton(remoteStaging = "${remoteStaging}");
 
-		Pause(locator1 = "5000");
-
-		if (isSet(failureExpected)) {
-			AssertTextEquals(
-				locator1 = "Staging#PROCESS_FAILED",
-				value1 = "Failed");
-		}
-		else {
-			AssertTextEquals(
-				locator1 = "Staging#PROCESS_SUCCESSFUL",
-				value1 = "Successful");
-		}
-
-		if (isSet(validateErrorMessage)) {
-			Staging.viewValidationError(validateErrorMessage = "${validateErrorMessage}");
-		}
+		Staging.viewProcessResult(
+			failureExpected = "${failureExpected}",
+			scheduleProcess = "${scheduleProcess}",
+			validateErrorMessage = "${validateErrorMessage}");
 
 		SelectFrameTop();
 
@@ -1015,59 +1099,7 @@ definition {
 
 		Click(locator1 = "PagesConfiguration#PAGES_ALL_PUBLIC_PAGES_CHECKBOX");
 
-		Click(locator1 = "StagingPublishToLive#DATE_SCHEDULE_RADIO");
-
-		Type(
-			locator1 = "StagingPublishToLive#DATE_SCHEDULE_TITLE_FIELD",
-			value1 = "${scheduleTitleName}");
-
-		var displayDateHour = selenium.getAttribute("//input[contains(@id,'schedulerStartDateHour')]@value");
-		var displayDateHourLength = StringUtil.length("${displayDateHour}");
-
-		if ("${displayDateHourLength}" == "1") {
-			var displayDateHour = "0${displayDateHour}";
-		}
-
-		var displayDateAMPM = selenium.getAttribute("//input[contains(@id,'schedulerStartDateAmPm')]@value");
-		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "0", "AM");
-		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "1", "PM");
-		var displayDateMinute = selenium.getAttribute("//input[contains(@id,'schedulerStartDateMinute')]@value");
-		var displayDateMinuteFuture = ${displayDateMinute} + 3;
-		var displayDateMinuteFutureLength = StringUtil.length("${displayDateMinuteFuture}");
-
-		if ("${displayDateMinuteFutureLength}" == "1") {
-			var displayDateMinuteFuture = "0${displayDateMinuteFuture}";
-		}
-
-		var displayDate = "${displayDateHour}:${displayDateMinuteFuture} ${displayDateAMPM}";
-
-		Type(
-			locator1 = "StagingPublishToLive#DATE_SCHEDULE_TIME_INPUT",
-			value1 = "${displayDate}");
-
-		if (isSet(endByDate)) {
-			Check(locator1 = "StagingPublishToLive#DATE_SCHEDULE_END_DATE_END_BY_RADIO");
-
-			var endByDateDay = selenium.getAttribute("//input[contains(@id,'schedulerEndDateDay')]@value");
-
-			if ("${endByDateDayLength}" == "1") {
-				var endByDateDay = "0${endByDateDay}";
-			}
-
-			var endByDateMonth = selenium.getAttribute("//input[contains(@id,'schedulerEndDateMonth')]@value");
-
-			if ("${endByDateMonthLength}" == "1") {
-				var endByDateMonth = "0${endByDateMonth}";
-			}
-
-			var endByDateYear = selenium.getAttribute("//input[contains(@id,'schedulerEndDateYear')]@value");
-			var endByDateYearFuture = ${endByDateYear} + 5;
-			var endByDay = "${endByDateMonth}/${endByDateDay}/${endByDateYearFuture}";
-
-			Type(
-				locator1 = "StagingPublishToLive#DATE_SCHEDULE_END_DATE_INPUT",
-				value1 = "${endByDay}");
-		}
+		Staging.configureScheduleTime(scheduleTitleName = "${scheduleTitleName}");
 
 		if (isSet(frequency)) {
 			Select(
@@ -1288,6 +1320,35 @@ definition {
 			value1 = "${pageVariationName}");
 	}
 
+	macro viewProcessResult {
+		while (IsElementNotPresent(locator1 = "Staging#PROCESS_RESULT")) {
+			Pause(locator1 = "1000");
+		}
+
+		if (isSet(failureExpected)) {
+			AssertTextEquals(
+				locator1 = "Staging#PROCESS_FAILED",
+				value1 = "Failed");
+		}
+		else if (isSet(inProcess)) {
+			AssertTextEquals(
+				locator1 = "Staging#PROCESS_CURRENT_ITEM",
+				value1 = "Please wait as the publish processes complete on the remote site.");
+		}
+		else if (isSet(scheduleProcess)) {
+			Alert.viewSuccessMessage();
+		}
+		else {
+			AssertTextEquals(
+				locator1 = "Staging#PROCESS_SUCCESSFUL",
+				value1 = "Successful");
+		}
+
+		if (isSet(validateErrorMessage)) {
+			Staging.viewValidationError(validateErrorMessage = "${validateErrorMessage}");
+		}
+	}
+
 	macro viewPublicationSummary {
 		LexiconEntry.gotoEntryMenuItem(
 			menuItem = "Summary",
@@ -1396,6 +1457,12 @@ definition {
 		IFrame.closeFrame();
 	}
 
+	macro viewPublishTask {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Staging#PROCESS_TITLE",
+			value1 = "${publicationTitle}");
+	}
+
 	macro viewPublishTemplate {
 		if (IsElementPresent(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS")) {
 			Click(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
@@ -1491,7 +1558,7 @@ definition {
 	}
 
 	macro viewValidationError {
-		Click(locator1 = "Message#SEE_MORE_DETAILS_LINK");
+		Click.javaScriptClick(locator1 = "Message#SEE_MORE_DETAILS_LINK");
 
 		SelectFrameTop();
 
@@ -1508,6 +1575,20 @@ definition {
 		Alert.viewSuccessMessage();
 
 		SelectFrameTop(value1 = "relative=top");
+	}
+
+	macro viewVariationTooltipMessage {
+		var key_pageName = "${pageName}";
+		var key_title = "${title}";
+
+		MouseOver(
+			key_pageName = "${pageName}",
+			locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_PAGE_NAME");
+
+		AssertVisible(
+			key_pageName = "${pageName}",
+			key_title = "${title}",
+			locator1 = "StagingPublishToLive#PAGES_TO_PUBLISH_PAGE_NAME_SPAN_TITLE");
 	}
 
 }

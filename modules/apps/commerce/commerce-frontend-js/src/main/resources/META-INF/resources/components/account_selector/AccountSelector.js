@@ -30,9 +30,10 @@ import OrdersListView from './views/OrdersListView';
 
 function AccountSelector({
 	alignmentPosition,
+	commerceChannelId,
 	createNewOrderURL,
-	currentAccount: account,
-	currentOrder: order,
+	currentCommerceAccount: account,
+	currentCommerceOrder: order,
 	refreshPageOnAccountSelected: forceRefresh,
 	selectOrderURL,
 	setCurrentAccountURL,
@@ -109,6 +110,7 @@ function AccountSelector({
 
 				{currentView === VIEWS.ORDERS_LIST && (
 					<OrdersListView
+						commerceChannelId={commerceChannelId}
 						createOrderURL={createNewOrderURL}
 						currentAccount={currentAccount}
 						disabled={!active}
@@ -123,13 +125,14 @@ function AccountSelector({
 
 AccountSelector.propTypes = {
 	alignmentPosition: PropTypes.number,
+	commerceChannelId: PropTypes.number.isRequired,
 	createNewOrderURL: PropTypes.string.isRequired,
-	currentAccount: PropTypes.shape({
+	currentCommerceAccount: PropTypes.shape({
 		id: PropTypes.number,
 		logoURL: PropTypes.string,
 		name: PropTypes.string,
 	}),
-	currentOrder: PropTypes.shape({
+	currentCommerceOrder: PropTypes.shape({
 		orderId: PropTypes.number,
 		workflowStatusInfo: PropTypes.shape({
 			label_i18n: PropTypes.string,
@@ -143,7 +146,7 @@ AccountSelector.propTypes = {
 
 AccountSelector.defaultProps = {
 	alignmentPosition: 3,
-	currentOrder: {
+	currentCommerceOrder: {
 		orderId: 0,
 	},
 	refreshPageOnAccountSelected: false,

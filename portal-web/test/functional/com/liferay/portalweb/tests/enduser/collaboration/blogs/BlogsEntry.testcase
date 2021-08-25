@@ -26,7 +26,7 @@ definition {
 	@priority = "3"
 	@refactordone
 	test AbstractDescriptionPersistsWhenTypingInContentField {
-		property test.name.skip.portal.instance = "BlogsPage#AbstractDescriptionPersistsWhenTypingInContentField";
+		property test.name.skip.portal.instance = "BlogsEntry#AbstractDescriptionPersistsWhenTypingInContentField";
 
 		BlogsNavigator.openToAddEntry(
 			layoutName = "Blogs Page",
@@ -124,10 +124,60 @@ definition {
 		Button.clickPublish();
 	}
 
+	@description = "This is a test for LPS-136760. It checks that content can be added in code view."
+	@ignore = "true"
+	@priority = "2"
+	test CanAddContentInCodeView {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136760 CanAddContentInCodeView pending implementation
+
+	}
+
+	@description = "This is a test for LPS-136762. It checks that content can be added in full screen mode."
+	@ignore = "true"
+	@priority = "2"
+	test CanAddContentInFullScreenMode {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136762 CanAddContentInFullScreenMode pending implementation
+
+	}
+
+	@description = "This is a test for LPS-136763. It checks that 400 characters can be added to the description."
+	@ignore = "true"
+	@priority = "3"
+	test CanAddDescriptionWith400Characters {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136763 CanAddDescriptionWith400Characters pending implementation
+
+	}
+
+	@description = "This is a test for LPS-136769. It checks that a friendly URL can be added with escape characters."
+	@ignore = "true"
+	@priority = "3"
+	test CanAddFriendlyURLWithEscapeCharacters {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136769 CanAddFriendlyURLWithEscapeCharacters pending implementation
+
+	}
+
 	@description = "This test checks that HTML is rendered in the blog content field."
 	@priority = "4"
 	@refactordone
 	test CanAddHTMLToContentField {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		JSONBlog.addEntry(
 			entryContent = "<b>Bold Type</b> <i>Italics</i>",
 			entrySubtitle = "Blogs Entry Subtitle",
@@ -143,6 +193,16 @@ definition {
 			entryContentItalics = "Italics",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title");
+	}
+
+	@description = "This is a test for LPS-136761. It checks that special characters can be added to a custom abstract"
+	@ignore = "true"
+	@priority = "3"
+	test CanAddSpecialCharactersToCustomAbstract {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136761 CanAddSpecialCharactersToCustomAbstract pending implementation
+
 	}
 
 	@description = "This is the same case as BlogsPage#CanAddTitleWithoutEscapingCharacters, but due to LPS-130537 we should ensure both contexts are covered."
@@ -168,6 +228,16 @@ definition {
 	@priority = "4"
 	@refactordone
 	test CanAddWithCustomURL {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		BlogsNavigator.openToAddEntry(
 			layoutName = "Blogs Page",
 			siteURLKey = "guest");
@@ -308,6 +378,16 @@ definition {
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		Refresh();
 
 		BlogsEntry.addWithTrackbackURLPG(
@@ -354,7 +434,17 @@ definition {
 	@refactordone
 	@uitest
 	test CanChangeAScheduledEntryToThePresentAndPublish {
-		property test.name.skip.portal.instance = "BlogsUsecase#CanChangeAScheduledEntryToThePresentAndPublish";
+		property test.name.skip.portal.instance = "BlogsEntry#CanChangeAScheduledEntryToThePresentAndPublish";
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
 
 		BlogsNavigator.openToAddEntry(
 			layoutName = "Blogs Page",
@@ -387,6 +477,16 @@ definition {
 		BlogsEntry.viewEntryPG(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
+	}
+
+	@description = "This is a test for LPS-136772. It checks that the cover image caption can be deleted."
+	@ignore = "true"
+	@priority = "3"
+	test CanDeleteCoverImageCaption {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136772 CanDeleteCoverImageCaption pending implementation
+
 	}
 
 	@description = "This checks that a blog entry can saved as a draft and then deleted."
@@ -453,11 +553,31 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-136771. It checks that the cover image caption can be edited with special characters."
+	@ignore = "true"
+	@priority = "3"
+	test CanEditCoverImageCaptionWithSpecialCharacters {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136771 CanEditCoverImageCaptionWithSpecialCharacters pending implementation
+
+	}
+
 	@description = "This test covers LPS-106613. It ensures that the custom abstract can be added and edited."
 	@priority = "4"
 	@refactorneeded
 	test CanEditCustomAbstract {
 		property test.name.skip.portal.instance = "BlogsEntry#CanEditCustomAbstract";
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -644,6 +764,46 @@ definition {
 		BlogsEntry.viewDefaultCP(entryTitle = "");
 	}
 
+	@description = "This is a test for LPS-136764. It checks that Javascript cannot be executed in the content field."
+	@ignore = "true"
+	@priority = "3"
+	test CannotExecuteXSSInContent {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136764 CannotExecuteXSSInContent pending implementation
+
+	}
+
+	@description = "This is a test for LPS-136773. It checks that XSS cannot be executed in the cover image caption."
+	@ignore = "true"
+	@priority = "3"
+	test CannotExecuteXSSInCoverImageCaption {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136773 CannotExecuteXSSInCoverImageCaption pending implementation
+
+	}
+
+	@description = "This is a test for LPS-136765. It checks that Javascript cannot be executed in the custom abstract."
+	@ignore = "true"
+	@priority = "3"
+	test CannotExecuteXSSInCustomAbstract {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136765 CannotExecuteXSSInCustomAbstract pending implementation
+
+	}
+
+	@description = "This is a test for LPS-136788. It checks that a user cannot rate a post when it is disabled in the configuration."
+	@ignore = "true"
+	@priority = "3"
+	test CannotRatePost {
+		property portal.acceptance = "false";
+
+		// TODO LPS-136788 CannotRatePost pending implementation
+
+	}
+
 	@description = "This checks that a blog draft can be published."
 	@priority = "4"
 	@refactordone
@@ -676,6 +836,16 @@ definition {
 	@priority = "4"
 	@refactordone
 	test CanSchedulePost {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
 		BlogsNavigator.openToAddEntry(
 			layoutName = "Blogs Page",
 			siteURLKey = "guest");
@@ -748,7 +918,7 @@ definition {
 	@priority = "4"
 	@refactorneeded
 	test CanViewDefaultAbstract {
-		property test.name.skip.portal.instance = "BlogsUsecase#ViewBlogsEntryWithDefaultAbstract";
+		property test.name.skip.portal.instance = "BlogsEntry#CanViewDefaultAbstract";
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -756,6 +926,16 @@ definition {
 			entryAbstractDescription = "Blogs Entry Custom Abstract",
 			entryContent = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares represent a definition of a standard web application while the darker blue squares show the addition of social aspects.",
 			entryTitle = "Blogs Entry Title");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
@@ -778,6 +958,16 @@ definition {
 	@refactordone
 	test ShouldHaveUniqueURLForDuplicate {
 		var portalURL = PropsUtil.get("portal.url");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
 
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
@@ -806,6 +996,18 @@ definition {
 	@priority = "4"
 	@refactordone
 	test ShouldTrimTitleTo255CharactersWhenOver {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+
 		Blogs.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "|||||||||1|||||||||2|||||||||3|||||||||4|||||||||5|||||||||6|||||||||7|||||||||8|||||||||9||||||||10||||||||11||||||||12||||||||13||||||||14||||||||15||||||||16||||||||17||||||||18||||||||19||||||||20||||||||21||||||||22||||||||23||||||||24||||||||25||||XX");
@@ -831,6 +1033,16 @@ definition {
 			entrySubtitle = '''"><img src=xss onerror=alert(1)>''',
 			entryTitle = '''"><img src=xss onerror=alert(1)>''',
 			injectCode = "true");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 

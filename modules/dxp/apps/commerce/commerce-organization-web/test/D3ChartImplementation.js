@@ -67,7 +67,8 @@ jest.mock(
 jest.mock('../src/main/resources/META-INF/resources/js/data/accounts', () => ({
 	getAccount: () =>
 		Promise.resolve({
-			accountUsers: [
+			type: 'accountUserAccounts',
+			userAccounts: [
 				{
 					id: '2000',
 					name: `User Child 1`,
@@ -81,7 +82,6 @@ jest.mock('../src/main/resources/META-INF/resources/js/data/accounts', () => ({
 					name: `User Child 3`,
 				},
 			],
-			type: 'account',
 		}),
 }));
 
@@ -179,6 +179,7 @@ describe('D3OrganizationChart implementation', () => {
 	let zoomOutButton;
 	let defaultParams;
 	const getChartNodes = (...args) => getNodes(chartSVGWrapper, ...args);
+	let lastActionPerformed = null;
 
 	beforeEach(() => {
 		chartSVGWrapper = document.createElement('svg');
@@ -192,13 +193,31 @@ describe('D3OrganizationChart implementation', () => {
 			},
 			'./assets/clay/icons.svg',
 			{
-				open: () => {},
+				open: (parentData, type) => {
+					lastActionPerformed = {
+						details: {parentData, type},
+						name: 'modal opened',
+					};
+				},
 			},
 			{
-				close: () => {},
-				open: () => {},
+				close: () => {
+					lastActionPerformed = {
+						name: 'menu closed',
+					};
+				},
+				open: (target, data) => {
+					lastActionPerformed = {
+						details: {data, target},
+						name: 'menu opened',
+					};
+				},
 			},
 		];
+	});
+
+	afterEach(() => {
+		lastActionPerformed = null;
 	});
 
 	it('Must create a chart', async () => {
@@ -284,6 +303,106 @@ describe('D3OrganizationChart implementation', () => {
 				expect(node).toBeTruthy();
 				expect(node.__data__.parent.data.name).toBe('Canada');
 			});
+		});
+	});
+
+	describe('Node creation', () => {
+		let addButton = null;
+
+		beforeAll(async () => {
+			new D3OrganizationChart(INITIAL_DATA, ...defaultParams);
+			const clickedNode = getChartNodes('Root', 'name')[0];
+
+			await d3click(clickedNode);
+
+			addButton = getChartNodes('add', 'type')[0];
+		});
+
+		it('Must display an add button when an organization is clicked', () => {
+			expect(addButton).toBeTruthy();
+			expect(addButton.__data__.parent.data.name).toBe('Root');
+		});
+
+		it('Add button must change its state when clicked', async () => {
+			expect(addButton).toBeTruthy();
+
+			const actionsWrapper = addButton.querySelector('.actions-wrapper');
+			const openActionsWrapper = addButton.querySelector(
+				'.open-actions-wrapper'
+			);
+
+			await d3click(openActionsWrapper);
+
+			expect(actionsWrapper.classList).toContain('menu-open');
+		});
+
+		it('Must open a modal when a creation button is clicked', async () => {
+			const openActionsWrapper = addButton.querySelector(
+				'.open-actions-wrapper'
+			);
+
+			await d3click(openActionsWrapper);
+
+			const createOrganizationButton = addButton.querySelector(
+				'.add-action-wrapper.organization'
+			);
+			expect(createOrganizationButton).toBeTruthy();
+
+			await d3click(createOrganizationButton);
+
+			expect(lastActionPerformed.name).toBe('modal opened');
+		});
+
+		it('Must open a create organization modal when a creation button is clicked', async () => {
+			const openActionsWrapper = addButton.querySelector(
+				'.open-actions-wrapper'
+			);
+
+			await d3click(openActionsWrapper);
+
+			const createOrganizationButton = addButton.querySelector(
+				'.add-action-wrapper.organization'
+			);
+			expect(createOrganizationButton).toBeTruthy();
+
+			await d3click(createOrganizationButton);
+
+			expect(lastActionPerformed.name).toBe('modal opened');
+			expect(lastActionPerformed.details.type).toBe('organization');
+		});
+
+		it('Must open a create account modal when a creation button is clicked', async () => {
+			const openActionsWrapper = addButton.querySelector(
+				'.open-actions-wrapper'
+			);
+
+			await d3click(openActionsWrapper);
+
+			const createAccountButton = addButton.querySelector(
+				'.add-action-wrapper.account'
+			);
+			expect(createAccountButton).toBeTruthy();
+
+			await d3click(createAccountButton);
+
+			expect(lastActionPerformed.name).toBe('modal opened');
+			expect(lastActionPerformed.details.type).toBe('account');
+		});
+	});
+
+	describe('Node actions', () => {
+		it('must open an action menu when a menu button is clicked', async () => {
+			new D3OrganizationChart(INITIAL_DATA, ...defaultParams);
+
+			const rootNode = getChartNodes('Root', 'name')[0];
+			const menuButton = rootNode.querySelector('.node-menu-wrapper');
+
+			expect(menuButton).toBeTruthy();
+
+			await d3click(menuButton);
+
+			expect(lastActionPerformed.name).toBe('menu opened');
+			expect(lastActionPerformed.details.data.name).toBe('Root');
 		});
 	});
 });

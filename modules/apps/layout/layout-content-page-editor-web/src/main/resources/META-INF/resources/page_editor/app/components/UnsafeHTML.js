@@ -17,6 +17,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import RawDOM from '../../common/components/RawDOM';
+import isNullOrUndefined from '../utils/isNullOrUndefined';
 
 /**
  * DOM node which will be manually updated and injects
@@ -33,7 +34,7 @@ export default class UnsafeHTML extends React.PureComponent {
 			this._syncRefProps();
 
 			if (
-				!this.state.ref.innerHTML ||
+				(!this.state.ref.childNodes.length && this.props.markup) ||
 				prevProps.markup !== this.props.markup
 			) {
 				this._syncRefContent();
@@ -107,13 +108,25 @@ export default class UnsafeHTML extends React.PureComponent {
 	 */
 	_syncRefProps() {
 		const ref = this.state.ref;
-		ref.className = this.props.className;
-		ref.id = this.props.id;
+
+		if (this.props.className) {
+			ref.className = this.props.className;
+		}
+		else {
+			ref.removeAttribute('class');
+		}
+
+		if (this.props.id) {
+			ref.id = this.props.id;
+		}
+		else {
+			ref.removeAttribute('id');
+		}
 
 		ref.removeAttribute('style');
 
 		Object.entries(this.props.style).forEach(([key, value]) => {
-			if (value !== undefined && value !== null) {
+			if (!isNullOrUndefined(value)) {
 				ref.style[key] = value;
 			}
 		});

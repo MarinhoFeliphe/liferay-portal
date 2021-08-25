@@ -1,5 +1,13 @@
 definition {
 
+	macro viewGeomapAnalyticsLocationNames {
+		for (var locationName : list "${locationList}") {
+			AssertElementPresent(
+				key_entry = "${locationName}",
+				locator1 = "ACSites#GEOMAP_ANALYTICS_LOCATIONS_NAME");
+		}
+	}
+
 	macro viewSiteOverviewDashboardCards {
 		WaitForElementPresent(locator1 = "ACSites#ACTIVITIES_CARD");
 

@@ -49,11 +49,11 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 		try {
 			return InfoPage.of(
 				_objectEntryLocalService.getObjectEntries(
-					_objectDefinition.getObjectDefinitionId(),
+					0, _objectDefinition.getObjectDefinitionId(),
 					pagination.getStart(), pagination.getEnd()),
 				collectionQuery.getPagination(),
 				_objectEntryLocalService.getObjectEntriesCount(
-					_objectDefinition.getObjectDefinitionId()));
+					0, _objectDefinition.getObjectDefinitionId()));
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(

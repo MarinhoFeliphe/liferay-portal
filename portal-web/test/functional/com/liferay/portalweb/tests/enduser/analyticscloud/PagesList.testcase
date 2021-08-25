@@ -118,6 +118,27 @@ definition {
 		}
 	}
 
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8341 | Test Summary: Filter Page Table by Last Year"
+	@priority = "3"
+	test PeriodFilterLastYearPageTable {
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: Test needs data from past dates to assert
+		// AC Refactor ticket: LRAC-8747
+
+		task ("Open Analytics Cloud as active window") {
+			ACUtils.launchAC();
+		}
+
+		task ("Select Pages tab and set time period filter to Last Year") {
+			ACNavigation.switchTab(tabName = "Pages");
+
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLastYear();
+		}
+	}
+
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8111 | Test Summary: Assert the pages list shows a list of pages"
 	@ignore = "true"
 	@priority = "5"

@@ -80,12 +80,12 @@ public class CPDefinitionDiagramPinCacheModel
 		sb.append(modifiedDate);
 		sb.append(", CPDefinitionId=");
 		sb.append(CPDefinitionId);
-		sb.append(", number=");
-		sb.append(number);
 		sb.append(", positionX=");
 		sb.append(positionX);
 		sb.append(", positionY=");
 		sb.append(positionY);
+		sb.append(", sequence=");
+		sb.append(sequence);
 		sb.append("}");
 
 		return sb.toString();
@@ -123,9 +123,15 @@ public class CPDefinitionDiagramPinCacheModel
 		}
 
 		cpDefinitionDiagramPinImpl.setCPDefinitionId(CPDefinitionId);
-		cpDefinitionDiagramPinImpl.setNumber(number);
 		cpDefinitionDiagramPinImpl.setPositionX(positionX);
 		cpDefinitionDiagramPinImpl.setPositionY(positionY);
+
+		if (sequence == null) {
+			cpDefinitionDiagramPinImpl.setSequence("");
+		}
+		else {
+			cpDefinitionDiagramPinImpl.setSequence(sequence);
+		}
 
 		cpDefinitionDiagramPinImpl.resetOriginalValues();
 
@@ -145,11 +151,10 @@ public class CPDefinitionDiagramPinCacheModel
 
 		CPDefinitionId = objectInput.readLong();
 
-		number = objectInput.readInt();
-
 		positionX = objectInput.readDouble();
 
 		positionY = objectInput.readDouble();
+		sequence = objectInput.readUTF();
 	}
 
 	@Override
@@ -172,11 +177,16 @@ public class CPDefinitionDiagramPinCacheModel
 
 		objectOutput.writeLong(CPDefinitionId);
 
-		objectOutput.writeInt(number);
-
 		objectOutput.writeDouble(positionX);
 
 		objectOutput.writeDouble(positionY);
+
+		if (sequence == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(sequence);
+		}
 	}
 
 	public long CPDefinitionDiagramPinId;
@@ -186,8 +196,8 @@ public class CPDefinitionDiagramPinCacheModel
 	public long createDate;
 	public long modifiedDate;
 	public long CPDefinitionId;
-	public int number;
 	public double positionX;
 	public double positionY;
+	public String sequence;
 
 }

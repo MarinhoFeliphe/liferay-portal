@@ -36,6 +36,7 @@ import isMapped from '../../../../../app/utils/editable-value/isMapped';
 import isMappedToCollection from '../../../../../app/utils/editable-value/isMappedToCollection';
 import getLayoutDataItemLabel from '../../../../../app/utils/getLayoutDataItemLabel';
 import getMappingFieldsKey from '../../../../../app/utils/getMappingFieldsKey';
+import {getResponsiveConfig} from '../../../../../app/utils/getResponsiveConfig';
 import PageStructureSidebarSection from './PageStructureSidebarSection';
 import StructureTreeNode from './StructureTreeNode';
 
@@ -71,6 +72,15 @@ function getCollectionAncestor(layoutData, itemId) {
 	return parent.type === LAYOUT_DATA_ITEM_TYPES.collection
 		? parent
 		: getCollectionAncestor(layoutData, item.parentId);
+}
+
+function isItemHidden(item, selectedViewportSize) {
+	const responsiveConfig = getResponsiveConfig(
+		item.config,
+		selectedViewportSize
+	);
+
+	return responsiveConfig.styles.display === 'none';
 }
 
 export default function PageStructureSidebar() {
@@ -184,6 +194,7 @@ function visit(
 		canUpdateItemConfiguration,
 		dragAndDropHoveredItemId,
 		fragmentEntryLinks,
+		hasHiddenAncestor,
 		isMasterPage,
 		layoutData,
 		mappingFields,
@@ -198,6 +209,8 @@ function visit(
 	const itemInMasterLayout =
 		masterLayoutData &&
 		Object.keys(masterLayoutData.items).includes(item.itemId);
+
+	const hidden = isItemHidden(item, selectedViewportSize);
 
 	let icon = LAYOUT_DATA_ITEM_TYPE_ICONS[item.type];
 
@@ -262,6 +275,8 @@ function visit(
 					dragAndDropHoveredItemId,
 					draggable: false,
 					expanded: childId === activeItemId,
+					hidden: false,
+					hiddenAncestor: hasHiddenAncestor || hidden,
 					icon: EDITABLE_TYPE_ICONS[type],
 					id: childId,
 					itemType: ITEM_TYPES.editable,
@@ -282,6 +297,7 @@ function visit(
 						canUpdateItemConfiguration,
 						dragAndDropHoveredItemId,
 						fragmentEntryLinks,
+						hasHiddenAncestor: hasHiddenAncestor || hidden,
 						isMasterPage,
 						layoutData,
 						mappingFields,
@@ -321,6 +337,7 @@ function visit(
 						canUpdateItemConfiguration,
 						dragAndDropHoveredItemId,
 						fragmentEntryLinks,
+						hasHiddenAncestor: hasHiddenAncestor || hidden,
 						isMasterPage,
 						layoutData,
 						mappingFields,
@@ -340,6 +357,7 @@ function visit(
 					canUpdateItemConfiguration,
 					dragAndDropHoveredItemId,
 					fragmentEntryLinks,
+					hasHiddenAncestor: hasHiddenAncestor || hidden,
 					isMasterPage,
 					layoutData,
 					mappingFields,
@@ -366,6 +384,8 @@ function visit(
 		expanded:
 			item.itemId === activeItemId ||
 			dragAndDropHoveredItemId === item.itemId,
+		hidden,
+		hiddenAncestor: hasHiddenAncestor,
 		icon,
 		id: item.itemId,
 		itemType: ITEM_TYPES.layoutDataItem,

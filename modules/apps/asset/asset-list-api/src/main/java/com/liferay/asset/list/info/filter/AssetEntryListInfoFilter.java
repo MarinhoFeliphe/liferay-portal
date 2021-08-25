@@ -21,17 +21,23 @@ import com.liferay.info.filter.InfoFilter;
  */
 public class AssetEntryListInfoFilter implements InfoFilter {
 
-	public static final String KEY =
-		"com.liferay.asset.list.info.filter.AssetEntryListInfoFilter";
-
 	public long[][] getAssetCategoryIds() {
 		return _assetCategoryIds;
+	}
+
+	public String getKeywords() {
+		return _keywords;
 	}
 
 	public void setAssetCategoryIds(long[][] assetCategoryIds) {
 		_assetCategoryIds = assetCategoryIds;
 	}
 
+	public void setKeywords(String keywords) {
+		_keywords = keywords;
+	}
+
 	private long[][] _assetCategoryIds;
+	private String _keywords;
 
 }

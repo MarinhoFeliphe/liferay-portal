@@ -150,9 +150,9 @@ public class CPDefinitionDiagramEntryPersistenceTest {
 
 		newCPDefinitionDiagramEntry.setDiagram(RandomTestUtil.randomBoolean());
 
-		newCPDefinitionDiagramEntry.setNumber(RandomTestUtil.nextInt());
-
 		newCPDefinitionDiagramEntry.setQuantity(RandomTestUtil.nextInt());
+
+		newCPDefinitionDiagramEntry.setSequence(RandomTestUtil.randomString());
 
 		newCPDefinitionDiagramEntry.setSku(RandomTestUtil.randomString());
 
@@ -198,11 +198,11 @@ public class CPDefinitionDiagramEntryPersistenceTest {
 			existingCPDefinitionDiagramEntry.isDiagram(),
 			newCPDefinitionDiagramEntry.isDiagram());
 		Assert.assertEquals(
-			existingCPDefinitionDiagramEntry.getNumber(),
-			newCPDefinitionDiagramEntry.getNumber());
-		Assert.assertEquals(
 			existingCPDefinitionDiagramEntry.getQuantity(),
 			newCPDefinitionDiagramEntry.getQuantity());
+		Assert.assertEquals(
+			existingCPDefinitionDiagramEntry.getSequence(),
+			newCPDefinitionDiagramEntry.getSequence());
 		Assert.assertEquals(
 			existingCPDefinitionDiagramEntry.getSku(),
 			newCPDefinitionDiagramEntry.getSku());
@@ -216,11 +216,12 @@ public class CPDefinitionDiagramEntryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByCPDI_N() throws Exception {
-		_persistence.countByCPDI_N(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
+	public void testCountByCPDI_S() throws Exception {
+		_persistence.countByCPDI_S(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByCPDI_N(0L, 0);
+		_persistence.countByCPDI_S(0L, "null");
+
+		_persistence.countByCPDI_S(0L, (String)null);
 	}
 
 	@Test
@@ -257,7 +258,7 @@ public class CPDefinitionDiagramEntryPersistenceTest {
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "CPDefinitionId", true,
 			"CPInstanceUuid", true, "CProductId", true, "diagram", true,
-			"number", true, "quantity", true, "sku", true);
+			"quantity", true, "sequence", true, "sku", true);
 	}
 
 	@Test
@@ -561,10 +562,10 @@ public class CPDefinitionDiagramEntryPersistenceTest {
 				cpDefinitionDiagramEntry, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "CPDefinitionId"));
 		Assert.assertEquals(
-			Integer.valueOf(cpDefinitionDiagramEntry.getNumber()),
-			ReflectionTestUtil.<Integer>invoke(
+			cpDefinitionDiagramEntry.getSequence(),
+			ReflectionTestUtil.invoke(
 				cpDefinitionDiagramEntry, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "number_"));
+				new Class<?>[] {String.class}, "sequence"));
 	}
 
 	protected CPDefinitionDiagramEntry addCPDefinitionDiagramEntry()
@@ -594,9 +595,9 @@ public class CPDefinitionDiagramEntryPersistenceTest {
 
 		cpDefinitionDiagramEntry.setDiagram(RandomTestUtil.randomBoolean());
 
-		cpDefinitionDiagramEntry.setNumber(RandomTestUtil.nextInt());
-
 		cpDefinitionDiagramEntry.setQuantity(RandomTestUtil.nextInt());
+
+		cpDefinitionDiagramEntry.setSequence(RandomTestUtil.randomString());
 
 		cpDefinitionDiagramEntry.setSku(RandomTestUtil.randomString());
 

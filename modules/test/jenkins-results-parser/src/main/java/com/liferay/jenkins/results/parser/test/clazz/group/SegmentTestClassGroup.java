@@ -82,6 +82,13 @@ public class SegmentTestClassGroup extends BaseTestClassGroup {
 			getBatchName(), "/", String.valueOf(getBatchIndex()));
 	}
 
+	public String getSlaveLabel() {
+		BatchTestClassGroup batchTestClassGroup =
+			getParentBatchTestClassGroup();
+
+		return batchTestClassGroup.getSlaveLabel();
+	}
+
 	public File getTestBaseDir() {
 		List<AxisTestClassGroup> axisTestClassGroups = getAxisTestClassGroups();
 

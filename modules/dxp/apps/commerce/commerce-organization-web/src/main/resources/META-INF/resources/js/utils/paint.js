@@ -9,10 +9,16 @@
  * distribution rights of the Software.
  */
 
-import {linkHorizontal} from 'd3';
+import {event as d3event, linkHorizontal} from 'd3';
 
 import {formatItemDescription, formatItemName} from '.';
-import {RECT_SIZES, SYMBOLS_MAP} from './constants';
+import {
+	NODE_BUTTON_WIDTH,
+	NODE_PADDING,
+	RECT_SIZES,
+	SYMBOLS_MAP,
+} from './constants';
+import {USER_INVITATION_ENABLED} from './flags';
 
 export function appendIcon(node, symbol, size, className) {
 	return node
@@ -57,7 +63,56 @@ export const getLinkDiagonal = linkHorizontal()
 		}
 	});
 
-export function fillEntityNode(nodeEnter, spritemap) {
+export function appendCircle(node, size, className) {
+	return node.append('circle').attr('r', size).attr('class', className);
+}
+
+export function createAddActionButton(wrapper, type, openModal, spritemap) {
+	const newButtonContainer = wrapper
+		.append('g')
+		.attr('class', `add-action-wrapper ${type}`)
+		.on('mousedown', (node) => {
+			openModal(node.parent.data, type);
+		});
+
+	appendCircle(newButtonContainer, 16, 'action-circle');
+	appendIcon(
+		newButtonContainer,
+		`${spritemap}#${SYMBOLS_MAP[type]}`,
+		16,
+		'action-icon'
+	);
+}
+
+export function fillAddButtons(nodeEnter, spritemap, openModal) {
+	const actionsWrapper = nodeEnter
+		.append('g')
+		.attr('class', 'actions-wrapper');
+
+	const openActionsWrapper = actionsWrapper
+		.append('g')
+		.attr('class', 'open-actions-wrapper')
+		.on('mousedown', (node) => {
+			if (node.parent.data.type === 'account') {
+				openModal(node.parent.data, 'user');
+			}
+			else {
+				actionsWrapper.node().classList.toggle('menu-open');
+			}
+		});
+
+	appendCircle(openActionsWrapper, 36, 'action-circle');
+	appendIcon(openActionsWrapper, `${spritemap}#plus`, 18, 'action-icon');
+
+	createAddActionButton(actionsWrapper, 'account', openModal, spritemap);
+	createAddActionButton(actionsWrapper, 'organization', openModal, spritemap);
+
+	if (USER_INVITATION_ENABLED) {
+		createAddActionButton(actionsWrapper, 'user', openModal, spritemap);
+	}
+}
+
+export function fillEntityNode(nodeEnter, spritemap, openMenu) {
 	nodeEnter
 		.append('rect')
 		.attr('width', (d) => RECT_SIZES[d.data.type].width)
@@ -88,4 +143,25 @@ export function fillEntityNode(nodeEnter, spritemap) {
 		.append('text')
 		.attr('class', 'node-description')
 		.text(formatItemDescription);
+
+	const menuWrapper = nodeEnter
+		.append('g')
+		.attr('class', 'node-menu-wrapper')
+		.attr('transform', (d) => {
+			const x =
+				RECT_SIZES[d.data.type].width -
+				NODE_BUTTON_WIDTH -
+				NODE_PADDING;
+
+			return `translate(${x}, -14)`;
+		})
+		.on('mousedown', (d) => {
+			d3event.stopPropagation();
+
+			openMenu(d3event.currentTarget, d.data, d.parent?.data);
+		});
+
+	menuWrapper.append('rect').attr('class', 'node-menu-btn');
+
+	appendIcon(menuWrapper, `${spritemap}#ellipsis-v`, 16, 'node-menu-icon');
 }

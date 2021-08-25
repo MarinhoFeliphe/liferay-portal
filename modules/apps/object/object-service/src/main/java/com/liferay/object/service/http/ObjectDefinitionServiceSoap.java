@@ -70,17 +70,23 @@ public class ObjectDefinitionServiceSoap {
 	public static com.liferay.object.model.ObjectDefinitionSoap
 			addCustomObjectDefinition(
 				String[] labelMapLanguageIds, String[] labelMapValues,
-				String name,
+				String name, String panelAppOrder, String panelCategoryKey,
+				String[] pluralLabelMapLanguageIds,
+				String[] pluralLabelMapValues, String scope,
 				com.liferay.object.model.ObjectFieldSoap[] objectFields)
 		throws RemoteException {
 
 		try {
 			Map<Locale, String> labelMap = LocalizationUtil.getLocalizationMap(
 				labelMapLanguageIds, labelMapValues);
+			Map<Locale, String> pluralLabelMap =
+				LocalizationUtil.getLocalizationMap(
+					pluralLabelMapLanguageIds, pluralLabelMapValues);
 
 			com.liferay.object.model.ObjectDefinition returnValue =
 				ObjectDefinitionServiceUtil.addCustomObjectDefinition(
-					labelMap, name,
+					labelMap, name, panelAppOrder, panelCategoryKey,
+					pluralLabelMap, scope,
 					com.liferay.object.model.impl.ObjectFieldModelImpl.toModels(
 						objectFields));
 
@@ -151,6 +157,25 @@ public class ObjectDefinitionServiceSoap {
 		}
 	}
 
+	public static com.liferay.object.model.ObjectDefinitionSoap[]
+			getObjectDefinitions(long companyId, int start, int end)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.object.model.ObjectDefinition>
+				returnValue = ObjectDefinitionServiceUtil.getObjectDefinitions(
+					companyId, start, end);
+
+			return com.liferay.object.model.ObjectDefinitionSoap.toSoapModels(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static int getObjectDefinitionsCount() throws RemoteException {
 		try {
 			int returnValue =
@@ -190,6 +215,36 @@ public class ObjectDefinitionServiceSoap {
 			com.liferay.object.model.ObjectDefinition returnValue =
 				ObjectDefinitionServiceUtil.publishCustomObjectDefinition(
 					objectDefinitionId);
+
+			return com.liferay.object.model.ObjectDefinitionSoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.object.model.ObjectDefinitionSoap
+			updateCustomObjectDefinition(
+				Long objectDefinitionId, String[] labelMapLanguageIds,
+				String[] labelMapValues, String name, String panelAppOrder,
+				String panelCategoryKey, String[] pluralLabelMapLanguageIds,
+				String[] pluralLabelMapValues, String scope)
+		throws RemoteException {
+
+		try {
+			Map<Locale, String> labelMap = LocalizationUtil.getLocalizationMap(
+				labelMapLanguageIds, labelMapValues);
+			Map<Locale, String> pluralLabelMap =
+				LocalizationUtil.getLocalizationMap(
+					pluralLabelMapLanguageIds, pluralLabelMapValues);
+
+			com.liferay.object.model.ObjectDefinition returnValue =
+				ObjectDefinitionServiceUtil.updateCustomObjectDefinition(
+					objectDefinitionId, labelMap, name, panelAppOrder,
+					panelCategoryKey, pluralLabelMap, scope);
 
 			return com.liferay.object.model.ObjectDefinitionSoap.toSoapModel(
 				returnValue);

@@ -14,6 +14,7 @@
 
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
+import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.test.clazz.group.FunctionalBatchTestClassGroup.FunctionalTestClass;
 
 import java.io.File;
@@ -62,6 +63,18 @@ public class FunctionalAxisTestClassGroup extends AxisTestClassGroup {
 		FunctionalTestClass functionalTestClass = functionalTestClasses.get(0);
 
 		return functionalTestClass.getPoshiProperties();
+	}
+
+	@Override
+	public String getSlaveLabel() {
+		String slaveLabel = JenkinsResultsParserUtil.getProperty(
+			getPoshiProperties(), "slave.label");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(slaveLabel)) {
+			return slaveLabel;
+		}
+
+		return super.getSlaveLabel();
 	}
 
 	@Override

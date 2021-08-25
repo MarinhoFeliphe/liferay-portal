@@ -86,10 +86,10 @@ public class CPDefinitionDiagramEntryCacheModel
 		sb.append(CProductId);
 		sb.append(", diagram=");
 		sb.append(diagram);
-		sb.append(", number=");
-		sb.append(number);
 		sb.append(", quantity=");
 		sb.append(quantity);
+		sb.append(", sequence=");
+		sb.append(sequence);
 		sb.append(", sku=");
 		sb.append(sku);
 		sb.append("}");
@@ -140,8 +140,14 @@ public class CPDefinitionDiagramEntryCacheModel
 
 		cpDefinitionDiagramEntryImpl.setCProductId(CProductId);
 		cpDefinitionDiagramEntryImpl.setDiagram(diagram);
-		cpDefinitionDiagramEntryImpl.setNumber(number);
 		cpDefinitionDiagramEntryImpl.setQuantity(quantity);
+
+		if (sequence == null) {
+			cpDefinitionDiagramEntryImpl.setSequence("");
+		}
+		else {
+			cpDefinitionDiagramEntryImpl.setSequence(sequence);
+		}
 
 		if (sku == null) {
 			cpDefinitionDiagramEntryImpl.setSku("");
@@ -173,9 +179,8 @@ public class CPDefinitionDiagramEntryCacheModel
 
 		diagram = objectInput.readBoolean();
 
-		number = objectInput.readInt();
-
 		quantity = objectInput.readInt();
+		sequence = objectInput.readUTF();
 		sku = objectInput.readUTF();
 	}
 
@@ -210,9 +215,14 @@ public class CPDefinitionDiagramEntryCacheModel
 
 		objectOutput.writeBoolean(diagram);
 
-		objectOutput.writeInt(number);
-
 		objectOutput.writeInt(quantity);
+
+		if (sequence == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(sequence);
+		}
 
 		if (sku == null) {
 			objectOutput.writeUTF("");
@@ -232,8 +242,8 @@ public class CPDefinitionDiagramEntryCacheModel
 	public String CPInstanceUuid;
 	public long CProductId;
 	public boolean diagram;
-	public int number;
 	public int quantity;
+	public String sequence;
 	public String sku;
 
 }

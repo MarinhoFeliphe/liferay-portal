@@ -12,8 +12,8 @@
 		<field name="CPInstanceUuid" type="String" />
 		<field name="CProductId" type="long" />
 		<field name="diagram" type="boolean" />
-		<field name="number" type="int" />
 		<field name="quantity" type="int" />
+		<field name="sequence" type="String" />
 		<field name="sku" type="String" />
 	</model>
 	<model name="com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramPin">
@@ -24,9 +24,9 @@
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
 		<field name="CPDefinitionId" type="long" />
-		<field name="number" type="int" />
 		<field name="positionX" type="double" />
 		<field name="positionY" type="double" />
+		<field name="sequence" type="String" />
 	</model>
 	<model name="com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramSetting">
 		<field name="uuid" type="String" />

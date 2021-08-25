@@ -192,7 +192,7 @@ definition {
 			locator1 = "WorkflowDefinition#DEFINITION_TABLE_TITLE_PUBLISHED");
 	}
 
-	@description = "Verify that the user can not unpublish a Workflow in use and system displays an error message"
+	@description = "Verify that the user can not unpublish a Workflow is in use and system displays an error message"
 	@priority = "4"
 	test CanNotUnpublishWorkflowInUse {
 		ApplicationsMenu.gotoPortlet(
@@ -214,7 +214,7 @@ definition {
 
 		MenuItem.clickNoError(menuItem = "Unpublish");
 
-		Alert.viewErrorMessage(errorMessage = "Workflow in use. Remove its assignment to this asset: Blogs Entry.");
+		Alert.viewErrorMessage(errorMessage = "Workflow is in use. Remove its assignment to this asset: Blogs Entry.");
 
 		Workflow.viewDefinitionPublished(workflowDefinitionTitle = "Single Approver");
 	}

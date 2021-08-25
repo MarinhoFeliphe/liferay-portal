@@ -173,6 +173,16 @@ public class JSONStorageEntryLocalServiceTest {
 		_assertClassPKs(
 			Arrays.asList(_CLASS_PK_1, _CLASS_PK_3),
 			new Object[] {"object", "key 2"}, "value 2");
+
+		Assert.assertEquals(
+			Arrays.asList(_CLASS_PK_1, _CLASS_PK_2, _CLASS_PK_3),
+			_jsonStorageEntryLocalService.getClassPKs(
+				_COMPANY_ID, _CLASS_NAME_ID, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS));
+		Assert.assertEquals(
+			3,
+			_jsonStorageEntryLocalService.getClassPKsCount(
+				_COMPANY_ID, _CLASS_NAME_ID));
 	}
 
 	@Test
@@ -210,6 +220,9 @@ public class JSONStorageEntryLocalServiceTest {
 
 		_jsonStorageEntryLocalService.updateJSONStorageEntries(
 			_COMPANY_ID, _CLASS_NAME_ID, _CLASS_PK_1, json);
+
+		_assertClassPKs(
+			Collections.singletonList(_CLASS_PK_1), new Object[] {"key"}, null);
 
 		JSONObject jsonObject = _jsonStorageEntryLocalService.getJSONObject(
 			_CLASS_NAME_ID, _CLASS_PK_1);

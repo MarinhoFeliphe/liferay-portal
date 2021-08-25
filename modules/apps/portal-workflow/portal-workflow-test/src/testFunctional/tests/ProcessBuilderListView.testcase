@@ -183,7 +183,7 @@ definition {
 			value1 = "No workflow definitions are defined.");
 	}
 
-	@description = "Verify that the user can not unpublish a Workflow in use and system displays an error message"
+	@description = "Verify that the user can not unpublish a Workflow is in use and system displays an error message"
 	@priority = "5"
 	test CanNotUnpublishWorkflowInUse {
 		ApplicationsMenu.gotoPortlet(
@@ -210,7 +210,7 @@ definition {
 
 		AssertElementPresent(
 			locator1 = "Message#ERROR",
-			value1 = "Workflow in use. Remove its assignment to this asset: Blogs Entry.");
+			value1 = "Workflow is in use. Remove its assignment to this asset: Blogs Entry.");
 
 		Workflow.viewDefinitionPublished(workflowDefinitionTitle = "Single Approver");
 	}
@@ -616,42 +616,6 @@ definition {
 		AssertElementPresent(
 			key_pageName = "New Workflow",
 			locator1 = "ProcessBuilderListView#PROCESS_BUILDER_HEADER_TITLE");
-	}
-
-	@description = "Verify that, in the error message when you try to unpublish a workflow in use, there is a link to the configuration tab"
-	@priority = "3"
-	test UserIsDirectedToConfigurationTab {
-		ApplicationsMenu.gotoPortlet(
-			category = "Workflow",
-			panel = "Applications",
-			portlet = "Process Builder");
-
-		Navigator.gotoNavItem(navItem = "Configuration");
-
-		Workflow.configureWorkflow(
-			workflowDefinition = "Single Approver",
-			workflowResourceValue = "Blogs Entry");
-
-		JSONBlog.addEntry(
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Workflow",
-			panel = "Applications",
-			portlet = "Process Builder");
-
-		Click(
-			key_workflowDefinitionTitle = "Single Approver",
-			locator1 = "WorkflowDefinition#DEFINITION_TABLE_SPECIFIC_DEFINITION_ELLIPSIS");
-
-		MenuItem.clickNoError(menuItem = "Unpublish");
-
-		Click(locator1 = "MyWorkflowTasks#UNPUBLISH_ALERT_ERROR_MESSAGE_LINK");
-
-		AssertElementPresent(
-			key_navItem = "Configuration",
-			locator1 = "NavBar#NAV_ITEM_LINK");
 	}
 
 }

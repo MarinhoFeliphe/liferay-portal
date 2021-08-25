@@ -103,9 +103,8 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 
 		if (commerceAccount != null) {
 			commerceOrder = _commerceOrderService.addCommerceOrder(
-				_portal.getUserId(httpServletRequest),
 				commerceContext.getCommerceChannelGroupId(),
-				commerceAccount.getCommerceAccountId(), commerceCurrencyId);
+				commerceAccount.getCommerceAccountId(), commerceCurrencyId, 0);
 		}
 
 		if (commerceAccount == null) {
@@ -337,7 +336,7 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 			_configurationProvider.getConfiguration(
 				CommerceOrderCheckoutConfiguration.class,
 				new GroupServiceSettingsLocator(
-					groupId, CommerceConstants.SERVICE_NAME_ORDER));
+					groupId, CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
 
 		return commerceOrderCheckoutConfiguration.guestCheckoutEnabled();
 	}

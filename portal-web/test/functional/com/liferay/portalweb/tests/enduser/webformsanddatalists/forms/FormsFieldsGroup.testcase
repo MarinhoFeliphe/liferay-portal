@@ -35,6 +35,7 @@ definition {
 	@priority = "5"
 	test CanBeCollapsed {
 		property forms.functional = "true";
+		property test.name.skip.portal.instance = "FormsFieldsGroup#CanBeCollapsed";
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -72,9 +73,7 @@ definition {
 
 		Form.viewFieldsGroupNotCollapsedField(fieldLabel = "Numeric");
 
-		Click(
-			key_trueOrFalse = "true",
-			locator1 = "Form#COLLAPSE_BUTTON");
+		Click(locator1 = "Form#COLLAPSE_BUTTON");
 
 		Form.viewCollapsedCollapseButton();
 

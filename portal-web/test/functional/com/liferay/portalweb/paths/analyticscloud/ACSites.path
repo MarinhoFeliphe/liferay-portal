@@ -22,8 +22,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TOP_PAGES_INDEXES</td>
+	<td>//tr[${key_indexNumber}]//div[contains(@class,'table-title')]//a[contains(text(),'${key_entryName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TOP_PAGES_ENTRANCES_BUTTON</td>
+	<td>//span[text()='Entrances']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ACQUISITIONS_CARD</td>
 	<td>//div[contains(@class,'acquisitions')]//h5[text()='Acquisitions']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GEOMAP_ANALYTICS_LOCATIONS_NAME</td>
+	<td>//div[contains(@class,'analytics-geomap')]//td[contains(@class,'text-left') and contains(text(),'${key_entry}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -54,6 +69,11 @@
 <tr>
 	<td>COHORT_ANALYSIS_CARD</td>
 	<td>//div[contains(@class,'cohort-analysis')]//h5[text()='Cohort Analysis']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCHED_KEYWORD</td>
+	<td>//span[contains(@class,'text-truncate title')and contains(text(),'${key_keyword}')]</td>
 	<td></td>
 </tr>
 </tbody>

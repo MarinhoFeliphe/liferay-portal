@@ -408,7 +408,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public long getLayoutModelDeletionCount(
-			final PortletDataContext portletDataContext, boolean privateLayout)
+			PortletDataContext portletDataContext, boolean privateLayout)
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -561,8 +561,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public long getModelDeletionCount(
-			final PortletDataContext portletDataContext,
-			final StagedModelType stagedModelType)
+			PortletDataContext portletDataContext,
+			StagedModelType stagedModelType)
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -1483,14 +1483,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	private String _getZipWriterFileName(String id) {
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(id);
-		sb.append(StringPool.DASH);
-		sb.append(Time.getTimestamp());
-		sb.append(".lar");
-
-		return sb.toString();
+		return StringBundler.concat(
+			id, StringPool.DASH, Time.getTimestamp(), ".lar");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

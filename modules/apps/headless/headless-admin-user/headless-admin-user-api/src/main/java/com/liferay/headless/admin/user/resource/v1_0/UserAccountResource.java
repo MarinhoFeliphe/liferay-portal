@@ -51,6 +51,18 @@ public interface UserAccountResource {
 		return FactoryHolder.factory.create();
 	}
 
+	public void
+			deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+				String accountExternalReferenceCode,
+				String userAccountExternalReferenceCode)
+		throws Exception;
+
+	public void
+			postAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+				String accountExternalReferenceCode,
+				String userAccountExternalReferenceCode)
+		throws Exception;
+
 	public Page<UserAccount> getAccountUserAccountsByExternalReferenceCodePage(
 			String externalReferenceCode, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
@@ -93,15 +105,15 @@ public interface UserAccountResource {
 			Long accountId, String[] strings)
 		throws Exception;
 
-	public void postAccountUserAccountsByEmailAddress(
-			Long accountId, String[] strings)
+	public Page<UserAccount> postAccountUserAccountsByEmailAddress(
+			Long accountId, String accountRoleIds, String[] strings)
 		throws Exception;
 
 	public void deleteAccountUserAccountByEmailAddress(
 			Long accountId, String emailAddress)
 		throws Exception;
 
-	public void postAccountUserAccountByEmailAddress(
+	public UserAccount postAccountUserAccountByEmailAddress(
 			Long accountId, String emailAddress)
 		throws Exception;
 

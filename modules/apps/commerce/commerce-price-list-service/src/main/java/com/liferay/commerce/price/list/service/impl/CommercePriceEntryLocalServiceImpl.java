@@ -28,7 +28,6 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -456,19 +455,11 @@ public class CommercePriceEntryLocalServiceImpl
 				neverExpire, serviceContext);
 		}
 
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("{cProductId=");
-		sb.append(cProductId);
-		sb.append(StringPool.COMMA_AND_SPACE);
-		sb.append("cpInstanceUuid=");
-		sb.append(cpInstanceUuid);
-		sb.append(StringPool.COMMA_AND_SPACE);
-		sb.append("skuExternalReferenceCode=");
-		sb.append(skuExternalReferenceCode);
-		sb.append(CharPool.CLOSE_CURLY_BRACE);
-
-		throw new NoSuchCPInstanceException(sb.toString());
+		throw new NoSuchCPInstanceException(
+			StringBundler.concat(
+				"{cProductId=", cProductId, ", cpInstanceUuid=", cpInstanceUuid,
+				", skuExternalReferenceCode=", skuExternalReferenceCode,
+				CharPool.CLOSE_CURLY_BRACE));
 	}
 
 	/**

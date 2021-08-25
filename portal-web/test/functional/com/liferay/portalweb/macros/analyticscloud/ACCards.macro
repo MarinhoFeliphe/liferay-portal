@@ -1,5 +1,17 @@
 definition {
 
+	macro clickFilterByDay {
+		Click(locator1 = "ACCards#CARD_FILTER_BY_DAY_ACTIVE");
+	}
+
+	macro clickFilterByMonth {
+		Click(locator1 = "ACCards#CARD_FILTER_BY_MONTH");
+	}
+
+	macro clickFilterByWeek {
+		Click(locator1 = "ACCards#CARD_FILTER_BY_WEEK");
+	}
+
 	macro viewCards {
 		var key_cardTitle = "${cardTitle}";
 
@@ -8,12 +20,65 @@ definition {
 			value1 = "${cardTitle}");
 	}
 
+	macro viewGeomapContainer {
+		AssertVisible(
+			element = "",
+			key_cardTitle = "${cardTitle}",
+			locator1 = "ACCards#GEOMAP_CONTAINER");
+	}
+
+	macro viewGeomapTableText {
+		AssertTextEquals(
+			key_cardTitle = "${cardTitle}",
+			locator1 = "ACCards#GEOMAP_TABLE_TEXT",
+			position = "left",
+			value1 = "${leftText}");
+
+		AssertTextEquals(
+			key_cardTitle = "${cardTitle}",
+			locator1 = "ACCards#GEOMAP_TABLE_TEXT",
+			position = "right",
+			value1 = "${rightText}");
+	}
+
+	macro viewMetricBarStyle {
+		AssertAttributeValue(
+			attribute1 = "style",
+			entryName = "${entryName}",
+			key_cardTitle = "${cardTitle}",
+			locator1 = "ACCards#METRIC_BAR",
+			value1 = "${style}");
+
+		AssertCssValue(
+			entryName = "${entryName}",
+			key_cardTitle = "${cardTitle}",
+			locator1 = "ACCards#METRIC_BAR",
+			locator2 = "background-color",
+			value1 = "${backgroundColor}");
+	}
+
 	macro viewMetricValue {
 		AssertTextEquals(
 			key_cardTitle = "${cardTitle}",
 			key_metricName = "${metricName}",
 			locator1 = "ACCards#METRIC_VALUE",
 			value1 = "${metricValue}");
+	}
+
+	macro viewTableEntryInfo {
+		AssertVisible(
+			column = "${column}",
+			entryInfo = "${entryInfo}",
+			entryName = "${entryName}",
+			key_cardTitle = "${cardTitle}",
+			locator1 = "ACCards#TABLE_ENTRY_INFO");
+	}
+
+	macro viewTopSitesByIndexes {
+		AssertElementPresent(
+			key_entryName = "${key_entry}",
+			key_indexNumber = "${key_index}",
+			locator1 = "ACSites#TOP_PAGES_INDEXES");
 	}
 
 }

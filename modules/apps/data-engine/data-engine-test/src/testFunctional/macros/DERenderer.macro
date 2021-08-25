@@ -1,5 +1,17 @@
 definition {
 
+	macro assertDataInColorField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		AssertTextEquals.assertValue(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "DataEngineRenderer#COLOR_PICKER_GENERAL_INPUT_INDEXED",
+			value1 = "${value}");
+	}
+
 	macro assertDataInDateField {
 		if (!(isSet(index))) {
 			var index = "1";
@@ -27,6 +39,32 @@ definition {
 			locator1 = "DataEngineRenderer#GRID_OPTION_INDEXED");
 	}
 
+	macro assertDataInImageField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		AssertTextEquals.assertValue(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "DataEngineRenderer#IMAGE_INPUT_INDEXED",
+			value1 = "${imageTitle}");
+
+		AssertElementPresent(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			key_image = "${imageFile}",
+			locator1 = "DataEngineRenderer#IMAGE_PICKER_PREVIEW_INDEXED");
+
+		if (isSet(imageDescription)) {
+			AssertTextEquals(
+				index = "${index}",
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "DataEngineRenderer#IMAGE_DESCRIPTION_INDEXED",
+				value1 = "${imageDescription}");
+		}
+	}
+
 	macro assertDataInMultipleSelectionField {
 		if (!(isSet(fieldIndex))) {
 			var fieldIndex = "1";
@@ -42,6 +80,18 @@ definition {
 			key_optionValue = "${optionValue}",
 			locator1 = "DataEngineRenderer#MULTIPLE_SELECTION_OPTION_INDEXED",
 			optionIndex = "${optionIndex}");
+	}
+
+	macro assertDataInNumericField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		AssertTextEquals.assertValue(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "DataEngineRenderer#TEXT_INPUT_INDEXED",
+			value1 = "${value}");
 	}
 
 	macro assertDataInSelectFromListField {
@@ -85,6 +135,18 @@ definition {
 			value1 = "${value}");
 	}
 
+	macro assertImageNotPresent {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		AssertElementNotPresent(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			key_image = "${imageField}",
+			locator1 = "DataEngineRenderer#IMAGE_PICKER_PREVIEW_INDEXED");
+	}
+
 	macro assertMultipleSelectionOptionIsUnchecked {
 		if (!(isSet(fieldIndex))) {
 			var fieldIndex = "1";
@@ -100,6 +162,84 @@ definition {
 			key_optionValue = "${optionValue}",
 			locator1 = "DataEngineRenderer#MULTIPLE_SELECTION_OPTION_INDEXED",
 			optionIndex = "${optionIndex}");
+	}
+
+	macro clearImageField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		Click(
+			index = "${index}",
+			key_buttonName = "Clear",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "DataEngineRenderer#FIELD_BUTTON_INDEXED");
+	}
+
+	macro inputDataInColorField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		var colorSelectionMethod = "${colorSelectionMethod}";
+
+		if ("${colorSelectionMethod}" == "Swatch") {
+			Click(
+				index = "${index}",
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "DataEngineRenderer#COLOR_PICKER_INDEXED");
+
+			Click(
+				key_colorSwatchItem = "${value}",
+				locator1 = "Button#COLOR_SWATCH_ITEM");
+		}
+		else if ("${colorSelectionMethod}" == "RGB") {
+			Click(
+				index = "${index}",
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "DataEngineRenderer#COLOR_PICKER_INDEXED");
+
+			Click(locator1 = "DataEngineRenderer#COLOR_PICKER_CUSTOM_COLOR_BUTTON");
+
+			DoubleClick(locator1 = "DataEngineRenderer#COLOR_PICKER_RGB_RED_INPUT");
+
+			Type.sendKeys(
+				locator1 = "DataEngineRenderer#COLOR_PICKER_RGB_RED_INPUT",
+				value1 = "${valueRed}");
+
+			DoubleClick(locator1 = "DataEngineRenderer#COLOR_PICKER_RGB_GREEN_INPUT");
+
+			Type.sendKeys(
+				locator1 = "DataEngineRenderer#COLOR_PICKER_RGB_GREEN_INPUT",
+				value1 = "${valueGreen}");
+
+			DoubleClick(locator1 = "DataEngineRenderer#COLOR_PICKER_RGB_BLUE_INPUT");
+
+			Type.sendKeys(
+				locator1 = "DataEngineRenderer#COLOR_PICKER_RGB_BLUE_INPUT",
+				value1 = "${valueBlue}");
+		}
+		else if ("${colorSelectionMethod}" == "HEX") {
+			Click(
+				index = "${index}",
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "DataEngineRenderer#COLOR_PICKER_INDEXED");
+
+			Click(locator1 = "DataEngineRenderer#COLOR_PICKER_CUSTOM_COLOR_BUTTON");
+
+			Click(locator1 = "DataEngineRenderer#COLOR_PICKER_HEX_INPUT");
+
+			Type(
+				locator1 = "DataEngineRenderer#COLOR_PICKER_HEX_INPUT",
+				value1 = "${value}");
+		}
+		else {
+			Type(
+				index = "${index}",
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "DataEngineRenderer#COLOR_PICKER_GENERAL_INPUT_INDEXED",
+				value1 = "${value}");
+		}
 	}
 
 	macro inputDataInDateField {
@@ -129,6 +269,53 @@ definition {
 			locator1 = "DataEngineRenderer#GRID_OPTION_INDEXED");
 	}
 
+	macro inputDataInImageField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
+		Click(
+			index = "${index}",
+			key_buttonName = "Select",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "DataEngineRenderer#FIELD_BUTTON_INDEXED");
+
+		if ("${navTab}" == "Documents and Media") {
+			if (isSet(depotName)) {
+				ItemSelector.selectRepositoryImage(
+					depotName = "${depotName}",
+					folderName = "${folderName}",
+					imageFileName = "${webContentImage}",
+					navTab = "${navTab}");
+			}
+			else if (isSet(imageFileName)) {
+				ItemSelector.selectDMImage(
+					imageFileName = "${webContentImage}",
+					navTab = "${navTab}");
+			}
+			else {
+				ItemSelector.uploadFile(
+					navTab = "${navTab}",
+					uploadFileName = "${webContentImage}");
+			}
+		}
+		else if ("${navTab}" == "Web Content Images") {
+			ItemSelector.uploadFile(
+				navTab = "${navTab}",
+				uploadFileName = "${webContentImage}");
+		}
+
+		if (isSet(imageDescription)) {
+			Type(
+				index = "${index}",
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "DataEngineRenderer#IMAGE_DESCRIPTION_INDEXED",
+				value1 = "${imageDescription}");
+		}
+	}
+
 	macro inputDataInMultipleSelectionField {
 		if (!(isSet(fieldIndex))) {
 			var fieldIndex = "1";
@@ -144,6 +331,18 @@ definition {
 			key_optionValue = "${optionValue}",
 			locator1 = "DataEngineRenderer#MULTIPLE_SELECTION_OPTION_INDEXED",
 			optionIndex = "${optionIndex}");
+	}
+
+	macro inputDataInNumericField {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		Type(
+			index = "${index}",
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "DataEngineRenderer#TEXT_INPUT_INDEXED",
+			value1 = "${value}");
 	}
 
 	macro inputDataInSelectFromListField {

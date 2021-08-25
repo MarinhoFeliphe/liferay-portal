@@ -146,7 +146,7 @@ public class CommerceOrderGenerator {
 				_commerceChannelLocalService.
 					getCommerceChannelGroupIdBySiteGroupId(groupId),
 				commerceAccountUserRel.getCommerceAccountId(),
-				commerceCurrency.getCommerceCurrencyId());
+				commerceCurrency.getCommerceCurrencyId(), 0);
 
 		// Commerce order items
 
@@ -299,7 +299,7 @@ public class CommerceOrderGenerator {
 		// Commerce accounts
 
 		List<CommerceAccount> commerceAccounts =
-			_commerceAccountLocalService.searchCommerceAccounts(
+			_commerceAccountLocalService.search(
 				group.getCompanyId(),
 				CommerceAccountConstants.DEFAULT_PARENT_ACCOUNT_ID, null,
 				_getAccountType(groupId), true, QueryUtil.ALL_POS,

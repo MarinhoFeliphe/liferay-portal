@@ -405,6 +405,80 @@ definition {
 			pollsQuestionVotePercent = "0%");
 	}
 
+	@description = "This is a use case for LPS-123156."
+	@priority = "3"
+	test AssertPublishTemplateInfo {
+		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
+
+		Staging.addPublishTemplate(
+			publishTemplateDescription = "New Publish Template Description",
+			publishTemplateName = "New Publish Template");
+
+		Staging.savePublishTemplate(
+			publishTemplateDescription = "New Publish Template Description",
+			publishTemplateName = "New Publish Template");
+
+		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
+
+		Staging.addCustomPublication(publishTemplateName = "New Publish Template");
+
+		ControlMenu.viewHeaderTitle(headerTitle = "New Publish Process Based on New Publish Template");
+	}
+
+	@description = "This is a use case for LPS-123156."
+	@priority = "3"
+	test AssertScheduledPublicationInfo {
+		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
+
+		Staging.gotoNavTab(tabName = "Scheduled");
+
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No scheduled publish processes were found.");
+
+		Staging.gotoNavTab(tabName = "Processes");
+
+		Staging.publishCustomPublication(scheduleProcess = "true");
+
+		Staging.gotoNavTab(tabName = "Scheduled");
+
+		AssertTextPresent(
+			locator1 = "StagingPublishToLive#SCHEDULED_TABLE_TITLE",
+			value1 = "Untitled Scheduled Publish Process");
+	}
+
+	@description = "This is a use case for LPS-123156"
+	@priority = "4"
+	test AssertStagingPublicationAndProcessesMessage {
+		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
+
+		Staging.viewPublishTask(publicationTitle = "Initial Publish Process");
+
+		Staging.deletePublishTask(publicationTitle = "Initial Publish Process");
+
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No publish processes were found.");
+
+		Navigator.openStagingSiteURL(siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		AssertElementPresent(locator1 = "StagingPublishToLive#CHANGES_SINCE_LAST_PUBLISH_PROCESS");
+
+		AssertTextEquals(
+			locator1 = "StagingPublishToLive#PUBLISH_SIMPLE_HELP_TEXT",
+			value1 = "Simple publish process includes the publishing of theme and site pages settings, logo, deletions, and permissions.");
+
+		Staging.configurePublishToLive();
+
+		AssertTextEquals(
+			locator1 = "StagingPublishToLive#SWITCH_TO_SIMPLE_PUBLICATION",
+			value1 = "Switch to Simple Publish Process");
+
+		AssertElementNotPresent(locator1 = "Staging#LIVE_BUTTON");
+	}
+
 	@description = "This is a use case for LPS-95516."
 	@priority = "3"
 	test AssertWebContentNotBeDeletedOnLiveViaSAP {
@@ -1731,6 +1805,7 @@ definition {
 		WebContent.subscribeToCurrentFolderCP();
 	}
 
+	@description = "This is a use case for LPS-123156"
 	@priority = "5"
 	test TrashEntryReferencePublishing {
 		property portal.acceptance = "true";
@@ -1814,7 +1889,9 @@ definition {
 			uncheckPages = "true",
 			uncheckSubContent = "Referenced Content");
 
-		Staging.publishToLive(failureExpected = "true");
+		Staging.publishToLive(
+			failureExpected = "true",
+			validateErrorMessage = "The publish process did not start due to validation errors.");
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",

@@ -133,16 +133,9 @@ public class FreeMarkerFragmentEntryProcessor
 				"configuration", configurationValuesJSONObject
 			).put(
 				"fragmentElementId",
-				() -> {
-					StringBundler sb = new StringBundler(4);
-
-					sb.append("fragment-");
-					sb.append(fragmentEntryLink.getFragmentEntryId());
-					sb.append("-");
-					sb.append(fragmentEntryLinkNamespace);
-
-					return sb.toString();
-				}
+				StringBundler.concat(
+					"fragment-", fragmentEntryLink.getFragmentEntryId(), "-",
+					fragmentEntryLinkNamespace)
 			).put(
 				"fragmentEntryLinkNamespace", fragmentEntryLinkNamespace
 			).putAll(

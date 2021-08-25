@@ -309,73 +309,73 @@ public class CPDefinitionDiagramEntryUtil {
 	}
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or throws a <code>NoSuchCPDefinitionDiagramEntryException</code> if it could not be found.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or throws a <code>NoSuchCPDefinitionDiagramEntryException</code> if it could not be found.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the matching cp definition diagram entry
 	 * @throws NoSuchCPDefinitionDiagramEntryException if a matching cp definition diagram entry could not be found
 	 */
-	public static CPDefinitionDiagramEntry findByCPDI_N(
-			long CPDefinitionId, int number)
+	public static CPDefinitionDiagramEntry findByCPDI_S(
+			long CPDefinitionId, String sequence)
 		throws com.liferay.commerce.shop.by.diagram.exception.
 			NoSuchCPDefinitionDiagramEntryException {
 
-		return getPersistence().findByCPDI_N(CPDefinitionId, number);
+		return getPersistence().findByCPDI_S(CPDefinitionId, sequence);
 	}
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the matching cp definition diagram entry, or <code>null</code> if a matching cp definition diagram entry could not be found
 	 */
-	public static CPDefinitionDiagramEntry fetchByCPDI_N(
-		long CPDefinitionId, int number) {
+	public static CPDefinitionDiagramEntry fetchByCPDI_S(
+		long CPDefinitionId, String sequence) {
 
-		return getPersistence().fetchByCPDI_N(CPDefinitionId, number);
+		return getPersistence().fetchByCPDI_S(CPDefinitionId, sequence);
 	}
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching cp definition diagram entry, or <code>null</code> if a matching cp definition diagram entry could not be found
 	 */
-	public static CPDefinitionDiagramEntry fetchByCPDI_N(
-		long CPDefinitionId, int number, boolean useFinderCache) {
+	public static CPDefinitionDiagramEntry fetchByCPDI_S(
+		long CPDefinitionId, String sequence, boolean useFinderCache) {
 
-		return getPersistence().fetchByCPDI_N(
-			CPDefinitionId, number, useFinderCache);
+		return getPersistence().fetchByCPDI_S(
+			CPDefinitionId, sequence, useFinderCache);
 	}
 
 	/**
-	 * Removes the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; from the database.
+	 * Removes the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; from the database.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the cp definition diagram entry that was removed
 	 */
-	public static CPDefinitionDiagramEntry removeByCPDI_N(
-			long CPDefinitionId, int number)
+	public static CPDefinitionDiagramEntry removeByCPDI_S(
+			long CPDefinitionId, String sequence)
 		throws com.liferay.commerce.shop.by.diagram.exception.
 			NoSuchCPDefinitionDiagramEntryException {
 
-		return getPersistence().removeByCPDI_N(CPDefinitionId, number);
+		return getPersistence().removeByCPDI_S(CPDefinitionId, sequence);
 	}
 
 	/**
-	 * Returns the number of cp definition diagram entries where CPDefinitionId = &#63; and number = &#63;.
+	 * Returns the number of cp definition diagram entries where CPDefinitionId = &#63; and sequence = &#63;.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the number of matching cp definition diagram entries
 	 */
-	public static int countByCPDI_N(long CPDefinitionId, int number) {
-		return getPersistence().countByCPDI_N(CPDefinitionId, number);
+	public static int countByCPDI_S(long CPDefinitionId, String sequence) {
+		return getPersistence().countByCPDI_S(CPDefinitionId, sequence);
 	}
 
 	/**

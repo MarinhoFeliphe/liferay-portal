@@ -110,35 +110,6 @@ public class Pin implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@DecimalMin("0")
-	@Schema
-	public Integer getNumber() {
-		return number;
-	}
-
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
-
-	@JsonIgnore
-	public void setNumber(
-		UnsafeSupplier<Integer, Exception> numberUnsafeSupplier) {
-
-		try {
-			number = numberUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer number;
-
 	@Schema
 	public Double getPositionX() {
 		return positionX;
@@ -195,6 +166,34 @@ public class Pin implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double positionY;
 
+	@Schema
+	public String getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(String sequence) {
+		this.sequence = sequence;
+	}
+
+	@JsonIgnore
+	public void setSequence(
+		UnsafeSupplier<String, Exception> sequenceUnsafeSupplier) {
+
+		try {
+			sequence = sequenceUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String sequence;
+
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -242,16 +241,6 @@ public class Pin implements Serializable {
 			sb.append(id);
 		}
 
-		if (number != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"number\": ");
-
-			sb.append(number);
-		}
-
 		if (positionX != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -270,6 +259,20 @@ public class Pin implements Serializable {
 			sb.append("\"positionY\": ");
 
 			sb.append(positionY);
+		}
+
+		if (sequence != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"sequence\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(sequence));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");

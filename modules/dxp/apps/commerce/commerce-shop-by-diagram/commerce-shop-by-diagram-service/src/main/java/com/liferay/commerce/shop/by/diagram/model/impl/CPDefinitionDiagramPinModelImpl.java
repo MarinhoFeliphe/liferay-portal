@@ -77,8 +77,8 @@ public class CPDefinitionDiagramPinModelImpl
 		{"CPDefinitionDiagramPinId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"CPDefinitionId", Types.BIGINT}, {"number_", Types.INTEGER},
-		{"positionX", Types.DOUBLE}, {"positionY", Types.DOUBLE}
+		{"CPDefinitionId", Types.BIGINT}, {"positionX", Types.DOUBLE},
+		{"positionY", Types.DOUBLE}, {"sequence", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -92,22 +92,22 @@ public class CPDefinitionDiagramPinModelImpl
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("CPDefinitionId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("number_", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("positionX", Types.DOUBLE);
 		TABLE_COLUMNS_MAP.put("positionY", Types.DOUBLE);
+		TABLE_COLUMNS_MAP.put("sequence", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPDefinitionDiagramPin (CPDefinitionDiagramPinId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPDefinitionId LONG,number_ INTEGER,positionX DOUBLE,positionY DOUBLE)";
+		"create table CPDefinitionDiagramPin (CPDefinitionDiagramPinId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPDefinitionId LONG,positionX DOUBLE,positionY DOUBLE,sequence VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CPDefinitionDiagramPin";
 
 	public static final String ORDER_BY_JPQL =
-		" ORDER BY cpDefinitionDiagramPin.number ASC";
+		" ORDER BY cpDefinitionDiagramPin.sequence ASC";
 
 	public static final String ORDER_BY_SQL =
-		" ORDER BY CPDefinitionDiagramPin.number_ ASC";
+		" ORDER BY CPDefinitionDiagramPin.sequence ASC";
 
 	public static final String DATA_SOURCE = "liferayDataSource";
 
@@ -126,7 +126,7 @@ public class CPDefinitionDiagramPinModelImpl
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long NUMBER_COLUMN_BITMASK = 2L;
+	public static final long SEQUENCE_COLUMN_BITMASK = 2L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -167,9 +167,9 @@ public class CPDefinitionDiagramPinModelImpl
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setCPDefinitionId(soapModel.getCPDefinitionId());
-		model.setNumber(soapModel.getNumber());
 		model.setPositionX(soapModel.getPositionX());
 		model.setPositionY(soapModel.getPositionY());
+		model.setSequence(soapModel.getSequence());
 
 		return model;
 	}
@@ -372,12 +372,6 @@ public class CPDefinitionDiagramPinModelImpl
 			(BiConsumer<CPDefinitionDiagramPin, Long>)
 				CPDefinitionDiagramPin::setCPDefinitionId);
 		attributeGetterFunctions.put(
-			"number", CPDefinitionDiagramPin::getNumber);
-		attributeSetterBiConsumers.put(
-			"number",
-			(BiConsumer<CPDefinitionDiagramPin, Integer>)
-				CPDefinitionDiagramPin::setNumber);
-		attributeGetterFunctions.put(
 			"positionX", CPDefinitionDiagramPin::getPositionX);
 		attributeSetterBiConsumers.put(
 			"positionX",
@@ -389,6 +383,12 @@ public class CPDefinitionDiagramPinModelImpl
 			"positionY",
 			(BiConsumer<CPDefinitionDiagramPin, Double>)
 				CPDefinitionDiagramPin::setPositionY);
+		attributeGetterFunctions.put(
+			"sequence", CPDefinitionDiagramPin::getSequence);
+		attributeSetterBiConsumers.put(
+			"sequence",
+			(BiConsumer<CPDefinitionDiagramPin, String>)
+				CPDefinitionDiagramPin::setSequence);
 
 		_attributeGetterFunctions = Collections.unmodifiableMap(
 			attributeGetterFunctions);
@@ -540,21 +540,6 @@ public class CPDefinitionDiagramPinModelImpl
 
 	@JSON
 	@Override
-	public int getNumber() {
-		return _number;
-	}
-
-	@Override
-	public void setNumber(int number) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_number = number;
-	}
-
-	@JSON
-	@Override
 	public double getPositionX() {
 		return _positionX;
 	}
@@ -581,6 +566,26 @@ public class CPDefinitionDiagramPinModelImpl
 		}
 
 		_positionY = positionY;
+	}
+
+	@JSON
+	@Override
+	public String getSequence() {
+		if (_sequence == null) {
+			return "";
+		}
+		else {
+			return _sequence;
+		}
+	}
+
+	@Override
+	public void setSequence(String sequence) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_sequence = sequence;
 	}
 
 	public long getColumnBitmask() {
@@ -649,9 +654,9 @@ public class CPDefinitionDiagramPinModelImpl
 		cpDefinitionDiagramPinImpl.setCreateDate(getCreateDate());
 		cpDefinitionDiagramPinImpl.setModifiedDate(getModifiedDate());
 		cpDefinitionDiagramPinImpl.setCPDefinitionId(getCPDefinitionId());
-		cpDefinitionDiagramPinImpl.setNumber(getNumber());
 		cpDefinitionDiagramPinImpl.setPositionX(getPositionX());
 		cpDefinitionDiagramPinImpl.setPositionY(getPositionY());
+		cpDefinitionDiagramPinImpl.setSequence(getSequence());
 
 		cpDefinitionDiagramPinImpl.resetOriginalValues();
 
@@ -662,15 +667,7 @@ public class CPDefinitionDiagramPinModelImpl
 	public int compareTo(CPDefinitionDiagramPin cpDefinitionDiagramPin) {
 		int value = 0;
 
-		if (getNumber() < cpDefinitionDiagramPin.getNumber()) {
-			value = -1;
-		}
-		else if (getNumber() > cpDefinitionDiagramPin.getNumber()) {
-			value = 1;
-		}
-		else {
-			value = 0;
-		}
+		value = getSequence().compareTo(cpDefinitionDiagramPin.getSequence());
 
 		if (value != 0) {
 			return value;
@@ -775,11 +772,17 @@ public class CPDefinitionDiagramPinModelImpl
 
 		cpDefinitionDiagramPinCacheModel.CPDefinitionId = getCPDefinitionId();
 
-		cpDefinitionDiagramPinCacheModel.number = getNumber();
-
 		cpDefinitionDiagramPinCacheModel.positionX = getPositionX();
 
 		cpDefinitionDiagramPinCacheModel.positionY = getPositionY();
+
+		cpDefinitionDiagramPinCacheModel.sequence = getSequence();
+
+		String sequence = cpDefinitionDiagramPinCacheModel.sequence;
+
+		if ((sequence != null) && (sequence.length() == 0)) {
+			cpDefinitionDiagramPinCacheModel.sequence = null;
+		}
 
 		return cpDefinitionDiagramPinCacheModel;
 	}
@@ -864,13 +867,11 @@ public class CPDefinitionDiagramPinModelImpl
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
 	private long _CPDefinitionId;
-	private int _number;
 	private double _positionX;
 	private double _positionY;
+	private String _sequence;
 
 	public <T> T getColumnValue(String columnName) {
-		columnName = _attributeNames.getOrDefault(columnName, columnName);
-
 		Function<CPDefinitionDiagramPin, Object> function =
 			_attributeGetterFunctions.get(columnName);
 
@@ -905,19 +906,9 @@ public class CPDefinitionDiagramPinModelImpl
 		_columnOriginalValues.put("createDate", _createDate);
 		_columnOriginalValues.put("modifiedDate", _modifiedDate);
 		_columnOriginalValues.put("CPDefinitionId", _CPDefinitionId);
-		_columnOriginalValues.put("number_", _number);
 		_columnOriginalValues.put("positionX", _positionX);
 		_columnOriginalValues.put("positionY", _positionY);
-	}
-
-	private static final Map<String, String> _attributeNames;
-
-	static {
-		Map<String, String> attributeNames = new HashMap<>();
-
-		attributeNames.put("number_", "number");
-
-		_attributeNames = Collections.unmodifiableMap(attributeNames);
+		_columnOriginalValues.put("sequence", _sequence);
 	}
 
 	private transient Map<String, Object> _columnOriginalValues;
@@ -945,11 +936,11 @@ public class CPDefinitionDiagramPinModelImpl
 
 		columnBitmasks.put("CPDefinitionId", 64L);
 
-		columnBitmasks.put("number_", 128L);
+		columnBitmasks.put("positionX", 128L);
 
-		columnBitmasks.put("positionX", 256L);
+		columnBitmasks.put("positionY", 256L);
 
-		columnBitmasks.put("positionY", 512L);
+		columnBitmasks.put("sequence", 512L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

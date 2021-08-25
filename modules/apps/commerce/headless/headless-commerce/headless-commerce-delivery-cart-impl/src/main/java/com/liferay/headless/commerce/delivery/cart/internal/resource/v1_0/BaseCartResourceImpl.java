@@ -162,7 +162,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "errorMessages": ___, "notes": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "errorMessages": ___, "notes": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override
@@ -226,6 +226,10 @@ public abstract class BaseCartResourceImpl
 			existingCart.setModifiedDate(cart.getModifiedDate());
 		}
 
+		if (cart.getOrderTypeId() != null) {
+			existingCart.setOrderTypeId(cart.getOrderTypeId());
+		}
+
 		if (cart.getOrderUUID() != null) {
 			existingCart.setOrderUUID(cart.getOrderUUID());
 		}
@@ -286,7 +290,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "errorMessages": ___, "notes": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "errorMessages": ___, "notes": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override
@@ -383,7 +387,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/account/{accountId}/carts'  -u 'test@liferay.com:test'
 	 */
 	@GET
 	@Operation(
@@ -392,15 +396,18 @@ public abstract class BaseCartResourceImpl
 	@Override
 	@Parameters(
 		value = {
+			@Parameter(in = ParameterIn.PATH, name = "accountId"),
 			@Parameter(in = ParameterIn.PATH, name = "channelId"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
-	@Path("/channels/{channelId}/carts")
+	@Path("/channels/{channelId}/account/{accountId}/carts")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Cart")})
 	public Page<Cart> getChannelCartsPage(
+			@NotNull @Parameter(hidden = true) @PathParam("accountId") Long
+				accountId,
 			@NotNull @Parameter(hidden = true) @PathParam("channelId") Long
 				channelId,
 			@Context Pagination pagination)
@@ -412,7 +419,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "errorMessages": ___, "notes": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "errorMessages": ___, "notes": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override

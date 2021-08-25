@@ -19,7 +19,6 @@ import MappingFields from './components/MappingFields';
 import lang from './utils/lang';
 
 export default function OpenGraphMapping({
-	ffSEOInlineFieldMappingEnabled = false,
 	fields,
 	openGraphDescription,
 	openGraphImage,
@@ -30,7 +29,6 @@ export default function OpenGraphMapping({
 }) {
 	return (
 		<MappingFields
-			ffSEOInlineFieldMappingEnabled={ffSEOInlineFieldMappingEnabled}
 			fields={fields}
 			inputs={[
 				{
@@ -44,7 +42,6 @@ export default function OpenGraphMapping({
 					),
 					label: Liferay.Language.get('title'),
 					name: `${portletNamespace}TypeSettingsProperties--mapped-openGraphTitle--`,
-					selectedFieldKey: openGraphTitle,
 					value: openGraphTitle,
 				},
 				{
@@ -59,7 +56,6 @@ export default function OpenGraphMapping({
 					),
 					label: Liferay.Language.get('description'),
 					name: `${portletNamespace}TypeSettingsProperties--mapped-openGraphDescription--`,
-					selectedFieldKey: openGraphDescription,
 					value: openGraphDescription,
 				},
 				{
@@ -89,7 +85,6 @@ export default function OpenGraphMapping({
 						'open-graph-image-alt-description'
 					),
 					name: `${portletNamespace}TypeSettingsProperties--mapped-openGraphImageAlt--`,
-					selectedFieldKey: openGraphImageAlt,
 					value: openGraphImageAlt,
 				},
 			]}

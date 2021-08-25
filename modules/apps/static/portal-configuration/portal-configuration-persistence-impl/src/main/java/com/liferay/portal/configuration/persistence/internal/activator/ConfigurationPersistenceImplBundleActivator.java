@@ -40,7 +40,7 @@ public class ConfigurationPersistenceImplBundleActivator
 	implements BundleActivator {
 
 	@Override
-	public void start(final BundleContext bundleContext) throws Exception {
+	public void start(BundleContext bundleContext) throws Exception {
 		Collection<ServiceReference<DataSource>> serviceReferences =
 			bundleContext.getServiceReferences(
 				DataSource.class, "(bean.id=liferayDataSource)");
@@ -68,10 +68,10 @@ public class ConfigurationPersistenceImplBundleActivator
 				},
 				_configurationPersistenceManager,
 				HashMapDictionaryBuilder.<String, Object>put(
+					Constants.SERVICE_RANKING, Integer.MAX_VALUE - 1000
+				).put(
 					PersistenceManager.PROPERTY_NAME,
 					ConfigurationPersistenceManager.class.getName()
-				).put(
-					Constants.SERVICE_RANKING, Integer.MAX_VALUE - 1000
 				).build());
 
 		_configurationUpgradeStepFactoryRegistration =

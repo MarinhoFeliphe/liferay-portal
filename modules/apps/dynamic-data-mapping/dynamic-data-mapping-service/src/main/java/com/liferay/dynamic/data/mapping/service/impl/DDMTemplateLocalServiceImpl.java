@@ -443,6 +443,11 @@ public class DDMTemplateLocalServiceImpl
 			template.getCompanyId(), resourceName,
 			ResourceConstants.SCOPE_INDIVIDUAL, template.getTemplateId());
 
+		// Template versions
+
+		_ddmTemplateVersionLocalService.deleteTemplateVersions(
+			template.getTemplateId());
+
 		return template;
 	}
 

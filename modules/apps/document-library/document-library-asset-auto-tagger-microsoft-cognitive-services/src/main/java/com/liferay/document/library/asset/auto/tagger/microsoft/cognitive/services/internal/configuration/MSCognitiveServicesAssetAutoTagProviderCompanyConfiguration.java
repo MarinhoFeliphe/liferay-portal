@@ -42,7 +42,8 @@ public interface MSCognitiveServicesAssetAutoTagProviderCompanyConfiguration {
 		requiredInput = true
 	)
 	@Meta.AD(
-		description = "api-key-description", name = "api-key", required = false
+		description = "set-the-api-key-for-the-computer-vision-api-v2",
+		name = "api-key", required = false
 	)
 	public String apiKey();
 
@@ -68,7 +69,8 @@ public interface MSCognitiveServicesAssetAutoTagProviderCompanyConfiguration {
 	 * API.
 	 */
 	@Meta.AD(
-		description = "enabled-description", name = "enabled", required = false
+		description = "enable-auto-tagging-of-images-in-the-document-library-using-microsoft-cognitive-services",
+		name = "enabled", required = false
 	)
 	public boolean enabled();
 

@@ -376,10 +376,9 @@ public class ProductResourceImpl
 			serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
 		}
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			product.getDisplayDate(), serviceContext.getTimeZone());
-
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			product.getExpirationDate(), serviceContext.getTimeZone());
 
 		ProductShippingConfiguration shippingConfiguration =
@@ -445,7 +444,7 @@ public class ProductResourceImpl
 
 		cpDefinition = _cpDefinitionService.addOrUpdateCPDefinition(
 			product.getExternalReferenceCode(), commerceCatalog.getGroupId(),
-			contextUser.getUserId(), LanguageUtils.getLocalizedMap(nameMap),
+			LanguageUtils.getLocalizedMap(nameMap),
 			LanguageUtils.getLocalizedMap(shortDescriptionMap),
 			LanguageUtils.getLocalizedMap(descriptionMap), null,
 			LanguageUtils.getLocalizedMap(product.getMetaTitle()),
@@ -483,7 +482,7 @@ public class ProductResourceImpl
 			Map<String, Serializable> workflowContext = new HashMap<>();
 
 			_cpDefinitionService.updateStatus(
-				contextUser.getUserId(), cpDefinition.getCPDefinitionId(),
+				cpDefinition.getCPDefinitionId(),
 				WorkflowConstants.STATUS_INACTIVE, serviceContext,
 				workflowContext);
 		}
@@ -535,17 +534,6 @@ public class ProductResourceImpl
 		);
 	}
 
-	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
-		if (date == null) {
-			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
-		}
-
-		Calendar calendar = CalendarFactoryUtil.getCalendar(
-			date.getTime(), timeZone);
-
-		return new DateConfig(calendar);
-	}
-
 	private Map<String, Serializable> _getExpandoBridgeAttributes(
 		Attachment attachment) {
 
@@ -562,22 +550,6 @@ public class ProductResourceImpl
 			CPDefinition.class.getName(), contextCompany.getCompanyId(),
 			product.getCustomFields(),
 			contextAcceptLanguage.getPreferredLocale());
-	}
-
-	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
-		if (date == null) {
-			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
-				timeZone);
-
-			expirationCalendar.add(Calendar.MONTH, 1);
-
-			return new DateConfig(expirationCalendar);
-		}
-
-		Calendar calendar = CalendarFactoryUtil.getCalendar(
-			date.getTime(), timeZone);
-
-		return new DateConfig(calendar);
 	}
 
 	private ProductShippingConfiguration _getProductShippingConfiguration(
@@ -617,6 +589,33 @@ public class ProductResourceImpl
 		}
 
 		return new ProductTaxConfiguration();
+	}
+
+	private DateConfig _toDisplayDateConfig(Date date, TimeZone timeZone) {
+		if (date == null) {
+			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
+		}
+
+		Calendar calendar = CalendarFactoryUtil.getCalendar(
+			date.getTime(), timeZone);
+
+		return new DateConfig(calendar);
+	}
+
+	private DateConfig _toExpirationDateConfig(Date date, TimeZone timeZone) {
+		if (date == null) {
+			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
+				timeZone);
+
+			expirationCalendar.add(Calendar.MONTH, 1);
+
+			return new DateConfig(expirationCalendar);
+		}
+
+		Calendar calendar = CalendarFactoryUtil.getCalendar(
+			date.getTime(), timeZone);
+
+		return new DateConfig(calendar);
 	}
 
 	private Product _toProduct(Long cpDefinitionId) throws Exception {
@@ -1035,7 +1034,7 @@ public class ProductResourceImpl
 			Map<String, Serializable> workflowContext = new HashMap<>();
 
 			_cpDefinitionService.updateStatus(
-				contextUser.getUserId(), cpDefinition.getCPDefinitionId(),
+				cpDefinition.getCPDefinitionId(),
 				WorkflowConstants.STATUS_INACTIVE, serviceContext,
 				workflowContext);
 		}

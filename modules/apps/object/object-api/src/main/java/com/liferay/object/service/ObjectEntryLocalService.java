@@ -261,7 +261,7 @@ public interface ObjectEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectEntry> getObjectEntries(
-			long objectDefinitionId, int start, int end)
+			long groupId, long objectDefinitionId, int start, int end)
 		throws PortalException;
 
 	/**
@@ -299,7 +299,7 @@ public interface ObjectEntryLocalService
 	public int getObjectEntriesCount();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getObjectEntriesCount(long objectDefinitionId);
+	public int getObjectEntriesCount(long groupId, long objectDefinitionId);
 
 	/**
 	 * Returns the object entry with the primary key.
@@ -359,7 +359,8 @@ public interface ObjectEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<ObjectEntry> searchObjectEntries(
-			long objectDefinitionId, String keywords, int cur, int delta)
+			long groupId, long objectDefinitionId, String keywords, int cur,
+			int delta)
 		throws PortalException;
 
 	public void updateAsset(

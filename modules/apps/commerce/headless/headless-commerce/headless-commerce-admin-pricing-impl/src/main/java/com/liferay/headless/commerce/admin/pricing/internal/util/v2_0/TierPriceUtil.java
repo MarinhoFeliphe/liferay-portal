@@ -45,10 +45,9 @@ public class TierPriceUtil {
 		ServiceContext serviceContext =
 			serviceContextHelper.getServiceContext();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			tierPrice.getDisplayDate(), serviceContext.getTimeZone());
-
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			tierPrice.getExpirationDate(), serviceContext.getTimeZone());
 
 		return commerceTierPriceEntryService.addOrUpdateCommerceTierPriceEntry(
@@ -69,7 +68,7 @@ public class TierPriceUtil {
 			tierPrice.getPriceEntryExternalReferenceCode(), serviceContext);
 	}
 
-	private static DateConfig _getDisplayDateConfig(
+	private static DateConfig _toDisplayDateConfig(
 		Date date, TimeZone timeZone) {
 
 		if (date == null) {
@@ -82,7 +81,7 @@ public class TierPriceUtil {
 		return new DateConfig(calendar);
 	}
 
-	private static DateConfig _getExpirationDateConfig(
+	private static DateConfig _toExpirationDateConfig(
 		Date date, TimeZone timeZone) {
 
 		if (date == null) {

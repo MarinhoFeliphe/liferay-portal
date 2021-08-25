@@ -43,6 +43,15 @@ definition {
 		AssertElementPresent(locator1 = "ACSettings#ITEM_ON_LIST");
 	}
 
+	macro assertEventPropertyValue {
+		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
+		var actual = JSONUtil.getWithJSONPath("[${postDataText}]","$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]..${property}");
+
+		TestUtils.assertEquals(
+			actual = "${actual}",
+			expected = "${value}");
+	}
+
 	@summary = "Asserts a list of items by the name"
 	macro assertItemsName {
 		for (var key_itemName : list "${itemList}") {
@@ -50,6 +59,39 @@ definition {
 				itemName = "${key_itemName}",
 				locator1 = "ACSettings#ITEM_ON_LIST");
 		}
+	}
+
+	macro assertPageTitle {
+		var key_pageTitle = "${pageTitle}";
+		AssertTextEquals(
+			locator1 = "ACUtils#PAGE_TITLE",
+			value1 = "${pageTitle}");
+	}
+
+	macro assertRequestCommonPropertiesValue {
+		var actualChannelId = ACUtils.getRequestCommonPropertyValue(property = "channelId");
+
+		TestUtils.assertEquals(
+			actual = "${actualChannelId}",
+			expected = "${expectedChannelId}");
+
+		var actualDataSourceId = ACUtils.getRequestCommonPropertyValue(property = "dataSourceId");
+
+		TestUtils.assertEquals(
+			actual = "${actualDataSourceId}",
+			expected = "${expectedDataSourceId}");
+
+		var id = ACUtils.getRequestCommonPropertyValue(property = "id");
+
+		TestUtils.assertNotEquals(
+			actual = "${id}",
+			expected = "");
+
+		var userId = ACUtils.getRequestCommonPropertyValue(property = "userId");
+
+		TestUtils.assertNotEquals(
+			actual = "${userId}",
+			expected = "");
 	}
 
 	macro assertXAxisTimedGraph {
@@ -165,9 +207,7 @@ definition {
 			layoutName = "${layoutName}",
 			widgetName = "Form");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			portlet = "Forms");
+		FormsAdmin.openFormsAdmin(siteURLKey = "site-name");
 
 		FormsAdminNavigator.gotoAddForm();
 
@@ -195,32 +235,81 @@ definition {
 			layoutName = "AC Page";
 		}
 
-		ACUtils.addWidgetToPage(
-			layoutName = "${layoutName}",
-			widgetName = "Web Content Display");
-
 		if (!(isSet(webContentTitle))) {
 			webContentTitle = "Web Content AC Title";
 		}
 
-		if (!(isSet(webContentRichText))) {
-			webContentRichText = "This is the web content test for AC";
+		if (!(isSet(webContentContent))) {
+			webContentContent = "This is the web content test for AC";
+
+			JSONWebcontent.addWebContent(
+				content = "${webContentContent}",
+				groupName = "Site Name",
+				title = "${webContentTitle}");
+		}
+		else {
+			JSONWebcontent.addWebContent(
+				content = "${webContentContent}",
+				groupName = "Site Name",
+				source = "true",
+				title = "${webContentTitle}");
 		}
 
-		if (isSet(webContentRichText)) {
-			webContentRichText = "${webContentRichText}";
-		}
+		ACUtils.addWidgetToPage(
+			layoutName = "${layoutName}",
+			widgetName = "Web Content Display");
 
-		WebContent.addPGViaWCD(
-			fieldFieldLabel = "content",
-			webContentRichText = "${webContentRichText}",
-			webContentTitle = "${webContentTitle}");
-
-		Pause(locator1 = "500");
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "${webContentTitle}");
 
 		Navigator.gotoSitePage(
 			pageName = "AC Page",
 			siteName = "Site Name");
+	}
+
+	macro getEventPropertyValue {
+		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
+		var value = JSONUtil.getWithJSONPath("[${postDataText}]","$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]..${property}");
+
+		return "${value}";
+	}
+
+	macro getIPCountry {
+		var curl = '''https://ipinfo.io''';
+
+		var code = JSONCurlUtil.get("${curl}", "$.country");
+
+		if ("${code}" == "GB") {
+			var country = "United Kingdom";
+		}
+
+		if ("${code}" == "BR") {
+			var country = "Brazil";
+		}
+
+		if ("${code}" == "US") {
+			var country = "United States";
+		}
+
+		if ("${code}" == "CN") {
+			var country = "China";
+		}
+
+		if ("${code}" == "ES") {
+			var country = "Spain";
+		}
+
+		if ("${code}" == "NZ") {
+			var country = "New Zealand";
+		}
+
+		return "${country}";
+	}
+
+	macro getRequestCommonPropertyValue {
+		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
+		var value = JSONUtil.getWithJSONPath("[${postDataText}]","$.[0].${property}");
+
+		return "${value}";
 	}
 
 	macro launchAC {
@@ -248,8 +337,6 @@ definition {
 	}
 
 	macro searchBar {
-		Click(locator1 = "ACSettings#SEARCH_BAR");
-
 		Type(
 			locator1 = "ACSettings#SEARCH_BAR",
 			value1 = "${searchItem}");

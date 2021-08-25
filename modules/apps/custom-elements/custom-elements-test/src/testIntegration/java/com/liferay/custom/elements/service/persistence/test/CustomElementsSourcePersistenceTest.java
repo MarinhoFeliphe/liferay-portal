@@ -144,7 +144,7 @@ public class CustomElementsSourcePersistenceTest {
 
 		newCustomElementsSource.setName(RandomTestUtil.randomString());
 
-		newCustomElementsSource.setURL(RandomTestUtil.randomString());
+		newCustomElementsSource.setURLs(RandomTestUtil.randomString());
 
 		_customElementsSources.add(
 			_persistence.update(newCustomElementsSource));
@@ -186,8 +186,8 @@ public class CustomElementsSourcePersistenceTest {
 			existingCustomElementsSource.getName(),
 			newCustomElementsSource.getName());
 		Assert.assertEquals(
-			existingCustomElementsSource.getURL(),
-			newCustomElementsSource.getURL());
+			existingCustomElementsSource.getURLs(),
+			newCustomElementsSource.getURLs());
 	}
 
 	@Test
@@ -213,15 +213,6 @@ public class CustomElementsSourcePersistenceTest {
 		_persistence.countByCompanyId(RandomTestUtil.nextLong());
 
 		_persistence.countByCompanyId(0L);
-	}
-
-	@Test
-	public void testCountByName() throws Exception {
-		_persistence.countByName("");
-
-		_persistence.countByName("null");
-
-		_persistence.countByName((String)null);
 	}
 
 	@Test
@@ -255,7 +246,7 @@ public class CustomElementsSourcePersistenceTest {
 			"CustomElementsSource", "mvccVersion", true, "uuid", true,
 			"customElementsSourceId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true,
-			"htmlElementName", true, "name", true, "url", true);
+			"htmlElementName", true, "name", true);
 	}
 
 	@Test
@@ -515,7 +506,7 @@ public class CustomElementsSourcePersistenceTest {
 
 		customElementsSource.setName(RandomTestUtil.randomString());
 
-		customElementsSource.setURL(RandomTestUtil.randomString());
+		customElementsSource.setURLs(RandomTestUtil.randomString());
 
 		_customElementsSources.add(_persistence.update(customElementsSource));
 

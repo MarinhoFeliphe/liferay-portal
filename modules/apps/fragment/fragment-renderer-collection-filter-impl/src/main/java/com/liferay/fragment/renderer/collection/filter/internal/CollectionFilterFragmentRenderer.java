@@ -16,87 +16,37 @@ package com.liferay.fragment.renderer.collection.filter.internal;
 
 import com.liferay.fragment.collection.filter.FragmentCollectionFilter;
 import com.liferay.fragment.collection.filter.FragmentCollectionFilterTracker;
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
-import com.liferay.fragment.renderer.collection.filter.internal.configuration.FFFragmentRendererCollectionFilterConfiguration;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rubén Pulido
  */
-@Component(
-	configurationPid = "com.liferay.fragment.renderer.collection.filter.internal.configuration.FFFragmentRendererCollectionFilterConfiguration",
-	service = FragmentRenderer.class
-)
+@Component(enabled = false, service = FragmentRenderer.class)
 public class CollectionFilterFragmentRenderer implements FragmentRenderer {
 
 	@Override
 	public String getCollectionKey() {
 		return "content-display";
-	}
-
-	@Override
-	public String getConfiguration(
-		FragmentRendererContext fragmentRendererContext) {
-
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			"content.Language", fragmentRendererContext.getLocale(),
-			getClass());
-
-		try {
-			String json = StringUtil.read(
-				getClass(),
-				"/com/liferay/fragment/renderer/collection/filter/internal" +
-					"/dependencies/configuration.json");
-
-			JSONObject configurationJSONObject =
-				JSONFactoryUtil.createJSONObject(json);
-
-			String filterPlaceholder = _getFilterPlaceholder(
-				json, fragmentRendererContext, resourceBundle);
-
-			JSONObject filterTypeOptionsJSONObject =
-				_filterTypeOptionsJSONObject(configurationJSONObject);
-
-			if ((filterPlaceholder != null) &&
-				(filterTypeOptionsJSONObject != null)) {
-
-				filterTypeOptionsJSONObject.put(
-					"placeholder", filterPlaceholder);
-			}
-
-			return _fragmentEntryConfigurationParser.translateConfiguration(
-				configurationJSONObject, resourceBundle);
-		}
-		catch (JSONException jsonException) {
-			return StringPool.BLANK;
-		}
 	}
 
 	@Override
@@ -113,15 +63,6 @@ public class CollectionFilterFragmentRenderer implements FragmentRenderer {
 	}
 
 	@Override
-	public boolean isSelectable(HttpServletRequest httpServletRequest) {
-		if (!_ffFragmentRendererCollectionFilterConfiguration.enabled()) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
 	public void render(
 		FragmentRendererContext fragmentRendererContext,
 		HttpServletRequest httpServletRequest,
@@ -129,84 +70,48 @@ public class CollectionFilterFragmentRenderer implements FragmentRenderer {
 
 		FragmentCollectionFilter fragmentCollectionFilter =
 			_fragmentCollectionFilterTracker.getFragmentCollectionFilter(
-				"category");
+				_getInfoFilterKey(fragmentRendererContext));
 
-		fragmentCollectionFilter.render(
-			fragmentRendererContext, httpServletRequest, httpServletResponse);
-	}
+		if ((fragmentCollectionFilter == null) &&
+			!Objects.equals(
+				fragmentRendererContext.getMode(),
+				FragmentEntryLinkConstants.EDIT)) {
 
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_ffFragmentRendererCollectionFilterConfiguration =
-			ConfigurableUtil.createConfigurable(
-				FFFragmentRendererCollectionFilterConfiguration.class,
-				properties);
-	}
-
-	private JSONObject _filterTypeOptionsJSONObject(
-		JSONObject configurationJSONObject) {
-
-		JSONArray fieldSetsJSONArray = configurationJSONObject.getJSONArray(
-			"fieldSets");
-
-		if (fieldSetsJSONArray == null) {
-			return null;
+			return;
 		}
 
-		JSONObject fieldSetsJSONObject = fieldSetsJSONArray.getJSONObject(0);
+		try {
+			httpServletRequest.setAttribute(
+				FragmentCollectionFilter.class.getName(),
+				fragmentCollectionFilter);
+			httpServletRequest.setAttribute(
+				FragmentRendererContext.class.getName(),
+				fragmentRendererContext);
 
-		JSONArray fieldsJSONArray = fieldSetsJSONObject.getJSONArray("fields");
+			RequestDispatcher requestDispatcher =
+				_servletContext.getRequestDispatcher("/page.jsp");
 
-		if (fieldsJSONArray == null) {
-			return null;
+			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}
-
-		for (int j = 0; j < fieldsJSONArray.length(); j++) {
-			JSONObject fieldJSONObject = fieldsJSONArray.getJSONObject(j);
-
-			if (Objects.equals(fieldJSONObject.getString("name"), "label") &&
-				fieldJSONObject.has("typeOptions")) {
-
-				return fieldJSONObject.getJSONObject("typeOptions");
-			}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to render collection filter fragment", exception);
 		}
-
-		return null;
 	}
 
-	private String _getFilterPlaceholder(
-		String configuration, FragmentRendererContext fragmentRendererContext,
-		ResourceBundle resourceBundle) {
+	private String _getInfoFilterKey(
+		FragmentRendererContext fragmentRendererContext) {
 
 		FragmentEntryLink fragmentEntryLink =
 			fragmentRendererContext.getFragmentEntryLink();
 
-		if (fragmentEntryLink == null) {
-			return null;
-		}
-
-		String source = GetterUtil.getString(
-			_fragmentEntryConfigurationParser.getFieldValue(
-				configuration, fragmentEntryLink.getEditableValues(),
-				resourceBundle.getLocale(), "source"));
-
-		if (Validator.isNull(source) || !JSONUtil.isValid(source)) {
-			return null;
-		}
-
-		try {
-			JSONObject sourceJSONObject = JSONFactoryUtil.createJSONObject(
-				source);
-
-			return sourceJSONObject.getString("title");
-		}
-		catch (JSONException jsonException) {
-			return null;
-		}
+		return (String)
+			_fragmentEntryConfigurationParser.getConfigurationFieldValue(
+				fragmentEntryLink.getEditableValues(), "string", "filterKey");
 	}
 
-	private volatile FFFragmentRendererCollectionFilterConfiguration
-		_ffFragmentRendererCollectionFilterConfiguration;
+	private static final Log _log = LogFactoryUtil.getLog(
+		CollectionFilterFragmentRenderer.class);
 
 	@Reference
 	private FragmentCollectionFilterTracker _fragmentCollectionFilterTracker;

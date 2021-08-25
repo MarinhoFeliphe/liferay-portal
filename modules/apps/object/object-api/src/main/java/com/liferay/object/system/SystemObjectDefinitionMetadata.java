@@ -44,6 +44,10 @@ public interface SystemObjectDefinitionMetadata {
 		return null;
 	}
 
+	public Map<Locale, String> getPluralLabelMap();
+
+	public String getScope();
+
 	public int getVersion();
 
 }

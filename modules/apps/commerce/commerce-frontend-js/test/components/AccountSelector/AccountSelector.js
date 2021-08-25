@@ -32,15 +32,17 @@ import {getOrders} from '../../utils/fake_data/orders';
 
 const ACCOUNTS_HEADLESS_API_ENDPOINT = ServiceProvider.AdminAccountAPI('v1')
 	.baseURL;
-const ORDERS_HEADLESS_API_ENDPOINT = ServiceProvider.AdminOrderAPI('v1')
-	.baseURL;
 
 describe('AccountSelector', () => {
 	beforeEach(() => {
 		const accountsEndpointRegexp = new RegExp(
 			ACCOUNTS_HEADLESS_API_ENDPOINT
 		);
-		const ordersEndpointRegexp = new RegExp(ORDERS_HEADLESS_API_ENDPOINT);
+		const ordersEndpointRegexp = new RegExp(
+			`${ServiceProvider.DeliveryCartAPI(
+				'v1'
+			).cartsByAccountIdAndChannelIdURL(42332, 24324)}`
+		);
 
 		fetchMock.mock(accountsEndpointRegexp, (url) => getAccounts(url));
 		fetchMock.mock(ordersEndpointRegexp, (url) => getOrders(url));
@@ -57,6 +59,7 @@ describe('AccountSelector', () => {
 		beforeEach(() => {
 			renderedComponent = render(
 				<AccountSelector
+					commerceChannelId={24324}
 					createNewOrderURL="/order-link"
 					selectOrderURL="/test-url/{id}"
 					setCurrentAccountURL="/account-selector/setCurrentAccounts"
@@ -148,8 +151,9 @@ describe('AccountSelector', () => {
 		beforeEach(() => {
 			renderedComponent = render(
 				<AccountSelector
+					commerceChannelId={24324}
 					createNewOrderURL="/order-link"
-					currentAccount={{
+					currentCommerceAccount={{
 						id: 42332,
 						name: 'My Account Name',
 					}}
@@ -216,12 +220,13 @@ describe('AccountSelector', () => {
 		beforeEach(() => {
 			renderedComponent = render(
 				<AccountSelector
+					commerceChannelId={24324}
 					createNewOrderURL="/order-link"
-					currentAccount={{
+					currentCommerceAccount={{
 						id: 42332,
 						name: 'My Account Name',
 					}}
-					currentOrder={{
+					currentCommerceOrder={{
 						orderId: 34234,
 						workflowStatusInfo: {
 							label_i18n: 'Completed',

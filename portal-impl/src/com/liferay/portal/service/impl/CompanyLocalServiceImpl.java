@@ -968,15 +968,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 					LocaleUtil.getDefault());
 
 				if (_log.isWarnEnabled()) {
-					StringBundler sb = new StringBundler(5);
-
-					sb.append("No name was found for locale ");
-					sb.append(locale);
-					sb.append(". Using \"");
-					sb.append(oldGroupDefaultName);
-					sb.append("\" as the name instead.");
-
-					_log.warn(sb.toString());
+					_log.warn(
+						StringBundler.concat(
+							"No name was found for locale ", locale,
+							". Using \"", oldGroupDefaultName,
+							"\" as the name instead."));
 				}
 
 				nameMap.put(locale, oldGroupDefaultName);
@@ -1238,8 +1234,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		return searchContext;
 	}
 
-	protected Company doDeleteCompany(final long companyId)
-		throws PortalException {
+	protected Company doDeleteCompany(long companyId) throws PortalException {
 
 		// Company
 

@@ -289,10 +289,9 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 			cpInstanceUuid = cpInstance.getCPInstanceUuid();
 		}
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			priceEntry.getDisplayDate(), serviceContext.getTimeZone());
-
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			priceEntry.getExpirationDate(), serviceContext.getTimeZone());
 
 		CommercePriceEntry commercePriceEntry =
@@ -342,7 +341,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 		).build();
 	}
 
-	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toDisplayDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
 		}
@@ -353,7 +352,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 		return new DateConfig(calendar);
 	}
 
-	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toExpirationDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
 				timeZone);
@@ -429,10 +428,10 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 		ServiceContext serviceContext =
 			_serviceContextHelper.getServiceContext();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			priceEntry.getDisplayDate(), serviceContext.getTimeZone());
 
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			priceEntry.getExpirationDate(), serviceContext.getTimeZone());
 
 		commercePriceEntry =

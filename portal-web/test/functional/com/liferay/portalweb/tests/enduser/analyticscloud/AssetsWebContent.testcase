@@ -2,6 +2,7 @@
 definition {
 
 	property analytics.cloud.enabled = "true";
+	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property minimum.slave.ram = "32";
 	property portal.release = "false";
 	property portal.upstream = "true";
@@ -43,12 +44,49 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8456 | Test Summary: Web content appears on card shows the pages that the web content appears on"
-	@ignore = "true"
 	@priority = "5"
 	test AssertAppearsOnListShowsPagesWebContentExists {
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		// TODO LRAC-8456 AssertAppearsOnListShowsPagesWebContentExists
+		task ("Go to the site page") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+		}
 
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch to new property in AC and go to WC tab") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToAssets();
+
+			ACNavigation.switchTab(tabName = "Web Content");
+		}
+
+		task ("Go to the WC overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+
+			ACNavigation.openItem(itemName = "Web Content AC Title");
+		}
+
+		task ("Assert appears on metric") {
+			var portalURL = PropsUtil.get("portal.url");
+			var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+			ACAssets.viewAssetAppearsOnMetric(
+				canonicalURL = "${portalURL}/web/site-name",
+				cardTitle = "Asset Appears On",
+				pageNmae = "AC Page - Site Name - ${siteName}");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8446 | Test Summary: Assert 180 day time filter in Assets"
@@ -61,12 +99,63 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8448 | Test Summary: Web content audience card shows expected amount of known and anonymous individuals"
-	@ignore = "true"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInWC {
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		// TODO LRAC-8448 AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInWC
+		for (var name : list "ac,liferay") {
+			JSONUser.addUser(
+				userEmailAddress = "${name}@liferay.com",
+				userFirstName = "${name}",
+				userLastName = "${name}",
+				userScreenName = "${name}");
+		}
 
+		ACDXPSettings.syncNewContactData();
+
+		for (var name : list "ac,liferay") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "${name}@liferay.com",
+				userLoginFullName = "${name} ${name}");
+
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+
+			Pause(locator1 = "5000");
+		}
+
+		User.logoutPG();
+
+		Navigator.gotoSitePage(
+			pageName = "AC Page",
+			siteName = "Site Name");
+
+		ACUtils.closeAllSessions();
+
+		Pause(locator1 = "30000");
+
+		ACUtils.launchAC();
+
+		ACProperties.switchProperty(propertyName = "${propertyName}");
+
+		ACNavigation.goToAssets();
+
+		ACNavigation.switchTab(tabName = "Web Content");
+
+		ACTimeFilter.clickTimeFilterButton();
+
+		ACTimeFilter.setLast24Hours();
+
+		ACNavigation.openItem(itemName = "Web Content AC Title");
+
+		ACIndividualsDashboard.goToOverviewTab();
+
+		ACNavigation.viewActiveSwitchTab(tabName = "Overview");
+
+		ACUtils.assertAudienceCard(
+			index = "1",
+			percentageList = "66.67%,33.33%");
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8449 | Test Summary: Web content audience card shows expected amount of segmented and unsegmented individuals"
@@ -409,6 +498,94 @@ definition {
 			metricValue = "4");
 	}
 
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8451 | Test Summary: Web content submissions by location card shows expected views by location"
+	@priority = "5"
+	test WebContentLocationCardShowsViewsByExpectedLocation {
+		task ("Add a new user") {
+			JSONUser.addUser(
+				userEmailAddress = "userea@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Connect the DXP to AC") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Sign in as new user") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "userea@liferay.com",
+				userLoginFullName = "userfn userln");
+		}
+
+		task ("View the site page") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+		}
+
+		task ("Get the ip country") {
+			var country = ACUtils.getIPCountry();
+		}
+
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch the property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Navigate to Web Content tab") {
+			ACNavigation.goToAssets();
+
+			ACNavigation.switchTab(tabName = "Web Content");
+		}
+
+		task ("Select the Last 24 Hours in time filter") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+		}
+
+		task ("Access to the web content report entry") {
+			ACNavigation.openItem(itemName = "Web Content AC Title");
+		}
+
+		task ("View the time filter of Views by Location map is Last 24 Hours") {
+			ACTimeFilter.assertCurrentTimeFilterRange(
+				cardName = "Views by Location",
+				timeFilterRange = "Last 24 hours");
+		}
+
+		task ("View the views by location info shown in geomap") {
+			AssertElementNotPresent(
+				key_noResultMessage = "There are no views on any location on the selected period.",
+				locator1 = "ACAssets#NO_RESULTS_CONTENT_MESSAGE");
+
+			ACCards.viewGeomapContainer(cardTitle = "Views by Location");
+
+			ACCards.viewGeomapTableText(
+				cardTitle = "Views by Location",
+				leftText = "${country}",
+				rightText = "1 100%");
+		}
+	}
+
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8454 | Test Summary: Web content submissions by technology card shows views by expected browser"
 	@priority = "5"
 	test WebContentTechnologyCardShowsViewsByExpectedBrowser {
@@ -454,13 +631,17 @@ definition {
 
 		ACNavigation.viewActiveSwitchTab(tabName = "Overview");
 
-		ACAssets.gotoViewsByTechnologyTab(tabName = "Browsers");
+		ACNavigation.switchTabInCard(tabName = "Browsers");
 
-		ACAssets.viewViewsByTechnologyTabActive(tabName = "Browsers");
+		ACAssets.viewViewsByTechnologyTabActive(
+			cardTitle = "Views by Technology",
+			tabName = "Browsers");
 
-		ACAssets.viewViewsByTechnologyBrowserPercentage(
-			browserName = "Chrome",
-			percentageValue = "100%");
+		ACAssets.viewTechnologyBrowsersMetric(
+			browserMetricValue = "Chrome",
+			cardTitle = "Views by Technology",
+			cssValue = "rgb(75, 155, 255)",
+			percentageMetricValue = "100%");
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8453 | Test Summary: Web content submissions by technology card shows views by expected device"
@@ -508,10 +689,11 @@ definition {
 
 		ACNavigation.viewActiveSwitchTab(tabName = "Overview");
 
-		ACAssets.viewViewsByTechnologyDeviceViewsAndPercentage(
+		ACAssets.viewTechnologyDeviceViewsAndPercentage(
+			actionValue = "3 Views",
+			cardTitle = "Views by Technology",
 			deviceName = "Desktop",
-			percentageValue = "100%",
-			viewsValue = "3");
+			percentageValue = "100%");
 	}
 
 }

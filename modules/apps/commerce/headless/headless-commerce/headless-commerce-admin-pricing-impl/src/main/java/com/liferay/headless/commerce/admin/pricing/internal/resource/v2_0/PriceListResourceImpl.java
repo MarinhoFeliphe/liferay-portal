@@ -223,7 +223,6 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 		CommerceCatalog commerceCatalog =
 			_commerceCatalogService.getCommerceCatalog(
 				priceList.getCatalogId());
-
 		CommerceCurrency commerceCurrency =
 			_commerceCurrencyService.getCommerceCurrency(
 				contextCompany.getCompanyId(), priceList.getCurrencyCode());
@@ -231,16 +230,15 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 		ServiceContext serviceContext =
 			_serviceContextHelper.getServiceContext();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			priceList.getDisplayDate(), serviceContext.getTimeZone());
-
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			priceList.getExpirationDate(), serviceContext.getTimeZone());
 
 		CommercePriceList commercePriceList =
 			_commercePriceListService.addOrUpdateCommercePriceList(
 				priceList.getExternalReferenceCode(),
-				commerceCatalog.getGroupId(), contextUser.getUserId(), 0L,
+				commerceCatalog.getGroupId(), 0L,
 				commerceCurrency.getCommerceCurrencyId(),
 				GetterUtil.get(priceList.getNetPrice(), true),
 				GetterUtil.get(
@@ -310,7 +308,7 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 		).build();
 	}
 
-	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toDisplayDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
 		}
@@ -321,7 +319,7 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 		return new DateConfig(calendar);
 	}
 
-	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toExpirationDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
 				timeZone);
@@ -465,11 +463,11 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 
 		if (priceModifiers != null) {
 			for (PriceModifier priceModifier : priceModifiers) {
-				DateConfig displayDateConfig = _getDisplayDateConfig(
+				DateConfig displayDateConfig = _toDisplayDateConfig(
 					priceModifier.getDisplayDate(),
 					serviceContext.getTimeZone());
 
-				DateConfig expirationDateConfig = _getExpirationDateConfig(
+				DateConfig expirationDateConfig = _toExpirationDateConfig(
 					priceModifier.getExpirationDate(),
 					serviceContext.getTimeZone());
 
@@ -477,7 +475,6 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 					_commercePriceModifierService.
 						addOrUpdateCommercePriceModifier(
 							priceModifier.getExternalReferenceCode(),
-							serviceContext.getUserId(),
 							GetterUtil.getLong(priceModifier.getId()),
 							commercePriceList.getGroupId(),
 							priceModifier.getTitle(), priceModifier.getTarget(),
@@ -515,10 +512,10 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 
 		if (priceEntries != null) {
 			for (PriceEntry priceEntry : priceEntries) {
-				DateConfig displayDateConfig = _getDisplayDateConfig(
+				DateConfig displayDateConfig = _toDisplayDateConfig(
 					priceEntry.getDisplayDate(), serviceContext.getTimeZone());
 
-				DateConfig expirationDateConfig = _getExpirationDateConfig(
+				DateConfig expirationDateConfig = _toExpirationDateConfig(
 					priceEntry.getExpirationDate(),
 					serviceContext.getTimeZone());
 
@@ -579,10 +576,10 @@ public class PriceListResourceImpl extends BasePriceListResourceImpl {
 		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
 			commercePriceList.getGroupId());
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			priceList.getDisplayDate(), serviceContext.getTimeZone());
 
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			priceList.getExpirationDate(), serviceContext.getTimeZone());
 
 		commercePriceList = _commercePriceListService.updateCommercePriceList(

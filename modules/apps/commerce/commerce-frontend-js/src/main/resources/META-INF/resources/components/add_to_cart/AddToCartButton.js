@@ -102,7 +102,7 @@ function AddToCartButton({
 
 					setDisabled(disabled || !isPurchasable);
 				}),
-		[activeOrder, CartResource, catalogItem]
+		[activeOrder, CartResource, catalogItem, disabled]
 	);
 
 	const changeOrder = useCallback(
@@ -164,7 +164,7 @@ function AddToCartButton({
 
 							if (orderDidChange) {
 								orderCookie.setValue(
-									channel.id,
+									channel.groupId,
 									order.orderUUID
 								);
 
@@ -214,6 +214,7 @@ AddToCartButton.propTypes = {
 		 * one and the same per single channel
 		 */
 		currencyCode: PropTypes.string.isRequired,
+		groupId: PropTypes.number.isRequired,
 		id: PropTypes.number.isRequired,
 	}),
 	cpInstance: PropTypes.shape({

@@ -218,6 +218,8 @@ public abstract class BaseJob implements Job {
 			batchProperties.setProperty(
 				"test.batch.minimum.slave.ram",
 				String.valueOf(batchTestClassGroup.getMinimumSlaveRAM()));
+			batchProperties.setProperty(
+				"test.batch.slave.label", batchTestClassGroup.getSlaveLabel());
 
 			if (batchTestClassGroup instanceof FunctionalBatchTestClassGroup) {
 				FunctionalBatchTestClassGroup functionalBatchTestClassGroup =
@@ -263,6 +265,9 @@ public abstract class BaseJob implements Job {
 				segmentProperties.setProperty(
 					"test.batch.size",
 					String.valueOf(segmentTestClassGroup.getAxisCount()));
+				segmentProperties.setProperty(
+					"test.batch.slave.label",
+					segmentTestClassGroup.getSlaveLabel());
 
 				String testCasePropertiesContent =
 					segmentTestClassGroup.getTestCasePropertiesContent();

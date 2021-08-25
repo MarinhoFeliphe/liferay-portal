@@ -62,12 +62,12 @@ public class CPDefinitionDiagramPinLocalServiceUtil {
 	}
 
 	public static CPDefinitionDiagramPin addCPDefinitionDiagramPin(
-			long userId, long cpDefinitionId, int number, double positionX,
-			double positionY)
+			long userId, long cpDefinitionId, double positionX,
+			double positionY, String sequence)
 		throws PortalException {
 
 		return getService().addCPDefinitionDiagramPin(
-			userId, cpDefinitionId, number, positionX, positionY);
+			userId, cpDefinitionId, positionX, positionY, sequence);
 	}
 
 	/**
@@ -335,12 +335,12 @@ public class CPDefinitionDiagramPinLocalServiceUtil {
 	}
 
 	public static CPDefinitionDiagramPin updateCPDefinitionDiagramPin(
-			long cpDefinitionDiagramPinId, int number, double positionX,
-			double positionY)
+			long cpDefinitionDiagramPinId, double positionX, double positionY,
+			String sequence)
 		throws PortalException {
 
 		return getService().updateCPDefinitionDiagramPin(
-			cpDefinitionDiagramPinId, number, positionX, positionY);
+			cpDefinitionDiagramPinId, positionX, positionY, sequence);
 	}
 
 	public static CPDefinitionDiagramPinLocalService getService() {

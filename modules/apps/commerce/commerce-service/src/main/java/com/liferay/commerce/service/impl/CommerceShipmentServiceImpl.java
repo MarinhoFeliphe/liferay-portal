@@ -116,8 +116,8 @@ public class CommerceShipmentServiceImpl
 			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -139,8 +139,8 @@ public class CommerceShipmentServiceImpl
 			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		if (commerceChannels.isEmpty()) {
 			return Collections.emptyList();
@@ -166,8 +166,8 @@ public class CommerceShipmentServiceImpl
 			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -212,8 +212,8 @@ public class CommerceShipmentServiceImpl
 			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		if (commerceChannels.isEmpty()) {
 			return 0;
@@ -237,8 +237,8 @@ public class CommerceShipmentServiceImpl
 			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -258,8 +258,8 @@ public class CommerceShipmentServiceImpl
 			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -445,7 +445,7 @@ public class CommerceShipmentServiceImpl
 		_portletResourcePermission =
 			PortletResourcePermissionFactory.getInstance(
 				CommerceShipmentServiceImpl.class, "_portletResourcePermission",
-				CommerceConstants.RESOURCE_NAME_SHIPMENT);
+				CommerceConstants.RESOURCE_NAME_COMMERCE_SHIPMENT);
 
 	@ServiceReference(type = CommerceChannelService.class)
 	private CommerceChannelService _commerceChannelService;

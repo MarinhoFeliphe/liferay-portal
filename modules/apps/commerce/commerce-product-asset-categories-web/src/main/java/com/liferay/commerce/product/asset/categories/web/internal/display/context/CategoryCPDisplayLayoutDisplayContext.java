@@ -18,6 +18,8 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.commerce.product.configuration.CPDisplayLayoutConfiguration;
+import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.display.context.BaseCPDefinitionsDisplayContext;
 import com.liferay.commerce.product.model.CPDisplayLayout;
 import com.liferay.commerce.product.model.CommerceChannel;
@@ -36,12 +38,15 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -71,7 +76,8 @@ public class CategoryCPDisplayLayoutDisplayContext
 		HttpServletRequest httpServletRequest,
 		CommerceChannelLocalService commerceChannelLocalService,
 		CPDisplayLayoutService cpDisplayLayoutService,
-		GroupLocalService groupLocalService, ItemSelector itemSelector) {
+		GroupLocalService groupLocalService, ItemSelector itemSelector,
+		LayoutLocalService layoutLocalService) {
 
 		super(actionHelper, httpServletRequest);
 
@@ -80,6 +86,7 @@ public class CategoryCPDisplayLayoutDisplayContext
 		_cpDisplayLayoutService = cpDisplayLayoutService;
 		_groupLocalService = groupLocalService;
 		_itemSelector = itemSelector;
+		_layoutLocalService = layoutLocalService;
 	}
 
 	public String getAddCategoryDisplayPageURL() throws Exception {
@@ -174,6 +181,34 @@ public class CategoryCPDisplayLayoutDisplayContext
 				dropdownItem.setTarget("sidePanel");
 			}
 		).build();
+	}
+
+	public Layout getDefaultAssetCategoryLayout() throws Exception {
+		CommerceChannel commerceChannel = getCommerceChannel();
+
+		CPDisplayLayoutConfiguration cpDisplayLayoutConfiguration =
+			ConfigurationProviderUtil.getConfiguration(
+				CPDisplayLayoutConfiguration.class,
+				new GroupServiceSettingsLocator(
+					commerceChannel.getGroupId(),
+					CPConstants.RESOURCE_NAME_CP_DISPLAY_LAYOUT));
+
+		String layoutUuid =
+			cpDisplayLayoutConfiguration.assetCategoryLayoutUuid();
+
+		Layout layout = null;
+
+		if (Validator.isNotNull(layoutUuid)) {
+			layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+				layoutUuid, commerceChannel.getSiteGroupId(), false);
+
+			if (layout == null) {
+				layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+					layoutUuid, commerceChannel.getSiteGroupId(), true);
+			}
+		}
+
+		return layout;
 	}
 
 	public String getItemSelectorUrl(RenderRequest renderRequest)
@@ -288,5 +323,6 @@ public class CategoryCPDisplayLayoutDisplayContext
 	private final CPDisplayLayoutService _cpDisplayLayoutService;
 	private final GroupLocalService _groupLocalService;
 	private final ItemSelector _itemSelector;
+	private final LayoutLocalService _layoutLocalService;
 
 }

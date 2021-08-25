@@ -17,7 +17,7 @@ package com.liferay.object.web.internal.object.definitions.frontend.taglib.servl
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ViewObjectFieldsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsFieldsDisplayContext;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -58,7 +58,7 @@ public class ObjectDefinitionsFieldsScreenNavigationCategory
 
 	@Override
 	public String getJspPath() {
-		return "/object_definitions/view_object_fields.jsp";
+		return "/object_definitions/object_definition/fields.jsp";
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class ObjectDefinitionsFieldsScreenNavigationCategory
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ViewObjectFieldsDisplayContext(httpServletRequest));
+			new ObjectDefinitionsFieldsDisplayContext(httpServletRequest));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}

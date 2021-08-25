@@ -106,6 +106,15 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 
 			String tag = matcher.group(1);
 
+			String lastLine = StringUtil.trim(
+				getLine(content, getLineNumber(content, matcher.end(1))));
+
+			if (lastLine.matches("></[-\\w:]+>")) {
+				String newTag = StringUtil.replaceLast(tag, lastLine, "/>");
+
+				return StringUtil.replace(content, tag, newTag);
+			}
+
 			if (getLevel(_getStrippedTag(tag, "\"", "'"), "<", ">") != 0) {
 				continue;
 			}
@@ -176,6 +185,12 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 		Map<String, String> attributesMap = tag.getAttributesMap();
 
 		for (Map.Entry<String, String> entry : attributesMap.entrySet()) {
+			String attributeName = entry.getKey();
+
+			if (tagName.equals("svg") && attributeName.equals("viewBox")) {
+				continue;
+			}
+
 			String attributeValue = entry.getValue();
 
 			if (attributeValue.matches("([-a-z0-9]+ )+[-a-z0-9]+")) {
@@ -185,12 +200,10 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 				Collections.sort(htmlAttributes);
 
 				tag.putAttribute(
-					entry.getKey(),
+					attributeName,
 					StringUtil.merge(htmlAttributes, StringPool.SPACE));
 			}
 			else if (attributeValue.matches("([-a-z0-9]+,)+[-a-z0-9]+")) {
-				String attributeName = entry.getKey();
-
 				if (!tagName.equals("aui:script") ||
 					!attributeName.equals("use")) {
 
@@ -203,7 +216,7 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 				Collections.sort(htmlAttributes);
 
 				tag.putAttribute(
-					entry.getKey(),
+					attributeName,
 					StringUtil.merge(htmlAttributes, StringPool.COMMA));
 			}
 		}

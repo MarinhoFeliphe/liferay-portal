@@ -19,6 +19,7 @@ import {
 	RulesSupport,
 	useFieldTypesResource,
 } from 'data-engine-js-components-web';
+import {SettingsContext} from 'dynamic-data-mapping-form-builder';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useReducer} from 'react';
 
@@ -33,11 +34,21 @@ const CONFIG_DATA = {
 	actions: {
 		component: Actions,
 		expression: Liferay.Language.get('do'),
+		fieldFilter: ({settingsContext}) =>
+			!SettingsContext.getSettingsContextProperty(
+				settingsContext,
+				'rulesActionDisabled'
+			),
 		name: Liferay.Language.get('actions'),
 	},
 	conditions: {
 		component: Conditions,
 		expression: Liferay.Language.get('if'),
+		fieldFilter: ({settingsContext}) =>
+			!SettingsContext.getSettingsContextProperty(
+				settingsContext,
+				'rulesConditionDisabled'
+			),
 		name: Liferay.Language.get('condition'),
 	},
 };
@@ -512,9 +523,11 @@ export function Editor({
 		<ClayModalProvider>
 			<FieldProvider value={{fieldTypes}}>
 				{state.panels.map((key) => {
-					const {component: Component, ...otherData} = CONFIG_DATA[
-						key
-					];
+					const {
+						component: Component,
+						fieldFilter,
+						...otherData
+					} = CONFIG_DATA[key];
 
 					return (
 						<Component
@@ -524,7 +537,7 @@ export function Editor({
 							allowActions={allowActions}
 							dataProvider={dataProvider}
 							dispatch={dispatch}
-							fields={fields}
+							fields={fields?.filter(fieldFilter)}
 							key={key}
 							state={state}
 						/>

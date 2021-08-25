@@ -180,6 +180,91 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected ObjectField[] objectFields;
 
+	public String getPanelAppOrder() {
+		return panelAppOrder;
+	}
+
+	public void setPanelAppOrder(String panelAppOrder) {
+		this.panelAppOrder = panelAppOrder;
+	}
+
+	public void setPanelAppOrder(
+		UnsafeSupplier<String, Exception> panelAppOrderUnsafeSupplier) {
+
+		try {
+			panelAppOrder = panelAppOrderUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String panelAppOrder;
+
+	public String getPanelCategoryKey() {
+		return panelCategoryKey;
+	}
+
+	public void setPanelCategoryKey(String panelCategoryKey) {
+		this.panelCategoryKey = panelCategoryKey;
+	}
+
+	public void setPanelCategoryKey(
+		UnsafeSupplier<String, Exception> panelCategoryKeyUnsafeSupplier) {
+
+		try {
+			panelCategoryKey = panelCategoryKeyUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String panelCategoryKey;
+
+	public Map<String, String> getPluralLabel() {
+		return pluralLabel;
+	}
+
+	public void setPluralLabel(Map<String, String> pluralLabel) {
+		this.pluralLabel = pluralLabel;
+	}
+
+	public void setPluralLabel(
+		UnsafeSupplier<Map<String, String>, Exception>
+			pluralLabelUnsafeSupplier) {
+
+		try {
+			pluralLabel = pluralLabelUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Map<String, String> pluralLabel;
+
+	public String getScope() {
+		return scope;
+	}
+
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	public void setScope(
+		UnsafeSupplier<String, Exception> scopeUnsafeSupplier) {
+
+		try {
+			scope = scopeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String scope;
+
 	public Status getStatus() {
 		return status;
 	}

@@ -140,11 +140,11 @@ public class CPDefinitionDiagramPinPersistenceTest {
 
 		newCPDefinitionDiagramPin.setCPDefinitionId(RandomTestUtil.nextLong());
 
-		newCPDefinitionDiagramPin.setNumber(RandomTestUtil.nextInt());
-
 		newCPDefinitionDiagramPin.setPositionX(RandomTestUtil.nextDouble());
 
 		newCPDefinitionDiagramPin.setPositionY(RandomTestUtil.nextDouble());
+
+		newCPDefinitionDiagramPin.setSequence(RandomTestUtil.randomString());
 
 		_cpDefinitionDiagramPins.add(
 			_persistence.update(newCPDefinitionDiagramPin));
@@ -177,15 +177,15 @@ public class CPDefinitionDiagramPinPersistenceTest {
 		Assert.assertEquals(
 			existingCPDefinitionDiagramPin.getCPDefinitionId(),
 			newCPDefinitionDiagramPin.getCPDefinitionId());
-		Assert.assertEquals(
-			existingCPDefinitionDiagramPin.getNumber(),
-			newCPDefinitionDiagramPin.getNumber());
 		AssertUtils.assertEquals(
 			existingCPDefinitionDiagramPin.getPositionX(),
 			newCPDefinitionDiagramPin.getPositionX());
 		AssertUtils.assertEquals(
 			existingCPDefinitionDiagramPin.getPositionY(),
 			newCPDefinitionDiagramPin.getPositionY());
+		Assert.assertEquals(
+			existingCPDefinitionDiagramPin.getSequence(),
+			newCPDefinitionDiagramPin.getSequence());
 	}
 
 	@Test
@@ -225,8 +225,8 @@ public class CPDefinitionDiagramPinPersistenceTest {
 		return OrderByComparatorFactoryUtil.create(
 			"CPDefinitionDiagramPin", "CPDefinitionDiagramPinId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "CPDefinitionId", true, "number", true,
-			"positionX", true, "positionY", true);
+			true, "modifiedDate", true, "CPDefinitionId", true, "positionX",
+			true, "positionY", true, "sequence", true);
 	}
 
 	@Test
@@ -484,11 +484,11 @@ public class CPDefinitionDiagramPinPersistenceTest {
 
 		cpDefinitionDiagramPin.setCPDefinitionId(RandomTestUtil.nextLong());
 
-		cpDefinitionDiagramPin.setNumber(RandomTestUtil.nextInt());
-
 		cpDefinitionDiagramPin.setPositionX(RandomTestUtil.nextDouble());
 
 		cpDefinitionDiagramPin.setPositionY(RandomTestUtil.nextDouble());
+
+		cpDefinitionDiagramPin.setSequence(RandomTestUtil.randomString());
 
 		_cpDefinitionDiagramPins.add(
 			_persistence.update(cpDefinitionDiagramPin));

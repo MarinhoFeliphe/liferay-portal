@@ -111,13 +111,6 @@ public class SearchLocationDDMFormFieldTemplateContextContributorTest {
 
 		Assert.assertEquals(
 			"googlePlacesAPIKey", parameters.get("googlePlacesAPIKey"));
-		Assert.assertEquals(
-			Arrays.toString(new String[] {"two-columns"}),
-			parameters.get("layout"));
-		Assert.assertEquals(
-			Arrays.toString(new String[] {"city", "country"}),
-			parameters.get("visibleFields"));
-
 		JSONAssert.assertEquals(
 			String.valueOf(
 				JSONUtil.put(
@@ -127,6 +120,12 @@ public class SearchLocationDDMFormFieldTemplateContextContributorTest {
 				)),
 			String.valueOf(parameters.get("labels")),
 			JSONCompareMode.STRICT_ORDER);
+		Assert.assertEquals(
+			Arrays.toString(new String[] {"two-columns"}),
+			parameters.get("layout"));
+		Assert.assertEquals(
+			Arrays.toString(new String[] {"city", "country"}),
+			parameters.get("visibleFields"));
 	}
 
 	private DDMFormFieldRenderingContext _createDDMFormFieldRenderingContext() {

@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.ClassTestRule;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SystemProperties;
@@ -35,8 +36,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.BasicRegistryImpl;
-import com.liferay.registry.RegistryUtil;
 
 import java.io.File;
 
@@ -156,6 +155,15 @@ public class CounterLocalServiceTest {
 		builder.setArguments(arguments);
 		builder.setBootstrapClassPath(
 			portalProcessConfig.getBootstrapClassPath());
+		builder.setEnvironment(
+			HashMapBuilder.putAll(
+				System.getenv()
+			).put(
+				"LIFERAY_COM_PERIOD_LIFERAY_PERIOD_PORTAL_PERIOD_SEARCH_" +
+					"PERIOD_ELASTICSEARCH7_PERIOD_CONFIGURATION_PERIOD_" +
+						"ELASTICSEARCHCONFIGURATION_PERIOD_SIDECARJVMOPTIONS",
+				"-Xms128m -Xmx256m"
+			).build());
 		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
 		builder.setRuntimeClassPath(
 			StringBundler.concat(
@@ -224,8 +232,6 @@ public class CounterLocalServiceTest {
 
 		@Override
 		public Long[] call() throws ProcessException {
-			RegistryUtil.setRegistry(new BasicRegistryImpl());
-
 			System.setProperty(
 				PropsKeys.COUNTER_INCREMENT + "." + _counterName, "1");
 

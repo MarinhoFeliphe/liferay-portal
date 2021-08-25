@@ -56,6 +56,12 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
+			JSONUser.tearDownNonAdminUsers();
+		}
+
 		ACUtils.tearDownAC();
 	}
 
@@ -228,7 +234,7 @@ definition {
 	@priority = "3"
 	test CanCancelCreatingStaticSegment {
 		task ("Get site assigned property name") {
-			var propertyName = ACDXPSettings.getSiteAssignedPropertyName(siteName = "Site Name");
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
 
 		task ("Sign in as new user") {
@@ -300,7 +306,7 @@ definition {
 		}
 
 		task ("Get site assigned property name") {
-			var propertyName = ACDXPSettings.getSiteAssignedPropertyName(siteName = "Site Name");
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
 
 		task ("View the page as different users") {
@@ -372,13 +378,216 @@ definition {
 		}
 	}
 
-	@description = "Feature ID: Legacy | Automation ID: LRAC-8480 | Test Summary: Create a Dynamic Individuals Segment with a criteria that uses is known and is not"
-	@ignore = "true"
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8481 | Test Summary: Create a Dynamic Individuals Segment with a criteria that uses a boolean and a does not contain"
 	@priority = "4"
-	test CanCreateDynamicIndividualsSegmentWithCriteriaUsesIsAndIsNot {
+	test CanCreateDynamicSegmentWithIndividualCriteriaUsesBooleanAndDoesNotContain {
+		task ("Add three more new users") {
+			for (var n : list "1,2,3") {
+				JSONUser.addUser(
+					userEmailAddress = "user${n}@liferay.com",
+					userFirstName = "user${n}",
+					userLastName = "user${n}",
+					userScreenName = "user${n}");
 
-		// TODO LRAC-8480 CanCreateDynamicIndividualsSegmentWithCriteriaUsesIsAndIsNot
+				JSONUser.setFirstPassword(
+					agreeToTermsAndAnswerReminderQuery = "true",
+					requireReset = "false",
+					userEmailAddress = "user${n}@liferay.com");
+			}
+		}
 
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "user1,user2,user3") {
+				var fullName = "${username} ${username}";
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a CSV Data Source") {
+			ACSettings.addCSVDataSource(
+				dataSourceName = "CSV Gender",
+				sourceFileName = "contacts_gender.csv");
+		}
+
+		task ("Exit Settings") {
+			ACNavigation.exitSettings();
+		}
+
+		task ("Add a new dynamic segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createDynamicSegment();
+
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("Add a jobTitle criteria from Individual Attributes") {
+			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
+
+			ACSegments.addSegmentField(segmentField = "jobTitle");
+
+			ACSegments.selectOperator(operator = "does not contain");
+
+			ACSegments.editTextCriterion(textInput = "Doctor");
+		}
+
+		task ("Add a male criteria from Individual Attributes") {
+			ACSegments.addSegmentField(segmentField = "male");
+
+			ACSegments.editWebBehaviorCriterion(
+				activitiesOption = "False",
+				indexField = "2");
+		}
+
+		task ("Create the segment") {
+			ACSegments.saveSegment();
+		}
+
+		task ("Navigate to Segments admin") {
+			ACNavigation.goToSegments();
+		}
+
+		task ("Search the new segment") {
+			ACUtils.searchBar(searchItem = "Dynamic Segment Test");
+
+			ACAssets.viewAssets(assetName = "Dynamic Segment Test");
+		}
+
+		task ("View the number of Membership is 1") {
+			ACAssets.viewAssetsInfo(
+				assetName = "Dynamic Segment Test",
+				index = "1",
+				value = "1");
+		}
+	}
+
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8480 | Test Summary: Create a Dynamic Individuals Segment with a criteria that uses is known and is not"
+	@priority = "4"
+	test CanCreateDynamicSegmentWithIndividualCriteriaUsesIsKnownAndIsNot {
+		task ("Add three more new users") {
+			for (var n : list "1,2,3") {
+				JSONUser.addUser(
+					userEmailAddress = "user${n}@liferay.com",
+					userFirstName = "user${n}",
+					userLastName = "user${n}",
+					userScreenName = "user${n}");
+
+				JSONUser.setFirstPassword(
+					agreeToTermsAndAnswerReminderQuery = "true",
+					requireReset = "false",
+					userEmailAddress = "user${n}@liferay.com");
+			}
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "user1,user2,user3") {
+				var fullName = "${username} ${username}";
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a CSV Data Source") {
+			ACSettings.addCSVDataSource(
+				dataSourceName = "CSV Country",
+				fieldName = "country",
+				fieldType = "Text",
+				newField = "true",
+				selectAnalyticsCloudField = "true",
+				sourceFileName = "contacts_country.csv");
+		}
+
+		task ("Exit Settings") {
+			ACNavigation.exitSettings();
+		}
+
+		task ("Add a new dynamic segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createDynamicSegment();
+
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("Add the first country criteria from Individual Attributes") {
+			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
+
+			ACSegments.addSegmentField(segmentField = "country");
+
+			ACSegments.selectOperator(operator = "is not");
+
+			ACSegments.editTextCriterion(textInput = "USA");
+		}
+
+		task ("Add the second country criteria from Individual Attributes") {
+			ACSegments.addSegmentField(segmentField = "country");
+
+			ACSegments.editWebBehaviorCriterion(
+				activitiesOption = "is known",
+				indexField = "2");
+		}
+
+		task ("Create the segment") {
+			ACSegments.saveSegment();
+		}
+
+		task ("Navigate to Segments admin") {
+			ACNavigation.goToSegments();
+		}
+
+		task ("Search the new segment") {
+			ACUtils.searchBar(searchItem = "Dynamic Segment Test");
+
+			ACAssets.viewAssets(assetName = "Dynamic Segment Test");
+		}
+
+		task ("View the number of Membership is 2") {
+			ACAssets.viewAssetsInfo(
+				assetName = "Dynamic Segment Test",
+				index = "1",
+				value = "2");
+		}
 	}
 
 	@description = "Create a dynamic segment with individuals"
@@ -488,12 +697,139 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8482 | Test Summary: Create a nested criteria"
-	@ignore = "true"
 	@priority = "3"
 	test CanCreateNestedCriteria {
+		task ("Add one more user with a given birth date") {
+			JSONUser.addUser(
+				birthdayDay = "10",
+				birthdayMonth = "10",
+				birthdayYear = "2020",
+				userEmailAddress = "user1@liferay.com",
+				userFirstName = "user1",
+				userLastName = "user1",
+				userScreenName = "user1");
 
-		// TODO LRAC-8482 CanCreateNestedCriteria
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "user1@liferay.com");
+		}
 
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "userea,user1,test") {
+				if ("${username}" == "userea") {
+					var fullName = "userfn userln";
+				}
+
+				else if ("${username}" == "test") {
+					var fullName = "Test Test";
+				}
+
+				else {
+					var fullName = "${username} ${username}";
+				}
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a new dynamic segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createDynamicSegment();
+
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("Add an email criteria from Individual Attributes") {
+			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
+
+			ACSegments.addSegmentField(segmentField = "email");
+
+			ACSegments.selectOperator(operator = "contains");
+
+			ACSegments.editTextCriterion(textInput = "@liferay.com");
+		}
+
+		task ("Add a birthDate criteria from Individual Attributes") {
+			ACSegments.addSegmentField(segmentField = "birthDate");
+
+			ACSegments.selectOperator(
+				index = "2",
+				operator = "is after");
+
+			ACSegments.editDateCriterion(
+				day = "10",
+				month = "September",
+				year = "2000");
+		}
+
+		task ("Add a userName criteria from Individual Attributes nested in email") {
+			ACSegments.addNestedSegmentField(
+				index = "2",
+				segmentField = "userName");
+
+			ACSegments.selectOperator(
+				index = "3",
+				operator = "does not contain");
+
+			ACSegments.editTextCriterion(
+				index = "3",
+				textInput = "@liferay.com");
+		}
+
+		task ("View the first conjunction") {
+			ACSegments.viewConjunction(conjunction = "And");
+		}
+
+		task ("Change the second conjunction to OR") {
+			ACSegments.editConjunction(index = "2");
+
+			ACSegments.viewConjunction(
+				conjunction = "Or",
+				index = "2");
+		}
+
+		task ("Save the segment") {
+			ACSegments.saveSegment();
+		}
+
+		task ("Navigate to Segments admin") {
+			ACNavigation.goToSegments();
+		}
+
+		task ("Search the new segment") {
+			ACUtils.searchBar(searchItem = "Dynamic Segment Test");
+
+			ACAssets.viewAssets(assetName = "Dynamic Segment Test");
+		}
+
+		task ("View the number of Membership is 2") {
+			ACAssets.viewAssetsInfo(
+				assetName = "Dynamic Segment Test",
+				index = "1",
+				value = "2");
+		}
 	}
 
 	@description = "Create a segment that contains anonymous individuals"
@@ -559,12 +895,103 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8479 | Test Summary: Create a Segment with a Number Property"
-	@ignore = "true"
 	@priority = "4"
 	test CanCreateSegmentWithNumberProperty {
+		task ("Add three more new users") {
+			for (var n : list "1,2,3") {
+				JSONUser.addUser(
+					userEmailAddress = "user${n}@liferay.com",
+					userFirstName = "user${n}",
+					userLastName = "user${n}",
+					userScreenName = "user${n}");
 
-		// TODO LRAC-8479 CanCreateSegmentWithNumberProperty
+				JSONUser.setFirstPassword(
+					agreeToTermsAndAnswerReminderQuery = "true",
+					requireReset = "false",
+					userEmailAddress = "user${n}@liferay.com");
+			}
+		}
 
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "user1,user2,user3") {
+				var fullName = "${username} ${username}";
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a CSV Data Source") {
+			ACSettings.addCSVDataSource(
+				dataSourceName = "CSV Age",
+				fieldName = "age",
+				fieldType = "Number",
+				newField = "true",
+				selectAnalyticsCloudField = "true",
+				sourceFileName = "contacts_age.csv");
+		}
+
+		task ("Exit Settings") {
+			ACNavigation.exitSettings();
+		}
+
+		task ("Add a new dynamic segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createDynamicSegment();
+
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("Add an age criteria from Individual Attributes") {
+			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
+
+			ACSegments.addSegmentField(segmentField = "age");
+
+			ACSegments.selectOperator(operator = "less than");
+
+			ACSegments.editNumberCriterion(numberInput = "40");
+		}
+
+		task ("Create the segment") {
+			ACSegments.saveSegment();
+		}
+
+		task ("Navigate to Segments admin") {
+			ACNavigation.goToSegments();
+		}
+
+		task ("Search the new segment") {
+			ACUtils.searchBar(searchItem = "Dynamic Segment Test");
+
+			ACAssets.viewAssets(assetName = "Dynamic Segment Test");
+		}
+
+		task ("View the number of Membership is 2") {
+			ACAssets.viewAssetsInfo(
+				assetName = "Dynamic Segment Test",
+				index = "1",
+				value = "2");
+		}
 	}
 
 	@description = "Create a static segment with individual"
@@ -687,31 +1114,103 @@ definition {
 		}
 	}
 
-	@description = "Feature ID: Legacy | Automation ID: LRAC-8475 | Test Summary: Dynamic segment members preview in real time"
-	@ignore = "true"
-	@priority = "3"
-	test CanDynamicSegmentMembersPreviewInRealTime {
-
-		// TODO LRAC-8475 CanDynamicSegmentMembersPreviewInRealTime
-
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-8473 | Test Summary: Filter the Segment 'Add Members' Modal"
-	@ignore = "true"
-	@priority = "3"
-	test CanFilterSegmentByAddMembers {
-
-		// TODO LRAC-8473 CanFilterSegmentByAddMembers
-
-	}
-
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8471 | Test Summary: Paginate Segment Profile in Membership List"
-	@ignore = "true"
 	@priority = "3"
 	test CanPaginateSegmentProfileInMembershipList {
+		task ("Add 5 more new users") {
+			for (var n : list "1,2,3,4,5") {
+				JSONUser.addUser(
+					userEmailAddress = "user${n}@liferay.com",
+					userFirstName = "user${n}",
+					userLastName = "user${n}",
+					userScreenName = "user${n}");
 
-		// TODO LRAC-8471 CanPaginateSegmentProfileInMembershipList
+				JSONUser.setFirstPassword(
+					agreeToTermsAndAnswerReminderQuery = "true",
+					requireReset = "false",
+					userEmailAddress = "user${n}@liferay.com");
+			}
+		}
 
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "userea,user1,user2,user3,user4,user5") {
+				if ("${username}" == "userea") {
+					var fullName = "userfn userln";
+				}
+
+				else {
+					var fullName = "${username} ${username}";
+				}
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a new dynamic segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createDynamicSegment();
+
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("Add an email field") {
+			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
+
+			ACSegments.addSegmentField(segmentField = "email");
+
+			ACSegments.selectOperator(operator = "contains");
+
+			ACSegments.editTextCriterion(textInput = "@liferay.com");
+
+			ACSegments.saveSegment();
+		}
+
+		task ("Navigate to Membership tab") {
+			ACNavigation.switchTab(tabName = "Membership");
+		}
+
+		task ("Select the 5 Items in Pagination") {
+			ACUtils.changePagination(itemsPerPage = "5");
+		}
+
+		task ("View only 5 users are shown in page 1") {
+			for (var username : list "userfn userln,user1 user1,user2 user2,user3 user3,user4 user4") {
+				ACAssets.viewAssets(assetName = "${username}");
+			}
+
+			AssertElementNotPresent(
+				key_assetName = "user5 user5",
+				locator1 = "ACAssets#ASSETS_TABLE");
+		}
+
+		task ("Navigate to the page 2") {
+			ACUtils.checkAnyPage(pageNumber = "2");
+		}
+
+		task ("View the user5 user5 is shown in page 2") {
+			ACAssets.viewAssets(assetName = "user5 user5");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8472 | Test Summary: Paginate static segment 'Add Members' creation model"
@@ -813,6 +1312,193 @@ definition {
 		}
 	}
 
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8475 | Test Summary: Dynamic segment members preview in real time"
+	@priority = "3"
+	test CanPreviewDynamicSegmentMembers {
+		task ("Add one more user with a jobTitle") {
+			JSONUser.addUser(
+				jobTitle = "lawyer",
+				userEmailAddress = "user1@liferay.com",
+				userFirstName = "user1",
+				userLastName = "user1",
+				userScreenName = "user1");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "user1@liferay.com");
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "userea,user1") {
+				if ("${username}" == "userea") {
+					var fullName = "userfn userln";
+				}
+
+				else {
+					var fullName = "${username} ${username}";
+				}
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a new dynamic segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createDynamicSegment();
+
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
+		}
+
+		task ("Add an email criteria") {
+			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
+
+			ACSegments.addSegmentField(segmentField = "email");
+
+			ACSegments.selectOperator(operator = "contains");
+
+			ACSegments.editTextCriterion(textInput = "@liferay.com");
+		}
+
+		task ("View two users are shown on the Preview mode") {
+			ACSegments.previewSegmentMembership();
+
+			for (var username : list "userfn userln,user1 user1") {
+				ACAssets.viewAssets(assetName = "${username}");
+			}
+
+			Click.mouseDownMouseUp(locator1 = "Modal#CLOSE_BUTTON");
+		}
+
+		task ("Add a jobTitle criteria") {
+			ACSegments.addSegmentField(segmentField = "jobTitle");
+
+			ACSegments.editTextCriterion(
+				index = "2",
+				textInput = "lawyer");
+		}
+
+		task ("View only one user is shown on Preview mode") {
+			ACSegments.previewSegmentMembership();
+
+			ACAssets.viewAssets(assetName = "user1 user1");
+
+			AssertElementNotPresent(
+				key_assetName = "userfn userln",
+				locator1 = "ACAssets#ASSETS_TABLE");
+		}
+	}
+
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8473 | Test Summary: Filter the Segment 'Add Members' Modal"
+	@priority = "3"
+	test CanSearchUserInAddMembersModal {
+		task ("Add one more user with a given birth date") {
+			JSONUser.addUser(
+				userEmailAddress = "user1@liferay.com",
+				userFirstName = "user1",
+				userLastName = "user1",
+				userScreenName = "user1");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "user1@liferay.com");
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		task ("View the page as different users") {
+			for (var username : list "userea,user1") {
+				if ("${username}" == "userea") {
+					var fullName = "userfn userln";
+				}
+
+				else {
+					var fullName = "${username} ${username}";
+				}
+
+				User.logoutAndLoginPG(
+					userLoginEmailAddress = "${username}@liferay.com",
+					userLoginFullName = "${fullName}");
+
+				Navigator.gotoSitePage(
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
+		}
+
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Add a new static segment") {
+			ACNavigation.goToSegments();
+
+			ACSegments.createStaticSegment();
+		}
+
+		task ("Search username in Add Members modal") {
+			Click(locator1 = "ACSegments#ADD_MEMBERS_BUTTON");
+
+			ACUtils.searchBar(searchItem = "userfn userln");
+		}
+
+		task ("View only the userea shown in modal") {
+			AssertVisible(
+				key_assetName = "userfn userln",
+				locator1 = "ACAssets#ASSETS_TABLE");
+
+			AssertElementNotPresent(
+				key_assetName = "user1 user1",
+				locator1 = "ACAssets#ASSETS_TABLE");
+		}
+
+		task ("Search email in Add Members modal") {
+			ACUtils.clearSearchBar();
+
+			ACUtils.searchBar(searchItem = "user1@liferay.com");
+		}
+
+		task ("View only the user1 shown in modal") {
+			AssertVisible(
+				key_assetName = "user1 user1",
+				locator1 = "ACAssets#ASSETS_TABLE");
+
+			AssertElementNotPresent(
+				key_assetName = "userfn userln",
+				locator1 = "ACAssets#ASSETS_TABLE");
+		}
+	}
+
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8133 | Test Summary: Create button shows option to create static or dynamic"
 	@priority = "5"
 	test CanSeeOptionsToCreateStaticOrDynamicSegment {
@@ -864,15 +1550,6 @@ definition {
 		AssertTextEquals(
 			locator1 = "ACSegments#SEGMENT_LABEL",
 			value1 = "DYNAMIC SEGMENT");
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-8481 | Test Summary: Create a Dynamic Individuals Segment with a criteria that uses a boolean and a does not contain"
-	@ignore = "true"
-	@priority = "4"
-	test CreateDynamicIndividualsSegmentWithCriteriaUsesBooleanAndDoesNotContain {
-
-		// TODO LRAC-8481 CreateDynamicIndividualsSegmentWithCriteriaUsesBooleanAndDoesNotContain
-
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8484 | Test Summary: Segment Form Validation"

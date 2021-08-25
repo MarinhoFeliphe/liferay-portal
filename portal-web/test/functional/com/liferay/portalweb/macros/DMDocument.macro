@@ -1622,9 +1622,9 @@ definition {
 		WaitForPageLoad();
 
 		if (IsElementPresent(locator1 = "Button#INFO")) {
-			WaitForVisible(
-				key_tagName = "infoPanel",
-				locator1 = "Questions#TAGS_LIST_TAB_NAMES");
+			WaitForElementPresent(
+				key_href = "infoPanel",
+				locator1 = "DocumentsAndMedia#DOCUMENT_ANY_HREF");
 		}
 
 		if (IsElementNotPresent(locator1 = "DocumentsAndMedia#SIDEBAR_INFO_ACTIVE")) {
@@ -1849,6 +1849,30 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet");
 	}
 
+	macro publishExpiredDocument {
+		AssertTextEquals(
+			locator1 = "TextInput#TITLE",
+			value1 = "${dmDocumentTitle}");
+
+		AssertNotChecked.assertNotCheckedNotVisible(
+			checkboxName = "Never Expire",
+			locator1 = "Checkbox#ANY_CHECKBOX");
+
+		if (isSet(disableExpirationDate)) {
+			Check(
+				checkboxName = "Never Expire",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			AssertElementPresent(locator1 = "TextInput#EXPIRATION_DATE_DISABLED");
+
+			AssertElementPresent(locator1 = "TextInput#EXPIRATION_DATE_TIME_DISABLED");
+		}
+
+		Button.clickPublish();
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro removeCategories {
 		SelectFrame(value1 = "relative=top");
 
@@ -1953,48 +1977,6 @@ definition {
 		}
 	}
 
-	macro selectColorHEX {
-		Click(
-			key_fieldLabel = "${fieldLabel}",
-			locator1 = "DDMField#COLOR_PICKER");
-
-		Click(locator1 = "DDMField#COLOR_PICKER_CUSTOM_COLOR_BUTTON");
-
-		Click(locator1 = "DDMField#COLOR_PICKER_HEX_INPUT");
-
-		Type(
-			locator1 = "DDMField#COLOR_PICKER_HEX_INPUT",
-			value1 = "${hexValue}");
-
-		Click(
-			key_fieldLabel = "${fieldLabel}",
-			locator1 = "DDMField#COLOR_PICKER");
-	}
-
-	macro selectColorRGB {
-		Click(
-			key_fieldLabel = "${fieldLabel}",
-			locator1 = "DDMField#COLOR_PICKER");
-
-		Click(locator1 = "DDMField#COLOR_PICKER_CUSTOM_COLOR_BUTTON");
-
-		Type(
-			locator1 = "DDMField#COLOR_PICKER_RGB_RED_INPUT",
-			value1 = "${redValue}");
-
-		Type(
-			locator1 = "DDMField#COLOR_PICKER_RGB_GREEN_INPUT",
-			value1 = "${greenValue}");
-
-		Type(
-			locator1 = "DDMField#COLOR_PICKER_RGB_BLUE_INPUT",
-			value1 = "${blueValue}");
-
-		Click(
-			key_fieldLabel = "${fieldLabel}",
-			locator1 = "DDMField#COLOR_PICKER");
-	}
-
 	macro setExpirationDate {
 		Panel.expandPanel(panel = "Expiration Date");
 
@@ -2014,6 +1996,10 @@ definition {
 			var displayDateMinute = ${displayDateMinute} + ${increaseMinutes};
 		}
 
+		if ("${invalidExpirationDate}" == "true") {
+			var displayDateYear = ${displayDateYear} - 1;
+		}
+
 		var expirationDate = "${displayDateMonth}/${displayDateDay}/${displayDateYear}";
 
 		var expirationDateTime = "${displayDateHour}:${displayDateMinute}";
@@ -2028,7 +2014,15 @@ definition {
 
 		Button.clickPublish();
 
-		Alert.viewSuccessMessage();
+		if ("${invalidExpirationDate}" == "true") {
+			AssertTextEquals.assertPartialText(
+				key_alertMessage = "Please enter a valid expiration date.",
+				locator1 = "Message#ERROR_ENTER_A_VALID_VALUE",
+				value1 = "Please enter a valid expiration date.");
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
 	}
 
 	macro setReviewDate {
@@ -2442,27 +2436,6 @@ definition {
 					key_reviewDateField = "${user}",
 					locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_REVIEW_DATE");
 			}
-		}
-	}
-
-	macro viewCPStatus {
-		var key_dmDocumentTitle = "${dmDocumentTitle}";
-
-		if ("${dmDocumentStatus}" == "Approved") {
-			AssertTextEquals(
-				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_WORKFLOW_STATUS",
-				value1 = "Approved");
-		}
-		else {
-			AssertTextEquals(
-				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_WORKFLOW_STATUS",
-				value1 = "${dmDocumentStatus}");
-
-			DMDocument.gotoEntry(dmDocumentTitle = "${dmDocumentTitle}");
-
-			AssertTextEquals(
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
-				value1 = "${dmDocumentTitle}");
 		}
 	}
 
@@ -3407,6 +3380,27 @@ definition {
 		Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_CHECKBOX");
 
 		AssertVisible(locator1 = "Icon#MOVE_TO_RECYCLE_BIN");
+	}
+
+	macro viewStatus {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		if ("${dmDocumentStatus}" == "Approved") {
+			AssertTextEquals(
+				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_WORKFLOW_STATUS",
+				value1 = "Approved");
+		}
+		else {
+			AssertTextEquals(
+				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_WORKFLOW_STATUS",
+				value1 = "${dmDocumentStatus}");
+
+			DMDocument.gotoEntry(dmDocumentTitle = "${dmDocumentTitle}");
+
+			AssertTextEquals(
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
+				value1 = "${dmDocumentTitle}");
+		}
 	}
 
 	macro viewTag {

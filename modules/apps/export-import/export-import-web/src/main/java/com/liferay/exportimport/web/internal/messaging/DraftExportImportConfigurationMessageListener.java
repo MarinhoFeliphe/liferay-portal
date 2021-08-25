@@ -114,7 +114,7 @@ public class DraftExportImportConfigurationMessageListener
 			return;
 		}
 
-		final Date lastCreateDate;
+		Date lastCreateDate;
 
 		if (ExportImportWebConfigurationValues.
 				DRAFT_EXPORT_IMPORT_CONFIGURATION_CLEAN_UP_COUNT == 0) {
@@ -153,7 +153,7 @@ public class DraftExportImportConfigurationMessageListener
 		ActionableDynamicQuery actionableDynamicQuery =
 			_exportImportConfigurationLocalService.getActionableDynamicQuery();
 
-		final Property createDate = PropertyFactoryUtil.forName("createDate");
+		Property createDate = PropertyFactoryUtil.forName("createDate");
 
 		actionableDynamicQuery.setAddCriteriaMethod(
 			dynamicQuery -> {
@@ -204,17 +204,12 @@ public class DraftExportImportConfigurationMessageListener
 		Property taskContextMapProperty = PropertyFactoryUtil.forName(
 			"taskContextMap");
 
-		StringBundler sb = new StringBundler(7);
-
-		sb.append(StringPool.PERCENT);
-		sb.append(StringPool.QUOTE);
-		sb.append("exportImportConfigurationId");
-		sb.append(StringPool.QUOTE);
-		sb.append(StringPool.COLON);
-		sb.append(exportImportConfiguration.getExportImportConfigurationId());
-		sb.append(StringPool.PERCENT);
-
-		dynamicQuery.add(taskContextMapProperty.like(sb.toString()));
+		dynamicQuery.add(
+			taskContextMapProperty.like(
+				StringBundler.concat(
+					"%\"exportImportConfigurationId\":",
+					exportImportConfiguration.getExportImportConfigurationId(),
+					StringPool.PERCENT)));
 
 		return _backgroundTaskLocalService.dynamicQuery(dynamicQuery);
 	}

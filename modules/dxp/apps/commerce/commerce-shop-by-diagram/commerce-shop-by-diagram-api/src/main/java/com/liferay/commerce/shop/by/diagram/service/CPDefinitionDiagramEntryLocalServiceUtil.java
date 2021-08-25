@@ -64,14 +64,14 @@ public class CPDefinitionDiagramEntryLocalServiceUtil {
 
 	public static CPDefinitionDiagramEntry addCPDefinitionDiagramEntry(
 			long userId, long cpDefinitionId, String cpInstanceUuid,
-			long cProductId, boolean diagram, int number, int quantity,
+			long cProductId, boolean diagram, int quantity, String sequence,
 			String sku,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCPDefinitionDiagramEntry(
-			userId, cpDefinitionId, cpInstanceUuid, cProductId, diagram, number,
-			quantity, sku, serviceContext);
+			userId, cpDefinitionId, cpInstanceUuid, cProductId, diagram,
+			quantity, sequence, sku, serviceContext);
 	}
 
 	/**
@@ -240,11 +240,11 @@ public class CPDefinitionDiagramEntryLocalServiceUtil {
 	}
 
 	public static CPDefinitionDiagramEntry fetchCPDefinitionDiagramEntry(
-			long cpDefinitionId, int number)
+			long cpDefinitionId, String sequence)
 		throws PortalException {
 
 		return getService().fetchCPDefinitionDiagramEntry(
-			cpDefinitionId, number);
+			cpDefinitionId, sequence);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
@@ -306,10 +306,11 @@ public class CPDefinitionDiagramEntryLocalServiceUtil {
 	}
 
 	public static CPDefinitionDiagramEntry getCPDefinitionDiagramEntry(
-			long cpDefinitionId, int number)
+			long cpDefinitionId, String sequence)
 		throws PortalException {
 
-		return getService().getCPDefinitionDiagramEntry(cpDefinitionId, number);
+		return getService().getCPDefinitionDiagramEntry(
+			cpDefinitionId, sequence);
 	}
 
 	public static
@@ -356,14 +357,14 @@ public class CPDefinitionDiagramEntryLocalServiceUtil {
 
 	public static CPDefinitionDiagramEntry updateCPDefinitionDiagramEntry(
 			long cpDefinitionDiagramEntryId, String cpInstanceUuid,
-			long cProductId, boolean diagram, int number, int quantity,
+			long cProductId, boolean diagram, int quantity, String sequence,
 			String sku,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateCPDefinitionDiagramEntry(
 			cpDefinitionDiagramEntryId, cpInstanceUuid, cProductId, diagram,
-			number, quantity, sku, serviceContext);
+			quantity, sequence, sku, serviceContext);
 	}
 
 	public static CPDefinitionDiagramEntryLocalService getService() {

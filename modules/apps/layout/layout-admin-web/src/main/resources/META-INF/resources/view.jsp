@@ -20,6 +20,8 @@
 portletDisplay.setShowStagingIcon(false);
 %>
 
+<liferay-ui:success key='<%= portletDisplay.getId() + "requestProcessed" %>' message="your-request-completed-successfully" />
+
 <liferay-ui:success key='<%= portletDisplay.getPortletName() + "layoutUpdated" %>' message='<%= LanguageUtil.get(resourceBundle, "the-page-was-updated-succesfully") %>' />
 
 <liferay-ui:success key="layoutPublished" message="the-page-was-published-succesfully" />

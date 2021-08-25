@@ -23,7 +23,6 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalServic
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -162,14 +161,8 @@ public class DDMFormInstanceRecordIndexer
 		Set<Locale> locales = ddmFormValues.getAvailableLocales();
 
 		for (Locale locale : locales) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("ddmContent");
-			sb.append(StringPool.UNDERLINE);
-			sb.append(LocaleUtil.toLanguageId(locale));
-
 			document.addText(
-				sb.toString(),
+				"ddmContent_" + LocaleUtil.toLanguageId(locale),
 				extractContent(ddmFormInstanceRecordVersion, locale));
 		}
 	}
@@ -180,13 +173,9 @@ public class DDMFormInstanceRecordIndexer
 
 		Locale locale = searchContext.getLocale();
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("ddmContent");
-		sb.append(StringPool.UNDERLINE);
-		sb.append(LocaleUtil.toLanguageId(locale));
-
-		addSearchTerm(searchQuery, searchContext, sb.toString(), false);
+		addSearchTerm(
+			searchQuery, searchContext,
+			"ddmContent_ " + LocaleUtil.toLanguageId(locale), false);
 	}
 
 	@Override
@@ -327,7 +316,7 @@ public class DDMFormInstanceRecordIndexer
 	}
 
 	protected void reindexFormInstanceRecords(long companyId) throws Exception {
-		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			ddmFormInstanceRecordLocalService.
 				getIndexableActionableDynamicQuery();
 

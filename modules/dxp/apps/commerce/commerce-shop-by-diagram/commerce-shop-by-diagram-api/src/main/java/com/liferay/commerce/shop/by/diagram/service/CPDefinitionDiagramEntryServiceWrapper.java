@@ -36,15 +36,14 @@ public class CPDefinitionDiagramEntryServiceWrapper
 	@Override
 	public com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
 			addCPDefinitionDiagramEntry(
-				long userId, long cpDefinitionId, String cpInstanceUuid,
-				long cProductId, boolean diagram, int number, int quantity,
-				String sku,
+				long cpDefinitionId, String cpInstanceUuid, long cProductId,
+				boolean diagram, int number, String sku, String sequence,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionDiagramEntryService.addCPDefinitionDiagramEntry(
-			userId, cpDefinitionId, cpInstanceUuid, cProductId, diagram, number,
-			quantity, sku, serviceContext);
+			cpDefinitionId, cpInstanceUuid, cProductId, diagram, number, sku,
+			sequence, serviceContext);
 	}
 
 	@Override
@@ -57,11 +56,11 @@ public class CPDefinitionDiagramEntryServiceWrapper
 
 	@Override
 	public com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
-			fetchCPDefinitionDiagramEntry(long cpDefinitionId, int number)
+			fetchCPDefinitionDiagramEntry(long cpDefinitionId, String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionDiagramEntryService.fetchCPDefinitionDiagramEntry(
-			cpDefinitionId, number);
+			cpDefinitionId, sequence);
 	}
 
 	@Override
@@ -94,11 +93,11 @@ public class CPDefinitionDiagramEntryServiceWrapper
 
 	@Override
 	public com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
-			getCPDefinitionDiagramEntry(long cpDefinitionId, int number)
+			getCPDefinitionDiagramEntry(long cpDefinitionId, String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionDiagramEntryService.getCPDefinitionDiagramEntry(
-			cpDefinitionId, number);
+			cpDefinitionId, sequence);
 	}
 
 	/**
@@ -115,14 +114,14 @@ public class CPDefinitionDiagramEntryServiceWrapper
 	public com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
 			updateCPDefinitionDiagramEntry(
 				long cpDefinitionDiagramEntryId, String cpInstanceUuid,
-				long cProductId, boolean diagram, int number, int quantity,
-				String sku,
+				long cProductId, boolean diagram, int number, String sku,
+				String sequence,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionDiagramEntryService.updateCPDefinitionDiagramEntry(
 			cpDefinitionDiagramEntryId, cpInstanceUuid, cProductId, diagram,
-			number, quantity, sku, serviceContext);
+			number, sku, sequence, serviceContext);
 	}
 
 	@Override

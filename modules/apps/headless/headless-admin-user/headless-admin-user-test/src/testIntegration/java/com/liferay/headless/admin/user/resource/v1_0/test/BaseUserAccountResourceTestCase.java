@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -221,6 +220,58 @@ public abstract class BaseUserAccountResourceTestCase {
 		Assert.assertEquals(regex, userAccount.getJobTitle());
 		Assert.assertEquals(regex, userAccount.getName());
 		Assert.assertEquals(regex, userAccount.getProfileURL());
+	}
+
+	@Test
+	public void testDeleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		UserAccount userAccount =
+			testDeleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode_addUserAccount();
+
+		assertHttpResponseStatusCode(
+			204,
+			userAccountResource.
+				deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeHttpResponse(
+					null, null));
+	}
+
+	protected UserAccount
+			testDeleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode_addUserAccount()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPostAccountByExternalReferenceCodeUserAccountByExternalReferenceCode()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		UserAccount userAccount =
+			testPostAccountByExternalReferenceCodeUserAccountByExternalReferenceCode_addUserAccount();
+
+		assertHttpResponseStatusCode(
+			204,
+			userAccountResource.
+				postAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeHttpResponse(
+					null, null));
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.
+				postAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeHttpResponse(
+					null, null));
+	}
+
+	protected UserAccount
+			testPostAccountByExternalReferenceCodeUserAccountByExternalReferenceCode_addUserAccount()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1048,27 +1099,7 @@ public abstract class BaseUserAccountResourceTestCase {
 
 	@Test
 	public void testPostAccountUserAccountsByEmailAddress() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		UserAccount userAccount =
-			testPostAccountUserAccountsByEmailAddress_addUserAccount();
-
-		assertHttpResponseStatusCode(
-			204,
-			userAccountResource.
-				postAccountUserAccountsByEmailAddressHttpResponse(null, null));
-
-		assertHttpResponseStatusCode(
-			404,
-			userAccountResource.
-				postAccountUserAccountsByEmailAddressHttpResponse(null, null));
-	}
-
-	protected UserAccount
-			testPostAccountUserAccountsByEmailAddress_addUserAccount()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		Assert.assertTrue(false);
 	}
 
 	@Test
@@ -1094,25 +1125,19 @@ public abstract class BaseUserAccountResourceTestCase {
 
 	@Test
 	public void testPostAccountUserAccountByEmailAddress() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		UserAccount userAccount =
-			testPostAccountUserAccountByEmailAddress_addUserAccount();
+		UserAccount randomUserAccount = randomUserAccount();
 
-		assertHttpResponseStatusCode(
-			204,
-			userAccountResource.
-				postAccountUserAccountByEmailAddressHttpResponse(
-					null, userAccount.getEmailAddress()));
+		UserAccount postUserAccount =
+			testPostAccountUserAccountByEmailAddress_addUserAccount(
+				randomUserAccount);
 
-		assertHttpResponseStatusCode(
-			404,
-			userAccountResource.
-				postAccountUserAccountByEmailAddressHttpResponse(
-					null, userAccount.getEmailAddress()));
+		assertEquals(randomUserAccount, postUserAccount);
+		assertValid(postUserAccount);
 	}
 
 	protected UserAccount
-			testPostAccountUserAccountByEmailAddress_addUserAccount()
+			testPostAccountUserAccountByEmailAddress_addUserAccount(
+				UserAccount userAccount)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -2475,6 +2500,14 @@ public abstract class BaseUserAccountResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("accountBriefs", additionalAssertFieldName)) {
+				if (userAccount.getAccountBriefs() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("actions", additionalAssertFieldName)) {
 				if (userAccount.getActions() == null) {
 					valid = false;
@@ -2741,6 +2774,17 @@ public abstract class BaseUserAccountResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("accountBriefs", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getAccountBriefs(),
+						userAccount2.getAccountBriefs())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("actions", additionalAssertFieldName)) {
 				if (!equals(
@@ -3104,6 +3148,11 @@ public abstract class BaseUserAccountResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("accountBriefs")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("actions")) {
 			throw new IllegalArgumentException(
@@ -3508,8 +3557,8 @@ public abstract class BaseUserAccountResourceTestCase {
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseUserAccountResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseUserAccountResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

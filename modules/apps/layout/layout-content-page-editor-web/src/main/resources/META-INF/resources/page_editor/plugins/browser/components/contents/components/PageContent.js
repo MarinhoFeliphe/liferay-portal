@@ -20,10 +20,10 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
 
+import {fromControlsId} from '../../../../../app/components/layout-data-items/Collection';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../../../../app/config/constants/editableFragmentEntryProcessor';
 import {ITEM_ACTIVATION_ORIGINS} from '../../../../../app/config/constants/itemActivationOrigins';
 import {ITEM_TYPES} from '../../../../../app/config/constants/itemTypes';
-import {useToControlsId} from '../../../../../app/contexts/CollectionItemContext';
 import {
 	useHoverItem,
 	useHoveredItemId,
@@ -39,6 +39,7 @@ import {
 } from '../../../../../app/contexts/StoreContext';
 import selectCanUpdateEditables from '../../../../../app/selectors/selectCanUpdateEditables';
 import {selectPageContentDropdownItems} from '../../../../../app/selectors/selectPageContentDropdownItems';
+import getFirstControlsId from '../../../../../app/utils/getFirstControlsId';
 import ImageEditorModal from './ImageEditorModal';
 
 export default function PageContent({
@@ -55,18 +56,18 @@ export default function PageContent({
 	const canUpdateEditables = useSelector(selectCanUpdateEditables);
 	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
 	const [isHovered, setIsHovered] = useState(false);
+	const layoutData = useSelector((state) => state.layoutData);
 	const [
-		nextEditbleProcessorUniqueId,
-		setEditableNextProcessorUniqueId,
+		nextEditableProcessorUniqueId,
+		setNextEditableProcessorUniqueId,
 	] = useState(null);
 	const selectItem = useSelectItem();
 	const setEditableProcessorUniqueId = useSetEditableProcessorUniqueId();
 	const [imageEditorParams, setImageEditorParams] = useState(null);
-	const toControlsId = useToControlsId();
 
 	const isBeingEdited = useMemo(
-		() => toControlsId(editableId) === editableProcessorUniqueId,
-		[toControlsId, editableId, editableProcessorUniqueId]
+		() => editableId === fromControlsId(editableProcessorUniqueId),
+		[editableId, editableProcessorUniqueId]
 	);
 
 	const dropdownItems = useSelectorCallback(
@@ -96,15 +97,15 @@ export default function PageContent({
 	);
 
 	useEffect(() => {
-		if (editableProcessorUniqueId || !nextEditbleProcessorUniqueId) {
+		if (editableProcessorUniqueId || !nextEditableProcessorUniqueId) {
 			return;
 		}
 
-		setEditableProcessorUniqueId(nextEditbleProcessorUniqueId);
-		setEditableNextProcessorUniqueId(null);
+		setEditableProcessorUniqueId(nextEditableProcessorUniqueId);
+		setNextEditableProcessorUniqueId(null);
 	}, [
 		editableProcessorUniqueId,
-		nextEditbleProcessorUniqueId,
+		nextEditableProcessorUniqueId,
 		setEditableProcessorUniqueId,
 	]);
 
@@ -169,12 +170,25 @@ export default function PageContent({
 			return;
 		}
 
-		selectItem(`${editableId}`, {
+		const itemId = getFirstControlsId({
+			item: {
+				id: editableId,
+				itemType: ITEM_TYPES.editable,
+				parentId: Object.values(layoutData.items).find(
+					(item) =>
+						item.config.fragmentEntryLinkId ===
+						editableId.split('-')[0]
+				)?.itemId,
+			},
+			layoutData,
+		});
+
+		selectItem(itemId, {
 			itemType: ITEM_TYPES.editable,
 			origin: ITEM_ACTIVATION_ORIGINS.sidebar,
 		});
 
-		setEditableNextProcessorUniqueId(toControlsId(editableId));
+		setNextEditableProcessorUniqueId(itemId);
 	};
 
 	return (

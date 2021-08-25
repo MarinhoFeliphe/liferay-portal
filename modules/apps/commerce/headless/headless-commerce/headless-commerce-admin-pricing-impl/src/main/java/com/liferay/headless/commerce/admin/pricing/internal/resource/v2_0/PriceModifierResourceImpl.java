@@ -243,16 +243,14 @@ public class PriceModifierResourceImpl extends BasePriceModifierResourceImpl {
 		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
 			commercePriceList.getGroupId());
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			priceModifier.getDisplayDate(), serviceContext.getTimeZone());
-
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			priceModifier.getExpirationDate(), serviceContext.getTimeZone());
 
 		CommercePriceModifier commercePriceModifier =
 			_commercePriceModifierService.addOrUpdateCommercePriceModifier(
 				priceModifier.getExternalReferenceCode(),
-				serviceContext.getUserId(),
 				GetterUtil.getLong(priceModifier.getId()),
 				commercePriceList.getGroupId(), priceModifier.getTitle(),
 				priceModifier.getTarget(),
@@ -302,7 +300,7 @@ public class PriceModifierResourceImpl extends BasePriceModifierResourceImpl {
 		).build();
 	}
 
-	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toDisplayDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
 		}
@@ -313,7 +311,7 @@ public class PriceModifierResourceImpl extends BasePriceModifierResourceImpl {
 		return new DateConfig(calendar);
 	}
 
-	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toExpirationDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
 				timeZone);
@@ -381,10 +379,10 @@ public class PriceModifierResourceImpl extends BasePriceModifierResourceImpl {
 		ServiceContext serviceContext =
 			_serviceContextHelper.getServiceContext();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
 			priceModifier.getDisplayDate(), serviceContext.getTimeZone());
 
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			priceModifier.getExpirationDate(), serviceContext.getTimeZone());
 
 		commercePriceModifier =

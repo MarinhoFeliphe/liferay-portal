@@ -41,11 +41,14 @@ public class ObjectDefinitionServiceUtil {
 	 */
 	public static ObjectDefinition addCustomObjectDefinition(
 			Map<java.util.Locale, String> labelMap, String name,
+			String panelAppOrder, String panelCategoryKey,
+			Map<java.util.Locale, String> pluralLabelMap, String scope,
 			List<com.liferay.object.model.ObjectField> objectFields)
 		throws PortalException {
 
 		return getService().addCustomObjectDefinition(
-			labelMap, name, objectFields);
+			labelMap, name, panelAppOrder, panelCategoryKey, pluralLabelMap,
+			scope, objectFields);
 	}
 
 	public static ObjectDefinition deleteObjectDefinition(
@@ -65,6 +68,12 @@ public class ObjectDefinitionServiceUtil {
 		int start, int end) {
 
 		return getService().getObjectDefinitions(start, end);
+	}
+
+	public static List<ObjectDefinition> getObjectDefinitions(
+		long companyId, int start, int end) {
+
+		return getService().getObjectDefinitions(companyId, start, end);
 	}
 
 	public static int getObjectDefinitionsCount() throws PortalException {
@@ -91,6 +100,17 @@ public class ObjectDefinitionServiceUtil {
 		throws PortalException {
 
 		return getService().publishCustomObjectDefinition(objectDefinitionId);
+	}
+
+	public static ObjectDefinition updateCustomObjectDefinition(
+			Long objectDefinitionId, Map<java.util.Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			Map<java.util.Locale, String> pluralLabelMap, String scope)
+		throws PortalException {
+
+		return getService().updateCustomObjectDefinition(
+			objectDefinitionId, labelMap, name, panelAppOrder, panelCategoryKey,
+			pluralLabelMap, scope);
 	}
 
 	public static ObjectDefinitionService getService() {

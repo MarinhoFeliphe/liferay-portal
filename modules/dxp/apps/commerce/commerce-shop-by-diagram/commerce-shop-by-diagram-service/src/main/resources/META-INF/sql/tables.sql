@@ -9,8 +9,8 @@ create table CPDefinitionDiagramEntry (
 	CPInstanceUuid VARCHAR(75) null,
 	CProductId LONG,
 	diagram BOOLEAN,
-	number_ INTEGER,
 	quantity INTEGER,
+	sequence VARCHAR(75) null,
 	sku VARCHAR(75) null
 );
 
@@ -22,9 +22,9 @@ create table CPDefinitionDiagramPin (
 	createDate DATE null,
 	modifiedDate DATE null,
 	CPDefinitionId LONG,
-	number_ INTEGER,
 	positionX DOUBLE,
-	positionY DOUBLE
+	positionY DOUBLE,
+	sequence VARCHAR(75) null
 );
 
 create table CPDefinitionDiagramSetting (

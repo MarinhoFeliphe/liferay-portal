@@ -125,13 +125,13 @@ public class CPDefinitionItemSelectorViewDisplayContext
 
 		BaseModelSearchResult<CPDefinition> cpDefinitionBaseModelSearchResult;
 
-		long channelGroupId = ParamUtil.getLong(
-			httpServletRequest, CPField.CHANNEL_GROUP_ID);
+		long commerceChannelGroupId = ParamUtil.getLong(
+			httpServletRequest, CPField.COMMERCE_CHANNEL_GROUP_ID);
 
-		if (channelGroupId != 0) {
+		if (commerceChannelGroupId != 0) {
 			cpDefinitionBaseModelSearchResult =
 				_cpDefinitionService.searchCPDefinitionsByChannelGroupId(
-					cpRequestHelper.getCompanyId(), channelGroupId,
+					cpRequestHelper.getCompanyId(), commerceChannelGroupId,
 					getKeywords(), WorkflowConstants.STATUS_APPROVED,
 					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}

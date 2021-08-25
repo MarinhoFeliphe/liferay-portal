@@ -54,9 +54,9 @@ public class CPDefinitionDiagramEntryServiceHttp {
 	public static
 		com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
 				addCPDefinitionDiagramEntry(
-					HttpPrincipal httpPrincipal, long userId,
-					long cpDefinitionId, String cpInstanceUuid, long cProductId,
-					boolean diagram, int number, int quantity, String sku,
+					HttpPrincipal httpPrincipal, long cpDefinitionId,
+					String cpInstanceUuid, long cProductId, boolean diagram,
+					int number, String sku, String sequence,
 					com.liferay.portal.kernel.service.ServiceContext
 						serviceContext)
 			throws com.liferay.portal.kernel.exception.PortalException {
@@ -68,8 +68,8 @@ public class CPDefinitionDiagramEntryServiceHttp {
 				_addCPDefinitionDiagramEntryParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, cpDefinitionId, cpInstanceUuid, cProductId,
-				diagram, number, quantity, sku, serviceContext);
+				methodKey, cpDefinitionId, cpInstanceUuid, cProductId, diagram,
+				number, sku, sequence, serviceContext);
 
 			Object returnObj = null;
 
@@ -141,7 +141,7 @@ public class CPDefinitionDiagramEntryServiceHttp {
 		com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
 				fetchCPDefinitionDiagramEntry(
 					HttpPrincipal httpPrincipal, long cpDefinitionId,
-					int number)
+					String sequence)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -151,7 +151,7 @@ public class CPDefinitionDiagramEntryServiceHttp {
 				_fetchCPDefinitionDiagramEntryParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, cpDefinitionId, number);
+				methodKey, cpDefinitionId, sequence);
 
 			Object returnObj = null;
 
@@ -318,7 +318,7 @@ public class CPDefinitionDiagramEntryServiceHttp {
 		com.liferay.commerce.shop.by.diagram.model.CPDefinitionDiagramEntry
 				getCPDefinitionDiagramEntry(
 					HttpPrincipal httpPrincipal, long cpDefinitionId,
-					int number)
+					String sequence)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -328,7 +328,7 @@ public class CPDefinitionDiagramEntryServiceHttp {
 				_getCPDefinitionDiagramEntryParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, cpDefinitionId, number);
+				methodKey, cpDefinitionId, sequence);
 
 			Object returnObj = null;
 
@@ -364,8 +364,8 @@ public class CPDefinitionDiagramEntryServiceHttp {
 				updateCPDefinitionDiagramEntry(
 					HttpPrincipal httpPrincipal,
 					long cpDefinitionDiagramEntryId, String cpInstanceUuid,
-					long cProductId, boolean diagram, int number, int quantity,
-					String sku,
+					long cProductId, boolean diagram, int number, String sku,
+					String sequence,
 					com.liferay.portal.kernel.service.ServiceContext
 						serviceContext)
 			throws com.liferay.portal.kernel.exception.PortalException {
@@ -378,7 +378,7 @@ public class CPDefinitionDiagramEntryServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpDefinitionDiagramEntryId, cpInstanceUuid,
-				cProductId, diagram, number, quantity, sku, serviceContext);
+				cProductId, diagram, number, sku, sequence, serviceContext);
 
 			Object returnObj = null;
 
@@ -414,8 +414,8 @@ public class CPDefinitionDiagramEntryServiceHttp {
 
 	private static final Class<?>[]
 		_addCPDefinitionDiagramEntryParameterTypes0 = new Class[] {
-			long.class, long.class, String.class, long.class, boolean.class,
-			int.class, int.class, String.class,
+			long.class, String.class, long.class, boolean.class, int.class,
+			String.class, String.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[]
@@ -424,7 +424,7 @@ public class CPDefinitionDiagramEntryServiceHttp {
 		};
 	private static final Class<?>[]
 		_fetchCPDefinitionDiagramEntryParameterTypes2 = new Class[] {
-			long.class, int.class
+			long.class, String.class
 		};
 	private static final Class<?>[]
 		_getCPDefinitionDiagramEntriesParameterTypes3 = new Class[] {
@@ -438,12 +438,12 @@ public class CPDefinitionDiagramEntryServiceHttp {
 		_getCPDefinitionDiagramEntryParameterTypes5 = new Class[] {long.class};
 	private static final Class<?>[]
 		_getCPDefinitionDiagramEntryParameterTypes6 = new Class[] {
-			long.class, int.class
+			long.class, String.class
 		};
 	private static final Class<?>[]
 		_updateCPDefinitionDiagramEntryParameterTypes7 = new Class[] {
 			long.class, String.class, long.class, boolean.class, int.class,
-			int.class, String.class,
+			String.class, String.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 

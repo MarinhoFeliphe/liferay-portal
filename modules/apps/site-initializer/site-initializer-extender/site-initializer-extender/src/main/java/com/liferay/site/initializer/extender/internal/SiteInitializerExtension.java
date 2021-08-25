@@ -14,12 +14,17 @@
 
 package com.liferay.site.initializer.extender.internal;
 
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
+import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.fragment.importer.FragmentsImporter;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.style.book.zip.processor.StyleBookEntryZipProcessor;
 
 import javax.servlet.ServletContext;
 
@@ -37,9 +42,13 @@ public class SiteInitializerExtension {
 
 	public SiteInitializerExtension(
 		Bundle bundle, BundleContext bundleContext,
+		DDMStructureLocalService ddmStructureLocalService,
+		DDMTemplateLocalService ddmTemplateLocalService,
+		DefaultDDMStructureHelper defaultDDMStructureHelper,
 		DocumentResource.Factory documentResourceFactory,
 		FragmentsImporter fragmentsImporter, JSONFactory jsonFactory,
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
+		Portal portal, StyleBookEntryZipProcessor styleBookEntryZipProcessor,
 		TaxonomyVocabularyResource.Factory taxonomyVocabularyResourceFactory,
 		UserLocalService userLocalService) {
 
@@ -49,9 +58,12 @@ public class SiteInitializerExtension {
 
 		_component.setImplementation(
 			new SiteInitializerRegistrar(
-				bundle, bundleContext, documentResourceFactory,
-				fragmentsImporter, jsonFactory, objectDefinitionResourceFactory,
-				taxonomyVocabularyResourceFactory, userLocalService));
+				bundle, bundleContext, ddmStructureLocalService,
+				ddmTemplateLocalService, defaultDDMStructureHelper,
+				documentResourceFactory, fragmentsImporter, jsonFactory,
+				objectDefinitionResourceFactory, portal,
+				styleBookEntryZipProcessor, taxonomyVocabularyResourceFactory,
+				userLocalService));
 
 		ServiceDependency serviceDependency =
 			_dependencyManager.createServiceDependency();

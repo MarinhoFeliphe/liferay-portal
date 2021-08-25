@@ -43,16 +43,15 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -612,24 +611,24 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 	private static final String _FINDER_COLUMN_CPDEFINITIONID_CPDEFINITIONID_2 =
 		"cpDefinitionDiagramEntry.CPDefinitionId = ?";
 
-	private FinderPath _finderPathFetchByCPDI_N;
-	private FinderPath _finderPathCountByCPDI_N;
+	private FinderPath _finderPathFetchByCPDI_S;
+	private FinderPath _finderPathCountByCPDI_S;
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or throws a <code>NoSuchCPDefinitionDiagramEntryException</code> if it could not be found.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or throws a <code>NoSuchCPDefinitionDiagramEntryException</code> if it could not be found.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the matching cp definition diagram entry
 	 * @throws NoSuchCPDefinitionDiagramEntryException if a matching cp definition diagram entry could not be found
 	 */
 	@Override
-	public CPDefinitionDiagramEntry findByCPDI_N(
-			long CPDefinitionId, int number)
+	public CPDefinitionDiagramEntry findByCPDI_S(
+			long CPDefinitionId, String sequence)
 		throws NoSuchCPDefinitionDiagramEntryException {
 
-		CPDefinitionDiagramEntry cpDefinitionDiagramEntry = fetchByCPDI_N(
-			CPDefinitionId, number);
+		CPDefinitionDiagramEntry cpDefinitionDiagramEntry = fetchByCPDI_S(
+			CPDefinitionId, sequence);
 
 		if (cpDefinitionDiagramEntry == null) {
 			StringBundler sb = new StringBundler(6);
@@ -639,8 +638,8 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 			sb.append("CPDefinitionId=");
 			sb.append(CPDefinitionId);
 
-			sb.append(", number=");
-			sb.append(number);
+			sb.append(", sequence=");
+			sb.append(sequence);
 
 			sb.append("}");
 
@@ -655,42 +654,44 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 	}
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the matching cp definition diagram entry, or <code>null</code> if a matching cp definition diagram entry could not be found
 	 */
 	@Override
-	public CPDefinitionDiagramEntry fetchByCPDI_N(
-		long CPDefinitionId, int number) {
+	public CPDefinitionDiagramEntry fetchByCPDI_S(
+		long CPDefinitionId, String sequence) {
 
-		return fetchByCPDI_N(CPDefinitionId, number, true);
+		return fetchByCPDI_S(CPDefinitionId, sequence, true);
 	}
 
 	/**
-	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching cp definition diagram entry, or <code>null</code> if a matching cp definition diagram entry could not be found
 	 */
 	@Override
-	public CPDefinitionDiagramEntry fetchByCPDI_N(
-		long CPDefinitionId, int number, boolean useFinderCache) {
+	public CPDefinitionDiagramEntry fetchByCPDI_S(
+		long CPDefinitionId, String sequence, boolean useFinderCache) {
+
+		sequence = Objects.toString(sequence, "");
 
 		Object[] finderArgs = null;
 
 		if (useFinderCache) {
-			finderArgs = new Object[] {CPDefinitionId, number};
+			finderArgs = new Object[] {CPDefinitionId, sequence};
 		}
 
 		Object result = null;
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByCPDI_N, finderArgs);
+				_finderPathFetchByCPDI_S, finderArgs);
 		}
 
 		if (result instanceof CPDefinitionDiagramEntry) {
@@ -699,7 +700,8 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 			if ((CPDefinitionId !=
 					cpDefinitionDiagramEntry.getCPDefinitionId()) ||
-				(number != cpDefinitionDiagramEntry.getNumber())) {
+				!Objects.equals(
+					sequence, cpDefinitionDiagramEntry.getSequence())) {
 
 				result = null;
 			}
@@ -710,9 +712,18 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 			sb.append(_SQL_SELECT_CPDEFINITIONDIAGRAMENTRY_WHERE);
 
-			sb.append(_FINDER_COLUMN_CPDI_N_CPDEFINITIONID_2);
+			sb.append(_FINDER_COLUMN_CPDI_S_CPDEFINITIONID_2);
 
-			sb.append(_FINDER_COLUMN_CPDI_N_NUMBER_2);
+			boolean bindSequence = false;
+
+			if (sequence.isEmpty()) {
+				sb.append(_FINDER_COLUMN_CPDI_S_SEQUENCE_3);
+			}
+			else {
+				bindSequence = true;
+
+				sb.append(_FINDER_COLUMN_CPDI_S_SEQUENCE_2);
+			}
 
 			String sql = sb.toString();
 
@@ -727,14 +738,16 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 				queryPos.add(CPDefinitionId);
 
-				queryPos.add(number);
+				if (bindSequence) {
+					queryPos.add(sequence);
+				}
 
 				List<CPDefinitionDiagramEntry> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
 						finderCache.putResult(
-							_finderPathFetchByCPDI_N, finderArgs, list);
+							_finderPathFetchByCPDI_S, finderArgs, list);
 					}
 				}
 				else {
@@ -763,35 +776,37 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 	}
 
 	/**
-	 * Removes the cp definition diagram entry where CPDefinitionId = &#63; and number = &#63; from the database.
+	 * Removes the cp definition diagram entry where CPDefinitionId = &#63; and sequence = &#63; from the database.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the cp definition diagram entry that was removed
 	 */
 	@Override
-	public CPDefinitionDiagramEntry removeByCPDI_N(
-			long CPDefinitionId, int number)
+	public CPDefinitionDiagramEntry removeByCPDI_S(
+			long CPDefinitionId, String sequence)
 		throws NoSuchCPDefinitionDiagramEntryException {
 
-		CPDefinitionDiagramEntry cpDefinitionDiagramEntry = findByCPDI_N(
-			CPDefinitionId, number);
+		CPDefinitionDiagramEntry cpDefinitionDiagramEntry = findByCPDI_S(
+			CPDefinitionId, sequence);
 
 		return remove(cpDefinitionDiagramEntry);
 	}
 
 	/**
-	 * Returns the number of cp definition diagram entries where CPDefinitionId = &#63; and number = &#63;.
+	 * Returns the number of cp definition diagram entries where CPDefinitionId = &#63; and sequence = &#63;.
 	 *
 	 * @param CPDefinitionId the cp definition ID
-	 * @param number the number
+	 * @param sequence the sequence
 	 * @return the number of matching cp definition diagram entries
 	 */
 	@Override
-	public int countByCPDI_N(long CPDefinitionId, int number) {
-		FinderPath finderPath = _finderPathCountByCPDI_N;
+	public int countByCPDI_S(long CPDefinitionId, String sequence) {
+		sequence = Objects.toString(sequence, "");
 
-		Object[] finderArgs = new Object[] {CPDefinitionId, number};
+		FinderPath finderPath = _finderPathCountByCPDI_S;
+
+		Object[] finderArgs = new Object[] {CPDefinitionId, sequence};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
@@ -800,9 +815,18 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 			sb.append(_SQL_COUNT_CPDEFINITIONDIAGRAMENTRY_WHERE);
 
-			sb.append(_FINDER_COLUMN_CPDI_N_CPDEFINITIONID_2);
+			sb.append(_FINDER_COLUMN_CPDI_S_CPDEFINITIONID_2);
 
-			sb.append(_FINDER_COLUMN_CPDI_N_NUMBER_2);
+			boolean bindSequence = false;
+
+			if (sequence.isEmpty()) {
+				sb.append(_FINDER_COLUMN_CPDI_S_SEQUENCE_3);
+			}
+			else {
+				bindSequence = true;
+
+				sb.append(_FINDER_COLUMN_CPDI_S_SEQUENCE_2);
+			}
 
 			String sql = sb.toString();
 
@@ -817,7 +841,9 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 				queryPos.add(CPDefinitionId);
 
-				queryPos.add(number);
+				if (bindSequence) {
+					queryPos.add(sequence);
+				}
 
 				count = (Long)query.uniqueResult();
 
@@ -834,19 +860,16 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CPDI_N_CPDEFINITIONID_2 =
+	private static final String _FINDER_COLUMN_CPDI_S_CPDEFINITIONID_2 =
 		"cpDefinitionDiagramEntry.CPDefinitionId = ? AND ";
 
-	private static final String _FINDER_COLUMN_CPDI_N_NUMBER_2 =
-		"cpDefinitionDiagramEntry.number = ?";
+	private static final String _FINDER_COLUMN_CPDI_S_SEQUENCE_2 =
+		"cpDefinitionDiagramEntry.sequence = ?";
+
+	private static final String _FINDER_COLUMN_CPDI_S_SEQUENCE_3 =
+		"(cpDefinitionDiagramEntry.sequence IS NULL OR cpDefinitionDiagramEntry.sequence = '')";
 
 	public CPDefinitionDiagramEntryPersistenceImpl() {
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("number", "number_");
-
-		setDBColumnNames(dbColumnNames);
-
 		setModelClass(CPDefinitionDiagramEntry.class);
 
 		setModelImplClass(CPDefinitionDiagramEntryImpl.class);
@@ -867,10 +890,10 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 			cpDefinitionDiagramEntry.getPrimaryKey(), cpDefinitionDiagramEntry);
 
 		finderCache.putResult(
-			_finderPathFetchByCPDI_N,
+			_finderPathFetchByCPDI_S,
 			new Object[] {
 				cpDefinitionDiagramEntry.getCPDefinitionId(),
-				cpDefinitionDiagramEntry.getNumber()
+				cpDefinitionDiagramEntry.getSequence()
 			},
 			cpDefinitionDiagramEntry);
 	}
@@ -950,12 +973,12 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 		Object[] args = new Object[] {
 			cpDefinitionDiagramEntryModelImpl.getCPDefinitionId(),
-			cpDefinitionDiagramEntryModelImpl.getNumber()
+			cpDefinitionDiagramEntryModelImpl.getSequence()
 		};
 
-		finderCache.putResult(_finderPathCountByCPDI_N, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByCPDI_S, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByCPDI_N, args, cpDefinitionDiagramEntryModelImpl);
+			_finderPathFetchByCPDI_S, args, cpDefinitionDiagramEntryModelImpl);
 	}
 
 	/**
@@ -1395,11 +1418,6 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 	}
 
 	@Override
-	public Set<String> getBadColumnNames() {
-		return _badColumnNames;
-	}
-
-	@Override
 	protected EntityCache getEntityCache() {
 		return entityCache;
 	}
@@ -1461,15 +1479,15 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"CPDefinitionId"}, false);
 
-		_finderPathFetchByCPDI_N = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByCPDI_N",
-			new String[] {Long.class.getName(), Integer.class.getName()},
-			new String[] {"CPDefinitionId", "number_"}, true);
+		_finderPathFetchByCPDI_S = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByCPDI_S",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"CPDefinitionId", "sequence"}, true);
 
-		_finderPathCountByCPDI_N = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCPDI_N",
-			new String[] {Long.class.getName(), Integer.class.getName()},
-			new String[] {"CPDefinitionId", "number_"}, false);
+		_finderPathCountByCPDI_S = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCPDI_S",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"CPDefinitionId", "sequence"}, false);
 	}
 
 	@Deactivate
@@ -1536,9 +1554,6 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPDefinitionDiagramEntryPersistenceImpl.class);
-
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"number"});
 
 	@Override
 	protected FinderCache getFinderCache() {
@@ -1652,7 +1667,7 @@ public class CPDefinitionDiagramEntryPersistenceImpl
 			long orderByColumnsBitmask = 0;
 
 			orderByColumnsBitmask |=
-				CPDefinitionDiagramEntryModelImpl.getColumnBitmask("number_");
+				CPDefinitionDiagramEntryModelImpl.getColumnBitmask("sequence");
 
 			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
 		}

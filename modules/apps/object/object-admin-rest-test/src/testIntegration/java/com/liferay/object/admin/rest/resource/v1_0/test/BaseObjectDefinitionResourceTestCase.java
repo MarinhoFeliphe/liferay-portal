@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -183,6 +182,9 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		ObjectDefinition objectDefinition = randomObjectDefinition();
 
 		objectDefinition.setName(regex);
+		objectDefinition.setPanelAppOrder(regex);
+		objectDefinition.setPanelCategoryKey(regex);
+		objectDefinition.setScope(regex);
 
 		String json = ObjectDefinitionSerDes.toJSON(objectDefinition);
 
@@ -191,6 +193,9 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		objectDefinition = ObjectDefinitionSerDes.toDTO(json);
 
 		Assert.assertEquals(regex, objectDefinition.getName());
+		Assert.assertEquals(regex, objectDefinition.getPanelAppOrder());
+		Assert.assertEquals(regex, objectDefinition.getPanelCategoryKey());
+		Assert.assertEquals(regex, objectDefinition.getScope());
 	}
 
 	@Test
@@ -383,6 +388,69 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 	}
 
 	@Test
+	public void testPatchObjectDefinition() throws Exception {
+		ObjectDefinition postObjectDefinition =
+			testPatchObjectDefinition_addObjectDefinition();
+
+		ObjectDefinition randomPatchObjectDefinition =
+			randomPatchObjectDefinition();
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		ObjectDefinition patchObjectDefinition =
+			objectDefinitionResource.patchObjectDefinition(
+				postObjectDefinition.getId(), randomPatchObjectDefinition);
+
+		ObjectDefinition expectedPatchObjectDefinition =
+			postObjectDefinition.clone();
+
+		_beanUtilsBean.copyProperties(
+			expectedPatchObjectDefinition, randomPatchObjectDefinition);
+
+		ObjectDefinition getObjectDefinition =
+			objectDefinitionResource.getObjectDefinition(
+				patchObjectDefinition.getId());
+
+		assertEquals(expectedPatchObjectDefinition, getObjectDefinition);
+		assertValid(getObjectDefinition);
+	}
+
+	protected ObjectDefinition testPatchObjectDefinition_addObjectDefinition()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPutObjectDefinition() throws Exception {
+		ObjectDefinition postObjectDefinition =
+			testPutObjectDefinition_addObjectDefinition();
+
+		ObjectDefinition randomObjectDefinition = randomObjectDefinition();
+
+		ObjectDefinition putObjectDefinition =
+			objectDefinitionResource.putObjectDefinition(
+				postObjectDefinition.getId(), randomObjectDefinition);
+
+		assertEquals(randomObjectDefinition, putObjectDefinition);
+		assertValid(putObjectDefinition);
+
+		ObjectDefinition getObjectDefinition =
+			objectDefinitionResource.getObjectDefinition(
+				putObjectDefinition.getId());
+
+		assertEquals(randomObjectDefinition, getObjectDefinition);
+		assertValid(getObjectDefinition);
+	}
+
+	protected ObjectDefinition testPutObjectDefinition_addObjectDefinition()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
 	public void testPostObjectDefinitionPublish() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		ObjectDefinition objectDefinition =
@@ -516,6 +584,38 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 
 			if (Objects.equals("objectFields", additionalAssertFieldName)) {
 				if (objectDefinition.getObjectFields() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("panelAppOrder", additionalAssertFieldName)) {
+				if (objectDefinition.getPanelAppOrder() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("panelCategoryKey", additionalAssertFieldName)) {
+				if (objectDefinition.getPanelCategoryKey() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("pluralLabel", additionalAssertFieldName)) {
+				if (objectDefinition.getPluralLabel() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("scope", additionalAssertFieldName)) {
+				if (objectDefinition.getScope() == null) {
 					valid = false;
 				}
 
@@ -701,6 +801,50 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				if (!Objects.deepEquals(
 						objectDefinition1.getObjectFields(),
 						objectDefinition2.getObjectFields())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("panelAppOrder", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getPanelAppOrder(),
+						objectDefinition2.getPanelAppOrder())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("panelCategoryKey", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getPanelCategoryKey(),
+						objectDefinition2.getPanelCategoryKey())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("pluralLabel", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)objectDefinition1.getPluralLabel(),
+						(Map)objectDefinition2.getPluralLabel())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("scope", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getScope(),
+						objectDefinition2.getScope())) {
 
 					return false;
 				}
@@ -922,6 +1066,35 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("panelAppOrder")) {
+			sb.append("'");
+			sb.append(String.valueOf(objectDefinition.getPanelAppOrder()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("panelCategoryKey")) {
+			sb.append("'");
+			sb.append(String.valueOf(objectDefinition.getPanelCategoryKey()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("pluralLabel")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("scope")) {
+			sb.append("'");
+			sb.append(String.valueOf(objectDefinition.getScope()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("status")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -980,6 +1153,11 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				dateModified = RandomTestUtil.nextDate();
 				id = RandomTestUtil.randomLong();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				panelAppOrder = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				panelCategoryKey = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				scope = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				system = RandomTestUtil.randomBoolean();
 			}
 		};
@@ -1074,8 +1252,8 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseObjectDefinitionResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseObjectDefinitionResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

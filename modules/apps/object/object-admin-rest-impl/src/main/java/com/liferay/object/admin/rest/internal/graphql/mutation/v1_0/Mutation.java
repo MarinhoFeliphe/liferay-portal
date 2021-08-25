@@ -119,6 +119,48 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public ObjectDefinition patchObjectDefinition(
+			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
+			@GraphQLName("objectDefinition") ObjectDefinition objectDefinition)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectDefinitionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectDefinitionResource ->
+				objectDefinitionResource.patchObjectDefinition(
+					objectDefinitionId, objectDefinition));
+	}
+
+	@GraphQLField
+	public ObjectDefinition updateObjectDefinition(
+			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
+			@GraphQLName("objectDefinition") ObjectDefinition objectDefinition)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectDefinitionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectDefinitionResource ->
+				objectDefinitionResource.putObjectDefinition(
+					objectDefinitionId, objectDefinition));
+	}
+
+	@GraphQLField
+	public Response updateObjectDefinitionBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectDefinitionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectDefinitionResource ->
+				objectDefinitionResource.putObjectDefinitionBatch(
+					callbackURL, object));
+	}
+
+	@GraphQLField
 	public boolean createObjectDefinitionPublish(
 			@GraphQLName("objectDefinitionId") Long objectDefinitionId)
 		throws Exception {
@@ -160,6 +202,19 @@ public class Mutation {
 			objectFieldResource ->
 				objectFieldResource.postObjectDefinitionObjectFieldBatch(
 					objectDefinitionId, callbackURL, object));
+	}
+
+	@GraphQLField
+	public ObjectField patchObjectField(
+			@GraphQLName("objectFieldId") Long objectFieldId,
+			@GraphQLName("objectField") ObjectField objectField)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectFieldResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectFieldResource -> objectFieldResource.patchObjectField(
+				objectFieldId, objectField));
 	}
 
 	@GraphQLField

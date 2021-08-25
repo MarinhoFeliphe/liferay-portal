@@ -15,8 +15,6 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		ACUtils.launchDXP();
-
-		ACUtils.launchAC();
 	}
 
 	tearDown {
@@ -59,30 +57,141 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8275 | Test Summary: Site Activity Card: Can filter graph by day"
-	@ignore = "true"
 	@priority = "5"
 	test CanFilterActivityCardGraphByDay {
+		property portal.upstream = "quarantine";
 
-		// TODO LRAC-8275 CanFilterActivityCardGraphByDay
+		// AC Refactor: the issue is due to data not appearing on time
+		// AC Refactor ticket: LRAC-8770
 
+		task ("Site and blogs creation and connection with AC") {
+			ACUtils.addSiteAndPage();
+
+			ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
+
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
+
+		task ("Interation with pages") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
+		}
+
+		task ("AC launch and go to property menu") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Asset in the Activity card graph by day filter") {
+
+			// Unable to perform the declaration because the data does not appear at the time
+
+			ACNavigation.switchTab(tabName = "Overview");
+
+			ACCards.viewCards(cardTitle = "${propertyName} Activities");
+
+			ACCards.clickFilterByDay();
+
+			ACUtils.assertXAxisTimedGraph(parentName = "${propertyName} Activities");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8278 | Test Summary: Site Activity Card: Can filter graph by month"
-	@ignore = "true"
 	@priority = "5"
 	test CanFilterActivityCardGraphByMonth {
+		property portal.upstream = "quarantine";
 
-		// TODO LRAC-8278 CanFilterActivityCardGraphByMonth
+		// AC Refactor: the issue is due to data not appearing on time
+		// AC Refactor ticket: LRAC-8772
 
+		task ("Site and blogs creation and connection with AC") {
+			ACUtils.addSiteAndPage();
+
+			ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
+
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
+
+		task ("Interation with pages") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
+		}
+
+		task ("AC launch and go to property menu") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Asset in the Activity card graph by month filter") {
+
+			// Unable to perform the declaration because the data does not appear at the time
+
+			ACNavigation.switchTab(tabName = "Overview");
+
+			ACCards.viewCards(cardTitle = "${propertyName} Activities");
+
+			ACCards.clickFilterByMonth();
+
+			ACUtils.assertXAxisTimedGraph(parentName = "${propertyName} Activities");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8276 | Test Summary: Site Activity Card: Can filter graph by week"
-	@ignore = "true"
 	@priority = "5"
 	test CanFilterActivityCardGraphByWeek {
+		property portal.upstream = "quarantine";
 
-		// TODO LRAC-8276 CanFilterActivityCardGraphByWeek
+		// AC Refactor: the test needs data from a past date
+		// AC Refactor ticket: LRAC-8771
 
+		task ("Site and blogs creation and connection with AC") {
+			ACUtils.addSiteAndPage();
+
+			ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
+
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
+
+		task ("Interation with pages") {
+			Navigator.gotoSitePage(
+				pageName = "AC Page",
+				siteName = "Site Name");
+
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
+		}
+
+		task ("AC launch and go to property menu") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
+
+		task ("Asset in the Activity card graph by week filter") {
+
+			// It is not possible to perform the assert because this test needs data from the past
+
+			ACNavigation.switchTab(tabName = "Overview");
+
+			ACCards.viewCards(cardTitle = "${propertyName} Activities");
+
+			ACCards.clickFilterByWeek();
+
+			ACUtils.assertXAxisTimedGraph(parentName = "${propertyName} Activities");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8279 | Test Summary: Site Activity Card: Can hover over a point on the graph to get detailed stats"
@@ -104,12 +213,57 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8280 | Test Summary: Anon and known visitors legend shown"
-	@ignore = "true"
 	@priority = "5"
 	test CanShownAnonAndKnownVisitorsLegend {
+		task ("Connect Analytics Cloud to DXP") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
+		}
 
-		// TODO LRAC-8280 CanShownAnonAndKnownVisitorsLegend
+		task ("Visits the site with known user") {
+			Navigator.openURL();
 
+			Pause(locator1 = "5000");
+		}
+
+		task ("Visits the site with anonymous user") {
+			User.logoutPG();
+
+			Navigator.openURL();
+		}
+
+		task ("Close sessions") {
+			ACUtils.closeAllSessions();
+
+			Pause(locator1 = "30000");
+		}
+
+		task ("Switch to new property in AC and go to Sites") {
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToSites();
+		}
+
+		task ("Go to Sites overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+		}
+
+		task ("Verify if anonymous and known users legends are shown") {
+			for (var visitor : list "Anonymous,Known") {
+				AssertElementPresent(
+					key_visitorLegend = "${visitor} Visitors",
+					locator1 = "ACIndividualsDashboard#VISITORS_LEGEND");
+
+				MouseOver(
+					key_visitorLegend = "${visitor} Visitors",
+					locator1 = "ACIndividualsDashboard#VISITORS_LEGEND");
+
+				AssertElementPresent(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART");
+			}
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8281 | Test Summary: Anon and known visitors popover shows breakdown"

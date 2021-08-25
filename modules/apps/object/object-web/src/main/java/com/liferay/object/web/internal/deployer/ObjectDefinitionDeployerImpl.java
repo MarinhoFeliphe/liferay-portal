@@ -15,7 +15,6 @@
 package com.liferay.object.web.internal.deployer;
 
 import com.liferay.application.list.PanelApp;
-import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.frontend.taglib.clay.data.set.ClayDataSetDisplayView;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilderFactory;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
@@ -62,9 +61,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				PanelApp.class, new ObjectEntriesPanelApp(objectDefinition),
 				HashMapDictionaryBuilder.<String, Object>put(
-					"panel.app.order:Integer", "300"
+					"panel.app.order:Integer",
+					objectDefinition.getPanelAppOrder()
 				).put(
-					"panel.category.key", PanelCategoryKeys.CONTROL_PANEL_USERS
+					"panel.category.key", objectDefinition.getPanelCategoryKey()
 				).build()),
 			_bundleContext.registerService(
 				Portlet.class,
@@ -76,10 +76,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					"javax.portlet.display-name",
 					objectDefinition.getShortName()
 				).put(
-					"javax.portlet.name", objectDefinition.getPortletId()
-				).put(
 					"javax.portlet.init-param.view-template",
 					"/object_entries/view_object_entries.jsp"
+				).put(
+					"javax.portlet.name", objectDefinition.getPortletId()
 				).build()));
 	}
 

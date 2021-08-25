@@ -42,6 +42,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CRITERIA_STATEMENT_BODY</td>
+	<td>xpath=(//div[contains(@class,'criteria-statement')])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CRITERION_TYPE_DROPDOWN</td>
 	<td>//div[@class='dropdown dropdown-root']/button</td>
 	<td></td>
@@ -49,6 +54,11 @@
 <tr>
 	<td>DELETE_SEGMENT</td>
 	<td>//div[contains(@class,'dropdown')]/button[contains(@class,'item')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DELETE_SEGMENT_INLINE_BUTTON</td>
+	<td>//td[contains(.,'${key_segmentName}')]/following-sibling::td//button[contains(@aria-label,'Delete')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -74,6 +84,26 @@
 <tr>
 	<td>EDIT_NAME_BUTTON</td>
 	<td>//div[contains(@class,'editor')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FORM_HEADER_LOADING_ANIMATION</td>
+	<td>//div[contains(@class,'form-header')]//span[contains(@class,'loading-animation')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>KNOWN_SEGMENT_MEMBERS_FILTER</td>
+	<td>//button[contains(@class,'btn')]/span[@class='text-truncate' and text()='Name | Email']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>KNOWN_SEGMENT_MEMBERS_FILTER_ARROW_DESC</td>
+	<td>//*[name()='svg'][contains(@class,'lexicon-icon-order-arrow-down')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>KNOWN_SEGMENT_MEMBERS_VIEW_SPECIFIC_ORDER</td>
+	<td>//tbody//tr[${resultOrder}]//div[contains(@class,'table-title')and text()='${key_userName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -208,6 +238,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONJUNCTION_BUTTON</td>
+	<td>xpath=(//button[contains(@class,'conjunction-button')])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DATE_PICKER</td>
 	<td>//div[contains(@class,'date-picker')]</td>
 	<td></td>
@@ -239,17 +274,22 @@
 </tr>
 <tr>
 	<td>SEGMENT_DROP_AREA</td>
-	<td>//div[@class='drop-zone-target p-5']</td>
+	<td>xpath=(//div[contains(@class,'drop-zone-target')])[last()]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>SEGMENT_MEMBERSHIP_BUTTON</td>
-	<td>//div[@class='total-members']/following-sibling::button</td>
+	<td>TOTAL_MEMBERS</td>
+	<td>//div[contains(@class,'total-members')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TEXT_INPUT</td>
 	<td>xpath=(//div[contains(@class,'criteria-statement')]//div[contains(@class,'input-group-item')]//input[@type='text'])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NUMBER_INPUT</td>
+	<td>xpath=(//div[contains(@class,'criteria-statement')]//div[contains(@class,'group-item')]//input[@type='number'])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -301,6 +341,11 @@
 <tr>
 	<td>ADD_MEMBERS_BUTTON</td>
 	<td>//ul/li/button[contains(@class,'btn-primary')]|//ul/li/button[contains(@class,'btn-secondary')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISABLED_MEMBER</td>
+	<td>//tr[contains(@class,'disabled')]//div[text()='${key_memberName}']</td>
 	<td></td>
 </tr>
 <!-- Segments List -->

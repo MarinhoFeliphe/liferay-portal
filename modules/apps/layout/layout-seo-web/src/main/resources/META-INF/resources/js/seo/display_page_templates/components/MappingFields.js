@@ -12,57 +12,35 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
 import {PropTypes} from 'prop-types';
 import React from 'react';
 
 import {FIELD_TYPES} from '../constants';
-import MappingContext from './MappingContext';
 import MappingInput from './MappingInput';
 import MappingSelector from './MappingSelector';
 
-function MappingFields({
-	ffSEOInlineFieldMappingEnabled,
-	fields,
-	inputs,
-	selectedSource,
-}) {
-	return (
-		<MappingContext.Provider value={{ffSEOInlineFieldMappingEnabled}}>
-			{ffSEOInlineFieldMappingEnabled && (
-				<ClayAlert
-					displayType="info"
-					title={Liferay.Language.get('info')}
-				>
-					{Liferay.Language.get(
-						'add-multiple-fields-to-define-how-the-meta-tags-will-be-filled'
-					)}
-				</ClayAlert>
-			)}
-			{inputs.map((props) => {
-				const filteredFields = fields.filter(
-					({type}) => type === props.fieldType
-				);
+function MappingFields({fields, inputs, selectedSource}) {
+	return inputs.map((props) => {
+		const filteredFields = fields.filter(
+			({type}) => type === props.fieldType
+		);
 
-				return ffSEOInlineFieldMappingEnabled &&
-					props.fieldType === FIELD_TYPES.TEXT ? (
-					<MappingInput
-						fields={filteredFields}
-						key={props.name}
-						selectedSource={selectedSource}
-						{...props}
-					/>
-				) : (
-					<MappingSelector
-						fields={filteredFields}
-						key={props.name}
-						selectedSource={selectedSource}
-						{...props}
-					/>
-				);
-			})}
-		</MappingContext.Provider>
-	);
+		return props.fieldType === FIELD_TYPES.TEXT ? (
+			<MappingInput
+				fields={filteredFields}
+				key={props.name}
+				selectedSource={selectedSource}
+				{...props}
+			/>
+		) : (
+			<MappingSelector
+				fields={filteredFields}
+				key={props.name}
+				selectedSource={selectedSource}
+				{...props}
+			/>
+		);
+	});
 }
 
 MappingFields.propTypes = {
@@ -77,6 +55,7 @@ MappingFields.propTypes = {
 			label: PropTypes.string,
 			name: PropTypes.string,
 			selectedFieldKey: PropTypes.string,
+			value: PropTypes.string,
 		})
 	).isRequired,
 };

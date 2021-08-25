@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
+import java.util.List;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -58,8 +60,19 @@ public interface BatchPlannerPlanService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BatchPlannerPlan fetchBatchPlannerPlan(long batchPlannerPlanId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BatchPlannerPlan getBatchPlannerPlan(long batchPlannerPlanId)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<BatchPlannerPlan> getBatchPlannerPlans(
+		long companyId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getBatchPlannerPlansCount(long companyId);
 
 	/**
 	 * Returns the OSGi service identifier.

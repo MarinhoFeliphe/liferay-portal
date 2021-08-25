@@ -20,7 +20,6 @@ import lang from './utils/lang';
 
 export default function SeoMapping({
 	description,
-	ffSEOInlineFieldMappingEnabled = false,
 	fields,
 	portletNamespace,
 	selectedSource,
@@ -28,7 +27,6 @@ export default function SeoMapping({
 }) {
 	return (
 		<MappingFields
-			ffSEOInlineFieldMappingEnabled={ffSEOInlineFieldMappingEnabled}
 			fields={fields}
 			inputs={[
 				{
@@ -42,7 +40,6 @@ export default function SeoMapping({
 					),
 					label: Liferay.Language.get('html-title'),
 					name: `${portletNamespace}TypeSettingsProperties--mapped-title--`,
-					selectedFieldKey: title,
 					value: title,
 				},
 				{
@@ -57,7 +54,6 @@ export default function SeoMapping({
 					),
 					label: Liferay.Language.get('description'),
 					name: `${portletNamespace}TypeSettingsProperties--mapped-description--`,
-					selectedFieldKey: description,
 					value: description,
 				},
 			]}

@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
+import com.liferay.portal.vulcan.pagination.Page;
 
 import java.util.function.BiFunction;
 
@@ -336,9 +337,11 @@ public class Mutation {
 		return true;
 	}
 
-	@GraphQLField(description = "Unassigns account users to the account role")
+	@GraphQLField(
+		description = "Unassigns account users by external reference code from the account role"
+	)
 	public boolean
-			deleteAccountAccountRoleUserAccountAssociationByExternalReferenceCode(
+			deleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode(
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
 				@GraphQLName("accountRoleId") Long accountRoleId,
@@ -351,16 +354,18 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountRoleResource ->
 				accountRoleResource.
-					deleteAccountAccountRoleUserAccountAssociationByExternalReferenceCode(
+					deleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode(
 						accountExternalReferenceCode, accountRoleId,
 						userAccountExternalReferenceCode));
 
 		return true;
 	}
 
-	@GraphQLField(description = "Assigns account users to the account role")
+	@GraphQLField(
+		description = "Assigns account users by external reference code to the account role"
+	)
 	public boolean
-			createAccountAccountRoleUserAccountAssociationByExternalReferenceCode(
+			createAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode(
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
 				@GraphQLName("accountRoleId") Long accountRoleId,
@@ -373,7 +378,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountRoleResource ->
 				accountRoleResource.
-					postAccountAccountRoleUserAccountAssociationByExternalReferenceCode(
+					postAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode(
 						accountExternalReferenceCode, accountRoleId,
 						userAccountExternalReferenceCode));
 
@@ -393,6 +398,50 @@ public class Mutation {
 				accountRoleResource.
 					postAccountAccountRoleByExternalReferenceCode(
 						externalReferenceCode, accountRole));
+	}
+
+	@GraphQLField(
+		description = "Unassigns account users by email address from the account role"
+	)
+	public boolean
+			deleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("accountRoleId") Long accountRoleId,
+				@GraphQLName("emailAddress") String emailAddress)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_accountRoleResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountRoleResource ->
+				accountRoleResource.
+					deleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(
+						externalReferenceCode, accountRoleId, emailAddress));
+
+		return true;
+	}
+
+	@GraphQLField(
+		description = "Assigns account users by email address to the account role"
+	)
+	public boolean
+			createAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("accountRoleId") Long accountRoleId,
+				@GraphQLName("emailAddress") String emailAddress)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_accountRoleResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountRoleResource ->
+				accountRoleResource.
+					postAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(
+						externalReferenceCode, accountRoleId, emailAddress));
+
+		return true;
 	}
 
 	@GraphQLField(description = "Adds a role for the account")
@@ -576,19 +625,22 @@ public class Mutation {
 	@GraphQLField(
 		description = "Assigns users to an organization by their email addresses"
 	)
-	public boolean createUserAccountsByEmailAddress(
+	public java.util.Collection<UserAccount> createUserAccountsByEmailAddress(
 			@GraphQLName("organizationId") String organizationId,
+			@GraphQLName("organizationRoleIds") String organizationRoleIds,
 			@GraphQLName("strings") String[] strings)
 		throws Exception {
 
-		_applyVoidComponentServiceObjects(
+		return _applyComponentServiceObjects(
 			_organizationResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.postUserAccountsByEmailAddress(
-					organizationId, strings));
+			organizationResource -> {
+				Page paginationPage =
+					organizationResource.postUserAccountsByEmailAddress(
+						organizationId, organizationRoleIds, strings);
 
-		return true;
+				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField(
@@ -612,19 +664,17 @@ public class Mutation {
 	@GraphQLField(
 		description = "Assigns a user to an organization by their email address"
 	)
-	public boolean createUserAccountByEmailAddress(
+	public UserAccount createUserAccountByEmailAddress(
 			@GraphQLName("organizationId") String organizationId,
 			@GraphQLName("emailAddress") String emailAddress)
 		throws Exception {
 
-		_applyVoidComponentServiceObjects(
+		return _applyComponentServiceObjects(
 			_organizationResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			organizationResource ->
 				organizationResource.postUserAccountByEmailAddress(
 					organizationId, emailAddress));
-
-		return true;
 	}
 
 	@GraphQLField(description = "Unassociates a role with a user account")
@@ -738,6 +788,52 @@ public class Mutation {
 			subscriptionResource ->
 				subscriptionResource.deleteMyUserAccountSubscription(
 					subscriptionId));
+
+		return true;
+	}
+
+	@GraphQLField(
+		description = "Removes a user by their external reference code from an account by external reference code"
+	)
+	public boolean
+			deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+				@GraphQLName("accountExternalReferenceCode") String
+					accountExternalReferenceCode,
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_userAccountResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userAccountResource ->
+				userAccountResource.
+					deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+						accountExternalReferenceCode,
+						userAccountExternalReferenceCode));
+
+		return true;
+	}
+
+	@GraphQLField(
+		description = "Assigns a user by their external reference code to an account by external reference code"
+	)
+	public boolean
+			createAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+				@GraphQLName("accountExternalReferenceCode") String
+					accountExternalReferenceCode,
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_userAccountResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userAccountResource ->
+				userAccountResource.
+					postAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+						accountExternalReferenceCode,
+						userAccountExternalReferenceCode));
 
 		return true;
 	}
@@ -894,19 +990,23 @@ public class Mutation {
 	@GraphQLField(
 		description = "Assigns users to an account by their email addresses"
 	)
-	public boolean createAccountUserAccountsByEmailAddress(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("strings") String[] strings)
+	public java.util.Collection<UserAccount>
+			createAccountUserAccountsByEmailAddress(
+				@GraphQLName("accountId") Long accountId,
+				@GraphQLName("accountRoleIds") String accountRoleIds,
+				@GraphQLName("strings") String[] strings)
 		throws Exception {
 
-		_applyVoidComponentServiceObjects(
+		return _applyComponentServiceObjects(
 			_userAccountResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			userAccountResource ->
-				userAccountResource.postAccountUserAccountsByEmailAddress(
-					accountId, strings));
+			userAccountResource -> {
+				Page paginationPage =
+					userAccountResource.postAccountUserAccountsByEmailAddress(
+						accountId, accountRoleIds, strings);
 
-		return true;
+				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField(
@@ -930,19 +1030,17 @@ public class Mutation {
 	@GraphQLField(
 		description = "Assigns a user to an account by their email address"
 	)
-	public boolean createAccountUserAccountByEmailAddress(
+	public UserAccount createAccountUserAccountByEmailAddress(
 			@GraphQLName("accountId") Long accountId,
 			@GraphQLName("emailAddress") String emailAddress)
 		throws Exception {
 
-		_applyVoidComponentServiceObjects(
+		return _applyComponentServiceObjects(
 			_userAccountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			userAccountResource ->
 				userAccountResource.postAccountUserAccountByEmailAddress(
 					accountId, emailAddress));
-
-		return true;
 	}
 
 	@GraphQLField(description = "Creates a new user account")

@@ -14,7 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.internal.upgrade.v1_1_1;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -42,13 +41,9 @@ public class DDMStructureIndexTypeUpgradeProcess extends UpgradeProcess {
 	}
 
 	private void _upgradeDDMStructureDefinition() throws Exception {
-		StringBundler sb = new StringBundler(2);
-
-		sb.append("select DDMStructure.definition, DDMStructure.structureId ");
-		sb.append("from DDMStructure where structureKey = ? ");
-
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
-				sb.toString());
+				"select DDMStructure.definition, DDMStructure.structureId " +
+					"from DDMStructure where structureKey = ? ");
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection,

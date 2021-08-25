@@ -234,20 +234,6 @@ public interface CPDefinitionDiagramEntryModel
 	public void setDiagram(boolean diagram);
 
 	/**
-	 * Returns the number of this cp definition diagram entry.
-	 *
-	 * @return the number of this cp definition diagram entry
-	 */
-	public int getNumber();
-
-	/**
-	 * Sets the number of this cp definition diagram entry.
-	 *
-	 * @param number the number of this cp definition diagram entry
-	 */
-	public void setNumber(int number);
-
-	/**
 	 * Returns the quantity of this cp definition diagram entry.
 	 *
 	 * @return the quantity of this cp definition diagram entry
@@ -260,6 +246,21 @@ public interface CPDefinitionDiagramEntryModel
 	 * @param quantity the quantity of this cp definition diagram entry
 	 */
 	public void setQuantity(int quantity);
+
+	/**
+	 * Returns the sequence of this cp definition diagram entry.
+	 *
+	 * @return the sequence of this cp definition diagram entry
+	 */
+	@AutoEscape
+	public String getSequence();
+
+	/**
+	 * Sets the sequence of this cp definition diagram entry.
+	 *
+	 * @param sequence the sequence of this cp definition diagram entry
+	 */
+	public void setSequence(String sequence);
 
 	/**
 	 * Returns the sku of this cp definition diagram entry.

@@ -24,14 +24,18 @@ import {AppContext} from '../../AppContext.es';
 import Alert from '../../components/Alert.es';
 import Link from '../../components/Link.es';
 import PaginatedList from '../../components/PaginatedList.es';
+import SubscriptionButton from '../../components/SubscriptionButton.es';
 import useQueryParams from '../../hooks/useQueryParams.es';
 import {
 	getTagsOrderByDateCreatedQuery,
 	getTagsOrderByNumberOfUsagesQuery,
+	subscribeTagQuery,
+	unsubscribeTagQuery,
 } from '../../utils/client.es';
 import lang from '../../utils/lang.es';
 import {
 	dateToInternationalHuman,
+	deleteCacheKey,
 	historyPushWithSlug,
 	useDebounceCallback,
 } from '../../utils/utils.es';
@@ -255,20 +259,32 @@ export default withRouter(({history, location}) => {
 								className="col-md-3 question-tags"
 								key={tag.id}
 							>
-								<Link
-									title={tag.name}
-									to={`/questions/tag/${tag.name}`}
-								>
-									<div className="card card-interactive card-interactive-primary card-type-template template-card-horizontal">
-										<div className="card-body">
-											<div className="card-row">
-												<div className="autofit-col autofit-col-expand">
-													<div className="autofit-section">
-														<div className="card-title">
-															<span className="text-truncate">
-																{tag.name}
-															</span>
+								<div className="card card-interactive card-interactive-primary card-type-template d-flex justify-content-between template-card-horizontal">
+									<div className="col-9">
+										<Link
+											title={tag.name}
+											to={`/questions/tag/${tag.name}`}
+										>
+											<div className="card-body d-flex flex-column">
+												<div className="card-row">
+													<div className="autofit-row autofit-row-center autofit-row-expand">
+														<div>
+															<div className="autofit-col autofit-col-expand">
+																<div className="autofit-section">
+																	<div className="card-title">
+																		<span className="text-truncate">
+																			{
+																				tag.name
+																			}
+																		</span>
+																	</div>
+																</div>
+															</div>
 														</div>
+													</div>
+												</div>
+												<div className="card-row">
+													<div className="autofit-col autofit-col-expand card-subtitle">
 														{orderBy ===
 														'latest-created' ? (
 															<div>
@@ -298,9 +314,53 @@ export default withRouter(({history, location}) => {
 													</div>
 												</div>
 											</div>
-										</div>
+										</Link>
 									</div>
-								</Link>
+									<div className="align-items-center col-3 d-flex">
+										{tag.actions.subscribe && (
+											<div className="autofit-col">
+												<div className="autofit-section">
+													<SubscriptionButton
+														isSubscribed={
+															tag.subscribed
+														}
+														onSubscription={() => {
+															deleteCacheKey(
+																getTagsOrderByDateCreatedQuery,
+																{
+																	page,
+																	pageSize,
+																	search,
+																	siteKey:
+																		context.siteKey,
+																}
+															);
+															deleteCacheKey(
+																getTagsOrderByNumberOfUsagesQuery,
+																{
+																	page,
+																	pageSize,
+																	search,
+																	siteKey:
+																		context.siteKey,
+																}
+															);
+														}}
+														queryVariables={{
+															keywordId: tag.id,
+														}}
+														subscribeQuery={
+															subscribeTagQuery
+														}
+														unsubscribeQuery={
+															unsubscribeTagQuery
+														}
+													/>
+												</div>
+											</div>
+										)}
+									</div>
+								</div>
 							</div>
 						)}
 					</PaginatedList>

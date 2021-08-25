@@ -258,7 +258,7 @@ public class TierPriceResourceImpl extends BaseTierPriceResourceImpl {
 		).build();
 	}
 
-	private DateConfig _getDisplayDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toDisplayDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			return new DateConfig(CalendarFactoryUtil.getCalendar(timeZone));
 		}
@@ -269,7 +269,7 @@ public class TierPriceResourceImpl extends BaseTierPriceResourceImpl {
 		return new DateConfig(calendar);
 	}
 
-	private DateConfig _getExpirationDateConfig(Date date, TimeZone timeZone) {
+	private DateConfig _toExpirationDateConfig(Date date, TimeZone timeZone) {
 		if (date == null) {
 			Calendar expirationCalendar = CalendarFactoryUtil.getCalendar(
 				timeZone);
@@ -322,16 +322,15 @@ public class TierPriceResourceImpl extends BaseTierPriceResourceImpl {
 			CommerceTierPriceEntry commerceTierPriceEntry, TierPrice tierPrice)
 		throws Exception {
 
-		ServiceContext serviceContext =
-			_serviceContextHelper.getServiceContext();
-
 		CommercePriceEntry commercePriceEntry =
 			commerceTierPriceEntry.getCommercePriceEntry();
 
-		DateConfig displayDateConfig = _getDisplayDateConfig(
-			tierPrice.getDisplayDate(), serviceContext.getTimeZone());
+		ServiceContext serviceContext =
+			_serviceContextHelper.getServiceContext();
 
-		DateConfig expirationDateConfig = _getExpirationDateConfig(
+		DateConfig displayDateConfig = _toDisplayDateConfig(
+			tierPrice.getDisplayDate(), serviceContext.getTimeZone());
+		DateConfig expirationDateConfig = _toExpirationDateConfig(
 			tierPrice.getExpirationDate(), serviceContext.getTimeZone());
 
 		return _commerceTierPriceEntryService.updateCommerceTierPriceEntry(

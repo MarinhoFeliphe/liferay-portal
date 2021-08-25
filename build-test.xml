@@ -4302,6 +4302,7 @@ go</echo>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.2.10.5" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.0" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.1" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.12" />
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.43" />
@@ -6269,14 +6270,14 @@ war.path=${app.server.portal.dir}/</echo>
 				<then>
 					<loadfile
 						failonerror="false"
-						property="have.binary.commerce.license"
+						property="commerce.license.binary"
 					>
 						<zipentry name="data/license/LiferayCommerceSubscriptionDevelopment_developercluster.li" zipfile="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
 					</loadfile>
 
 					<loadfile
 						failonerror="false"
-						property="have.binary.portal.license"
+						property="dxp.license.binary"
 					>
 						<zipentry name="data/license/Liferaycom_PortalDevelopment_developercluster.li" zipfile="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" />
 					</loadfile>
@@ -6288,8 +6289,8 @@ war.path=${app.server.portal.dir}/</echo>
 					<equals arg1="${poshi.method.name}" arg2="DeployCommerceLicenseBinaryFile" />
 					<and>
 						<isset property="data.archive.type" />
-						<isset property="have.binary.commerce.license" />
-						<isset property="have.binary.portal.license" />
+						<isset property="commerce.license.binary" />
+						<isset property="dxp.license.binary" />
 					</and>
 				</or>
 				<then>
@@ -6298,9 +6299,9 @@ war.path=${app.server.portal.dir}/</echo>
 				<elseif>
 					<and>
 						<isset property="data.archive.type" />
-						<isset property="have.binary.commerce.license" />
+						<isset property="commerce.license.binary" />
 						<not>
-							<isset property="have.binary.portal.license" />
+							<isset property="dxp.license.binary" />
 						</not>
 					</and>
 					<then>
@@ -6343,6 +6344,12 @@ war.path=${app.server.portal.dir}/</echo>
 						<equals arg1="${portal.version}" arg2="7.0.4" />
 						<then>
 							<property name="portal.version.url.path" value="7.0.4-ga5" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${portal.version}" arg2="7.0.6" />
+						<then>
+							<property name="portal.version.url.path" value="7.0.6-ga7" />
 						</then>
 					</elseif>
 					<elseif>
@@ -9082,7 +9089,17 @@ jdbc.default.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			</then>
 		</if>
 
-		<get-testcase-property property.name="aws.store.enabled" />
+		<if>
+			<or>
+				<equals arg1="aws.store.enabled" arg2="" />
+				<not>
+					<isset property="aws.store.enabled" />
+				</not>
+			</or>
+			<then>
+				<get-testcase-property property.name="aws.store.enabled" />
+			</then>
+		</if>
 
 		<if>
 			<equals arg1="${aws.store.enabled}" arg2="true" />
@@ -14206,6 +14223,13 @@ url=${short.hostname}:8080</echo>
 		</condition>
 
 		<uninstall-patches patching.tool.dir="${patching.tool.dir}" />
+	</target>
+
+	<target name="unzip-temp-file">
+		<unzip
+			dest="${selenium.output.dir.name}"
+			src="${selenium.output.dir.name}/${fileName}"
+		/>
 	</target>
 
 	<target name="update-osgi-module-configuration">

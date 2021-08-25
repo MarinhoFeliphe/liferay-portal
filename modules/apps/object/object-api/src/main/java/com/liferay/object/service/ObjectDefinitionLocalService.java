@@ -70,6 +70,8 @@ public interface ObjectDefinitionLocalService
 	 */
 	public ObjectDefinition addCustomObjectDefinition(
 			long userId, Map<Locale, String> labelMap, String name,
+			String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, String scope,
 			List<ObjectField> objectFields)
 		throws PortalException;
 
@@ -95,8 +97,8 @@ public interface ObjectDefinitionLocalService
 	public ObjectDefinition addSystemObjectDefinition(
 			long userId, String dbTableName, Map<Locale, String> labelMap,
 			String name, String pkObjectFieldDBColumnName,
-			String pkObjectFieldName, int version,
-			List<ObjectField> objectFields)
+			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
+			String scope, int version, List<ObjectField> objectFields)
 		throws PortalException;
 
 	/**
@@ -333,6 +335,12 @@ public interface ObjectDefinitionLocalService
 
 	@Clusterable
 	public void undeployObjectDefinition(ObjectDefinition objectDefinition);
+
+	public ObjectDefinition updateCustomObjectDefinition(
+			Long objectDefinitionId, Map<Locale, String> labelMap, String name,
+			String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, String scope)
+		throws PortalException;
 
 	/**
 	 * Updates the object definition in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
