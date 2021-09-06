@@ -36,7 +36,7 @@ public class DDLRecordStagingModelListener
 	extends BaseModelListener<DDLRecord> {
 
 	@Override
-	public void onAfterCreate(DDLRecord ddlRecord)
+	public void onAfterCreate(DDLRecord originalDdlRecord,DDLRecord ddlRecord)
 		throws ModelListenerException {
 
 		if (_isSkipEvent(ddlRecord)) {
@@ -47,14 +47,14 @@ public class DDLRecordStagingModelListener
 	}
 
 	@Override
-	public void onAfterRemove(DDLRecord ddlRecord)
+	public void onAfterRemove(DDLRecord originalDdlRecord,DDLRecord ddlRecord)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(ddlRecord);
 	}
 
 	@Override
-	public void onAfterUpdate(DDLRecord ddlRecord)
+	public void onAfterUpdate(DDLRecord originalDdlRecord,DDLRecord ddlRecord)
 		throws ModelListenerException {
 
 		if (_isSkipEvent(ddlRecord)) {

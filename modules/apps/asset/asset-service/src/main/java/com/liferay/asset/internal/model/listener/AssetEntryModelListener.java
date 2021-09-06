@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 public class AssetEntryModelListener extends BaseModelListener<AssetEntry> {
 
 	@Override
-	public void onAfterCreate(AssetEntry assetEntry) {
+	public void onAfterCreate(AssetEntry originalAssetEntry,AssetEntry assetEntry) {
 		assetEntry.setListable(true);
 	}
 

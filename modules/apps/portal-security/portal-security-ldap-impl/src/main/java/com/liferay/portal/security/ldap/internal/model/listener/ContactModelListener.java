@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 public class ContactModelListener extends BaseLDAPExportModelListener<Contact> {
 
 	@Override
-	public void onAfterCreate(Contact contact) throws ModelListenerException {
+	public void onAfterCreate(Contact originalContact,Contact contact) throws ModelListenerException {
 		try {
 			exportToLDAP(contact);
 		}
@@ -55,7 +55,7 @@ public class ContactModelListener extends BaseLDAPExportModelListener<Contact> {
 	}
 
 	@Override
-	public void onAfterUpdate(Contact contact) throws ModelListenerException {
+	public void onAfterUpdate(Contact originalContact,Contact contact) throws ModelListenerException {
 		try {
 			exportToLDAP(contact);
 		}

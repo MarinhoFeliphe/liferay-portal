@@ -223,7 +223,7 @@ public class LockLocalServiceTest {
 				new BaseModelListener<Lock>() {
 
 					@Override
-					public void onAfterCreate(Lock model) {
+					public void onAfterCreate(Lock originalModel,Lock model) {
 						if (Thread.currentThread() != testThread) {
 							createdCountDownLatch.countDown();
 

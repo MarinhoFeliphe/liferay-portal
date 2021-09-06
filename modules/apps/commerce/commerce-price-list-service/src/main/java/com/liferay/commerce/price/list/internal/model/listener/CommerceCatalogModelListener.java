@@ -33,7 +33,7 @@ public class CommerceCatalogModelListener
 	extends BaseModelListener<CommerceCatalog> {
 
 	@Override
-	public void onAfterCreate(CommerceCatalog commerceCatalog) {
+	public void onAfterCreate(CommerceCatalog originalCommerceCatalog,CommerceCatalog commerceCatalog) {
 		try {
 			_commerceBasePriceListHelper.addCatalogBaseCommercePriceList(
 				commerceCatalog);
@@ -46,7 +46,7 @@ public class CommerceCatalogModelListener
 	}
 
 	@Override
-	public void onBeforeRemove(CommerceCatalog commerceCatalog) {
+	public void onBeforeRemove(CommerceCatalog originalCommerceCatalog,CommerceCatalog commerceCatalog) {
 		try {
 			_commerceBasePriceListHelper.deleteCatalogBaseCommercePriceList(
 				commerceCatalog);

@@ -47,7 +47,7 @@ public class AccountEntryUserRelModelListener
 	extends BaseModelListener<AccountEntryUserRel> {
 
 	@Override
-	public void onAfterCreate(AccountEntryUserRel accountEntryUserRel)
+	public void onAfterCreate(AccountEntryUserRel originalAccountEntryUserRel,AccountEntryUserRel accountEntryUserRel)
 		throws ModelListenerException {
 
 		_updateDefaultAccountEntry(accountEntryUserRel.getAccountUserId());

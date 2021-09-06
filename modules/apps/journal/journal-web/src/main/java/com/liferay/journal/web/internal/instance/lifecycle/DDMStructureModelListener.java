@@ -53,7 +53,7 @@ public class DDMStructureModelListener
 	implements PortalInstanceLifecycleListener {
 
 	@Override
-	public void onAfterCreate(DDMStructure ddmStructure)
+	public void onAfterCreate(DDMStructure originalDdmStructure,DDMStructure ddmStructure)
 		throws ModelListenerException {
 
 		if (ddmStructure.getClassNameId() != _portal.getClassNameId(
@@ -76,7 +76,7 @@ public class DDMStructureModelListener
 	}
 
 	@Override
-	public void onBeforeRemove(DDMStructure ddmStructure)
+	public void onBeforeRemove(DDMStructure originalDdmStructure,DDMStructure ddmStructure)
 		throws ModelListenerException {
 
 		if (ddmStructure.getClassNameId() != _portal.getClassNameId(

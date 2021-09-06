@@ -39,7 +39,7 @@ public class DDMFormInstanceRecordStagingModelListener
 	extends BaseModelListener<DDMFormInstanceRecord> {
 
 	@Override
-	public void onAfterCreate(DDMFormInstanceRecord ddmFormInstanceRecord)
+	public void onAfterCreate(DDMFormInstanceRecord originalDdmFormInstanceRecord,DDMFormInstanceRecord ddmFormInstanceRecord)
 		throws ModelListenerException {
 
 		if (_isSkipEvent(ddmFormInstanceRecord)) {
@@ -50,14 +50,14 @@ public class DDMFormInstanceRecordStagingModelListener
 	}
 
 	@Override
-	public void onAfterRemove(DDMFormInstanceRecord ddmFormInstanceRecord)
+	public void onAfterRemove(DDMFormInstanceRecord originalDdmFormInstanceRecord,DDMFormInstanceRecord ddmFormInstanceRecord)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(ddmFormInstanceRecord);
 	}
 
 	@Override
-	public void onAfterUpdate(DDMFormInstanceRecord ddmFormInstanceRecord)
+	public void onAfterUpdate(DDMFormInstanceRecord originalDdmFormInstanceRecord,DDMFormInstanceRecord ddmFormInstanceRecord)
 		throws ModelListenerException {
 
 		if (_isSkipEvent(ddmFormInstanceRecord)) {

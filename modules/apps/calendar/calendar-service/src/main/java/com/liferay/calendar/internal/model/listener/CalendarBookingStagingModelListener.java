@@ -31,21 +31,21 @@ public class CalendarBookingStagingModelListener
 	extends BaseModelListener<CalendarBooking> {
 
 	@Override
-	public void onAfterCreate(CalendarBooking calendarBooking)
+	public void onAfterCreate(CalendarBooking originalCalendarBooking,CalendarBooking calendarBooking)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(calendarBooking);
 	}
 
 	@Override
-	public void onAfterRemove(CalendarBooking calendarBooking)
+	public void onAfterRemove(CalendarBooking originalCalendarBooking,CalendarBooking calendarBooking)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(calendarBooking);
 	}
 
 	@Override
-	public void onAfterUpdate(CalendarBooking calendarBooking)
+	public void onAfterUpdate(CalendarBooking originalCalendarBooking,CalendarBooking calendarBooking)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterUpdate(calendarBooking);

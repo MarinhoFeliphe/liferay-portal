@@ -31,7 +31,7 @@ public class AssetListEntryStagingModelListener
 	extends BaseModelListener<AssetListEntry> {
 
 	@Override
-	public void onAfterCreate(AssetListEntry assetListEntry)
+	public void onAfterCreate(AssetListEntry originalAssetListEntry,AssetListEntry assetListEntry)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(assetListEntry);

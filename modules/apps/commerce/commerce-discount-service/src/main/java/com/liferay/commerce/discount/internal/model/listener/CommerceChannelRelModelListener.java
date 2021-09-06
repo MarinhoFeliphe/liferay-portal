@@ -35,14 +35,14 @@ public class CommerceChannelRelModelListener
 	extends BaseModelListener<CommerceChannelRel> {
 
 	@Override
-	public void onAfterCreate(CommerceChannelRel commerceChannelRel)
+	public void onAfterCreate(CommerceChannelRel originalCommerceChannelRel,CommerceChannelRel commerceChannelRel)
 		throws ModelListenerException {
 
 		_reindexCommerceDiscount(commerceChannelRel);
 	}
 
 	@Override
-	public void onAfterRemove(CommerceChannelRel commerceChannelRel) {
+	public void onAfterRemove(CommerceChannelRel originalCommerceChannelRel,CommerceChannelRel commerceChannelRel) {
 		_reindexCommerceDiscount(commerceChannelRel);
 	}
 

@@ -31,21 +31,21 @@ public class DDMFormInstanceStagingModelListener
 	extends BaseModelListener<DDMFormInstance> {
 
 	@Override
-	public void onAfterCreate(DDMFormInstance ddmFormInstance)
+	public void onAfterCreate(DDMFormInstance originalDdmFormInstance,DDMFormInstance ddmFormInstance)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(ddmFormInstance);
 	}
 
 	@Override
-	public void onAfterRemove(DDMFormInstance ddmFormInstance)
+	public void onAfterRemove(DDMFormInstance originalDdmFormInstance,DDMFormInstance ddmFormInstance)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(ddmFormInstance);
 	}
 
 	@Override
-	public void onAfterUpdate(DDMFormInstance ddmFormInstance)
+	public void onAfterUpdate(DDMFormInstance originalDdmFormInstance,DDMFormInstance ddmFormInstance)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterUpdate(ddmFormInstance);

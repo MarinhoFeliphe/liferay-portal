@@ -31,21 +31,21 @@ public class DDMDataProviderInstanceStagingModelListener
 	extends BaseModelListener<DDMDataProviderInstance> {
 
 	@Override
-	public void onAfterCreate(DDMDataProviderInstance ddmDataProviderInstance)
+	public void onAfterCreate(DDMDataProviderInstance originalDdmDataProviderInstance,DDMDataProviderInstance ddmDataProviderInstance)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(ddmDataProviderInstance);
 	}
 
 	@Override
-	public void onAfterRemove(DDMDataProviderInstance ddmDataProviderInstance)
+	public void onAfterRemove(DDMDataProviderInstance originalDdmDataProviderInstance,DDMDataProviderInstance ddmDataProviderInstance)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(ddmDataProviderInstance);
 	}
 
 	@Override
-	public void onAfterUpdate(DDMDataProviderInstance ddmDataProviderInstance)
+	public void onAfterUpdate(DDMDataProviderInstance originalDdmDataProviderInstance,DDMDataProviderInstance ddmDataProviderInstance)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterUpdate(ddmDataProviderInstance);

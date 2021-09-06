@@ -31,7 +31,7 @@ public class AssetVocabularyStagingModelListener
 	extends BaseModelListener<AssetVocabulary> {
 
 	@Override
-	public void onAfterCreate(AssetVocabulary assetVocabulary)
+	public void onAfterCreate(AssetVocabulary originalAssetVocabulary,AssetVocabulary assetVocabulary)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(assetVocabulary);

@@ -31,7 +31,7 @@ public class AssetCategoryStagingModelListener
 	extends BaseModelListener<AssetCategory> {
 
 	@Override
-	public void onAfterCreate(AssetCategory assetCategory)
+	public void onAfterCreate(AssetCategory originalAssetCategory,AssetCategory assetCategory)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(assetCategory);

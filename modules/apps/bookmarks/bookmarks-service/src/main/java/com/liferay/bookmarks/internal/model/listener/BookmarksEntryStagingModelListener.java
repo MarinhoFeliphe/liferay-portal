@@ -31,7 +31,7 @@ public class BookmarksEntryStagingModelListener
 	extends BaseModelListener<BookmarksEntry> {
 
 	@Override
-	public void onAfterCreate(BookmarksEntry bookmarksEntry)
+	public void onAfterCreate(BookmarksEntry originalBookmarksEntry,BookmarksEntry bookmarksEntry)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(bookmarksEntry);

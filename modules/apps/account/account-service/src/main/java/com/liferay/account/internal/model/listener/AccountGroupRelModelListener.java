@@ -35,7 +35,7 @@ public class AccountGroupRelModelListener
 	extends BaseModelListener<AccountGroupRel> {
 
 	@Override
-	public void onAfterCreate(AccountGroupRel accountGroupRel)
+	public void onAfterCreate(AccountGroupRel originalAccountGroupRel,AccountGroupRel accountGroupRel)
 		throws ModelListenerException {
 
 		if (accountGroupRel.getClassNameId() ==

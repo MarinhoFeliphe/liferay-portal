@@ -45,7 +45,7 @@ public class AssetCategoryModelListener
 	extends BaseModelListener<AssetCategory> {
 
 	@Override
-	public void onAfterCreate(AssetCategory assetCategory)
+	public void onAfterCreate(AssetCategory originalAssetCategory,AssetCategory assetCategory)
 		throws ModelListenerException {
 
 		try {

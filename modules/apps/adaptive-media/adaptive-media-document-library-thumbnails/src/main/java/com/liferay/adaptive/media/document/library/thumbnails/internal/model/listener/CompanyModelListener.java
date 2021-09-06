@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 public class CompanyModelListener extends BaseModelListener<Company> {
 
 	@Override
-	public void onAfterCreate(Company company) throws ModelListenerException {
+	public void onAfterCreate(Company originalCompany,Company company) throws ModelListenerException {
 		try {
 			_amCompanyThumbnailConfigurationInitializer.initializeCompany(
 				company);

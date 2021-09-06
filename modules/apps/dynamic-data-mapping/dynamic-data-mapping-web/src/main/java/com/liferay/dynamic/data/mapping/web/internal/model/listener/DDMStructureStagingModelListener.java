@@ -31,21 +31,21 @@ public class DDMStructureStagingModelListener
 	extends BaseModelListener<DDMStructure> {
 
 	@Override
-	public void onAfterCreate(DDMStructure ddmStructure)
+	public void onAfterCreate(DDMStructure originalDdmStructure,DDMStructure ddmStructure)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(ddmStructure);
 	}
 
 	@Override
-	public void onAfterRemove(DDMStructure ddmStructure)
+	public void onAfterRemove(DDMStructure originalDdmStructure,DDMStructure ddmStructure)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(ddmStructure);
 	}
 
 	@Override
-	public void onAfterUpdate(DDMStructure ddmStructure)
+	public void onAfterUpdate(DDMStructure originalDdmStructure,DDMStructure ddmStructure)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterUpdate(ddmStructure);

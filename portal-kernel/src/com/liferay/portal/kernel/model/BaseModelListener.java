@@ -29,12 +29,33 @@ public class BaseModelListener<T extends BaseModel<T>>
 		throws ModelListenerException {
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #onAfterUpdate(T,
+	 *             T)}
+	 */
+	@Deprecated
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
 	}
 
 	@Override
+	public void onAfterCreate(T originalModel, T model)
+		throws ModelListenerException {
+
+	}
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #onAfterUpdate(T,
+	 *             T)}
+	 */
+	@Deprecated
+	@Override
 	public void onAfterRemove(T model) throws ModelListenerException {
+	}
+
+	@Override
+	public void onAfterRemove(T originalModel, T model)
+		throws ModelListenerException {
+
 	}
 
 	@Override
@@ -66,11 +87,19 @@ public class BaseModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 	}
-
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #onAfterUpdate(T,
+	 *             T)}
+	 */
+	@Deprecated
 	@Override
 	public void onBeforeCreate(T model) throws ModelListenerException {
 	}
-
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #onAfterUpdate(T,
+	 *             T)}
+	 */
+	@Deprecated
 	@Override
 	public void onBeforeRemove(T model) throws ModelListenerException {
 	}
@@ -81,16 +110,15 @@ public class BaseModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 	}
-
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #onAfterUpdate(T,
+	 *             T)}
+	 */
+	@Deprecated
 	@Override
 	public void onBeforeUpdate(T model) throws ModelListenerException {
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 *             #onBeforeUpdate(T, T)}
-	 */
-	@Deprecated
 	@Override
 	public void onBeforeUpdate(T originalModel, T model)
 		throws ModelListenerException {

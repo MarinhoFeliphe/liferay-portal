@@ -32,6 +32,7 @@ public class CalendarNotificationTemplateStagingModelListener
 
 	@Override
 	public void onAfterCreate(
+			CalendarNotificationTemplate originalCalendarNotificationTemplate,
 			CalendarNotificationTemplate calendarNotificationTemplate)
 		throws ModelListenerException {
 
@@ -40,6 +41,7 @@ public class CalendarNotificationTemplateStagingModelListener
 
 	@Override
 	public void onAfterRemove(
+			CalendarNotificationTemplate originalCalendarNotificationTemplate,
 			CalendarNotificationTemplate calendarNotificationTemplate)
 		throws ModelListenerException {
 
@@ -48,6 +50,7 @@ public class CalendarNotificationTemplateStagingModelListener
 
 	@Override
 	public void onAfterUpdate(
+			CalendarNotificationTemplate originalCalendarNotificationTemplate,
 			CalendarNotificationTemplate calendarNotificationTemplate)
 		throws ModelListenerException {
 

@@ -28,8 +28,10 @@ public interface ModelListener<T> {
 		throws ModelListenerException;
 
 	public void onAfterCreate(T model) throws ModelListenerException;
+	public void onAfterCreate(T originalModel, T model) throws ModelListenerException;
 
 	public void onAfterRemove(T model) throws ModelListenerException;
+	public void onAfterRemove(T originalModel, T model) throws ModelListenerException;
 
 	public void onAfterRemoveAssociation(
 			Object classPK, String associationClassName,
@@ -52,8 +54,10 @@ public interface ModelListener<T> {
 		throws ModelListenerException;
 
 	public void onBeforeCreate(T model) throws ModelListenerException;
+	public void onBeforeCreate(T originalModel, T model) throws ModelListenerException;
 
 	public void onBeforeRemove(T model) throws ModelListenerException;
+	public void onBeforeRemove(T originalModel, T model) throws ModelListenerException;
 
 	public void onBeforeRemoveAssociation(
 			Object classPK, String associationClassName,

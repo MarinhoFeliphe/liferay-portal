@@ -35,14 +35,14 @@ public class CalendarResourceStagingModelListener
 	extends BaseModelListener<CalendarResource> {
 
 	@Override
-	public void onAfterCreate(CalendarResource calendarResource)
+	public void onAfterCreate(CalendarResource originalCalendarResource,CalendarResource calendarResource)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(calendarResource);
 	}
 
 	@Override
-	public void onAfterRemove(CalendarResource calendarResource)
+	public void onAfterRemove(CalendarResource originalCalendarResource,CalendarResource calendarResource)
 		throws ModelListenerException {
 
 		if (_isSkipEvent(calendarResource)) {
@@ -53,7 +53,7 @@ public class CalendarResourceStagingModelListener
 	}
 
 	@Override
-	public void onAfterUpdate(CalendarResource calendarResource)
+	public void onAfterUpdate(CalendarResource originalCalendarResource,CalendarResource calendarResource)
 		throws ModelListenerException {
 
 		if (_isSkipEvent(calendarResource)) {

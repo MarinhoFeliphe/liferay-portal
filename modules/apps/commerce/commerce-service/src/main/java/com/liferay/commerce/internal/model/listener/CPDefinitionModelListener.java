@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 public class CPDefinitionModelListener extends BaseModelListener<CPDefinition> {
 
 	@Override
-	public void onAfterCreate(CPDefinition cpDefinition) {
+	public void onAfterCreate(CPDefinition originalCpDefinition,CPDefinition cpDefinition) {
 		try {
 			_cpDefinitionInventoryLocalService.addCPDefinitionInventory(
 				cpDefinition.getUserId(), cpDefinition.getCPDefinitionId(),

@@ -173,7 +173,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	@Override
-	public void onAfterCreate(T model) throws ModelListenerException {
+	public void onAfterCreate(T originalModel,T model) throws ModelListenerException {
 		if (!analyticsConfigurationTracker.isActive()) {
 			return;
 		}

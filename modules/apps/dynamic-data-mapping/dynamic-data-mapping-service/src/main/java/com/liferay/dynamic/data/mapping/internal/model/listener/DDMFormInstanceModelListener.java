@@ -37,7 +37,7 @@ public class DDMFormInstanceModelListener
 	extends BaseModelListener<DDMFormInstance> {
 
 	@Override
-	public void onAfterCreate(DDMFormInstance ddmFormInstance)
+	public void onAfterCreate(DDMFormInstance originalDdmFormInstance,DDMFormInstance ddmFormInstance)
 		throws ModelListenerException {
 
 		try {
@@ -57,7 +57,7 @@ public class DDMFormInstanceModelListener
 	}
 
 	@Override
-	public void onBeforeRemove(DDMFormInstance ddmFormInstance)
+	public void onBeforeRemove(DDMFormInstance originalDdmFormInstance,DDMFormInstance ddmFormInstance)
 		throws ModelListenerException {
 
 		try {

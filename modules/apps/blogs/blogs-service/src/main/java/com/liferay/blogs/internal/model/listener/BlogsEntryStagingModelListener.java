@@ -31,21 +31,21 @@ public class BlogsEntryStagingModelListener
 	extends BaseModelListener<BlogsEntry> {
 
 	@Override
-	public void onAfterCreate(BlogsEntry blogsEntry)
+	public void onAfterCreate(BlogsEntry originalBlogsEntry,BlogsEntry blogsEntry)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterCreate(blogsEntry);
 	}
 
 	@Override
-	public void onAfterRemove(BlogsEntry blogsEntry)
+	public void onAfterRemove(BlogsEntry originalBlogsEntry,BlogsEntry blogsEntry)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterRemove(blogsEntry);
 	}
 
 	@Override
-	public void onAfterUpdate(BlogsEntry blogsEntry)
+	public void onAfterUpdate(BlogsEntry originalBlogsEntry,BlogsEntry blogsEntry)
 		throws ModelListenerException {
 
 		_stagingModelListener.onAfterUpdate(blogsEntry);
