@@ -1,7 +1,9 @@
 Bundle-Name: Liferay Portal Workflow Kaleo Designer Web
 Bundle-SymbolicName: com.liferay.portal.workflow.kaleo.designer.web
-Bundle-Version: 5.0.13
-Export-Package: com.liferay.portal.workflow.kaleo.designer.web.constants
+Bundle-Version: 5.1.0
+Export-Package:\
+	com.liferay.portal.workflow.kaleo.designer.web.constants,\
+	com.liferay.portal.workflow.kaleo.designer.web.internal.util
 Liferay-JS-Config: /META-INF/resources/designer/js/config.js
 Provide-Capability:\
 	liferay.resource.bundle;\
