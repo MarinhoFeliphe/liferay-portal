@@ -323,8 +323,23 @@ public interface KaleoInstanceTokenLocalService
 	public Hits search(
 		Long userId, String assetClassName, String assetTitle,
 		String assetDescription, String currentKaleoNodeName,
+		String kaleoDefinitionName, Boolean completed,
+		boolean searchByActiveWorkflowHandlers, int start, int end,
+		Sort[] sorts, ServiceContext serviceContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Hits search(
+		Long userId, String assetClassName, String assetTitle,
+		String assetDescription, String currentKaleoNodeName,
 		String kaleoDefinitionName, Boolean completed, int start, int end,
 		Sort[] sorts, ServiceContext serviceContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(
+		Long userId, String assetClassName, String assetTitle,
+		String assetDescription, String currentKaleoNodeName,
+		String kaleoDefinitionName, Boolean completed,
+		boolean searchByActiveWorkflowHandlers, ServiceContext serviceContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int searchCount(
