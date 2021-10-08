@@ -64,7 +64,7 @@ public class KaleoInstanceTokenModelPreFilterContributor
 			return;
 		}
 
-		appendClassNameIdsTerm(booleanFilter);
+		appendClassNameIdsTerm(booleanFilter, kaleoInstanceTokenQuery);
 		appendCompletedTerm(booleanFilter, kaleoInstanceTokenQuery);
 		appendCompletionDateRangeTerm(booleanFilter, kaleoInstanceTokenQuery);
 		appendKaleoInstanceIdTerm(booleanFilter, kaleoInstanceTokenQuery);
@@ -74,7 +74,14 @@ public class KaleoInstanceTokenModelPreFilterContributor
 		appendUserIdTerm(booleanFilter, kaleoInstanceTokenQuery);
 	}
 
-	protected void appendClassNameIdsTerm(BooleanFilter booleanFilter) {
+	protected void appendClassNameIdsTerm(
+		BooleanFilter booleanFilter,
+		KaleoInstanceTokenQuery kaleoInstanceTokenQuery) {
+
+		if (!kaleoInstanceTokenQuery.isSearchByActiveWorkflowHandlers()) {
+			return;
+		}
+
 		TermsFilter classNameIdsTermsFilter = new TermsFilter(
 			Field.CLASS_NAME_ID);
 
