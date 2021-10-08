@@ -111,7 +111,7 @@ public class KaleoTaskInstanceTokenModelPreFilterContributor
 			booleanFilter.add(innerBooleanFilter, BooleanClauseOccur.MUST);
 		}
 
-		appendClassNameIdsTerm(booleanFilter);
+		appendClassNameIdsTerm(booleanFilter, kaleoTaskInstanceTokenQuery);
 		appendCompletedTerm(booleanFilter, kaleoTaskInstanceTokenQuery);
 		appendKaleoDefinitionIdTerm(booleanFilter, kaleoTaskInstanceTokenQuery);
 		appendKaleoInstanceIdsTerm(booleanFilter, kaleoTaskInstanceTokenQuery);
@@ -247,7 +247,14 @@ public class KaleoTaskInstanceTokenModelPreFilterContributor
 		booleanFilter.add(assigneeClassPKsTermsFilter);
 	}
 
-	protected void appendClassNameIdsTerm(BooleanFilter booleanFilter) {
+	protected void appendClassNameIdsTerm(
+		BooleanFilter booleanFilter,
+		KaleoTaskInstanceTokenQuery kaleoTaskInstanceTokenQuery) {
+
+		if (!kaleoTaskInstanceTokenQuery.isSearchByActiveWorkflowHandlers()) {
+			return;
+		}
+
 		TermsFilter classNameIdsTermsFilter = new TermsFilter(
 			Field.CLASS_NAME_ID);
 
