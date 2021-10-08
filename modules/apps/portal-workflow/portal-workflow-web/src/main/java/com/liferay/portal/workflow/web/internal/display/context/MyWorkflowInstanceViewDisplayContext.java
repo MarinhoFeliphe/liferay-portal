@@ -62,7 +62,7 @@ public class MyWorkflowInstanceViewDisplayContext
 				workflowInstanceRequestHelper.getCompanyId(),
 				workflowInstanceRequestHelper.getUserId(),
 				getAssetType(getKeywords()), getKeywords(), getKeywords(),
-				getKeywords(), getKeywords(), getCompleted(), start, end,
+				getKeywords(), getKeywords(), getCompleted(), true, start, end,
 				orderByComparator);
 
 		return workflowModelSearchResult;
