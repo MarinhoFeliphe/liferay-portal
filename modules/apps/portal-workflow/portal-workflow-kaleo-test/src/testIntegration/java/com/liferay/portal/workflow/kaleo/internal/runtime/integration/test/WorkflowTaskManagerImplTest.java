@@ -85,6 +85,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
@@ -95,6 +96,7 @@ import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -104,12 +106,15 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 import com.liferay.portal.kernel.workflow.WorkflowException;
+import com.liferay.portal.kernel.workflow.WorkflowHandler;
+import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
@@ -127,6 +132,7 @@ import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portal.util.PortalInstances;
 
 import java.io.File;
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -147,6 +153,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -1193,6 +1203,95 @@ public class WorkflowTaskManagerImplTest {
 			workflowTasks, workflowModelSearchResult.getWorkflowModels());
 
 		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testSearchWorkflowTasksWhenThereIsAUnregisteredHandler()
+		throws Exception {
+
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		ServiceRegistration<WorkflowHandler<?>>
+			workflowHandlerServiceRegistration = bundleContext.registerService(
+				(Class<WorkflowHandler<?>>)(Class<?>)WorkflowHandler.class,
+				(WorkflowHandler)ProxyUtil.newProxyInstance(
+					WorkflowHandler.class.getClassLoader(),
+					new Class<?>[] {WorkflowHandler.class},
+					(proxy, method, args) -> {
+						if (Objects.equals(method.getName(), "getClassName")) {
+							return WorkflowTaskManagerImplTest.class.getName();
+						}
+
+						if (Objects.equals(method.getName(), "getType")) {
+							return StringPool.BLANK;
+						}
+
+						if (Objects.equals(method.getName(), "isScopeable")) {
+							return false;
+						}
+
+						if (Objects.equals(
+								method.getName(),
+								"getWorkflowDefinitionLink")) {
+
+							return _workflowDefinitionLinkLocalService.
+								updateWorkflowDefinitionLink(
+									TestPropsValues.getUserId(),
+									TestPropsValues.getCompanyId(), 0,
+									WorkflowTaskManagerImplTest.class.getName(),
+									0, 0, "Single Approver", 1);
+						}
+
+						if (Objects.equals(
+								method.getName(), "startWorkflowInstance")) {
+
+							WorkflowInstanceLinkLocalServiceUtil.
+								startWorkflowInstance(
+									TestPropsValues.getCompanyId(), 0,
+									TestPropsValues.getUserId(),
+									WorkflowTaskManagerImplTest.class.getName(),
+									1, (Map<String, Serializable>)args[5]);
+						}
+
+						return null;
+					}),
+				HashMapDictionaryBuilder.put(
+					"model.class.name=",
+					WorkflowTaskManagerImplTest.class.getName()
+				).build());
+
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			TestPropsValues.getCompanyId(), 0, TestPropsValues.getUserId(),
+			WorkflowTaskManagerImplTest.class.getName(), 1, null,
+			new ServiceContext());
+
+		WorkflowModelSearchResult<WorkflowTask> workflowModelSearchResult =
+			_workflowTaskManager.searchWorkflowTasks(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				StringPool.BLANK, new String[] {StringPool.BLANK}, null, null,
+				null, null, null, null, null, true, true, null, null, false, 0,
+				1,
+				WorkflowComparatorFactoryUtil.getTaskModifiedDateComparator(
+					false));
+
+		List<WorkflowTask> workflowTasks =
+			workflowModelSearchResult.getWorkflowModels();
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		workflowHandlerServiceRegistration.unregister();
+
+		workflowModelSearchResult = _workflowTaskManager.searchWorkflowTasks(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			StringPool.BLANK, new String[] {StringPool.BLANK}, null, null, null,
+			null, null, null, null, true, true, null, null, false, 0, 1,
+			WorkflowComparatorFactoryUtil.getTaskModifiedDateComparator(false));
+
+		workflowTasks = workflowModelSearchResult.getWorkflowModels();
+
+		Assert.assertEquals(workflowTasks.toString(), 0, workflowTasks.size());
 	}
 
 	@Test
