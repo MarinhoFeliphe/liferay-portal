@@ -1002,6 +1002,48 @@ public class WorkflowTaskManagerImplTest {
 	}
 
 	@Test
+	public void testSearchWorkflowInstancesWhenThereIsAUnregisteredHandler()
+		throws Exception {
+
+		ServiceRegistration<WorkflowHandler<?>>
+			workflowHandlerServiceRegistration = _registryWorkflowHandler();
+
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			TestPropsValues.getCompanyId(), 0, TestPropsValues.getUserId(),
+			WorkflowTaskManagerImplTest.class.getName(), 1, null,
+			new ServiceContext());
+
+		WorkflowModelSearchResult<WorkflowInstance> workflowModelSearchResult =
+			_workflowInstanceManager.searchWorkflowInstances(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK, null, true, 0, 20,
+				WorkflowComparatorFactoryUtil.getInstanceCompletedComparator(
+					false));
+
+		List<WorkflowInstance> workflowInstances =
+			workflowModelSearchResult.getWorkflowModels();
+
+		Assert.assertEquals(
+			workflowInstances.toString(), 1, workflowInstances.size());
+
+		workflowHandlerServiceRegistration.unregister();
+
+		workflowModelSearchResult =
+			_workflowInstanceManager.searchWorkflowInstances(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK, null, true, 0, 20,
+				WorkflowComparatorFactoryUtil.getInstanceCompletedComparator(
+					false));
+
+		workflowInstances = workflowModelSearchResult.getWorkflowModels();
+
+		Assert.assertEquals(
+			workflowInstances.toString(), 0, workflowInstances.size());
+	}
+
+	@Test
 	public void testSearchWorkflowTaskByAssetTitle1() throws Exception {
 		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
 
@@ -1209,58 +1251,8 @@ public class WorkflowTaskManagerImplTest {
 	public void testSearchWorkflowTasksWhenThereIsAUnregisteredHandler()
 		throws Exception {
 
-		Bundle bundle = FrameworkUtil.getBundle(getClass());
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
 		ServiceRegistration<WorkflowHandler<?>>
-			workflowHandlerServiceRegistration = bundleContext.registerService(
-				(Class<WorkflowHandler<?>>)(Class<?>)WorkflowHandler.class,
-				(WorkflowHandler)ProxyUtil.newProxyInstance(
-					WorkflowHandler.class.getClassLoader(),
-					new Class<?>[] {WorkflowHandler.class},
-					(proxy, method, args) -> {
-						if (Objects.equals(method.getName(), "getClassName")) {
-							return WorkflowTaskManagerImplTest.class.getName();
-						}
-
-						if (Objects.equals(method.getName(), "getType")) {
-							return StringPool.BLANK;
-						}
-
-						if (Objects.equals(method.getName(), "isScopeable")) {
-							return false;
-						}
-
-						if (Objects.equals(
-								method.getName(),
-								"getWorkflowDefinitionLink")) {
-
-							return _workflowDefinitionLinkLocalService.
-								updateWorkflowDefinitionLink(
-									TestPropsValues.getUserId(),
-									TestPropsValues.getCompanyId(), 0,
-									WorkflowTaskManagerImplTest.class.getName(),
-									0, 0, "Single Approver", 1);
-						}
-
-						if (Objects.equals(
-								method.getName(), "startWorkflowInstance")) {
-
-							WorkflowInstanceLinkLocalServiceUtil.
-								startWorkflowInstance(
-									TestPropsValues.getCompanyId(), 0,
-									TestPropsValues.getUserId(),
-									WorkflowTaskManagerImplTest.class.getName(),
-									1, (Map<String, Serializable>)args[5]);
-						}
-
-						return null;
-					}),
-				HashMapDictionaryBuilder.put(
-					"model.class.name=",
-					WorkflowTaskManagerImplTest.class.getName()
-				).build());
+			workflowHandlerServiceRegistration = _registryWorkflowHandler();
 
 		WorkflowHandlerRegistryUtil.startWorkflowInstance(
 			TestPropsValues.getCompanyId(), 0, TestPropsValues.getUserId(),
@@ -1844,6 +1836,58 @@ public class WorkflowTaskManagerImplTest {
 
 		return StringUtil.read(
 			clazz.getClassLoader(), _getBasePath() + fileName);
+	}
+
+	private ServiceRegistration<WorkflowHandler<?>> _registryWorkflowHandler() {
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		return bundleContext.registerService(
+			(Class<WorkflowHandler<?>>)(Class<?>)WorkflowHandler.class,
+			(WorkflowHandler)ProxyUtil.newProxyInstance(
+				WorkflowHandler.class.getClassLoader(),
+				new Class<?>[] {WorkflowHandler.class},
+				(proxy, method, args) -> {
+					if (Objects.equals(method.getName(), "getClassName")) {
+						return WorkflowTaskManagerImplTest.class.getName();
+					}
+
+					if (Objects.equals(method.getName(), "getType")) {
+						return StringPool.BLANK;
+					}
+
+					if (Objects.equals(method.getName(), "isScopeable")) {
+						return false;
+					}
+
+					if (Objects.equals(
+							method.getName(), "getWorkflowDefinitionLink")) {
+
+						return _workflowDefinitionLinkLocalService.
+							updateWorkflowDefinitionLink(
+								TestPropsValues.getUserId(),
+								TestPropsValues.getCompanyId(), 0,
+								WorkflowTaskManagerImplTest.class.getName(), 0,
+								0, "Single Approver", 1);
+					}
+
+					if (Objects.equals(
+							method.getName(), "startWorkflowInstance")) {
+
+						WorkflowInstanceLinkLocalServiceUtil.
+							startWorkflowInstance(
+								TestPropsValues.getCompanyId(), 0,
+								TestPropsValues.getUserId(),
+								WorkflowTaskManagerImplTest.class.getName(), 1,
+								(Map<String, Serializable>)args[5]);
+					}
+
+					return null;
+				}),
+			HashMapDictionaryBuilder.put(
+				"model.class.name=", WorkflowTaskManagerImplTest.class.getName()
+			).build());
 	}
 
 	private List<WorkflowTask> _searchByAssetTypesAndAssetPrimaryKeys(
