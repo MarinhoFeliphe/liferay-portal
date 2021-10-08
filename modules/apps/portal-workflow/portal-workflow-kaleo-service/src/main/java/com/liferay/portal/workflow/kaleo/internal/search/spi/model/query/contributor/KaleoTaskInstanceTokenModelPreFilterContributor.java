@@ -14,6 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.internal.search.spi.model.query.contributor;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -42,12 +43,16 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowHandler;
+import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.search.filter.DateRangeFilterBuilder;
 import com.liferay.portal.search.filter.FilterBuilders;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
@@ -62,6 +67,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -105,6 +111,7 @@ public class KaleoTaskInstanceTokenModelPreFilterContributor
 		appendAssigneeClassPKsTerm(
 			innerBooleanFilter, kaleoTaskInstanceTokenQuery);
 		appendTaskNameTerm(innerBooleanFilter, kaleoTaskInstanceTokenQuery);
+		appendAssetTypesTerm(booleanFilter);
 
 		if (innerBooleanFilter.hasClauses()) {
 			booleanFilter.add(innerBooleanFilter, BooleanClauseOccur.MUST);
@@ -199,6 +206,26 @@ public class KaleoTaskInstanceTokenModelPreFilterContributor
 		}
 
 		booleanFilter.add(new QueryFilter(booleanQuery));
+	}
+
+	protected void appendAssetTypesTerm(BooleanFilter booleanFilter) {
+		BooleanQuery booleanQuery = new BooleanQueryImpl();
+
+		for (WorkflowHandler<?> workflowHandler :
+			WorkflowHandlerRegistryUtil.getWorkflowHandlers()) {
+			if (workflowHandler.isAssetTypeSearchable()) {
+				try {
+					booleanQuery.addTerm(
+						KaleoTaskInstanceTokenField.CLASS_NAME, workflowHandler.getClassName(),
+						false, BooleanClauseOccur.SHOULD);
+				}
+				catch (ParseException parseException) {
+					throw new RuntimeException(parseException);
+				}
+			}
+		}
+
+		booleanFilter.add(new QueryFilter(booleanQuery), BooleanClauseOccur.MUST);
 	}
 
 	protected void appendAssigneeClassIdsNameTerm(

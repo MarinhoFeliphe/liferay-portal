@@ -60,8 +60,8 @@ public class MyWorkflowInstanceViewDisplayContext
 		workflowModelSearchResult =
 			WorkflowInstanceManagerUtil.searchWorkflowInstances(
 				workflowInstanceRequestHelper.getCompanyId(),
-				workflowInstanceRequestHelper.getUserId(), getKeywords(),
-				getKeywords(), getAssetType(getKeywords()), getKeywords(),
+				workflowInstanceRequestHelper.getUserId(), getAssetType(getKeywords()),
+				getKeywords(), getKeywords(), getKeywords(),
 				getKeywords(), getCompleted(), start, end, orderByComparator);
 
 		return workflowModelSearchResult;

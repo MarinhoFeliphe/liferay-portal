@@ -170,12 +170,14 @@ public class KaleoTaskInstanceTokenModelDocumentContributor
 					LanguageUtil.getAvailableLocales(
 						kaleoTaskInstanceToken.getGroupId())) {
 
-				document.addText(
-					LocalizationUtil.getLocalizedName(
-						KaleoTaskInstanceTokenField.ASSET_TITLE,
-						availableLocale.getLanguage()),
-					workflowHandler.getTitle(
-						kaleoTaskInstanceToken.getClassPK(), availableLocale));
+				if (workflowHandler != null) {
+					document.addText(
+						LocalizationUtil.getLocalizedName(
+							KaleoTaskInstanceTokenField.ASSET_TITLE,
+							availableLocale.getLanguage()),
+						workflowHandler.getTitle(
+							kaleoTaskInstanceToken.getClassPK(), availableLocale));
+				}
 			}
 		}
 	}

@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -82,6 +83,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
@@ -723,6 +726,36 @@ public class WorkflowTaskDisplayContext {
 		return showEditURL;
 	}
 
+	protected String[] getAssetType(String keywords) {
+		for (WorkflowHandler<?> workflowHandler :
+				getSearchableAssetsWorkflowHandlers()) {
+
+			String assetType = workflowHandler.getType(getTaskContentLocale());
+
+			if (StringUtil.equalsIgnoreCase(keywords, assetType)) {
+				return new String[] {workflowHandler.getClassName()};
+			}
+		}
+
+		return null;
+	}
+
+	protected List<WorkflowHandler<?>> getSearchableAssetsWorkflowHandlers() {
+		List<WorkflowHandler<?>> searchableAssetsWorkflowHandlers =
+			new ArrayList<>();
+
+		List<WorkflowHandler<?>> workflowHandlers =
+			WorkflowHandlerRegistryUtil.getWorkflowHandlers();
+
+		for (WorkflowHandler<?> workflowHandler : workflowHandlers) {
+			if (workflowHandler.isAssetTypeSearchable()) {
+				searchableAssetsWorkflowHandlers.add(workflowHandler);
+			}
+		}
+
+		return searchableAssetsWorkflowHandlers;
+	}
+
 	private String _getActorName(WorkflowLog workflowLog) {
 		if (workflowLog.getRoleId() != 0) {
 			Role role = _getRole(workflowLog.getRoleId());
@@ -741,20 +774,6 @@ public class WorkflowTaskDisplayContext {
 		}
 
 		return StringPool.BLANK;
-	}
-
-	private String[] _getAssetType(String keywords) {
-		for (WorkflowHandler<?> workflowHandler :
-				_getSearchableAssetsWorkflowHandlers()) {
-
-			String assetType = workflowHandler.getType(getTaskContentLocale());
-
-			if (StringUtil.equalsIgnoreCase(keywords, assetType)) {
-				return new String[] {workflowHandler.getClassName()};
-			}
-		}
-
-		return null;
 	}
 
 	private Boolean _getCompleted() {
@@ -893,22 +912,6 @@ public class WorkflowTaskDisplayContext {
 		return role;
 	}
 
-	private List<WorkflowHandler<?>> _getSearchableAssetsWorkflowHandlers() {
-		List<WorkflowHandler<?>> searchableAssetsWorkflowHandlers =
-			new ArrayList<>();
-
-		List<WorkflowHandler<?>> workflowHandlers =
-			WorkflowHandlerRegistryUtil.getWorkflowHandlers();
-
-		for (WorkflowHandler<?> workflowHandler : workflowHandlers) {
-			if (workflowHandler.isAssetTypeSearchable()) {
-				searchableAssetsWorkflowHandlers.add(workflowHandler);
-			}
-		}
-
-		return searchableAssetsWorkflowHandlers;
-	}
-
 	private String _getTabs1() {
 		return ParamUtil.getString(
 			_liferayPortletRequest, "tabs1", "assigned-to-me");
@@ -999,7 +1002,7 @@ public class WorkflowTaskDisplayContext {
 				_workflowTaskRequestHelper.getUserId(),
 				displayTerms.getKeywords(),
 				new String[] {displayTerms.getKeywords()},
-				_getAssetType(displayTerms.getKeywords()), null, null, null,
+				getAssetType(displayTerms.getKeywords()), null, null, null,
 				null, null, _getCompleted(), searchByUserRoles, null, null,
 				false, _workflowTaskSearch.getStart(),
 				_workflowTaskSearch.getEnd(),
