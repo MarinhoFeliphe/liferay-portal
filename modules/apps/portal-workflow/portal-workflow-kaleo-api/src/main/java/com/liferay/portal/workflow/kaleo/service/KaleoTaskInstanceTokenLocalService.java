@@ -475,6 +475,20 @@ public interface KaleoTaskInstanceTokenLocalService
 				Long[] assetPrimaryKeys, String assigneeClassName,
 				Long[] assigneeClassPKs, Date dueDateGT, Date dueDateLT,
 				Boolean completed, Long kaleoDefinitionId,
+				Long[] kaleoInstanceIds, boolean searchByActiveWorkflowHandlers,
+				Boolean searchByUserRoles, boolean andOperator, int start,
+				int end,
+				OrderByComparator<KaleoTaskInstanceToken> orderByComparator,
+				ServiceContext serviceContext)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<KaleoTaskInstanceToken>
+			searchKaleoTaskInstanceTokens(
+				String assetTitle, String[] taskNames, String[] assetTypes,
+				Long[] assetPrimaryKeys, String assigneeClassName,
+				Long[] assigneeClassPKs, Date dueDateGT, Date dueDateLT,
+				Boolean completed, Long kaleoDefinitionId,
 				Long[] kaleoInstanceIds, Boolean searchByUserRoles,
 				boolean andOperator, int start, int end,
 				OrderByComparator<KaleoTaskInstanceToken> orderByComparator,

@@ -339,6 +339,16 @@ public interface KaleoInstanceLocalService
 	public BaseModelSearchResult<KaleoInstance> searchKaleoInstances(
 			Long userId, String assetClassName, String assetTitle,
 			String assetDescription, String nodeName,
+			String kaleoDefinitionName, Boolean completed,
+			boolean searchByActiveWorkflowHandlers, int start, int end,
+			OrderByComparator<KaleoInstance> orderByComparator,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<KaleoInstance> searchKaleoInstances(
+			Long userId, String assetClassName, String assetTitle,
+			String assetDescription, String nodeName,
 			String kaleoDefinitionName, Boolean completed, int start, int end,
 			OrderByComparator<KaleoInstance> orderByComparator,
 			ServiceContext serviceContext)

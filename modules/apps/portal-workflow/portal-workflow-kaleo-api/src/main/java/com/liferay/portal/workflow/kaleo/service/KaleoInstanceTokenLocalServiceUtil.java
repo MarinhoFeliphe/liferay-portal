@@ -388,6 +388,20 @@ public class KaleoInstanceTokenLocalServiceUtil {
 	public static com.liferay.portal.kernel.search.Hits search(
 		Long userId, String assetClassName, String assetTitle,
 		String assetDescription, String currentKaleoNodeName,
+		String kaleoDefinitionName, Boolean completed,
+		boolean searchByActiveWorkflowHandlers, int start, int end,
+		com.liferay.portal.kernel.search.Sort[] sorts,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext) {
+
+		return getService().search(
+			userId, assetClassName, assetTitle, assetDescription,
+			currentKaleoNodeName, kaleoDefinitionName, completed,
+			searchByActiveWorkflowHandlers, start, end, sorts, serviceContext);
+	}
+
+	public static com.liferay.portal.kernel.search.Hits search(
+		Long userId, String assetClassName, String assetTitle,
+		String assetDescription, String currentKaleoNodeName,
 		String kaleoDefinitionName, Boolean completed, int start, int end,
 		com.liferay.portal.kernel.search.Sort[] sorts,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext) {
@@ -396,6 +410,19 @@ public class KaleoInstanceTokenLocalServiceUtil {
 			userId, assetClassName, assetTitle, assetDescription,
 			currentKaleoNodeName, kaleoDefinitionName, completed, start, end,
 			sorts, serviceContext);
+	}
+
+	public static int searchCount(
+		Long userId, String assetClassName, String assetTitle,
+		String assetDescription, String currentKaleoNodeName,
+		String kaleoDefinitionName, Boolean completed,
+		boolean searchByActiveWorkflowHandlers,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext) {
+
+		return getService().searchCount(
+			userId, assetClassName, assetTitle, assetDescription,
+			currentKaleoNodeName, kaleoDefinitionName, completed,
+			searchByActiveWorkflowHandlers, serviceContext);
 	}
 
 	public static int searchCount(

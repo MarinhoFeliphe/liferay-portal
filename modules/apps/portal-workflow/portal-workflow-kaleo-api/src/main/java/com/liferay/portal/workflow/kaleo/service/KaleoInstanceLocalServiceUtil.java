@@ -417,6 +417,22 @@ public class KaleoInstanceLocalServiceUtil {
 		<KaleoInstance> searchKaleoInstances(
 				Long userId, String assetClassName, String assetTitle,
 				String assetDescription, String nodeName,
+				String kaleoDefinitionName, Boolean completed,
+				boolean searchByActiveWorkflowHandlers, int start, int end,
+				OrderByComparator<KaleoInstance> orderByComparator,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			throws PortalException {
+
+		return getService().searchKaleoInstances(
+			userId, assetClassName, assetTitle, assetDescription, nodeName,
+			kaleoDefinitionName, completed, searchByActiveWorkflowHandlers,
+			start, end, orderByComparator, serviceContext);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult
+		<KaleoInstance> searchKaleoInstances(
+				Long userId, String assetClassName, String assetTitle,
+				String assetDescription, String nodeName,
 				String kaleoDefinitionName, Boolean completed, int start,
 				int end, OrderByComparator<KaleoInstance> orderByComparator,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
