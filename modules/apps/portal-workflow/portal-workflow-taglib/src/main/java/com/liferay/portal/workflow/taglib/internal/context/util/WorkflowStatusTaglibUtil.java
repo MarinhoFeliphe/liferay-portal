@@ -133,6 +133,15 @@ public class WorkflowStatusTaglibUtil {
 			true);
 	}
 
+	public static boolean isShowInstanceTracker(
+		HttpServletRequest httpServletRequest) {
+
+		return GetterUtil.getBoolean(
+			String.valueOf(
+				httpServletRequest.getAttribute(
+					Attribute.SHOW_INSTANCE_TRACKER.getReference())));
+	}
+
 	public static boolean isShowLabel(HttpServletRequest httpServletRequest) {
 		return GetterUtil.getBoolean(
 			String.valueOf(
@@ -146,7 +155,8 @@ public class WorkflowStatusTaglibUtil {
 		BEAN("bean"), HELP_MESSAGE("helpMessage"), ID("id"),
 		MARKUP_VIEW("markupView"), MODEL("model"),
 		SHOW_HELP_MESSAGE("showHelpMessage"),
-		SHOW_INSTANCE_STATUS("showInstanceStatus"), SHOW_LABEL("showLabel"),
+		SHOW_INSTANCE_STATUS("showInstanceStatus"),
+		SHOW_INSTANCE_TRACKER("showInstanceTracker"), SHOW_LABEL("showLabel"),
 		STATUS("status"), STATUS_MESSAGE("statusMessage"), VERSION("version");
 
 		public String getReference() {

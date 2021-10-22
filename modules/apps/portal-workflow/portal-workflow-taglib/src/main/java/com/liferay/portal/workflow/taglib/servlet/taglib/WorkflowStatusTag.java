@@ -78,6 +78,10 @@ public class WorkflowStatusTag extends IncludeTag {
 		return _showInstanceStatus;
 	}
 
+	public boolean isShowInstanceTracker() {
+		return _showInstanceTracker;
+	}
+
 	public boolean isShowLabel() {
 		return _showLabel;
 	}
@@ -144,6 +148,7 @@ public class WorkflowStatusTag extends IncludeTag {
 		_model = null;
 		_showHelpMessage = true;
 		_showInstanceStatus = false;
+		_showInstanceTracker = false;
 		_showLabel = true;
 		_status = null;
 		_statusMessage = null;
@@ -186,6 +191,10 @@ public class WorkflowStatusTag extends IncludeTag {
 		setNamespacedAttribute(
 			httpServletRequest,
 			WorkflowStatusTaglibUtil.Attribute.SHOW_INSTANCE_STATUS.getValue(),
+			_showInstanceStatus);
+		setNamespacedAttribute(
+			httpServletRequest,
+			WorkflowStatusTaglibUtil.Attribute.SHOW_INSTANCE_TRACKER.getValue(),
 			_showInstanceStatus);
 		setNamespacedAttribute(
 			httpServletRequest,
@@ -237,6 +246,7 @@ public class WorkflowStatusTag extends IncludeTag {
 	private Class<?> _model;
 	private boolean _showHelpMessage = true;
 	private boolean _showInstanceStatus;
+	private boolean _showInstanceTracker;
 	private boolean _showLabel = true;
 	private Integer _status;
 	private String _statusMessage;
