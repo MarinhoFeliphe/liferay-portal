@@ -66,7 +66,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 
 /**
  * @author Alessio Antonio Rendina
@@ -706,42 +705,35 @@ public class CommerceShipmentLocalServiceImpl
 		CommerceShipment commerceShipment) {
 
 		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
+			() -> {
+				Message message = new Message();
 
-				@Override
-				public Void call() throws Exception {
-					Message message = new Message();
+				message.setPayload(
+					JSONUtil.put(
+						"commerceShipment",
+						() -> {
+							DTOConverter<?, ?> dtoConverter =
+								_dtoConverterRegistry.getDTOConverter(
+									CommerceShipment.class.getName());
 
-					message.setPayload(
-						JSONUtil.put(
-							"commerceShipment",
-							() -> {
-								DTOConverter<?, ?> dtoConverter =
-									_dtoConverterRegistry.getDTOConverter(
-										CommerceShipment.class.getName());
+							Object object = dtoConverter.toDTO(
+								new DefaultDTOConverterContext(
+									_dtoConverterRegistry,
+									commerceShipment.getCommerceShipmentId(),
+									LocaleUtil.getSiteDefault(), null, null));
 
-								Object object = dtoConverter.toDTO(
-									new DefaultDTOConverterContext(
-										_dtoConverterRegistry,
-										commerceShipment.
-											getCommerceShipmentId(),
-										LocaleUtil.getSiteDefault(), null,
-										null));
+							return JSONFactoryUtil.createJSONObject(
+								object.toString());
+						}
+					).put(
+						"commerceShipmentId",
+						commerceShipment.getCommerceShipmentId()
+					));
 
-								return JSONFactoryUtil.createJSONObject(
-									object.toString());
-							}
-						).put(
-							"commerceShipmentId",
-							commerceShipment.getCommerceShipmentId()
-						));
+				MessageBusUtil.sendMessage(
+					DestinationNames.COMMERCE_SHIPMENT_STATUS, message);
 
-					MessageBusUtil.sendMessage(
-						DestinationNames.COMMERCE_SHIPMENT_STATUS, message);
-
-					return null;
-				}
-
+				return null;
 			});
 	}
 

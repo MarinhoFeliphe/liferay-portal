@@ -121,7 +121,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -1906,45 +1905,38 @@ public class CommerceOrderLocalServiceImpl
 		CommerceOrder commerceOrder, int previousPaymentStatus) {
 
 		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
+			() -> {
+				Message message = new Message();
 
-				@Override
-				public Void call() throws Exception {
-					Message message = new Message();
+				message.setPayload(
+					JSONUtil.put(
+						"commerceOrder",
+						() -> {
+							DTOConverter<?, ?> dtoConverter =
+								_dtoConverterRegistry.getDTOConverter(
+									CommerceOrder.class.getName());
 
-					message.setPayload(
-						JSONUtil.put(
-							"commerceOrder",
-							() -> {
-								DTOConverter<?, ?> dtoConverter =
-									_dtoConverterRegistry.getDTOConverter(
-										CommerceOrder.class.getName());
+							Object object = dtoConverter.toDTO(
+								new DefaultDTOConverterContext(
+									_dtoConverterRegistry,
+									commerceOrder.getCommerceOrderId(),
+									LocaleUtil.getSiteDefault(), null, null));
 
-								Object object = dtoConverter.toDTO(
-									new DefaultDTOConverterContext(
-										_dtoConverterRegistry,
-										commerceOrder.getCommerceOrderId(),
-										LocaleUtil.getSiteDefault(), null,
-										null));
+							return JSONFactoryUtil.createJSONObject(
+								object.toString());
+						}
+					).put(
+						"commerceOrderId", commerceOrder.getCommerceOrderId()
+					).put(
+						"paymentStatus", commerceOrder.getPaymentStatus()
+					).put(
+						"previousPaymentStatus", previousPaymentStatus
+					));
 
-								return JSONFactoryUtil.createJSONObject(
-									object.toString());
-							}
-						).put(
-							"commerceOrderId",
-							commerceOrder.getCommerceOrderId()
-						).put(
-							"paymentStatus", commerceOrder.getPaymentStatus()
-						).put(
-							"previousPaymentStatus", previousPaymentStatus
-						));
+				MessageBusUtil.sendMessage(
+					DestinationNames.COMMERCE_PAYMENT_STATUS, message);
 
-					MessageBusUtil.sendMessage(
-						DestinationNames.COMMERCE_PAYMENT_STATUS, message);
-
-					return null;
-				}
-
+				return null;
 			});
 	}
 
