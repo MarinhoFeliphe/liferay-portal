@@ -110,8 +110,8 @@ public class QuerySXPSearchRequestBodyContributor
 	}
 
 	private <X, Y> void _process(
-		X[] objects, Function<X, Y> function, Consumer<Y> consumer,
-		ExceptionListener exceptionListener) {
+		Consumer<Y> consumer, ExceptionListener exceptionListener,
+		Function<X, Y> function, X[] objects) {
 
 		ArrayUtil.isNotEmptyForEach(
 			objects,
@@ -164,14 +164,14 @@ public class QuerySXPSearchRequestBodyContributor
 			invalidQueryEntryException::addSuppressed;
 
 		_process(
-			queryEntry.getClauses(), this::_toComplexQueryPart,
-			searchRequestBuilder::addComplexQueryPart, exceptionListener);
+			searchRequestBuilder::addComplexQueryPart, exceptionListener,
+			this::_toComplexQueryPart, queryEntry.getClauses());
 		_process(
-			queryEntry.getPostFilterClauses(), this::_toComplexQueryPart,
-			searchRequestBuilder::addPostFilterQueryPart, exceptionListener);
+			searchRequestBuilder::addPostFilterQueryPart, exceptionListener,
+			this::_toComplexQueryPart, queryEntry.getPostFilterClauses());
 		_process(
-			queryEntry.getRescores(), this::_toRescore,
-			searchRequestBuilder::addRescore, exceptionListener);
+			searchRequestBuilder::addRescore, exceptionListener,
+			this::_toRescore, queryEntry.getRescores());
 
 		if (ArrayUtil.isNotEmpty(invalidQueryEntryException.getSuppressed())) {
 			throw invalidQueryEntryException;
