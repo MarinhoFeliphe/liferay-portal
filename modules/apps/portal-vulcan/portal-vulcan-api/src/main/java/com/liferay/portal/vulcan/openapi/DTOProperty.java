@@ -24,11 +24,11 @@ import java.util.Map;
 public class DTOProperty {
 
 	public DTOProperty(
-		String name, String type, Map<String, Object> extensions) {
+		Map<String, Object> extensions, String name, String type) {
 
+		_extensions = extensions;
 		_name = name;
 		_type = type;
-		_extensions = extensions;
 	}
 
 	public List<DTOProperty> getDTOProperties() {

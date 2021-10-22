@@ -91,15 +91,15 @@ public class ObjectEntryApplication extends Application {
 		openAPISchemaFilter.setApplicationPath(applicationPath);
 
 		DTOProperty dtoProperty = new DTOProperty(
-			"ObjectEntry", "object", new HashMap<>());
+			new HashMap<>(), "ObjectEntry", "object");
 
 		Stream<ObjectField> stream = _objectFields.stream();
 
 		dtoProperty.setDTOProperties(
 			stream.map(
 				objectField -> new DTOProperty(
-					objectField.getName(), objectField.getType(),
-					Collections.singletonMap("x-parent-map", "properties"))
+					Collections.singletonMap("x-parent-map", "properties"),
+					objectField.getName(), objectField.getType())
 			).collect(
 				Collectors.toList()
 			));
