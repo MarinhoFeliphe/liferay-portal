@@ -68,16 +68,16 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectScopeProviderRegistry.getObjectScopeProvider(
 				_objectDefinition.getScope());
 
-		UnsafeConsumer<ObjectEntry, Exception> objectEntryUnsafeConsumer =
+		UnsafeConsumer<ObjectEntry, Exception> unsafeConsumer =
 			this::postObjectEntry;
 
 		if (objectScopeProvider.isGroupAware()) {
-			objectEntryUnsafeConsumer = objectEntry -> postScopeScopeKey(
+			unsafeConsumer = objectEntry -> postScopeScopeKey(
 				(String)parameters.get("scopeKey"), objectEntry);
 		}
 
 		for (ObjectEntry objectEntry : objectEntries) {
-			objectEntryUnsafeConsumer.accept(objectEntry);
+			unsafeConsumer.accept(objectEntry);
 		}
 	}
 
