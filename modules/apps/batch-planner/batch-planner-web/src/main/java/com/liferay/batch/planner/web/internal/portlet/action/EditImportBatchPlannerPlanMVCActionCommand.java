@@ -87,12 +87,12 @@ public class EditImportBatchPlannerPlanMVCActionCommand
 	private void _addBatchPlannerPlan(ActionRequest actionRequest)
 		throws Exception {
 
-		String name = ParamUtil.getString(actionRequest, "name");
 		boolean export = ParamUtil.getBoolean(actionRequest, "export");
 		String externalType = ParamUtil.getString(
 			actionRequest, "externalType");
 		String internalClassName = ParamUtil.getString(
 			actionRequest, "internalClassName");
+		String name = ParamUtil.getString(actionRequest, "name");
 		String taskItemDelegateName = ParamUtil.getString(
 			actionRequest, "taskItemDelegateName");
 
