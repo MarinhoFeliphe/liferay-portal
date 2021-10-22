@@ -315,8 +315,6 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 				Map<String, String> cookies,
 				Map<String, List<String>> headers) {
 
-				DTOProperty dtoProperty = openAPISchemaFilter.getDTOProperty();
-
 				if (schemaMappings.containsKey(schema.getName())) {
 					StringSchema stringSchema = new StringSchema();
 
@@ -326,6 +324,8 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 
 					schema.addProperties("x-schema-name", stringSchema);
 				}
+
+				DTOProperty dtoProperty = openAPISchemaFilter.getDTOProperty();
 
 				if (Objects.equals(dtoProperty.getName(), schema.getName())) {
 					for (DTOProperty childDTOProperty :
