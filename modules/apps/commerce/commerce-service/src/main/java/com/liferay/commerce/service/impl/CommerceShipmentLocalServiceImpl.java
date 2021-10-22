@@ -710,22 +710,27 @@ public class CommerceShipmentLocalServiceImpl
 
 				@Override
 				public Void call() throws Exception {
-					DTOConverter<?, ?> dtoConverter =
-						_dtoConverterRegistry.getDTOConverter(
-							CommerceShipment.class.getName());
-
-					Object object = dtoConverter.toDTO(
-						new DefaultDTOConverterContext(
-							_dtoConverterRegistry,
-							commerceShipment.getCommerceShipmentId(),
-							LocaleUtil.getSiteDefault(), null, null));
-
 					Message message = new Message();
 
 					message.setPayload(
 						JSONUtil.put(
 							"commerceShipment",
-							JSONFactoryUtil.createJSONObject(object.toString())
+							() -> {
+								DTOConverter<?, ?> dtoConverter =
+									_dtoConverterRegistry.getDTOConverter(
+										CommerceShipment.class.getName());
+
+								Object object = dtoConverter.toDTO(
+									new DefaultDTOConverterContext(
+										_dtoConverterRegistry,
+										commerceShipment.
+											getCommerceShipmentId(),
+										LocaleUtil.getSiteDefault(), null,
+										null));
+
+								return JSONFactoryUtil.createJSONObject(
+									object.toString());
+							}
 						).put(
 							"commerceShipmentId",
 							commerceShipment.getCommerceShipmentId()
