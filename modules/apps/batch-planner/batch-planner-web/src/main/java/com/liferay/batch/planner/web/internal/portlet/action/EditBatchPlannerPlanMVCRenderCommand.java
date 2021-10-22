@@ -76,15 +76,16 @@ public class EditBatchPlannerPlanMVCRenderCommand implements MVCRenderCommand {
 		ApplicationDTO applicationDTO, Map<String, String> headlessEndpoints,
 		ResourceMethodInfoDTO resourceMethodInfoDTO) {
 
-		String openApi = StringBundler.concat(
+		String headlessEndpoint = StringBundler.concat(
 			"/o", applicationDTO.base, resourceMethodInfoDTO.path);
 
-		if (!openApi.contains("openapi")) {
+		if (!headlessEndpoint.contains("openapi")) {
 			return;
 		}
 
 		headlessEndpoints.put(
-			applicationDTO.base, openApi.replaceAll("\\{.+\\}", "json"));
+			applicationDTO.base,
+			headlessEndpoint.replaceAll("\\{.+\\}", "json"));
 	}
 
 	private Map<String, String> _getHeadlessEndpoints() {
