@@ -164,13 +164,13 @@ public class QuerySXPSearchRequestBodyContributor
 			invalidQueryEntryException::addSuppressed;
 
 		_process(
-			queryEntry.getClauses(), this::_translateClause,
+			queryEntry.getClauses(), this::_toComplexQueryPart,
 			searchRequestBuilder::addComplexQueryPart, exceptionListener);
 		_process(
-			queryEntry.getPostFilterClauses(), this::_translateClause,
+			queryEntry.getPostFilterClauses(), this::_toComplexQueryPart,
 			searchRequestBuilder::addPostFilterQueryPart, exceptionListener);
 		_process(
-			queryEntry.getRescores(), this::_translateRescore,
+			queryEntry.getRescores(), this::_toRescore,
 			searchRequestBuilder::addRescore, exceptionListener);
 
 		if (ArrayUtil.isNotEmpty(invalidQueryEntryException.getSuppressed())) {
@@ -178,7 +178,7 @@ public class QuerySXPSearchRequestBodyContributor
 		}
 	}
 
-	private ComplexQueryPart _translateClause(Clause clause) {
+	private ComplexQueryPart _toComplexQueryPart(Clause clause) {
 		ComplexQueryPartBuilder complexQueryPartBuilder =
 			_complexQueryPartBuilderFactory.builder();
 
@@ -209,7 +209,7 @@ public class QuerySXPSearchRequestBodyContributor
 		).build();
 	}
 
-	private com.liferay.portal.search.rescore.Rescore _translateRescore(
+	private com.liferay.portal.search.rescore.Rescore _toRescore(
 		Rescore rescore) {
 
 		RescoreBuilder rescoreBuilder = _rescoreBuilderFactory.builder(
