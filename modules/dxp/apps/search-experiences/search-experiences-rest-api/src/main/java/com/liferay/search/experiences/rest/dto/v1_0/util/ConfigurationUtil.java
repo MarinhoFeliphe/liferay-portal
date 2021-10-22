@@ -53,11 +53,9 @@ public class ConfigurationUtil {
 				queryEntry -> {
 					ArrayUtil.isNotEmptyForEach(
 						queryEntry.getClauses(), ConfigurationUtil::_unpack);
-
 					ArrayUtil.isNotEmptyForEach(
 						queryEntry.getPostFilterClauses(),
 						ConfigurationUtil::_unpack);
-
 					ArrayUtil.isNotEmptyForEach(
 						queryEntry.getRescores(), ConfigurationUtil::_unpack);
 				});
