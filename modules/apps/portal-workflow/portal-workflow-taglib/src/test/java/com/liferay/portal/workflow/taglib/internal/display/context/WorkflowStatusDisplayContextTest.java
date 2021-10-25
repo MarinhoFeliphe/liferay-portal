@@ -12,11 +12,12 @@
  * details.
  */
 
-package com.liferay.portal.workflow.taglib.internal.context.util;
+package com.liferay.portal.workflow.taglib.internal.display.context;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanProperties;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.workflow.taglib.internal.constants.WorkflowStatusTaglibWebKeys;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -46,7 +49,7 @@ import org.mockito.Mockito;
  * @author Feliphe Marinho
  */
 @RunWith(Enclosed.class)
-public class WorkflowStatusTaglibUtilTest {
+public class WorkflowStatusDisplayContextTest {
 
 	@ClassRule
 	@Rule
@@ -54,6 +57,12 @@ public class WorkflowStatusTaglibUtilTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	public static class NonParameterizedTest {
+
+		@Before
+		public void setUp() throws PortalException {
+			_workflowStatusDisplayContext = Mockito.spy(
+				new WorkflowStatusDisplayContext());
+		}
 
 		@Test
 		public void testGetStatus() {
@@ -72,25 +81,23 @@ public class WorkflowStatusTaglibUtilTest {
 			ReflectionTestUtil.setFieldValue(
 				BeanPropertiesUtil.class, "_beanProperties", beanProperties);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.BEAN, httpServletRequest,
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest,
 				Mockito.mock(Object.class));
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS, httpServletRequest,
-				1);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest, 1);
 
 			Assert.assertEquals(
 				Integer.valueOf(2),
-				WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
+				_workflowStatusDisplayContext.getStatus(httpServletRequest));
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.BEAN, httpServletRequest,
-				null);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest, null);
 
 			Assert.assertEquals(
 				Integer.valueOf(1),
-				WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
+				_workflowStatusDisplayContext.getStatus(httpServletRequest));
 		}
 
 		@Test
@@ -98,26 +105,29 @@ public class WorkflowStatusTaglibUtilTest {
 			HttpServletRequest httpServletRequest = Mockito.mock(
 				HttpServletRequest.class);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS_MESSAGE,
-				httpServletRequest, "Status Message");
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS_MESSAGE, httpServletRequest,
+				"Status Message");
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS, httpServletRequest,
-				2);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest, 2);
 
 			Assert.assertEquals(
 				"Status Message",
-				WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
+				_workflowStatusDisplayContext.getStatusMessage(
+					httpServletRequest));
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS_MESSAGE,
-				httpServletRequest, StringPool.BLANK);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS_MESSAGE, httpServletRequest,
+				StringPool.BLANK);
 
 			Assert.assertEquals(
 				WorkflowConstants.LABEL_DRAFT,
-				WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
+				_workflowStatusDisplayContext.getStatusMessage(
+					httpServletRequest));
 		}
+
+		private WorkflowStatusDisplayContext _workflowStatusDisplayContext;
 
 	}
 
@@ -140,7 +150,7 @@ public class WorkflowStatusTaglibUtilTest {
 					{null, StringPool.BLANK, null, false, 1},
 					{
 						Mockito.mock(Object.class), " (review)",
-						WorkflowStatusTaglibUtilTest.class, true, 1
+						WorkflowStatusDisplayContextTest.class, true, 1
 					}
 				});
 		}
@@ -175,14 +185,19 @@ public class WorkflowStatusTaglibUtilTest {
 				LanguageUtil.class, "_language", language);
 		}
 
+		@Before
+		public void setUp() throws PortalException {
+			_workflowStatusDisplayContext = Mockito.spy(
+				new WorkflowStatusDisplayContext());
+		}
+
 		@Test
 		public void test() {
 			HttpServletRequest httpServletRequest = Mockito.mock(
 				HttpServletRequest.class);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.BEAN, httpServletRequest,
-				bean);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest, bean);
 
 			if (bean != null) {
 				BeanProperties beanProperties = Mockito.mock(
@@ -221,21 +236,19 @@ public class WorkflowStatusTaglibUtilTest {
 					beanProperties);
 			}
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.MODEL, httpServletRequest,
-				model);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.MODEL, httpServletRequest, model);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.SHOW_INSTANCE_STATUS,
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.SHOW_INSTANCE_STATUS,
 				httpServletRequest, showInstanceStatus);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS, httpServletRequest,
-				status);
+			mockAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest, status);
 
 			Assert.assertEquals(
 				expectedInstanceStatus,
-				WorkflowStatusTaglibUtil.getInstanceStatus(
+				_workflowStatusDisplayContext.getInstanceStatus(
 					httpServletRequest, Mockito.mock(ResourceBundle.class)));
 		}
 
@@ -254,15 +267,16 @@ public class WorkflowStatusTaglibUtilTest {
 		@Parameterized.Parameter(4)
 		public Integer status;
 
+		private WorkflowStatusDisplayContext _workflowStatusDisplayContext;
+
 	}
 
 	protected static void mockAttribute(
-		WorkflowStatusTaglibUtil.Attribute attribute,
-		HttpServletRequest httpServletRequest, Object value) {
+		String attributeName, HttpServletRequest httpServletRequest,
+		Object value) {
 
 		Mockito.when(
-			httpServletRequest.getAttribute(
-				Mockito.eq(attribute.getReference()))
+			httpServletRequest.getAttribute(Mockito.eq(attributeName))
 		).thenReturn(
 			value
 		);
