@@ -31,6 +31,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.liferay.portal.workflow.taglib.WorkflowStatusTaglibWebKeys;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -45,7 +46,6 @@ import org.mockito.Mockito;
 /**
  * @author Feliphe Marinho
  */
-@RunWith(Enclosed.class)
 public class WorkflowStatusTaglibUtilTest {
 
 	@ClassRule
@@ -53,216 +53,77 @@ public class WorkflowStatusTaglibUtilTest {
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	public static class NonParameterizedTest {
+	@Test
+	public void testGetStatus() {
+		HttpServletRequest httpServletRequest = Mockito.mock(
+			HttpServletRequest.class);
 
-		@Test
-		public void testGetStatus() {
-			HttpServletRequest httpServletRequest = Mockito.mock(
-				HttpServletRequest.class);
+		BeanProperties beanProperties = Mockito.mock(BeanProperties.class);
 
-			BeanProperties beanProperties = Mockito.mock(BeanProperties.class);
+		Mockito.when(
+			beanProperties.getInteger(
+				Mockito.anyObject(), Mockito.eq("status"))
+		).thenReturn(
+			2
+		);
 
-			Mockito.when(
-				beanProperties.getInteger(
-					Mockito.anyObject(), Mockito.eq("status"))
-			).thenReturn(
-				2
-			);
+		ReflectionTestUtil.setFieldValue(
+			BeanPropertiesUtil.class, "_beanProperties", beanProperties);
 
-			ReflectionTestUtil.setFieldValue(
-				BeanPropertiesUtil.class, "_beanProperties", beanProperties);
+		WorkflowStatusTaglibUtilTest.mockAttribute(
+			WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest,
+			Mockito.mock(Object.class));
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.BEAN, httpServletRequest,
-				Mockito.mock(Object.class));
+		WorkflowStatusTaglibUtilTest.mockAttribute(
+			WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest,
+			1);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS, httpServletRequest,
-				1);
+		Assert.assertEquals(
+			Integer.valueOf(2),
+			WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
 
-			Assert.assertEquals(
-				Integer.valueOf(2),
-				WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
+		WorkflowStatusTaglibUtilTest.mockAttribute(
+			WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest,
+			null);
 
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.BEAN, httpServletRequest,
-				null);
-
-			Assert.assertEquals(
-				Integer.valueOf(1),
-				WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
-		}
-
-		@Test
-		public void testGetStatusMessage() {
-			HttpServletRequest httpServletRequest = Mockito.mock(
-				HttpServletRequest.class);
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS_MESSAGE,
-				httpServletRequest, "Status Message");
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS, httpServletRequest,
-				2);
-
-			Assert.assertEquals(
-				"Status Message",
-				WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS_MESSAGE,
-				httpServletRequest, StringPool.BLANK);
-
-			Assert.assertEquals(
-				WorkflowConstants.LABEL_DRAFT,
-				WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
-		}
-
+		Assert.assertEquals(
+			Integer.valueOf(1),
+			WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
 	}
 
-	@RunWith(Parameterized.class)
-	public static class SetInstanceStatusTest {
+	@Test
+	public void testGetStatusMessage() {
+		HttpServletRequest httpServletRequest = Mockito.mock(
+			HttpServletRequest.class);
 
-		@Parameterized.Parameters(
-			name = "bean={0}, expectedInstanceStatus={1}, model={2}, showInstanceStatus={3}, status={4}"
-		)
-		public static List<Object[]> data() {
-			return Arrays.asList(
-				new Object[][] {
-					{null, StringPool.BLANK, null, false, 0},
-					{
-						Mockito.mock(Object.class), StringPool.BLANK, null,
-						false, 0
-					},
-					{null, StringPool.BLANK, null, true, 0},
-					{null, StringPool.BLANK, Object.class, false, 0},
-					{null, StringPool.BLANK, null, false, 1},
-					{
-						Mockito.mock(Object.class), " (review)",
-						WorkflowStatusTaglibUtilTest.class, true, 1
-					}
-				});
-		}
+		WorkflowStatusTaglibUtilTest.mockAttribute(
+			WorkflowStatusTaglibWebKeys.STATUS_MESSAGE,
+			httpServletRequest, "Status Message");
 
-		@BeforeClass
-		public static void setUpClass() throws Exception {
-			WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService =
-				Mockito.mock(WorkflowInstanceLinkLocalService.class);
+		WorkflowStatusTaglibUtilTest.mockAttribute(
+			WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest,
+			2);
 
-			ReflectionTestUtil.setFieldValue(
-				WorkflowInstanceLinkLocalServiceUtil.class, "_service",
-				workflowInstanceLinkLocalService);
+		Assert.assertEquals(
+			"Status Message",
+			WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
 
-			Mockito.when(
-				workflowInstanceLinkLocalService.getState(
-					Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(),
-					Mockito.anyLong())
-			).thenReturn(
-				"review"
-			);
+		WorkflowStatusTaglibUtilTest.mockAttribute(
+			WorkflowStatusTaglibWebKeys.STATUS_MESSAGE,
+			httpServletRequest, StringPool.BLANK);
 
-			Language language = Mockito.mock(Language.class);
-
-			Mockito.when(
-				language.get(
-					Mockito.any(ResourceBundle.class), Mockito.eq("review"))
-			).thenReturn(
-				"review"
-			);
-
-			ReflectionTestUtil.setFieldValue(
-				LanguageUtil.class, "_language", language);
-		}
-
-		@Test
-		public void test() {
-			HttpServletRequest httpServletRequest = Mockito.mock(
-				HttpServletRequest.class);
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.BEAN, httpServletRequest,
-				bean);
-
-			if (bean != null) {
-				BeanProperties beanProperties = Mockito.mock(
-					BeanProperties.class);
-
-				Mockito.when(
-					beanProperties.getLong(
-						Mockito.anyObject(), Mockito.eq("companyId"))
-				).thenReturn(
-					1L
-				);
-
-				Mockito.when(
-					beanProperties.getLong(
-						Mockito.anyObject(), Mockito.eq("groupId"))
-				).thenReturn(
-					1L
-				);
-
-				Mockito.when(
-					beanProperties.getLong(
-						Mockito.anyObject(), Mockito.eq("primaryKey"))
-				).thenReturn(
-					1L
-				);
-
-				Mockito.when(
-					beanProperties.getInteger(
-						Mockito.anyObject(), Mockito.eq("status"))
-				).thenReturn(
-					1
-				);
-
-				ReflectionTestUtil.setFieldValue(
-					BeanPropertiesUtil.class, "_beanProperties",
-					beanProperties);
-			}
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.MODEL, httpServletRequest,
-				model);
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.SHOW_INSTANCE_STATUS,
-				httpServletRequest, showInstanceStatus);
-
-			WorkflowStatusTaglibUtilTest.mockAttribute(
-				WorkflowStatusTaglibUtil.Attribute.STATUS, httpServletRequest,
-				status);
-
-			Assert.assertEquals(
-				expectedInstanceStatus,
-				WorkflowStatusTaglibUtil.getInstanceStatus(
-					httpServletRequest, Mockito.mock(ResourceBundle.class)));
-		}
-
-		@Parameterized.Parameter
-		public Object bean;
-
-		@Parameterized.Parameter(1)
-		public String expectedInstanceStatus;
-
-		@Parameterized.Parameter(2)
-		public Class<?> model;
-
-		@Parameterized.Parameter(3)
-		public boolean showInstanceStatus;
-
-		@Parameterized.Parameter(4)
-		public Integer status;
-
+		Assert.assertEquals(
+			WorkflowConstants.LABEL_DRAFT,
+			WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
 	}
 
 	protected static void mockAttribute(
-		WorkflowStatusTaglibUtil.Attribute attribute,
+		String attribute,
 		HttpServletRequest httpServletRequest, Object value) {
 
 		Mockito.when(
 			httpServletRequest.getAttribute(
-				Mockito.eq(attribute.getReference()))
+				Mockito.eq(WorkflowStatusTaglibUtil.ATTRIBUTE_NAMESPACE + attribute))
 		).thenReturn(
 			value
 		);

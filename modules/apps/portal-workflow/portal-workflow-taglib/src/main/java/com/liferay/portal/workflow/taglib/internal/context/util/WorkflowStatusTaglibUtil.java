@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.workflow.taglib.WorkflowStatusTaglibWebKeys;
 
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -42,14 +43,13 @@ public class WorkflowStatusTaglibUtil {
 
 	public static String getHelpMessage(HttpServletRequest httpServletRequest) {
 		return GetterUtil.getString(
-			httpServletRequest.getAttribute(
-				Attribute.HELP_MESSAGE.getReference()));
+			_getAttribute(
+				WorkflowStatusTaglibWebKeys.HELP_MESSAGE, httpServletRequest));
 	}
 
 	public static String getId(HttpServletRequest httpServletRequest) {
-		return GetterUtil.getString(
-			(String)httpServletRequest.getAttribute(
-				Attribute.ID.getReference()));
+		return GetterUtil.getString(_getAttribute(
+			WorkflowStatusTaglibWebKeys.ID, httpServletRequest));
 	}
 
 	public static String getInstanceStatus(
@@ -61,8 +61,7 @@ public class WorkflowStatusTaglibUtil {
 		if (Objects.equals(
 				getStatus(httpServletRequest),
 				WorkflowConstants.STATUS_PENDING) &&
-			(bean != null) && (model != null) &&
-			_isShowInstanceStatus(httpServletRequest)) {
+			(bean != null) && (model != null)) {
 
 			try {
 				String workflowStatus =
@@ -96,101 +95,57 @@ public class WorkflowStatusTaglibUtil {
 		}
 
 		return GetterUtil.getInteger(
-			String.valueOf(
-				httpServletRequest.getAttribute(
-					Attribute.STATUS.getReference())));
+			_getAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest));
 	}
 
 	public static String getStatusMessage(
 		HttpServletRequest httpServletRequest) {
 
 		if (Validator.isNotNull(
-				GetterUtil.getString(
-					(String)httpServletRequest.getAttribute(
-						Attribute.STATUS_MESSAGE.getReference())))) {
+				GetterUtil.getString(_getAttribute(
+					WorkflowStatusTaglibWebKeys.STATUS_MESSAGE, httpServletRequest)))) {
 
-			return GetterUtil.getString(
-				(String)httpServletRequest.getAttribute(
-					Attribute.STATUS_MESSAGE.getReference()));
+			return GetterUtil.getString(_getAttribute(
+				WorkflowStatusTaglibWebKeys.STATUS_MESSAGE, httpServletRequest));
 		}
 
 		return WorkflowConstants.getStatusLabel(getStatus(httpServletRequest));
 	}
 
 	public static String getVersion(HttpServletRequest httpServletRequest) {
-		return GetterUtil.getString(
-			(String)httpServletRequest.getAttribute(
-				Attribute.VERSION.getReference()));
+		return GetterUtil.getString(_getAttribute(
+			WorkflowStatusTaglibWebKeys.VERSION, httpServletRequest));
 	}
 
 	public static boolean isShowHelpMessage(
 		HttpServletRequest httpServletRequest) {
 
 		return GetterUtil.getBoolean(
-			String.valueOf(
-				httpServletRequest.getAttribute(
-					Attribute.SHOW_HELP_MESSAGE.getReference())),
+			_getAttribute(
+				WorkflowStatusTaglibWebKeys.SHOW_HELP_MESSAGE, httpServletRequest),
 			true);
-	}
-
-	public static boolean isShowInstanceTracker(
-		HttpServletRequest httpServletRequest) {
-
-		return GetterUtil.getBoolean(
-			String.valueOf(
-				httpServletRequest.getAttribute(
-					Attribute.SHOW_INSTANCE_TRACKER.getReference())));
 	}
 
 	public static boolean isShowLabel(HttpServletRequest httpServletRequest) {
 		return GetterUtil.getBoolean(
 			String.valueOf(
-				httpServletRequest.getAttribute(
-					Attribute.SHOW_LABEL.getReference())),
+				_getAttribute(
+					WorkflowStatusTaglibWebKeys.SHOW_LABEL, httpServletRequest)),
 			true);
 	}
 
-	public enum Attribute {
-
-		BEAN("bean"), HELP_MESSAGE("helpMessage"), ID("id"),
-		MARKUP_VIEW("markupView"), MODEL("model"),
-		SHOW_HELP_MESSAGE("showHelpMessage"),
-		SHOW_INSTANCE_STATUS("showInstanceStatus"),
-		SHOW_INSTANCE_TRACKER("showInstanceTracker"), SHOW_LABEL("showLabel"),
-		STATUS("status"), STATUS_MESSAGE("statusMessage"), VERSION("version");
-
-		public String getReference() {
-			return ATTRIBUTE_NAMESPACE + _value;
-		}
-
-		public String getValue() {
-			return _value;
-		}
-
-		private Attribute(String value) {
-			_value = value;
-		}
-
-		private final String _value;
-
-	}
-
 	private static Object _getBean(HttpServletRequest httpServletRequest) {
-		return httpServletRequest.getAttribute(Attribute.BEAN.getReference());
+		return _getAttribute(WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest);
 	}
 
 	private static Class<?> _getModel(HttpServletRequest httpServletRequest) {
-		return (Class<?>)httpServletRequest.getAttribute(
-			Attribute.MODEL.getReference());
+		return (Class<?>) _getAttribute(
+			WorkflowStatusTaglibWebKeys.MODEL, httpServletRequest);
 	}
-
-	private static boolean _isShowInstanceStatus(
-		HttpServletRequest httpServletRequest) {
-
-		return GetterUtil.getBoolean(
-			String.valueOf(
-				httpServletRequest.getAttribute(
-					Attribute.SHOW_INSTANCE_STATUS.getReference())));
+	
+	private static Object _getAttribute(String attribute, HttpServletRequest httpServletRequest) {
+		return httpServletRequest.getAttribute(ATTRIBUTE_NAMESPACE + attribute);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
