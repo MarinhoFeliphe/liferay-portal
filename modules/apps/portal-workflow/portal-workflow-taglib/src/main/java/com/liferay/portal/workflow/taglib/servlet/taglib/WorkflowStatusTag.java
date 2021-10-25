@@ -16,7 +16,8 @@ package com.liferay.portal.workflow.taglib.servlet.taglib;
 
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.workflow.taglib.internal.context.util.WorkflowStatusTaglibUtil;
+import com.liferay.portal.workflow.taglib.internal.constants.WorkflowStatusTaglibConstants;
+import com.liferay.portal.workflow.taglib.internal.constants.WorkflowStatusTaglibWebKeys;
 import com.liferay.portal.workflow.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
 
@@ -33,7 +34,8 @@ public class WorkflowStatusTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
-		setAttributeNamespace(WorkflowStatusTaglibUtil.ATTRIBUTE_NAMESPACE);
+		setAttributeNamespace(
+			WorkflowStatusTaglibConstants.ATTRIBUTE_NAMESPACE);
 
 		return super.doStartTag();
 	}
@@ -163,49 +165,35 @@ public class WorkflowStatusTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.BEAN.getValue(), _bean);
+			httpServletRequest, WorkflowStatusTaglibWebKeys.BEAN, _bean);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.HELP_MESSAGE.getValue(),
+			httpServletRequest, WorkflowStatusTaglibWebKeys.HELP_MESSAGE,
 			_helpMessage);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.ID.getValue(), _id);
+			httpServletRequest, WorkflowStatusTaglibWebKeys.ID, _id);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.MARKUP_VIEW.getValue(),
-			_markupView);
+			httpServletRequest, WorkflowStatusTaglibWebKeys.MODEL, _model);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.MODEL.getValue(), _model);
-		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.SHOW_HELP_MESSAGE.getValue(),
+			httpServletRequest, WorkflowStatusTaglibWebKeys.SHOW_HELP_MESSAGE,
 			_showHelpMessage);
 		setNamespacedAttribute(
 			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.SHOW_INSTANCE_STATUS.getValue(),
+			WorkflowStatusTaglibWebKeys.SHOW_INSTANCE_STATUS,
 			_showInstanceStatus);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.SHOW_LABEL.getValue(),
+			httpServletRequest, WorkflowStatusTaglibWebKeys.SHOW_LABEL,
 			_showLabel);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.STATUS.getValue(), _status);
+			httpServletRequest, WorkflowStatusTaglibWebKeys.STATUS, _status);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.STATUS_MESSAGE.getValue(),
+			httpServletRequest, WorkflowStatusTaglibWebKeys.STATUS_MESSAGE,
 			_statusMessage);
 		setNamespacedAttribute(
-			httpServletRequest,
-			WorkflowStatusTaglibUtil.Attribute.VERSION.getValue(), _version);
+			httpServletRequest, WorkflowStatusTaglibWebKeys.VERSION, _version);
 
 		if (getBean() == null) {
 			setNamespacedAttribute(
-				httpServletRequest,
-				WorkflowStatusTaglibUtil.Attribute.BEAN.getValue(),
+				httpServletRequest, WorkflowStatusTaglibWebKeys.BEAN,
 				pageContext.getAttribute("aui:model-context:bean"));
 		}
 
@@ -214,15 +202,13 @@ public class WorkflowStatusTag extends IncludeTag {
 			Validator.isNotNull(getVersion())) {
 
 			setNamespacedAttribute(
-				httpServletRequest,
-				WorkflowStatusTaglibUtil.Attribute.HELP_MESSAGE.getValue(),
+				httpServletRequest, WorkflowStatusTaglibWebKeys.HELP_MESSAGE,
 				_HELP_MESSAGE_DEFAULT);
 		}
 
 		if (getModel() == null) {
 			setNamespacedAttribute(
-				httpServletRequest,
-				WorkflowStatusTaglibUtil.Attribute.MODEL.getValue(),
+				httpServletRequest, WorkflowStatusTaglibWebKeys.MODEL,
 				pageContext.getAttribute("aui:model-context:model"));
 		}
 	}
