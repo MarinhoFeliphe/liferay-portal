@@ -25,7 +25,7 @@ page import="com.liferay.portal.kernel.util.JavaConstants" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
-page import="com.liferay.portal.workflow.taglib.internal.context.util.WorkflowStatusTaglibUtil" %><%@
+page import="com.liferay.portal.workflow.taglib.internal.context.util.WorkflowStatusDisplayContext" %><%@
 page import="com.liferay.taglib.aui.AUIUtil" %><%@
 page import="com.liferay.taglib.util.TagResourceBundleUtil" %>
 

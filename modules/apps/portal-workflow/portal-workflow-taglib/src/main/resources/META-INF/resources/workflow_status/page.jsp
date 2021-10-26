@@ -17,33 +17,33 @@
 <%@ include file="/init.jsp" %>
 
 <span class="taglib-workflow-status">
-	<c:if test="<%= Validator.isNotNull(WorkflowStatusTaglibUtil.getId(request)) %>">
+	<c:if test="<%= Validator.isNotNull(WorkflowStatusDisplayContext.getId(request)) %>">
 		<span class="mr-2 workflow-id">
 			<span class="workflow-label"><liferay-ui:message key="id" />:</span>
-
-			<span class="workflow-value"><%= HtmlUtil.escape(WorkflowStatusTaglibUtil.getId(request)) %></span>
+			<span class="workflow-value">
+				<%= HtmlUtil.escape(WorkflowStatusDisplayContext.getId(request)) %>
+			</span>
 		</span>
 	</c:if>
 
-	<c:if test="<%= Validator.isNotNull(WorkflowStatusTaglibUtil.getVersion(request)) %>">
+	<c:if test="<%= Validator.isNotNull(WorkflowStatusDisplayContext.getVersion(request)) %>">
 		<span class="mr-2 workflow-version">
 			<span class="workflow-label"><liferay-ui:message key="version" />:</span>
-
-			<span class="workflow-value"><%= WorkflowStatusTaglibUtil.getVersion(request) %></span>
+			<span class="workflow-value"><%= WorkflowStatusDisplayContext.getVersion(request) %></span>
 		</span>
 	</c:if>
 
 	<span class="workflow-status">
-		<c:if test="<%= WorkflowStatusTaglibUtil.isShowStatusLabel(request) %>">
+		<c:if test="<%= WorkflowStatusDisplayContext.isShowStatusLabel(request) %>">
 			<span class="workflow-label"><liferay-ui:message key="status" />:</span>
 		</c:if>
 
-		<span class="label label-<%= WorkflowConstants.getStatusStyle(WorkflowStatusTaglibUtil.getStatus(request)) %> status workflow-status-<%= WorkflowConstants.getStatusLabel(WorkflowStatusTaglibUtil.getStatus(request)) %> <%= WorkflowConstants.getStatusCssClass(WorkflowStatusTaglibUtil.getStatus(request)) %> workflow-value">
-			<liferay-ui:message key="<%= WorkflowStatusTaglibUtil.getStatusMessage(request) %>" />
+		<span class="label label-<%= WorkflowConstants.getStatusStyle(WorkflowStatusDisplayContext.getStatus(request)) %> status workflow-status-<%= WorkflowConstants.getStatusLabel(WorkflowStatusDisplayContext.getStatus(request)) %> <%= WorkflowConstants.getStatusCssClass(WorkflowStatusDisplayContext.getStatus(request)) %> workflow-value">
+			<liferay-ui:message key="<%= WorkflowStatusDisplayContext.getStatusMessage(request) %>" />
 		</span>
 	</span>
 
-	<c:if test="<%= WorkflowStatusTaglibUtil.isShowHelpMessage(request) && Validator.isNotNull(WorkflowStatusTaglibUtil.getHelpMessage(request)) %>">
-		<liferay-ui:icon-help message="<%= WorkflowStatusTaglibUtil.getHelpMessage(request) %>" />
+	<c:if test="<%= WorkflowStatusDisplayContext.isShowHelpMessage(request) && Validator.isNotNull(WorkflowStatusDisplayContext.getHelpMessage(request)) %>">
+		<liferay-ui:icon-help message="<%= WorkflowStatusDisplayContext.getHelpMessage(request) %>" />
 	</c:if>
 </span>

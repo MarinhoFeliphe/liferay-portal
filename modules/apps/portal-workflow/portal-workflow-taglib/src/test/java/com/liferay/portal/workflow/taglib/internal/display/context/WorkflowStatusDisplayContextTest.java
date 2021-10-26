@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.workflow.taglib.internal.context.util;
+package com.liferay.portal.workflow.taglib.internal.display.context;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanProperties;
@@ -20,7 +20,8 @@ import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.workflow.taglib.internal.WorkflowStatusTaglibWebKeys;
+import com.liferay.portal.workflow.taglib.internal.constants.WorkflowStatusWebKeys;
+import com.liferay.portal.workflow.taglib.internal.context.util.WorkflowStatusDisplayContext;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,7 +35,7 @@ import org.mockito.Mockito;
 /**
  * @author Feliphe Marinho
  */
-public class WorkflowStatusTaglibUtilTest {
+public class WorkflowStatusDisplayContextTest {
 
 	@ClassRule
 	@Rule
@@ -58,22 +59,20 @@ public class WorkflowStatusTaglibUtilTest {
 			BeanPropertiesUtil.class, "_beanProperties", beanProperties);
 
 		_mockAttribute(
-			WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest,
+			WorkflowStatusWebKeys.BEAN, httpServletRequest,
 			Mockito.mock(Object.class));
 
-		_mockAttribute(
-			WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest, 1);
+		_mockAttribute(WorkflowStatusWebKeys.STATUS, httpServletRequest, 1);
 
 		Assert.assertEquals(
 			Integer.valueOf(2),
-			WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
+			WorkflowStatusDisplayContext.getStatus(httpServletRequest));
 
-		_mockAttribute(
-			WorkflowStatusTaglibWebKeys.BEAN, httpServletRequest, null);
+		_mockAttribute(WorkflowStatusWebKeys.BEAN, httpServletRequest, null);
 
 		Assert.assertEquals(
 			Integer.valueOf(1),
-			WorkflowStatusTaglibUtil.getStatus(httpServletRequest));
+			WorkflowStatusDisplayContext.getStatus(httpServletRequest));
 	}
 
 	@Test
@@ -82,23 +81,22 @@ public class WorkflowStatusTaglibUtilTest {
 			HttpServletRequest.class);
 
 		_mockAttribute(
-			WorkflowStatusTaglibWebKeys.STATUS_MESSAGE, httpServletRequest,
+			WorkflowStatusWebKeys.STATUS_MESSAGE, httpServletRequest,
 			"Status Message");
 
-		_mockAttribute(
-			WorkflowStatusTaglibWebKeys.STATUS, httpServletRequest, 2);
+		_mockAttribute(WorkflowStatusWebKeys.STATUS, httpServletRequest, 2);
 
 		Assert.assertEquals(
 			"Status Message",
-			WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
+			WorkflowStatusDisplayContext.getStatusMessage(httpServletRequest));
 
 		_mockAttribute(
-			WorkflowStatusTaglibWebKeys.STATUS_MESSAGE, httpServletRequest,
+			WorkflowStatusWebKeys.STATUS_MESSAGE, httpServletRequest,
 			StringPool.BLANK);
 
 		Assert.assertEquals(
 			WorkflowConstants.LABEL_DRAFT,
-			WorkflowStatusTaglibUtil.getStatusMessage(httpServletRequest));
+			WorkflowStatusDisplayContext.getStatusMessage(httpServletRequest));
 	}
 
 	private void _mockAttribute(
@@ -107,7 +105,8 @@ public class WorkflowStatusTaglibUtilTest {
 		Mockito.when(
 			httpServletRequest.getAttribute(
 				Mockito.eq(
-					WorkflowStatusTaglibUtil.ATTRIBUTE_NAMESPACE + attribute))
+					WorkflowStatusDisplayContext.ATTRIBUTE_NAMESPACE +
+						attribute))
 		).thenReturn(
 			value
 		);

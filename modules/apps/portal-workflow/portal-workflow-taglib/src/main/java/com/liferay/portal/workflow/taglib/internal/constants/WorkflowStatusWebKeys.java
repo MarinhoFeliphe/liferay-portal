@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.portal.workflow.taglib.internal;
+package com.liferay.portal.workflow.taglib.internal.constants;
 
 /**
  * @author Feliphe Marinho
  */
-public class WorkflowStatusTaglibWebKeys {
+public class WorkflowStatusWebKeys {
 
 	public static final String BEAN = "bean";
 
