@@ -10,6 +10,16 @@
 	<short-name>liferay-portal-workflow</short-name>
 	<uri>http://liferay.com/tld/portal-workflow</uri>
 	<tag>
+		<name>track-approval-icon</name>
+		<tag-class>com.liferay.portal.workflow.taglib.servlet.taglib.TrackApprovalIconTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>modelResource</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
 		<description><![CDATA[Creates a UI component that displays the current status of its associated workflow.]]></description>
 		<name>status</name>
 		<tag-class>com.liferay.portal.workflow.taglib.servlet.taglib.WorkflowStatusTag</tag-class>

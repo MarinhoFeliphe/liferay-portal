@@ -26,6 +26,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -43,15 +44,19 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.workflow.taglib.servlet.taglib.TrackApprovalURLTag;
 import com.liferay.taglib.security.PermissionsURLTag;
 import com.liferay.trash.TrashHelper;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -230,17 +235,32 @@ public class BlogsEntryActionDropdownItemsProvider {
 				portletResource = portletDisplay.getPortletName();
 			}
 
+			/*dropdownItem.setHref(StringBundler.concat(
+				PortalUtil.getPortalURL(_httpServletRequest),
+				PortalUtil.getPathModule(),
+				StringPool.SLASH,
+				"track-approval-kebab-item" + "?status=3"));*/
+
+			dropdownItem.setHref(TrackApprovalURLTag.doTag(
+				BlogsEntry.class.getName(), _httpServletRequest));
+
+			/*PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+				_httpServletRequest, themeDisplay.getScopeGroup(),"com_liferay_portal_workflow_taglib_TrackApprovalPortlet"
+				, 0, themeDisplay.getPlid(),
+				PortletRequest.RENDER_PHASE);
+
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+
 			dropdownItem.setHref(
-				PortalUtil.getControlPanelPortletURL(
-					_httpServletRequest, themeDisplay.getScopeGroup(),
-					BlogsPortletKeys.BLOGS_ADMIN, 0, themeDisplay.getPlid(),
-					PortletRequest.RENDER_PHASE),
-				"mvcRenderCommandName", "/blogs/edit_entry", "redirect",
-				_getRedirectURL(), "portletResource", portletResource,
-				"entryId", blogsEntry.getEntryId());
+				portletURL,
+				"mvcRenderCommandName", "/workflow_status/track_approval", "portletResource", portletResource,
+				"status", blogsEntry.getCompanyId(),
+				"groupId", blogsEntry.getGroupId(),
+				"className", BlogsEntry.class.getName(),
+				"primaryKey", blogsEntry.getPrimaryKey());*/
 
 			dropdownItem.setIcon("edit");
-			dropdownItem.setLabel(LanguageUtil.get(_resourceBundle, "edit"));
+			dropdownItem.setLabel(LanguageUtil.get(_resourceBundle, "Foo"));
 		};
 	}
 

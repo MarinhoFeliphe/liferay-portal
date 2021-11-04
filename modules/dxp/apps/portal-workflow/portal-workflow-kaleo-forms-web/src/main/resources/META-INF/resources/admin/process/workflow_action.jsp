@@ -49,9 +49,19 @@ String backURL = (String)row.getParameter("backURL");
 	</c:if>
 
 	<liferay-ui:icon
+		message="Foo 1"
+		onClick='<%= "Liferay.Util.openModal({onClose: function(event){ window.location.reload();}, title: 'Foo', url: 'http://localhost:8080/group/guest/~/control_panel/manage?p_p_id=com_liferay_portal_workflow_taglib_TrackApprovalPortlet&p_p_lifecycle=0&p_p_state=pop_up&refererPlid=1&_com_liferay_portal_workflow_taglib_TrackApprovalPortlet_mvcRenderCommandName=%2Fworkflow_status%2Ftrack_approval&_com_liferay_portal_workflow_taglib_TrackApprovalPortlet_status=20099&_com_liferay_portal_workflow_taglib_TrackApprovalPortlet_groupId=20123&_com_liferay_portal_workflow_taglib_TrackApprovalPortlet_className=com.liferay.blogs.model.BlogsEntry&_com_liferay_portal_workflow_taglib_TrackApprovalPortlet_primaryKey=43064'});" %>'
+		url="javascript:;"
+	/>
+
+	<liferay-ui:icon
 		message="choose"
 		onClick='<%= "Liferay.fire('" + liferayPortletResponse.getNamespace() + "chooseWorkflow', {name: '" + HtmlUtil.escapeJS(workflowDefinition.getName()) + "', title: '" + HtmlUtil.escapeJS(workflowDefinition.getTitle(themeDisplay.getLanguageId())) + "', version: '" + workflowDefinition.getVersion() + "'});" %>'
 		url="javascript:;"
+	/>
+
+	<liferay-portal-workflow:track-approval-icon
+		modelResource="FOO"
 	/>
 
 	<c:if test="<%= permissionChecker.isCompanyAdmin() %>">

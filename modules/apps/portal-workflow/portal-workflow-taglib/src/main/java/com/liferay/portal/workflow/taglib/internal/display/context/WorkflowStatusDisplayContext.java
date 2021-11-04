@@ -75,7 +75,7 @@ public class WorkflowStatusDisplayContext {
 					resourceBundle, getStatusMessage(httpServletRequest)))
 		).put(
 			"statusStyle",
-			WorkflowConstants.getStatusStyle(getStatus(httpServletRequest))
+			WorkflowConstants.getStatusStyle(2)
 		).put(
 			"version", _getVersion(httpServletRequest)
 		).put(
@@ -103,7 +103,7 @@ public class WorkflowStatusDisplayContext {
 				_getAttribute("statusMessage", httpServletRequest));
 		}
 
-		return WorkflowConstants.getStatusLabel(getStatus(httpServletRequest));
+		return WorkflowConstants.getStatusLabel(2);
 	}
 
 	private Object _getAttribute(
