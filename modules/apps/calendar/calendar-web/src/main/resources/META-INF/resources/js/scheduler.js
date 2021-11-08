@@ -1115,7 +1115,6 @@ AUI.add(
 			'aui-datatype',
 			'aui-scheduler',
 			'dd-plugin',
-			'liferay-calendar-a11y',
 			'liferay-calendar-message-util',
 			'liferay-calendar-recurrence-converter',
 			'liferay-calendar-recurrence-util',
