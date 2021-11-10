@@ -64,7 +64,8 @@ page import="com.liferay.portal.workflow.kaleo.forms.web.internal.display.contex
 page import="com.liferay.portal.workflow.kaleo.forms.web.internal.display.context.KaleoFormsViewRecordsDisplayContext" %><%@
 page import="com.liferay.portal.workflow.kaleo.forms.web.internal.security.permission.resource.DDMStructurePermission" %><%@
 page import="com.liferay.portal.workflow.kaleo.forms.web.internal.util.KaleoFormsUtil" %><%@
-page import="com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion" %>
+page import="com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion" %><%@
+page import="com.liferay.portal.workflow.taglib.servlet.taglib.TrackWorkflowURLTag" %>
 
 <%@ page import="javax.portlet.PortletRequest" %><%@
 page import="javax.portlet.WindowState" %>
