@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.workflow.taglib.servlet.taglib;
+package com.liferay.portal.workflow.instance.tracker.web.internal.portlet;
 
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
@@ -21,27 +21,30 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.PortletProvider;
-import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalServiceUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.workflow.constants.WorkflowPortletKeys;
+import com.liferay.portal.workflow.instance.tracker.util.InstanceTrackerURLProvider;
+import org.osgi.service.component.annotations.Component;
 
+import javax.portlet.PortletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.tagext.TagSupport;
 
 /**
  * @author Feliphe Marinho
  */
-public class TrackWorkflowURLTag extends TagSupport {
+@Component(immediate = true, service = InstanceTrackerURLProvider.class)
+public class InstanceTrackerURLProviderImpl implements
+	InstanceTrackerURLProvider {
 
-	public static String doTag(
-			Object bean, Class<?> model, HttpServletRequest httpServletRequest)
-		throws Exception {
+	@Override
+	public String getURL(
+		Object bean, Class<?> model, HttpServletRequest httpServletRequest) {
 
 		return PortletURLBuilder.create(
-			PortletProviderUtil.getPortletURL(
-				httpServletRequest, WorkflowPortletKeys.INSTANCE_TRACKER,
-				PortletProvider.Action.VIEW)
+			PortalUtil.getControlPanelPortletURL(
+				httpServletRequest, null, WorkflowPortletKeys.INSTANCE_TRACKER, 0, 0,
+				PortletRequest.RENDER_PHASE)
 		).setParameter(
 			"instanceId",
 			() -> {
@@ -71,6 +74,5 @@ public class TrackWorkflowURLTag extends TagSupport {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		TrackWorkflowURLTag.class);
-
+		InstanceTrackerURLProviderImpl.class);
 }
