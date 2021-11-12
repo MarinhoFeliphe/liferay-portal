@@ -112,8 +112,8 @@ public abstract class BaseWorkflowManagerTestCase {
 							method.getName(), "startWorkflowInstance")) {
 
 						workflowInstanceLinkLocalService.startWorkflowInstance(
-							TestPropsValues.getCompanyId(), 0,
-							TestPropsValues.getUserId(), clazz.getName(), 1,
+							TestPropsValues.getCompanyId(), 0, (Long)args[2],
+							clazz.getName(), 1,
 							(Map<String, Serializable>)args[5]);
 					}
 

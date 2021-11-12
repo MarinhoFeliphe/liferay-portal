@@ -16,9 +16,11 @@ package com.liferay.portal.workflow.kaleo.internal.runtime.integration.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
@@ -156,6 +158,42 @@ public class WorkflowInstanceManagerImplTest
 
 		Assert.assertEquals(
 			workflowInstances.toString(), 0, workflowInstances.size());
+	}
+
+	@Test
+	public void testSearchWorkflowInstancesWhenTwoUsersSubmitAnEntry()
+		throws Exception {
+
+		ServiceRegistration<WorkflowHandler<?>>
+			workflowHandlerServiceRegistration = registryWorkflowHandler();
+
+		Class<?> clazz = getClass();
+
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			TestPropsValues.getCompanyId(), 0, TestPropsValues.getUserId(),
+			clazz.getName(), 1, null, new ServiceContext());
+
+		User user = UserTestUtil.addUser(TestPropsValues.getCompanyId());
+
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			TestPropsValues.getCompanyId(), 0, user.getUserId(),
+			clazz.getName(), 2, null, new ServiceContext());
+
+		WorkflowModelSearchResult<WorkflowInstance> workflowModelSearchResult =
+			workflowInstanceManager.searchWorkflowInstances(
+				TestPropsValues.getCompanyId(), user.getUserId(),
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK, null, true, 0, 2,
+				WorkflowComparatorFactoryUtil.getInstanceCompletedComparator(
+					false));
+
+		List<WorkflowInstance> workflowInstances =
+			workflowModelSearchResult.getWorkflowModels();
+
+		workflowHandlerServiceRegistration.unregister();
+
+		Assert.assertEquals(
+			workflowInstances.toString(), 1, workflowInstances.size());
 	}
 
 	@Inject
