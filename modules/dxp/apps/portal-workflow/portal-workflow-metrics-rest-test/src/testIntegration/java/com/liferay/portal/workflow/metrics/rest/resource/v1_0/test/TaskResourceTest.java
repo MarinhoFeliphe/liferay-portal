@@ -15,11 +15,15 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
-import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
+import com.liferay.portal.workflow.metrics.model.Assignment;
+import com.liferay.portal.workflow.metrics.model.RoleAssignment;
+import com.liferay.portal.workflow.metrics.model.UserAssignment;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Task;
@@ -28,7 +32,9 @@ import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Pagination;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
@@ -90,9 +96,17 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		Task task2 = testGetProcessTask_addTask();
 
+		User user = TestPropsValues.getUser();
+
+		List<Assignment> assignments = new ArrayList<>();
+
+		for (long roleId : user.getRoleIds()) {
+			assignments.add(
+				new RoleAssignment(roleId, Collections.emptyList()));
+		}
+
 		Task task3 = _workflowMetricsRESTTestHelper.addTask(
-			null, testGroup.getCompanyId(), _instance,
-			TestPropsValues.getUser());
+			assignments, testGroup.getCompanyId(), _instance);
 
 		page = taskResource.postTasksPage(
 			Pagination.of(1, 10),
@@ -309,13 +323,12 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	@Override
 	protected Task testGetProcessTask_addTask() throws Exception {
+		User user = TestPropsValues.getUser();
+
 		return _workflowMetricsRESTTestHelper.addTask(
-			new Assignee() {
-				{
-					id = TestPropsValues.getUserId();
-				}
-			},
-			testGroup.getCompanyId(), _instance, TestPropsValues.getUser());
+			Arrays.asList(
+				new UserAssignment(user.getUserId(), user.getFullName())),
+			testGroup.getCompanyId(), _instance);
 	}
 
 	@Override
@@ -335,9 +348,16 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	@Override
 	protected Task testPatchProcessTaskComplete_addTask() throws Exception {
+		User user = TestPropsValues.getUser();
+
+		Task task = randomPatchTask();
+
 		return _workflowMetricsRESTTestHelper.addTask(
-			testGroup.getCompanyId(), _instance, randomPatchTask(),
-			TestPropsValues.getUser());
+			Arrays.asList(
+				new UserAssignment(user.getUserId(), user.getFullName())),
+			testGroup.getCompanyId(), RandomTestUtil.randomLong(), _instance,
+			task.getName(), task.getNodeId(), task.getProcessId(),
+			task.getProcessVersion(), task.getId());
 	}
 
 	private Instance _instance;

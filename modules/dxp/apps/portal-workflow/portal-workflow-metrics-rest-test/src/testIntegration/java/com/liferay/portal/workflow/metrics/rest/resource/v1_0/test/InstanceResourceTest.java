@@ -39,6 +39,7 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.model.Assignment;
 import com.liferay.portal.workflow.metrics.model.RoleAssignment;
+import com.liferay.portal.workflow.metrics.model.UserAssignment;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Creator;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
@@ -145,6 +146,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 				new Assignee() {
 					{
 						id = _user.getUserId();
+						name = _user.getFullName();
 					}
 				}
 			});
@@ -196,25 +198,19 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 			new long[] {TestPropsValues.getUserId()}, testGroup.getGroupId(),
 			siteMemberRole.getRoleId());
 
-		List<Assignment> assignments = new ArrayList<>();
-
-		assignments.add(
-			new RoleAssignment(
-				siteAdministrationRole.getRoleId(),
-				Collections.singletonList(TestPropsValues.getGroupId())));
+		_testGetProcessInstancesPage_addInstance(
+			Collections.singletonList(
+				new RoleAssignment(
+					siteAdministrationRole.getRoleId(),
+					Collections.singletonList(TestPropsValues.getGroupId()))),
+			instance2, _process.getId());
 
 		_testGetProcessInstancesPage_addInstance(
-			assignments, instance2, _process.getId());
-
-		assignments = new ArrayList<>();
-
-		assignments.add(
-			new RoleAssignment(
-				siteMemberRole.getRoleId(),
-				Collections.singletonList(TestPropsValues.getGroupId())));
-
-		_testGetProcessInstancesPage_addInstance(
-			assignments, instance3, _process.getId());
+			Collections.singletonList(
+				new RoleAssignment(
+					siteMemberRole.getRoleId(),
+					Collections.singletonList(TestPropsValues.getGroupId()))),
+			instance3, _process.getId());
 
 		_testGetProcessInstancesPage(
 			null, null, null, null, new String[] {"Pending"},
@@ -559,15 +555,20 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 		instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), instance);
 
-		for (Assignee assignee : instance.getAssignees()) {
+		Assignee assignee = (Assignee)ArrayUtil.getValue(
+			instance.getAssignees(), 0);
+
+		if (assignee != null) {
 			if (assignee.getId() == -1L) {
 				_workflowMetricsRESTTestHelper.addTask(
-					assignee, assignments, testGroup.getCompanyId(), instance);
+					assignments, testGroup.getCompanyId(), instance);
 			}
 			else {
 				_workflowMetricsRESTTestHelper.addTask(
-					assignee, testGroup.getCompanyId(), instance,
-					TestPropsValues.getUser());
+					Collections.singletonList(
+						new UserAssignment(
+							assignee.getId(), assignee.getName())),
+					testGroup.getCompanyId(), instance);
 			}
 		}
 

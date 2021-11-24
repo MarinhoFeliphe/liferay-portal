@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
@@ -126,13 +125,14 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			new Assignee() {
 				{
 					id = user.getUserId();
+					name = user.getFullName();
 				}
 			},
 			testGroup.getCompanyId(),
 			() -> _workflowMetricsRESTTestHelper.addInstance(
 				testGroup.getCompanyId(), Objects.equals(status, "COMPLETED"),
 				processId),
-			processId, status, TestPropsValues.getUser());
+			processId, status);
 
 		return role;
 	}
