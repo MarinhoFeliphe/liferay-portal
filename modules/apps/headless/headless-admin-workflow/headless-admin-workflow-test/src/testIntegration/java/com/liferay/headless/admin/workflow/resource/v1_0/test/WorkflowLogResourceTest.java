@@ -29,8 +29,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -40,16 +38,14 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.test.rule.Inject;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Javier Gamarra
@@ -60,9 +56,6 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		BaseWorkflowLogResourceTestCase.setUpClass();
-
-		_resourceBundleLoader =
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
 
 		_workflowDefinition =
 			WorkflowDefinitionTestUtil.addWorkflowDefinition();
@@ -117,7 +110,7 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 					{
 						commentLog = StringPool.BLANK;
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"x-assigned-the-task-to-himself",
 							_portal.getUserName(
 								TestPropsValues.getUserId(), StringPool.BLANK),
@@ -130,9 +123,9 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 				new WorkflowLog() {
 					{
 						commentLog = _language.get(
-							_getResourceBundle(), "assigned-initial-task");
+							LocaleUtil.getDefault(), "assigned-initial-task");
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"task-initially-assigned-to-the-x-role",
 							_siteContentReviewerRole.getTitle(
 								LocaleUtil.getDefault()),
@@ -176,7 +169,7 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 					{
 						commentLog = StringPool.BLANK;
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"x-assigned-the-task-to-himself",
 							_portal.getUserName(
 								TestPropsValues.getUserId(), StringPool.BLANK),
@@ -205,9 +198,9 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 				new WorkflowLog() {
 					{
 						commentLog = _language.get(
-							_getResourceBundle(), "assigned-initial-task");
+							LocaleUtil.getDefault(), "assigned-initial-task");
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"task-initially-assigned-to-the-x-role",
 							_siteContentReviewerRole.getTitle(
 								LocaleUtil.getDefault()),
@@ -239,9 +232,9 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 				new WorkflowLog() {
 					{
 						commentLog = _language.get(
-							_getResourceBundle(), "assigned-initial-task");
+							LocaleUtil.getDefault(), "assigned-initial-task");
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"task-initially-assigned-to-the-x-role",
 							_siteContentReviewerRole.getTitle(
 								LocaleUtil.getDefault()),
@@ -285,7 +278,7 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 					{
 						commentLog = StringPool.BLANK;
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"x-assigned-the-task-to-himself",
 							_portal.getUserName(
 								TestPropsValues.getUserId(), StringPool.BLANK),
@@ -314,9 +307,9 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 				new WorkflowLog() {
 					{
 						commentLog = _language.get(
-							_getResourceBundle(), "assigned-initial-task");
+							LocaleUtil.getDefault(), "assigned-initial-task");
 						description = _language.format(
-							_getResourceBundle(),
+							LocaleUtil.getDefault(),
 							"task-initially-assigned-to-the-x-role",
 							_siteContentReviewerRole.getTitle(
 								LocaleUtil.getDefault()),
@@ -356,12 +349,6 @@ public class WorkflowLogResourceTest extends BaseWorkflowLogResourceTestCase {
 		return testGetWorkflowLog_addWorkflowLog();
 	}
 
-	private ResourceBundle _getResourceBundle() {
-		return _resourceBundleLoader.loadResourceBundle(
-			LocaleUtil.getDefault());
-	}
-
-	private static ResourceBundleLoader _resourceBundleLoader;
 	private static WorkflowDefinition _workflowDefinition;
 	private static WorkflowInstance _workflowInstance;
 
