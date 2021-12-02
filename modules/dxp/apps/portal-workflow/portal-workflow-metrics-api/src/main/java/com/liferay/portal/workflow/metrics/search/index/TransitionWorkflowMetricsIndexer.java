@@ -25,12 +25,8 @@ public interface TransitionWorkflowMetricsIndexer {
 
 	public Document addTransition(AddTransitionRequest addTransitionRequest);
 
-	public default void deleteTransition(
-		DeleteTransitionRequest deleteTransitionRequest) {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
+	public void deleteTransition(
+		DeleteTransitionRequest deleteTransitionRequest);
 
 	public void deleteTransition(long companyId, long transitionId);
 
