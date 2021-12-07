@@ -16,6 +16,7 @@ package com.liferay.portal.workflow.metrics.search.index;
 
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.workflow.metrics.model.AddTransitionRequest;
+import com.liferay.portal.workflow.metrics.model.DeleteTransitionRequest;
 
 /**
  * @author Rafael Praxedes
@@ -23,6 +24,13 @@ import com.liferay.portal.workflow.metrics.model.AddTransitionRequest;
 public interface TransitionWorkflowMetricsIndexer {
 
 	public Document addTransition(AddTransitionRequest addTransitionRequest);
+
+	public default void deleteTransition(
+		DeleteTransitionRequest deleteTransitionRequest) {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
 
 	public void deleteTransition(long companyId, long transitionId);
 
