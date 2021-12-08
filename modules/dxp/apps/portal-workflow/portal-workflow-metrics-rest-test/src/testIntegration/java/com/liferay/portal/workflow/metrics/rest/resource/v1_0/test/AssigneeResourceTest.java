@@ -17,12 +17,12 @@ package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.workflow.metrics.model.UserAssignment;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.AssigneeBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
@@ -81,14 +81,16 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 		Assignee assignee1 = randomAssignee();
 
 		_workflowMetricsRESTTestHelper.addTask(
-			assignee1, testGroup.getCompanyId(), _instance,
-			TestPropsValues.getUser());
+			Arrays.asList(
+				new UserAssignment(assignee1.getId(), assignee1.getName())),
+			testGroup.getCompanyId(), _instance);
 
 		Assignee assignee2 = randomAssignee();
 
 		_workflowMetricsRESTTestHelper.addTask(
-			assignee2, testGroup.getCompanyId(), _instance,
-			TestPropsValues.getUser());
+			Arrays.asList(
+				new UserAssignment(assignee2.getId(), assignee2.getName())),
+			testGroup.getCompanyId(), _instance);
 
 		Page<Assignee> page = assigneeResource.postProcessAssigneesPage(
 			_process.getId(), new AssigneeBulkSelection());

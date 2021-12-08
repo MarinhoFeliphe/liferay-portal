@@ -15,7 +15,10 @@
 package com.liferay.portal.workflow.metrics.search.index;
 
 import com.liferay.portal.search.document.Document;
+import com.liferay.portal.workflow.metrics.model.AddTaskRequest;
 import com.liferay.portal.workflow.metrics.model.Assignment;
+import com.liferay.portal.workflow.metrics.model.CompleteTaskRequest;
+import com.liferay.portal.workflow.metrics.model.UpdateTaskRequest;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +30,15 @@ import java.util.Map;
  */
 public interface TaskWorkflowMetricsIndexer {
 
+	public default Document addTask(AddTaskRequest addTaskRequest) {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addTask(AddTaskRequest)}
+	 */
+	@Deprecated
 	public Document addTask(
 		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
 		List<Assignment> assignments, String className, long classPK,
@@ -36,15 +48,35 @@ public interface TaskWorkflowMetricsIndexer {
 		String name, long nodeId, long processId, String processVersion,
 		long taskId, long userId);
 
+	public default Document completeTask(
+		CompleteTaskRequest completeTaskRequest) {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #completeTask(CompleteTaskRequest)}
+	 */
+	@Deprecated
 	public Document completeTask(
 		long companyId, Date completionDate, long completionUserId,
 		long duration, Date modifiedDate, long taskId, long userId);
 
 	public void deleteTask(long companyId, long taskId);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #updateTask(UpdateTaskRequest)}
+	 */
+	@Deprecated
 	public Document updateTask(
 		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
 		List<Assignment> assignments, long companyId, Date modifiedDate,
 		long taskId, long userId);
+
+	public default Document updateTask(UpdateTaskRequest updateTaskRequest) {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
 
 }

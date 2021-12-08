@@ -49,7 +49,10 @@ import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.workflow.metrics.model.AddTaskRequest;
 import com.liferay.portal.workflow.metrics.model.Assignment;
+import com.liferay.portal.workflow.metrics.model.CompleteTaskRequest;
+import com.liferay.portal.workflow.metrics.model.UpdateTaskRequest;
 import com.liferay.portal.workflow.metrics.model.UserAssignment;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Task;
@@ -154,11 +157,25 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 				new UserAssignment(assignee.getId(), user.getFullName()));
 		}
 
+		UpdateTaskRequest.Builder updateTaskRequestBuilder =
+			new UpdateTaskRequest.Builder();
+
 		_taskWorkflowMetricsIndexer.updateTask(
-			LocalizedMapUtil.getLocalizedMap(task.getAssetTitle_i18n()),
-			LocalizedMapUtil.getLocalizedMap(task.getAssetType_i18n()),
-			assignments, contextCompany.getCompanyId(), task.getDateModified(),
-			task.getId(), contextUser.getUserId());
+			updateTaskRequestBuilder.setAssetTitleMap(
+				LocalizedMapUtil.getLocalizedMap(task.getAssetTitle_i18n())
+			).setAssetTypeMap(
+				LocalizedMapUtil.getLocalizedMap(task.getAssetType_i18n())
+			).setAssignments(
+				assignments
+			).setCompanyId(
+				contextCompany.getCompanyId()
+			).setModifiedDate(
+				task.getDateModified()
+			).setTaskId(
+				task.getId()
+			).setUserId(
+				contextUser.getUserId()
+			).build());
 	}
 
 	@Override
@@ -167,35 +184,32 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 
 		getProcessTask(processId, taskId);
 
+		CompleteTaskRequest.Builder completeTaskRequestBuilder =
+			new CompleteTaskRequest.Builder();
+
 		_taskWorkflowMetricsIndexer.completeTask(
-			contextCompany.getCompanyId(), task.getDateCompletion(),
-			task.getCompletionUserId(), task.getDuration(),
-			task.getDateModified(), taskId, contextUser.getUserId());
+			completeTaskRequestBuilder.setCompanyId(
+				contextCompany.getCompanyId()
+			).setCompletionDate(
+				task.getDateCompletion()
+			).setCompletionUserId(
+				task.getCompletionUserId()
+			).setDuration(
+				task.getDuration()
+			).setModifiedDate(
+				task.getDateModified()
+			).setTaskId(
+				taskId
+			).setUserId(
+				contextUser.getUserId()
+			).build());
 	}
 
 	@Override
 	public Task postProcessTask(Long processId, Task task) throws Exception {
-		List<Assignment> assignments = new ArrayList<>();
-
-		Assignee assignee = task.getAssignee();
-
-		if ((assignee != null) && (assignee.getId() != null)) {
-			User user = _userLocalService.fetchUser(assignee.getId());
-
-			assignments.add(
-				new UserAssignment(assignee.getId(), user.getFullName()));
-		}
-
 		return TaskUtil.toTask(
 			_taskWorkflowMetricsIndexer.addTask(
-				LocalizedMapUtil.getLocalizedMap(task.getAssetTitle_i18n()),
-				LocalizedMapUtil.getLocalizedMap(task.getAssetType_i18n()),
-				assignments, task.getClassName(), task.getClassPK(),
-				contextCompany.getCompanyId(), false, null, null,
-				task.getDateCreated(), false, null, task.getInstanceId(),
-				task.getDateModified(), task.getName(), task.getNodeId(),
-				processId, task.getProcessVersion(), task.getId(),
-				contextUser.getUserId()),
+				_toAddTaskRequest(processId, task)),
 			_language, contextAcceptLanguage.getPreferredLocale(), _portal,
 			ResourceBundleUtil.getModuleAndPortalResourceBundle(
 				contextAcceptLanguage.getPreferredLocale(),
@@ -675,6 +689,60 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 		).collect(
 			Collectors.toCollection(LinkedList::new)
 		);
+	}
+
+	private AddTaskRequest _toAddTaskRequest(Long processId, Task task) {
+		AddTaskRequest.Builder builder = new AddTaskRequest.Builder();
+
+		return builder.setAssetTitleMap(
+			LocalizedMapUtil.getLocalizedMap(task.getAssetTitle_i18n())
+		).setAssetTypeMap(
+			LocalizedMapUtil.getLocalizedMap(task.getAssetType_i18n())
+		).setAssignments(
+			() -> {
+				List<Assignment> assignments = new ArrayList<>();
+
+				Assignee assignee = task.getAssignee();
+
+				if ((assignee != null) && (assignee.getId() != null)) {
+					User user = _userLocalService.fetchUser(assignee.getId());
+
+					assignments.add(
+						new UserAssignment(
+							assignee.getId(), user.getFullName()));
+				}
+
+				return assignments;
+			}
+		).setClassName(
+			task.getClassName()
+		).setClassPK(
+			task.getClassPK()
+		).setCompanyId(
+			contextCompany.getCompanyId()
+		).setCompleted(
+			false
+		).setCreateDate(
+			task.getDateCreated()
+		).setInstanceCompleted(
+			false
+		).setInstanceId(
+			task.getInstanceId()
+		).setModifiedDate(
+			task.getDateModified()
+		).setName(
+			task.getName()
+		).setNodeId(
+			task.getNodeId()
+		).setProcessId(
+			processId
+		).setProcessVersion(
+			task.getProcessVersion()
+		).setTaskId(
+			task.getId()
+		).setUserId(
+			contextUser.getUserId()
+		).build();
 	}
 
 	@Reference
