@@ -435,10 +435,11 @@ public class WorkflowDefinitionDisplayContext {
 		).setParameter(
 			"orderByType",
 			() -> {
-				String orderByType = ParamUtil.getString(
-					httpServletRequest, "orderByType", "asc");
+				if (Objects.equals(
+						ParamUtil.getString(
+							httpServletRequest, "orderByType", "asc"),
+						"asc")) {
 
-				if (Objects.equals(orderByType, "asc")) {
 					return "desc";
 				}
 
