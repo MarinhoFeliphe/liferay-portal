@@ -34,7 +34,6 @@ definition {
 
 	@description = "LPS-132234: Given the detail view of the page audit panel
 	Then the checks related to Low contrast ratio, Missing image-alt and Missing input-image-alt will appear under the Accessibility section"
-
 	@priority = "3"
 	test AccessibilityFailures {
 		property portal.acceptance = "true";
@@ -270,8 +269,6 @@ definition {
 
 		task ("Open Page Audit panel and assert the progress bar") {
 			PageAudit.openPanelAfterConfiguration(pageName = "Content Page");
-
-			AssertElementPresent(locator1 = "PageAudit#PROGRESS_BAR");
 		}
 
 		task ("Reset Google PageSpeed API to default at System Settings") {
@@ -3395,7 +3392,7 @@ definition {
 	@priority = "3"
 	test InvalidAPIKeyErrorIsRecovered {
 		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "PageAudit#CheckIllegibleFontSizes";
+		property test.name.skip.portal.instance = "PageAudit#InvalidAPIKeyErrorIsRecovered";
 
 		task ("Set a custom page as canonical URL to have data already loaded") {
 			PageAudit.setSEOcanonicalURL(URL = "https://liferay-tango.github.io/liferay-portal/page-audit-test");

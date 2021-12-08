@@ -19,9 +19,65 @@ import React, {useState} from 'react';
 
 import {useConstants} from '../contexts/ConstantsContext';
 
+function getNamespacedInfoItem(
+	portletNamespace,
+	selectedItem,
+	siteNavigationMenuId
+) {
+	if (!selectedItem) {
+		return;
+	}
+
+	let infoItem = {
+		...selectedItem,
+	};
+
+	let value;
+
+	if (typeof selectedItem.value === 'string') {
+		try {
+			value = JSON.parse(selectedItem.value);
+		}
+		catch (error) {}
+	}
+	else if (selectedItem.value && typeof selectedItem.value === 'object') {
+		value = selectedItem.value;
+	}
+
+	if (value) {
+		delete infoItem.value;
+		infoItem = {...value};
+	}
+
+	infoItem.siteNavigationMenuId = siteNavigationMenuId;
+
+	return Liferay.Util.ns(portletNamespace, infoItem);
+}
+
+function getNamespacedInfoItems(
+	portletNamespace,
+	selectedItems,
+	siteNavigationMenuId
+) {
+	if (!selectedItems.length) {
+		return;
+	}
+
+	const infoItems = {
+		items: JSON.stringify(selectedItems),
+		siteNavigationMenuId,
+	};
+
+	return Liferay.Util.ns(portletNamespace, infoItems);
+}
+
 export function AddItemDropDown({trigger}) {
 	const [active, setActive] = useState(false);
-	const {addSiteNavigationMenuItemOptions, portletNamespace} = useConstants();
+	const {
+		addSiteNavigationMenuItemOptions,
+		categoriesMultipleSelectionEnabled,
+		portletNamespace,
+	} = useConstants();
 
 	return (
 		<>
@@ -38,52 +94,29 @@ export function AddItemDropDown({trigger}) {
 							onClick={() => {
 								if (data.itemSelector) {
 									Liferay.Util.openSelectionModal({
-										onSelect: (selectedItem) => {
-											if (!selectedItem) {
-												return;
-											}
-
-											let infoItem = {
-												...selectedItem,
-											};
-
-											let value;
-
-											if (
-												typeof selectedItem.value ===
-												'string'
-											) {
-												try {
-													value = JSON.parse(
-														selectedItem.value
-													);
-												}
-												catch (error) {}
-											}
-											else if (
-												selectedItem.value &&
-												typeof selectedItem.value ===
-													'object'
-											) {
-												value = selectedItem.value;
-											}
-
-											if (value) {
-												delete infoItem.value;
-												infoItem = {...value};
-											}
-
-											infoItem.siteNavigationMenuId =
-												data.siteNavigationMenuId;
-
-											const namespacedInfoItem = Liferay.Util.ns(
-												portletNamespace,
-												infoItem
-											);
-
+										buttonAddLabel:
+											categoriesMultipleSelectionEnabled &&
+											data.multiSelection
+												? Liferay.Language.get('select')
+												: null,
+										multiple:
+											categoriesMultipleSelectionEnabled &&
+											data.multiSelection,
+										onSelect: (selection) => {
 											fetch(data.addItemURL, {
 												body: objectToFormData(
-													namespacedInfoItem
+													categoriesMultipleSelectionEnabled &&
+														data.multiSelection
+														? getNamespacedInfoItems(
+																portletNamespace,
+																selection,
+																data.siteNavigationMenuId
+														  )
+														: getNamespacedInfoItem(
+																portletNamespace,
+																selection,
+																data.siteNavigationMenuId
+														  )
 												),
 												method: 'POST',
 											}).then(() => {
@@ -91,9 +124,7 @@ export function AddItemDropDown({trigger}) {
 											});
 										},
 										selectEventName: `${portletNamespace}selectItem`,
-										title: Liferay.Language.get(
-											'select-item'
-										),
+										title: data.addTitle,
 										url: data.href,
 									});
 								}
@@ -103,7 +134,7 @@ export function AddItemDropDown({trigger}) {
 											destroyOnHide: true,
 										},
 										id: `${portletNamespace}addMenuItem`,
-										title: label,
+										title: data.addTitle,
 										uri: data.href,
 									});
 								}

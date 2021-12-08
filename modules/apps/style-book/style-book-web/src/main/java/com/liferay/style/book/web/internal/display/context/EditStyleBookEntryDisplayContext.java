@@ -112,6 +112,13 @@ public class EditStyleBookEntryDisplayContext {
 		).put(
 			"initialPreviewLayout", _getInitialPreviewLayoutJSONObject()
 		).put(
+			"isPrivateLayoutsEnabled",
+			() -> {
+				Group group = _themeDisplay.getScopeGroup();
+
+				return group.isPrivateLayoutsEnabled();
+			}
+		).put(
 			"layoutsTreeURL",
 			() -> {
 				ResourceURL resourceURL = _renderResponse.createResourceURL();

@@ -2930,6 +2930,938 @@ public class SXPElementPersistenceImpl
 	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
 		"sxpElement.companyId = ?";
 
+	private FinderPath _finderPathWithPaginationFindByC_R;
+	private FinderPath _finderPathWithoutPaginationFindByC_R;
+	private FinderPath _finderPathCountByC_R;
+
+	/**
+	 * Returns all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the matching sxp elements
+	 */
+	@Override
+	public List<SXPElement> findByC_R(long companyId, boolean readOnly) {
+		return findByC_R(
+			companyId, readOnly, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @return the range of matching sxp elements
+	 */
+	@Override
+	public List<SXPElement> findByC_R(
+		long companyId, boolean readOnly, int start, int end) {
+
+		return findByC_R(companyId, readOnly, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching sxp elements
+	 */
+	@Override
+	public List<SXPElement> findByC_R(
+		long companyId, boolean readOnly, int start, int end,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		return findByC_R(
+			companyId, readOnly, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching sxp elements
+	 */
+	@Override
+	public List<SXPElement> findByC_R(
+		long companyId, boolean readOnly, int start, int end,
+		OrderByComparator<SXPElement> orderByComparator,
+		boolean useFinderCache) {
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_R;
+				finderArgs = new Object[] {companyId, readOnly};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByC_R;
+			finderArgs = new Object[] {
+				companyId, readOnly, start, end, orderByComparator
+			};
+		}
+
+		List<SXPElement> list = null;
+
+		if (useFinderCache) {
+			list = (List<SXPElement>)finderCache.getResult(
+				finderPath, finderArgs);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (SXPElement sxpElement : list) {
+					if ((companyId != sxpElement.getCompanyId()) ||
+						(readOnly != sxpElement.isReadOnly())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = null;
+
+			if (orderByComparator != null) {
+				sb = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				sb = new StringBundler(4);
+			}
+
+			sb.append(_SQL_SELECT_SXPELEMENT_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_R_COMPANYID_2);
+
+			sb.append(_FINDER_COLUMN_C_R_READONLY_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(SXPElementModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				queryPos.add(readOnly);
+
+				list = (List<SXPElement>)QueryUtil.list(
+					query, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching sxp element
+	 * @throws NoSuchSXPElementException if a matching sxp element could not be found
+	 */
+	@Override
+	public SXPElement findByC_R_First(
+			long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws NoSuchSXPElementException {
+
+		SXPElement sxpElement = fetchByC_R_First(
+			companyId, readOnly, orderByComparator);
+
+		if (sxpElement != null) {
+			return sxpElement;
+		}
+
+		StringBundler sb = new StringBundler(6);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("companyId=");
+		sb.append(companyId);
+
+		sb.append(", readOnly=");
+		sb.append(readOnly);
+
+		sb.append("}");
+
+		throw new NoSuchSXPElementException(sb.toString());
+	}
+
+	/**
+	 * Returns the first sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching sxp element, or <code>null</code> if a matching sxp element could not be found
+	 */
+	@Override
+	public SXPElement fetchByC_R_First(
+		long companyId, boolean readOnly,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		List<SXPElement> list = findByC_R(
+			companyId, readOnly, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching sxp element
+	 * @throws NoSuchSXPElementException if a matching sxp element could not be found
+	 */
+	@Override
+	public SXPElement findByC_R_Last(
+			long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws NoSuchSXPElementException {
+
+		SXPElement sxpElement = fetchByC_R_Last(
+			companyId, readOnly, orderByComparator);
+
+		if (sxpElement != null) {
+			return sxpElement;
+		}
+
+		StringBundler sb = new StringBundler(6);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("companyId=");
+		sb.append(companyId);
+
+		sb.append(", readOnly=");
+		sb.append(readOnly);
+
+		sb.append("}");
+
+		throw new NoSuchSXPElementException(sb.toString());
+	}
+
+	/**
+	 * Returns the last sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching sxp element, or <code>null</code> if a matching sxp element could not be found
+	 */
+	@Override
+	public SXPElement fetchByC_R_Last(
+		long companyId, boolean readOnly,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		int count = countByC_R(companyId, readOnly);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<SXPElement> list = findByC_R(
+			companyId, readOnly, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the sxp elements before and after the current sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param sxpElementId the primary key of the current sxp element
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next sxp element
+	 * @throws NoSuchSXPElementException if a sxp element with the primary key could not be found
+	 */
+	@Override
+	public SXPElement[] findByC_R_PrevAndNext(
+			long sxpElementId, long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws NoSuchSXPElementException {
+
+		SXPElement sxpElement = findByPrimaryKey(sxpElementId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SXPElement[] array = new SXPElementImpl[3];
+
+			array[0] = getByC_R_PrevAndNext(
+				session, sxpElement, companyId, readOnly, orderByComparator,
+				true);
+
+			array[1] = sxpElement;
+
+			array[2] = getByC_R_PrevAndNext(
+				session, sxpElement, companyId, readOnly, orderByComparator,
+				false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected SXPElement getByC_R_PrevAndNext(
+		Session session, SXPElement sxpElement, long companyId,
+		boolean readOnly, OrderByComparator<SXPElement> orderByComparator,
+		boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(4);
+		}
+
+		sb.append(_SQL_SELECT_SXPELEMENT_WHERE);
+
+		sb.append(_FINDER_COLUMN_C_R_COMPANYID_2);
+
+		sb.append(_FINDER_COLUMN_C_R_READONLY_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			sb.append(SXPElementModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = sb.toString();
+
+		Query query = session.createQuery(sql);
+
+		query.setFirstResult(0);
+		query.setMaxResults(2);
+
+		QueryPos queryPos = QueryPos.getInstance(query);
+
+		queryPos.add(companyId);
+
+		queryPos.add(readOnly);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(sxpElement)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<SXPElement> list = query.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the matching sxp elements that the user has permission to view
+	 */
+	@Override
+	public List<SXPElement> filterFindByC_R(long companyId, boolean readOnly) {
+		return filterFindByC_R(
+			companyId, readOnly, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @return the range of matching sxp elements that the user has permission to view
+	 */
+	@Override
+	public List<SXPElement> filterFindByC_R(
+		long companyId, boolean readOnly, int start, int end) {
+
+		return filterFindByC_R(companyId, readOnly, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the sxp elements that the user has permissions to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching sxp elements that the user has permission to view
+	 */
+	@Override
+	public List<SXPElement> filterFindByC_R(
+		long companyId, boolean readOnly, int start, int end,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
+			return findByC_R(
+				companyId, readOnly, start, end, orderByComparator);
+		}
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
+		}
+		else {
+			sb = new StringBundler(5);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_SXPELEMENT_WHERE);
+		}
+		else {
+			sb.append(_FILTER_SQL_SELECT_SXPELEMENT_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		sb.append(_FINDER_COLUMN_C_R_COMPANYID_2);
+
+		sb.append(_FINDER_COLUMN_C_R_READONLY_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_SXPELEMENT_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+			}
+			else {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				sb.append(SXPElementModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				sb.append(SXPElementModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), SXPElement.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				sqlQuery.addEntity(_FILTER_ENTITY_ALIAS, SXPElementImpl.class);
+			}
+			else {
+				sqlQuery.addEntity(_FILTER_ENTITY_TABLE, SXPElementImpl.class);
+			}
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			queryPos.add(companyId);
+
+			queryPos.add(readOnly);
+
+			return (List<SXPElement>)QueryUtil.list(
+				sqlQuery, getDialect(), start, end);
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the sxp elements before and after the current sxp element in the ordered set of sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param sxpElementId the primary key of the current sxp element
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next sxp element
+	 * @throws NoSuchSXPElementException if a sxp element with the primary key could not be found
+	 */
+	@Override
+	public SXPElement[] filterFindByC_R_PrevAndNext(
+			long sxpElementId, long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws NoSuchSXPElementException {
+
+		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
+			return findByC_R_PrevAndNext(
+				sxpElementId, companyId, readOnly, orderByComparator);
+		}
+
+		SXPElement sxpElement = findByPrimaryKey(sxpElementId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SXPElement[] array = new SXPElementImpl[3];
+
+			array[0] = filterGetByC_R_PrevAndNext(
+				session, sxpElement, companyId, readOnly, orderByComparator,
+				true);
+
+			array[1] = sxpElement;
+
+			array[2] = filterGetByC_R_PrevAndNext(
+				session, sxpElement, companyId, readOnly, orderByComparator,
+				false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected SXPElement filterGetByC_R_PrevAndNext(
+		Session session, SXPElement sxpElement, long companyId,
+		boolean readOnly, OrderByComparator<SXPElement> orderByComparator,
+		boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(5);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_SXPELEMENT_WHERE);
+		}
+		else {
+			sb.append(_FILTER_SQL_SELECT_SXPELEMENT_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		sb.append(_FINDER_COLUMN_C_R_COMPANYID_2);
+
+		sb.append(_FINDER_COLUMN_C_R_READONLY_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_SXPELEMENT_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
+				}
+				else {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
+				}
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+				}
+				else {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+				}
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				sb.append(SXPElementModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				sb.append(SXPElementModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), SXPElement.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+		sqlQuery.setFirstResult(0);
+		sqlQuery.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sqlQuery.addEntity(_FILTER_ENTITY_ALIAS, SXPElementImpl.class);
+		}
+		else {
+			sqlQuery.addEntity(_FILTER_ENTITY_TABLE, SXPElementImpl.class);
+		}
+
+		QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+		queryPos.add(companyId);
+
+		queryPos.add(readOnly);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(sxpElement)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<SXPElement> list = sqlQuery.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the sxp elements where companyId = &#63; and readOnly = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 */
+	@Override
+	public void removeByC_R(long companyId, boolean readOnly) {
+		for (SXPElement sxpElement :
+				findByC_R(
+					companyId, readOnly, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
+			remove(sxpElement);
+		}
+	}
+
+	/**
+	 * Returns the number of sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the number of matching sxp elements
+	 */
+	@Override
+	public int countByC_R(long companyId, boolean readOnly) {
+		FinderPath finderPath = _finderPathCountByC_R;
+
+		Object[] finderArgs = new Object[] {companyId, readOnly};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_COUNT_SXPELEMENT_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_R_COMPANYID_2);
+
+			sb.append(_FINDER_COLUMN_C_R_READONLY_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				queryPos.add(readOnly);
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the number of matching sxp elements that the user has permission to view
+	 */
+	@Override
+	public int filterCountByC_R(long companyId, boolean readOnly) {
+		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
+			return countByC_R(companyId, readOnly);
+		}
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(_FILTER_SQL_COUNT_SXPELEMENT_WHERE);
+
+		sb.append(_FINDER_COLUMN_C_R_COMPANYID_2);
+
+		sb.append(_FINDER_COLUMN_C_R_READONLY_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), SXPElement.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			sqlQuery.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			queryPos.add(companyId);
+
+			queryPos.add(readOnly);
+
+			Long count = (Long)sqlQuery.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	private static final String _FINDER_COLUMN_C_R_COMPANYID_2 =
+		"sxpElement.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_READONLY_2 =
+		"sxpElement.readOnly = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_T;
 	private FinderPath _finderPathWithoutPaginationFindByC_T;
 	private FinderPath _finderPathCountByC_T;
@@ -5485,6 +6417,25 @@ public class SXPElementPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
+
+		_finderPathWithPaginationFindByC_R = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			},
+			new String[] {"companyId", "readOnly"}, true);
+
+		_finderPathWithoutPaginationFindByC_R = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_R",
+			new String[] {Long.class.getName(), Boolean.class.getName()},
+			new String[] {"companyId", "readOnly"}, true);
+
+		_finderPathCountByC_R = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R",
+			new String[] {Long.class.getName(), Boolean.class.getName()},
+			new String[] {"companyId", "readOnly"}, false);
 
 		_finderPathWithPaginationFindByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_T",

@@ -44,12 +44,18 @@ public class OpenIdConnectSessionTable
 	public final Column<OpenIdConnectSessionTable, Long> companyId =
 		createColumn(
 			"companyId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
+	public final Column<OpenIdConnectSessionTable, Long> userId = createColumn(
+		"userId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<OpenIdConnectSessionTable, Date> modifiedDate =
 		createColumn(
 			"modifiedDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<OpenIdConnectSessionTable, String> accessToken =
 		createColumn(
 			"accessToken", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<OpenIdConnectSessionTable, String> configurationPid =
+		createColumn(
+			"configurationPid", String.class, Types.VARCHAR,
+			Column.FLAG_DEFAULT);
 	public final Column<OpenIdConnectSessionTable, String> idToken =
 		createColumn(
 			"idToken", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);

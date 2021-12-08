@@ -145,23 +145,36 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136918. It checks that a category can be exported."
-	@ignore = "true"
 	@priority = "3"
 	test CanExportCategory {
-		property portal.acceptance = "false";
+		JSONMBMessage.addCategory(
+			categoryDescription = "MB Category Description",
+			categoryName = "MB Category Name",
+			userEmailAddress = "test@liferay.com");
 
-		// TODO LPS-136918 CanExportCategory pending implementation
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
 
+		LAR.exportPortlet(larFileName = "MB_portlet.lar");
+
+		MessageboardsThread.assertDownloadedFileNameFromTempFolder(exportedFileName = "MB_portlet");
 	}
 
 	@description = "This is a test for LPS-136917. It checks that a category can be imported."
-	@ignore = "true"
 	@priority = "3"
 	test CanImportCategory {
-		property portal.acceptance = "false";
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
 
-		// TODO LPS-136917 CanImportCategory pending implementation
+		LAR.importPortlet(
+			initializeLiferayEvent = "true",
+			larFileName = "message-boards-category.lar",
+			uploadFrom = "dependencies");
 
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
+
+		MessageboardsCategory.viewCP(
+			categoryCount = "0 Categories",
+			categoryName = "MB Category Name",
+			threadCount = "0");
 	}
 
 	@description = "This is a test for LPS-136923. It checks that a user can be unbanned."

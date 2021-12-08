@@ -14,40 +14,41 @@
 
 package com.liferay.friendly.url.web.internal.servlet;
 
+import com.liferay.friendly.url.info.item.provider.InfoItemFriendlyURLProvider;
+import com.liferay.friendly.url.info.item.updater.InfoItemFriendlyURLUpdater;
 import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
-import com.liferay.friendly.url.web.internal.util.comparator.FriendlyURLEntryLocalizationComparator;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.info.item.provider.InfoItemPermissionProvider;
-import com.liferay.layout.friendly.url.LayoutFriendlyURLEntryHelper;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.translation.info.item.provider.InfoItemLanguagesProvider;
 
 import java.io.IOException;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.servlet.Servlet;
@@ -121,18 +122,15 @@ public class FriendlyURLServlet extends HttpServlet {
 		try {
 			User user = _portal.getUser(httpServletRequest);
 
-			if (user.isDefaultUser() ||
-				!Objects.equals(
-					_getClassName(httpServletRequest),
-					Layout.class.getName())) {
-
+			if (user.isDefaultUser()) {
 				_writeJSON(httpServletResponse, JSONUtil.put("success", false));
 			}
 			else {
 				_writeJSON(
 					httpServletResponse,
 					_getFriendlyURLEntryLocalizationsJSONObject(
-						httpServletRequest));
+						_getClassName(httpServletRequest),
+						_getClassPK(httpServletRequest)));
 			}
 		}
 		catch (Exception exception) {
@@ -152,7 +150,7 @@ public class FriendlyURLServlet extends HttpServlet {
 			String className = _getClassName(httpServletRequest);
 			long classPK = _getClassPK(httpServletRequest);
 
-			InfoItemPermissionProvider infoItemPermissionProvider =
+			InfoItemPermissionProvider<Object> infoItemPermissionProvider =
 				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemPermissionProvider.class, className);
 
@@ -160,22 +158,19 @@ public class FriendlyURLServlet extends HttpServlet {
 					PermissionCheckerFactoryUtil.create(
 						_portal.getUser(httpServletRequest)),
 					new InfoItemReference(className, classPK),
-					ActionKeys.UPDATE) ||
-				!className.equals(Layout.class.getName())) {
+					ActionKeys.UPDATE)) {
 
 				_writeJSON(httpServletResponse, JSONUtil.put("success", false));
 			}
 			else {
-				String languageId = _getLanguageId(httpServletRequest);
+				InfoItemFriendlyURLUpdater<Object> infoItemFriendlyURLUpdater =
+					_infoItemServiceTracker.getFirstInfoItemService(
+						InfoItemFriendlyURLUpdater.class, className);
 
-				FriendlyURLEntryLocalization friendlyURLEntryLocalization =
-					_friendlyURLEntryLocalService.
-						getFriendlyURLEntryLocalization(
-							_getEntryId(httpServletRequest), languageId);
-
-				_layoutLocalService.updateFriendlyURL(
+				infoItemFriendlyURLUpdater.restoreFriendlyURL(
 					_portal.getUserId(httpServletRequest), classPK,
-					friendlyURLEntryLocalization.getUrlTitle(), languageId);
+					_getEntryId(httpServletRequest),
+					_getLanguageId(httpServletRequest));
 
 				_writeJSON(httpServletResponse, JSONUtil.put("success", true));
 			}
@@ -211,26 +206,39 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	private JSONObject _getFriendlyURLEntryLocalizationsJSONObject(
-			HttpServletRequest httpServletRequest)
+			String className, long classPK)
 		throws Exception {
-
-		Layout layout = _layoutLocalService.getLayout(
-			_getClassPK(httpServletRequest));
 
 		JSONObject friendlyURLEntryLocalizationsJSONObject =
 			JSONFactoryUtil.createJSONObject();
 
-		for (String languageId : layout.getAvailableLanguageIds()) {
-			List<FriendlyURLEntryLocalization> friendlyURLEntryLocalizations =
-				_friendlyURLEntryLocalService.getFriendlyURLEntryLocalizations(
-					layout.getGroupId(),
-					_layoutFriendlyURLEntryHelper.getClassNameId(
-						layout.isPrivateLayout()),
-					layout.getPlid(), languageId, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, _friendlyURLEntryLocalizationComparator);
+		InfoItemObjectProvider<Object> infoItemObjectProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemObjectProvider.class, className);
 
-			String mainUrlTitle = layout.getFriendlyURL(
-				LocaleUtil.fromLanguageId(languageId));
+		Object object = infoItemObjectProvider.getInfoItem(classPK);
+
+		InfoItemFriendlyURLProvider<Object> infoItemFriendlyURLProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFriendlyURLProvider.class, className);
+
+		InfoItemLanguagesProvider<Object> infoItemLanguagesProvider =
+			Optional.ofNullable(
+				_infoItemServiceTracker.getFirstInfoItemService(
+					InfoItemLanguagesProvider.class, className)
+			).orElse(
+				_defaultInfoItemLanguagesProvider
+			);
+
+		for (String languageId :
+				infoItemLanguagesProvider.getAvailableLanguageIds(object)) {
+
+			List<FriendlyURLEntryLocalization> friendlyURLEntryLocalizations =
+				infoItemFriendlyURLProvider.getFriendlyURLEntryLocalizations(
+					object, languageId);
+
+			String mainUrlTitle = infoItemFriendlyURLProvider.getFriendlyURL(
+				object, languageId);
 
 			friendlyURLEntryLocalizationsJSONObject.put(
 				languageId,
@@ -309,9 +317,24 @@ public class FriendlyURLServlet extends HttpServlet {
 	private static final Log _log = LogFactoryUtil.getLog(
 		FriendlyURLServlet.class);
 
-	private final FriendlyURLEntryLocalizationComparator
-		_friendlyURLEntryLocalizationComparator =
-			new FriendlyURLEntryLocalizationComparator();
+	private static final InfoItemLanguagesProvider<Object>
+		_defaultInfoItemLanguagesProvider =
+			new InfoItemLanguagesProvider<Object>() {
+
+				@Override
+				public String[] getAvailableLanguageIds(Object object)
+					throws PortalException {
+
+					return new String[] {getDefaultLanguageId(object)};
+				}
+
+				@Override
+				public String getDefaultLanguageId(Object object) {
+					return LanguageUtil.getLanguageId(
+						LocaleUtil.getSiteDefault());
+				}
+
+			};
 
 	@Reference
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
@@ -321,12 +344,6 @@ public class FriendlyURLServlet extends HttpServlet {
 
 	@Reference
 	private InfoItemServiceTracker _infoItemServiceTracker;
-
-	@Reference
-	private LayoutFriendlyURLEntryHelper _layoutFriendlyURLEntryHelper;
-
-	@Reference
-	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;

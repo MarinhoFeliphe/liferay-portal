@@ -1,12 +1,12 @@
 import {useQuery} from '@apollo/client';
 import {createContext, useEffect, useReducer} from 'react';
-import FormProvider from '~/common/providers/FormProvider';
-import {LiferayTheme} from '~/common/services/liferay';
-import {getUserAccountById} from '~/common/services/liferay/graphql/queries';
+import FormProvider from '../../../common/providers/FormProvider';
+import {LiferayTheme} from '../../../common/services/liferay';
+import {getUserAccount} from '../../../common/services/liferay/graphql/queries';
 import {
 	PARAMS_KEYS,
 	SearchParams,
-} from '~/common/services/liferay/search-params';
+} from '../../../common/services/liferay/search-params';
 import {
 	getInitialDxpAdmin,
 	getInitialInvite,
@@ -42,8 +42,8 @@ const AppContextProvider = ({assetsPath, children}) => {
 		userAccount: undefined,
 	});
 
-	const {data} = useQuery(getUserAccountById, {
-		variables: {userAccountId: LiferayTheme.getUserId()},
+	const {data} = useQuery(getUserAccount, {
+		variables: {id: LiferayTheme.getUserId()},
 	});
 
 	const userAccount = data?.userAccount;

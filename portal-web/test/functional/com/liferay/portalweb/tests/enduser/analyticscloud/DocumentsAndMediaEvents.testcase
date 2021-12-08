@@ -43,7 +43,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 
@@ -56,6 +55,7 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8969 | Test Summary: Check documentDownloaded triggers when a file is downloaded in a DXP site and check its properties (see reference document in comments)"
 	@priority = "5"
 	test CheckDocumentDownloadedInSiteAndCheckProperties {
+		property portal.upstream = "quarantine";
 		property proxy.server.enabled = "true";
 
 		task ("Get site assigned property name") {
@@ -151,6 +151,7 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8944 | Test Summary: Check documentPreviewed is triggered when viewing the document on a page and has the right parameters"
 	@priority = "3"
 	test CheckDocumentPreviewedWhenViewOnPageAndCheckParameters {
+		property portal.upstream = "quarantine";
 		property proxy.server.enabled = "true";
 
 		task ("Get site assigned property name") {

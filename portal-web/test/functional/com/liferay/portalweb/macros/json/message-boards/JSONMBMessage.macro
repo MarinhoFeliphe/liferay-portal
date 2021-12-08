@@ -85,16 +85,22 @@ definition {
 			var site = "true";
 		}
 
-		var groupId = JSONGroupAPI._getGroupIdByName(groupName = "${groupName}", site = "${site}");
+		var groupId = JSONGroupAPI._getGroupIdByName(
+			groupName = "${groupName}",
+			site = "${site}");
 
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (!(isSet(addGuestPermissions))) {
-			var addGuestPermissions = "false";
+			var addGuestPermissions = "true";
+		}
+
+		if (!(isSet(addGroupPermissions))) {
+			var addGroupPermissions = "true";
 		}
 
 		var serviceContext = JSONServiceContextUtil.setServiceContext(
-			addGroupPermissions = "true",
+			addGroupPermissions = "${addGroupPermissions}",
 			addGuestPermissions = "${addGuestPermissions}",
 			assetCategoryIds = "${assetCategoryIds}",
 			assetTagNames = "${assetTagNames}",
@@ -102,8 +108,8 @@ definition {
 
 		if (isSet(categoryName)) {
 			var categoryId = JSONMBMessage.getCategoryIdByName(
-				groupName = "${groupName}",
-				categoryName = "${categoryName}");
+				categoryName = "${categoryName}",
+				groupName = "${groupName}");
 		}
 		else {
 			var categoryId = "0";
@@ -196,8 +202,8 @@ definition {
 		Variables.assertDefined(parameterList = "${categoryName},${groupName}");
 
 		var categoryId = JSONMBMessage.getCategoryIdByName(
-			groupName = "${groupName}",
-			categoryName = "${categoryName}");
+			categoryName = "${categoryName}",
+			groupName = "${groupName}");
 
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -253,7 +259,6 @@ definition {
 			-u test@liferay.com:test \
 			-d groupId=${groupId}
 		''';
-
 		var categoryId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${categoryName}')]['categoryId']");
 
 		if ("${categoryId}" == "") {
@@ -276,8 +281,8 @@ definition {
 	macro getMessageIdByName {
 		if (isSet(categoryName)) {
 			var categoryId = JSONMBMessage.getCategoryIdByName(
-				groupName = "${groupName}",
-				categoryName = "${categoryName}");
+				categoryName = "${categoryName}",
+				groupName = "${groupName}");
 		}
 		else {
 			var categoryId = "0";
@@ -297,7 +302,6 @@ definition {
 			-d "end=-1"
 
 		''';
-
 		var messageId = JSONCurlUtil.post("${curl}", "$.[?(@['title'] == '${threadSubject}')]['rootMessageId']");
 
 		if ("${messageId}" == "") {
@@ -311,8 +315,8 @@ definition {
 	macro getThreadIdByName {
 		if (isSet(categoryName)) {
 			var categoryId = JSONMBMessage.getCategoryIdByName(
-				groupName = "${groupName}",
-				categoryName = "${categoryName}");
+				categoryName = "${categoryName}",
+				groupName = "${groupName}");
 		}
 		else {
 			var categoryId = "0";
@@ -332,7 +336,6 @@ definition {
 			-d "end=-1"
 
 		''';
-
 		var threadId = JSONCurlUtil.post("${curl}", "$.[?(@['title'] == '${threadSubject}')]['threadId']");
 
 		if ("${threadId}" == "") {
@@ -345,8 +348,8 @@ definition {
 	@summary = "This calls the JSON WS API to move a category to trash"
 	macro moveCategoryToTrash {
 		var categoryId = JSONMBMessage.getCategoryIdByName(
-			groupName = "${groupName}",
-			categoryName = "${categoryName}");
+			categoryName = "${categoryName}",
+			groupName = "${groupName}");
 
 		var portalURL = JSONCompany.getPortalURL();
 

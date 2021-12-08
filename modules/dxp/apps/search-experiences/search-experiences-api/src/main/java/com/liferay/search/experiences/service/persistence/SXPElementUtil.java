@@ -885,6 +885,279 @@ public class SXPElementUtil {
 	}
 
 	/**
+	 * Returns all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the matching sxp elements
+	 */
+	public static List<SXPElement> findByC_R(long companyId, boolean readOnly) {
+		return getPersistence().findByC_R(companyId, readOnly);
+	}
+
+	/**
+	 * Returns a range of all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @return the range of matching sxp elements
+	 */
+	public static List<SXPElement> findByC_R(
+		long companyId, boolean readOnly, int start, int end) {
+
+		return getPersistence().findByC_R(companyId, readOnly, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching sxp elements
+	 */
+	public static List<SXPElement> findByC_R(
+		long companyId, boolean readOnly, int start, int end,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		return getPersistence().findByC_R(
+			companyId, readOnly, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching sxp elements
+	 */
+	public static List<SXPElement> findByC_R(
+		long companyId, boolean readOnly, int start, int end,
+		OrderByComparator<SXPElement> orderByComparator,
+		boolean useFinderCache) {
+
+		return getPersistence().findByC_R(
+			companyId, readOnly, start, end, orderByComparator, useFinderCache);
+	}
+
+	/**
+	 * Returns the first sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching sxp element
+	 * @throws NoSuchSXPElementException if a matching sxp element could not be found
+	 */
+	public static SXPElement findByC_R_First(
+			long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws com.liferay.search.experiences.exception.
+			NoSuchSXPElementException {
+
+		return getPersistence().findByC_R_First(
+			companyId, readOnly, orderByComparator);
+	}
+
+	/**
+	 * Returns the first sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching sxp element, or <code>null</code> if a matching sxp element could not be found
+	 */
+	public static SXPElement fetchByC_R_First(
+		long companyId, boolean readOnly,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		return getPersistence().fetchByC_R_First(
+			companyId, readOnly, orderByComparator);
+	}
+
+	/**
+	 * Returns the last sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching sxp element
+	 * @throws NoSuchSXPElementException if a matching sxp element could not be found
+	 */
+	public static SXPElement findByC_R_Last(
+			long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws com.liferay.search.experiences.exception.
+			NoSuchSXPElementException {
+
+		return getPersistence().findByC_R_Last(
+			companyId, readOnly, orderByComparator);
+	}
+
+	/**
+	 * Returns the last sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching sxp element, or <code>null</code> if a matching sxp element could not be found
+	 */
+	public static SXPElement fetchByC_R_Last(
+		long companyId, boolean readOnly,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		return getPersistence().fetchByC_R_Last(
+			companyId, readOnly, orderByComparator);
+	}
+
+	/**
+	 * Returns the sxp elements before and after the current sxp element in the ordered set where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param sxpElementId the primary key of the current sxp element
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next sxp element
+	 * @throws NoSuchSXPElementException if a sxp element with the primary key could not be found
+	 */
+	public static SXPElement[] findByC_R_PrevAndNext(
+			long sxpElementId, long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws com.liferay.search.experiences.exception.
+			NoSuchSXPElementException {
+
+		return getPersistence().findByC_R_PrevAndNext(
+			sxpElementId, companyId, readOnly, orderByComparator);
+	}
+
+	/**
+	 * Returns all the sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the matching sxp elements that the user has permission to view
+	 */
+	public static List<SXPElement> filterFindByC_R(
+		long companyId, boolean readOnly) {
+
+		return getPersistence().filterFindByC_R(companyId, readOnly);
+	}
+
+	/**
+	 * Returns a range of all the sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @return the range of matching sxp elements that the user has permission to view
+	 */
+	public static List<SXPElement> filterFindByC_R(
+		long companyId, boolean readOnly, int start, int end) {
+
+		return getPersistence().filterFindByC_R(
+			companyId, readOnly, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the sxp elements that the user has permissions to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SXPElementModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param start the lower bound of the range of sxp elements
+	 * @param end the upper bound of the range of sxp elements (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching sxp elements that the user has permission to view
+	 */
+	public static List<SXPElement> filterFindByC_R(
+		long companyId, boolean readOnly, int start, int end,
+		OrderByComparator<SXPElement> orderByComparator) {
+
+		return getPersistence().filterFindByC_R(
+			companyId, readOnly, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns the sxp elements before and after the current sxp element in the ordered set of sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param sxpElementId the primary key of the current sxp element
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next sxp element
+	 * @throws NoSuchSXPElementException if a sxp element with the primary key could not be found
+	 */
+	public static SXPElement[] filterFindByC_R_PrevAndNext(
+			long sxpElementId, long companyId, boolean readOnly,
+			OrderByComparator<SXPElement> orderByComparator)
+		throws com.liferay.search.experiences.exception.
+			NoSuchSXPElementException {
+
+		return getPersistence().filterFindByC_R_PrevAndNext(
+			sxpElementId, companyId, readOnly, orderByComparator);
+	}
+
+	/**
+	 * Removes all the sxp elements where companyId = &#63; and readOnly = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 */
+	public static void removeByC_R(long companyId, boolean readOnly) {
+		getPersistence().removeByC_R(companyId, readOnly);
+	}
+
+	/**
+	 * Returns the number of sxp elements where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the number of matching sxp elements
+	 */
+	public static int countByC_R(long companyId, boolean readOnly) {
+		return getPersistence().countByC_R(companyId, readOnly);
+	}
+
+	/**
+	 * Returns the number of sxp elements that the user has permission to view where companyId = &#63; and readOnly = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param readOnly the read only
+	 * @return the number of matching sxp elements that the user has permission to view
+	 */
+	public static int filterCountByC_R(long companyId, boolean readOnly) {
+		return getPersistence().filterCountByC_R(companyId, readOnly);
+	}
+
+	/**
 	 * Returns all the sxp elements where companyId = &#63; and type = &#63;.
 	 *
 	 * @param companyId the company ID

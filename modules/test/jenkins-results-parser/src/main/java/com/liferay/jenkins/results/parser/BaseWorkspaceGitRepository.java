@@ -276,13 +276,14 @@ public abstract class BaseWorkspaceGitRepository
 
 		gitWorkingDirectory.checkoutLocalGitBranch(localGitBranch);
 
+		gitWorkingDirectory.createLocalGitBranch(
+			getUpstreamBranchName(), true, getBaseBranchSHA());
+
 		gitWorkingDirectory.reset("--hard " + localGitBranch.getSHA());
 
 		gitWorkingDirectory.clean();
 
 		gitWorkingDirectory.displayLog();
-
-		writePropertiesFiles();
 
 		_setUp = true;
 	}

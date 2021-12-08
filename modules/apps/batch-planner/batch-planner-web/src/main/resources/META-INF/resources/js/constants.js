@@ -12,9 +12,17 @@
  * details.
  */
 
-export const EXPORT_PROCESS_STARTED = 'STARTED';
-export const EXPORT_PROCESS_COMPLETED = 'COMPLETED';
-export const EXPORT_PROCESS_FAILED = 'FAILED';
+export const PROCESS_STARTED = 'STARTED';
+export const PROCESS_COMPLETED = 'COMPLETED';
+export const PROCESS_FAILED = 'FAILED';
 
-export const EXPORT_POLL_INTERVAL = 1000;
+export const POLL_INTERVAL = 1000;
 export const EXPORT_FILE_NAME = 'Export.zip';
+export const PARSE_FILE_CHUNK_SIZE = 64 * 1024;
+
+export const HEADERS = new Headers({
+	'Accept': 'application/json',
+	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
+});
+
+export const HEADLESS_BATCH_ENGINE_URL = '/o/headless-batch-engine/v1.0';

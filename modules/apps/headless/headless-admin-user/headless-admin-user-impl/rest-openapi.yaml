@@ -962,6 +962,23 @@ components:
                             type: array
                     type: object
             type: object
+        UserGroup:
+            properties:
+                description:
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                name:
+                    type: string
+                usersCount:
+                    format: int32
+                    readOnly: true
+                    type: integer
+            required:
+                - name
+            type: object
         WebUrl:
             description:
                 Represents a URL to an external site. This is modeled internally as a `WebSite`.
@@ -987,7 +1004,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.admin.user.client', and version '4.0.11'."
+        'com.liferay.headless.admin.user.client', and version '4.0.12'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -3812,6 +3829,30 @@ paths:
                                     $ref: "#/components/schemas/WebUrl"
                                 type: array
             tags: ["WebUrl"]
+    "/user-groups":
+        post:
+            operationId: postUserGroup
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserGroup"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/UserGroup"
+            responses:
+                201:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/UserGroup"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/UserGroup"
+                    # @review
+                    description:
+                        "User group successfully created"
+            tags: ["UserGroup"]
     "/web-urls/{webUrlId}":
         get:
             description:

@@ -10,22 +10,35 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useContext} from 'react';
 
+import {DefinitionBuilderContext} from '../../../../DefinitionBuilderContext';
 import BaseNode from '../BaseNode';
 
 export default function StateNode({
 	data: {description, label} = {},
 	descriptionSidebar,
+	id,
 	...otherProps
 }) {
+	const {defaultLanguageId} = useContext(DefinitionBuilderContext);
+
+	if (!label || !label[defaultLanguageId]) {
+		const defaultLanguageId = themeDisplay.getLanguageId();
+
+		label = {
+			[defaultLanguageId]: Liferay.Language.get('state'),
+		};
+	}
+
 	return (
 		<BaseNode
 			className="state-node"
 			description={description}
 			descriptionSidebar={descriptionSidebar}
 			icon="circle"
-			label={label ?? Liferay.Language.get('state')}
+			id={id}
+			label={label}
 			type="state"
 			{...otherProps}
 		/>
@@ -35,4 +48,5 @@ export default function StateNode({
 StateNode.propTypes = {
 	data: PropTypes.object,
 	descriptionSidebar: PropTypes.string,
+	id: PropTypes.string.isRequired,
 };

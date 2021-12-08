@@ -43,6 +43,7 @@ import com.liferay.commerce.product.model.impl.CPDefinitionModelImpl;
 import com.liferay.commerce.product.service.base.CPDefinitionLocalServiceBaseImpl;
 import com.liferay.commerce.product.type.CPType;
 import com.liferay.commerce.product.type.CPTypeServicesTracker;
+import com.liferay.commerce.product.type.virtual.constants.VirtualCPTypeConstants;
 import com.liferay.commerce.product.util.CPVersionContributor;
 import com.liferay.commerce.product.util.CPVersionContributorRegistryUtil;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
@@ -201,9 +202,18 @@ public class CPDefinitionLocalServiceImpl
 		cpDefinition.setCPTaxCategoryId(cpTaxCategoryId);
 		cpDefinition.setProductTypeName(productTypeName);
 		cpDefinition.setIgnoreSKUCombinations(ignoreSKUCombinations);
-		cpDefinition.setShippable(shippable);
 		cpDefinition.setFreeShipping(freeShipping);
 		cpDefinition.setShipSeparately(shipSeparately);
+
+		if (StringUtil.equalsIgnoreCase(
+				productTypeName, VirtualCPTypeConstants.NAME)) {
+
+			cpDefinition.setShippable(false);
+		}
+		else {
+			cpDefinition.setShippable(shippable);
+		}
+
 		cpDefinition.setShippingExtraPrice(shippingExtraPrice);
 		cpDefinition.setWidth(width);
 		cpDefinition.setHeight(height);
@@ -1585,10 +1595,11 @@ public class CPDefinitionLocalServiceImpl
 				CPDefinitionExpirationDateException.class);
 		}
 
+		String productTypeName = cpDefinition.getProductTypeName();
+
 		validate(
 			groupId, ddmStructureKey, metaTitleMap, metaDescriptionMap,
-			metaKeywordsMap, displayDate, expirationDate,
-			cpDefinition.getProductTypeName());
+			metaKeywordsMap, displayDate, expirationDate, productTypeName);
 
 		if (cpDefinitionLocalService.isVersionable(cpDefinition)) {
 			cpDefinition = cpDefinitionLocalService.copyCPDefinition(
@@ -1604,9 +1615,18 @@ public class CPDefinitionLocalServiceImpl
 
 		cpDefinition.setCPTaxCategoryId(cpTaxCategoryId);
 		cpDefinition.setIgnoreSKUCombinations(ignoreSKUCombinations);
-		cpDefinition.setShippable(shippable);
 		cpDefinition.setFreeShipping(freeShipping);
 		cpDefinition.setShipSeparately(shipSeparately);
+
+		if (StringUtil.equalsIgnoreCase(
+				productTypeName, VirtualCPTypeConstants.NAME)) {
+
+			cpDefinition.setShippable(false);
+		}
+		else {
+			cpDefinition.setShippable(shippable);
+		}
+
 		cpDefinition.setShippingExtraPrice(shippingExtraPrice);
 		cpDefinition.setWidth(width);
 		cpDefinition.setHeight(height);

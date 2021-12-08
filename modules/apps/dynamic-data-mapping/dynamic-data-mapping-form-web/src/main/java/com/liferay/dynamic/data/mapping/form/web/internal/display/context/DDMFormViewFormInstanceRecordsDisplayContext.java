@@ -42,9 +42,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -55,7 +54,6 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -310,43 +308,27 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(_renderRequest);
-
-		String orderByCol = ParamUtil.getString(_renderRequest, "orderByCol");
-
-		if (Validator.isNull(orderByCol)) {
-			orderByCol = portalPreferences.getValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
-				"view-entries-order-by-col", "modified-date");
-		}
-		else {
-			portalPreferences.setValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
-				"view-entries-order-by-col", orderByCol);
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
 		}
 
-		return orderByCol;
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
+			"view-entries-order-by-col", "modified-date");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(_renderRequest);
-
-		String orderByType = ParamUtil.getString(_renderRequest, "orderByType");
-
-		if (Validator.isNull(orderByType)) {
-			orderByType = portalPreferences.getValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
-				"view-entries-order-by-type", "asc");
-		}
-		else {
-			portalPreferences.setValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
-				"view-entries-order-by-type", orderByType);
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
 		}
 
-		return orderByType;
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
+			"view-entries-order-by-type", "asc");
+
+		return _orderByType;
 	}
 
 	public PortletURL getPortletURL() {
@@ -409,18 +391,6 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 			new DDMFormInstanceRecordSearch(
 				_renderRequest, portletURL, getHeaderNames());
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<DDMFormInstanceRecord> orderByComparator =
-			DDMFormInstanceRecordSearch.
-				getDDMFormInstanceRecordOrderByComparator(
-					orderByCol, orderByType);
-
-		ddmFormInstanceRecordSearch.setOrderByCol(orderByCol);
-		ddmFormInstanceRecordSearch.setOrderByComparator(orderByComparator);
-		ddmFormInstanceRecordSearch.setOrderByType(orderByType);
-
 		if (ddmFormInstanceRecordSearch.isSearch()) {
 			ddmFormInstanceRecordSearch.setEmptyResultsMessage(
 				"no-entries-were-found");
@@ -429,6 +399,13 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 			ddmFormInstanceRecordSearch.setEmptyResultsMessage(
 				"there-are-no-entries");
 		}
+
+		ddmFormInstanceRecordSearch.setOrderByCol(getOrderByCol());
+		ddmFormInstanceRecordSearch.setOrderByComparator(
+			DDMFormInstanceRecordSearch.
+				getDDMFormInstanceRecordOrderByComparator(
+					getOrderByCol(), getOrderByType()));
+		ddmFormInstanceRecordSearch.setOrderByType(getOrderByType());
 
 		setDDMFormInstanceRecordSearchResults(ddmFormInstanceRecordSearch);
 		setDDMFormInstanceRecordSearchTotal(ddmFormInstanceRecordSearch);
@@ -732,6 +709,8 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 	private final DDMFormInstance _ddmFormInstance;
 	private final DDMFormInstanceRecordLocalService
 		_ddmFormInstanceRecordLocalService;
+	private String _orderByCol;
+	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 

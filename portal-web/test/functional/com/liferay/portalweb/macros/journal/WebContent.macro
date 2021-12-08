@@ -775,6 +775,15 @@ definition {
 					locator1 = "WCEditWebContent#TEXT_INPUT",
 					value1 = "${webContentText}");
 			}
+
+			if (isSet(duplicateField)) {
+				Click(locator1 = "FormFields#FIELD_ADD_DUPLICATE");
+
+				Type(
+					key_fieldFieldLabel = "${webContentTextFieldLabel}",
+					locator1 = "WCEditWebContent#TEXT_INPUT_2",
+					value1 = "${webContentText} Duplicate Field");
+			}
 		}
 
 		if (isSet(webContentUpload)) {
@@ -962,8 +971,8 @@ definition {
 	}
 
 	macro assertFieldOnWebContent {
-		key_fieldFieldLabel = "${fieldFieldLabel}";
-		key_fieldName = "${fieldName}";
+		var key_fieldFieldLabel = "${fieldFieldLabel}";
+		var key_fieldName = "${fieldName}";
 
 		AssertVisible(locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER");
 
@@ -996,12 +1005,11 @@ definition {
 
 	macro clickMarginOfContentContainer {
 		var elementHeight = selenium.getElementHeight("WCEditWebContent#CONTENT_CONTAINER");
-		var offSetY = MathUtil.product("50","${elementHeight}");
-		var offSetY = MathUtil.quotient("${offSetY}","100");
-
+		var offSetY = 50 * ${elementHeight};
+		var offSetY = ${offSetY} / 100;
 		var elementWidth = selenium.getElementWidth("WCEditWebContent#CONTENT_CONTAINER");
-		var offSetX = MathUtil.product("2","${elementWidth}");
-		var offSetX = MathUtil.quotient("${offSetX}","100");
+		var offSetX = 2 * ${elementWidth};
+		var offSetX = ${offSetX} / 100;
 
 		Click.clickAt(
 			locator1 = "WCEditWebContent#CONTENT_CONTAINER",
@@ -1070,7 +1078,7 @@ definition {
 				siteName = "${siteName}");
 
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				portlet = "Web Content");
 		}
 
@@ -1276,7 +1284,6 @@ definition {
 					locator1 = "TextInput#INPUT_ID",
 					value1 = "Public Pages > ${pageName}");
 			}
-
 			else {
 				AssertTextEquals(
 					inputFieldId = "specificDisplayPageNameInput",
@@ -1336,6 +1343,7 @@ definition {
 				navTab = "Web Content Images",
 				uploadFileName = "${webContentImage}");
 		}
+
 		var iFrameDialog = "IFrame#MODAL_BODY";
 
 		if (IsElementPresent(locator1 = "${iFrameDialog}")) {
@@ -1393,7 +1401,6 @@ definition {
 				locator1 = "//div[@class='journal-content-article']//span[contains(@class,'portlet-title-text')]",
 				value1 = "${embeddedPortletTitle}");
 		}
-
 		else if (isSet(templateName)) {
 			AssertTextEquals(
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
@@ -1547,6 +1554,21 @@ definition {
 		AssertConfirm(value1 = "Are you sure you want to publish the selected web content?");
 	}
 
+	macro increaseDisplayDate {
+		var displayDate = selenium.getAttribute("//input[contains(@id,'displayDate')]@value");
+		var displayDateHour = selenium.getAttribute("//input[contains(@id,'displayDateHour')]@value");
+		var displayDateAMPM = selenium.getAttribute("//input[contains(@id,'displayDateAmPm')]@value");
+		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "0", "AM");
+		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "1", "PM");
+		var displayDateMinute = selenium.getAttribute("//input[contains(@id,'displayDateMinute')]@value");
+		var displayDateMinuteFuture = ${displayDateMinute} + ${minuteIncrease};
+		var displayTime = "${displayDateHour}:${displayDateMinuteFuture} ${displayDateAMPM}";
+
+		WebContent.editDisplayDate(
+			displayDate = "${displayDate}",
+			displayTime = "${displayTime}");
+	}
+
 	macro moveArticlesToFolderCP {
 		for (var webContentTitle : list "${webContentArticlesList}") {
 			Check(
@@ -1643,12 +1665,14 @@ definition {
 
 		if (!(contains("${webContentTitleEscapeCharacter}", "{webContentTitleEscapeCharacter}"))) {
 			var key_webContentTitle = "${webContentTitleEscapeCharacter}";
+
 			WebContentNavigator.gotoEntryMenuItem(
 				entry = "${webContentTitleEscapeCharacter}",
 				menuItem = "Move to Recycle Bin");
 		}
 		else {
 			var key_webContentTitle = "${webContentTitle}";
+
 			WebContentNavigator.gotoEntryMenuItem(
 				entry = "${webContentTitle}",
 				menuItem = "Move to Recycle Bin");
@@ -1845,7 +1869,6 @@ definition {
 		if ("${available}" == "false") {
 			AssertElementNotPresent(locator1 = "ItemSelector#SELECT_FILE_WEB_CONTENT");
 		}
-
 		else {
 			Click(locator1 = "ItemSelector#SELECT_FILE_WEB_CONTENT");
 		}
@@ -1921,7 +1944,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");

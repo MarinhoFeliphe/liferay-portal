@@ -23,6 +23,7 @@ import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelect
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
@@ -121,6 +122,12 @@ public class DisplayPageTypeSiteNavigationMenuItemType
 	}
 
 	@Override
+	public String getAddTitle(Locale locale) {
+		return LanguageUtil.format(
+			locale, "select-x", _displayPageTypeContext.getLabel(locale));
+	}
+
+	@Override
 	public PortletURL getAddURL(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
@@ -151,6 +158,7 @@ public class DisplayPageTypeSiteNavigationMenuItemType
 			new InfoItemItemSelectorReturnType());
 		itemSelectorCriterion.setItemType(
 			_displayPageTypeContext.getClassName());
+		itemSelectorCriterion.setMultiSelection(isMultiSelection());
 
 		PortletURL infoItemSelectorURL = _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),

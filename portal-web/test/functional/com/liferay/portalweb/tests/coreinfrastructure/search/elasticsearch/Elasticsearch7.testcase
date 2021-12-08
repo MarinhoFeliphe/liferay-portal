@@ -57,7 +57,9 @@ definition {
 		Portlet.addPG(portletName = "Asset Publisher");
 
 		var companyId = JSONCompany.getCompanyId();
+
 		var port = Elasticsearch.getServerPort();
+
 		var portalHostname = PropsUtil.get("portal.hostname");
 
 		var curl = '''
@@ -125,6 +127,7 @@ definition {
 			locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE_SPECIFIC");
 	}
 
+	@priority = "5"
 	test AssertSearchAdmin {
 		property test.name.skip.portal.instance = "Elasticsearch7#AssertSearchAdmin";
 
@@ -134,6 +137,7 @@ definition {
 			portlet = "Search");
 
 		var clientVersion = Elasticsearch.getClientVersion();
+
 		var serverVersion = Elasticsearch.getServerVersion();
 
 		SearchAdministration.assertEngineVendorAndVersions(
@@ -153,6 +157,7 @@ definition {
 			value1 = "liferay-0");
 
 		var companyId = JSONCompany.getCompanyId();
+
 		var liferayIndexName = "liferay-${companyId}";
 
 		Click(
@@ -227,6 +232,7 @@ definition {
 			value1 = "_explanation");
 	}
 
+	@priority = "5"
 	test AssertSidecarAutoInstall {
 		property delete.sidecar.bundle = "true";
 		property embedded.elasticsearch.only = "true";
@@ -248,6 +254,7 @@ definition {
 			searchAssetType = "Web Content Article");
 	}
 
+	@priority = "4"
 	test AssertSidecarDoesNotCluster {
 		property app.server.bundles.size = "1";
 		property cluster.enabled = "true";
@@ -361,7 +368,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.addCP(
@@ -371,7 +378,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -404,6 +411,7 @@ definition {
 			searchAssetType = "Message Boards Message");
 	}
 
+	@priority = "5"
 	test MultipleConnectionsSmokeTest {
 		property elasticsearch.multiple.connections = "true";
 		property portal.upstream = "quarantine";
@@ -518,6 +526,7 @@ definition {
 		Elasticsearch.viewClusterStatus(clusterStatus = "&quot;cluster_name&quot; : &quot;LiferayElasticsearchCluster1&quot;");
 	}
 
+	@priority = "5"
 	test SearchWithNonLiferayIndex {
 		property embedded.elasticsearch.only = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7#SearchWithNonLiferayIndex";
@@ -572,6 +581,7 @@ definition {
 			value1 = "1 results for bicycle");
 	}
 
+	@priority = "4"
 	test SwitchSidecarToRemote {
 		property embedded.elasticsearch.only = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7#SwitchSidecarToRemote";
@@ -590,7 +600,6 @@ definition {
 		// LRCI-2401
 
 		//Navigator.openSpecificURL(url = "http://localhost:9201");
-
 		//AssertTextNotPresent(value1 = "cluster_name");
 
 		Navigator.openURL();
@@ -598,6 +607,7 @@ definition {
 		SearchAdministration.openSearchAdmin();
 
 		var clientVersion = Elasticsearch.getClientVersion();
+
 		var serverVersion = Elasticsearch.getServerVersion();
 
 		SearchAdministration.assertEngineVendorAndVersions(

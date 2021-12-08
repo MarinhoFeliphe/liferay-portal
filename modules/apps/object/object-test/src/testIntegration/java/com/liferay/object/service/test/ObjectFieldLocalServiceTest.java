@@ -273,8 +273,8 @@ public class ObjectFieldLocalServiceTest {
 		// Types
 
 		String[] types = {
-			"BigDecimal", "Blob", "Boolean", "Date", "Double", "Integer",
-			"Long", "String"
+			"BigDecimal", "Blob", "Clob", "Boolean", "Date", "Double",
+			"Integer", "Long", "String"
 		};
 
 		for (String type : types) {

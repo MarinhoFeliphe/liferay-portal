@@ -9,43 +9,6 @@ definition {
 		TestCase.setUpPortalInstance();
 	}
 
-	@description = "This is a use case for LRQA-48218. User should be redirected to the changed landing page upon login."
-	@priority = "5"
-	@uitest
-	test DefaultPortalLandingPage {
-		property test.name.skip.portal.instance = "Login#DefaultPortalLandingPage";
-
-		task ("Login and configure landing page CP") {
-			User.firstLoginPG();
-
-			PortalSettings.gotoConfiguration(
-				baseURL = "http://localhost:8080",
-				configurationCategory = "Instance Configuration",
-				configurationName = "General",
-				configurationScope = "Virtual Instance Scope");
-
-			PortalSettings.editDefaultLandingPageCP(defaultLandingPage = "/web/guest/landing");
-		}
-
-		task ("Add public page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Guest",
-				layoutName = "landing");
-		}
-
-		task ("Logout and login") {
-			User.logoutPG();
-
-			User.firstLoginUI(
-				password = "test",
-				userEmailAddress = "test@liferay.com");
-		}
-
-		task ("Assert url value") {
-			AssertLocation(value1 = "http://localhost:8080/web/guest/landing");
-		}
-	}
-
 	@description = "This is a use case for LPS-39744. Default landing page could be set by property and user is redirected to the changed landing page."
 	@priority = "5"
 	test DefaultPortalLandingPageSetByProperty {
@@ -88,10 +51,7 @@ definition {
 		task ("Login and add CP") {
 			User.firstLoginPG();
 
-			ApplicationsMenu.gotoPortlet(
-				category = "System",
-				panel = "Control Panel",
-				portlet = "Virtual Instances");
+			PortalInstances.openVirtualInstancesAdmin();
 
 			PortalInstances.addCP(
 				mailDomain = "www.able.com",
@@ -195,6 +155,104 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LPS-105151. Users could login and logout using multiple OpenID Connect providers."
+	@priority = "4"
+	test LoginWithMultipleOpenIDConnectProviders {
+		property dummy.socket.proxy.disabled = "true";
+		property test.name.skip.portal.instance = "Login#MultipleOpenIDConnectProvider";
+		property osgi.module.configuration.file.names = "com.liferay.portal.security.sso.openid.connect.configuration.OpenIdConnectConfiguration.config";
+		property osgi.module.configurations = "enabled=&quot;true&quot;";
+
+		var openIDConnectClientID = PropsUtil.get("google.client.id.2");
+		var openIDConnectClientSecret = PropsUtil.get("google.client.secret.2");
+		var openIDConnectClientID1 = PropsUtil.get("google.client.id.3");
+		var openIDConnectClientSecret1 = PropsUtil.get("google.client.secret.3");
+		var userEmailAddress = PropsUtil.get("email.address.2");
+		var userPassword = PropsUtil.get("email.password.2");
+
+		task ("Login and add CP www.able.com") {
+			User.firstLoginPG();
+
+			PortalInstances.openVirtualInstancesAdmin();
+
+			PortalInstances.addCP(
+				mailDomain = "www.able.com",
+				virtualHost = "www.able.com",
+				webId = "www.able.com");
+
+			PortalInstances.viewCP(virtualHost = "www.able.com");
+		}
+
+		task ("add CP www.baker.com") {
+			PortalInstances.addCP(
+				mailDomain = "www.baker.com",
+				virtualHost = "www.baker.com",
+				webId = "www.baker.com");
+
+			PortalInstances.viewCP(virtualHost = "www.baker.com");
+		}
+
+		task ("Add SSO openID connect provider") {
+			SystemSettings.openSystemSettingsAdmin();
+
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "SSO",
+				configurationName = "OpenID Connect Provider Connection",
+				configurationScope = "Virtual Instance Scope");
+
+			OpenIDConnect.addProvider(
+				openIDConnectClientID = "${openIDConnectClientID}",
+				openIDConnectClientSecret = "${openIDConnectClientSecret}",
+				providerName = "Google");
+		}
+
+		task ("Login at www.able.com and add SSO openID connect provider") {
+			User.firstLoginPG(
+				password = "test",
+				userEmailAddress = "test@www.able.com",
+				virtualHostsURL = "http://www.able.com:8080");
+
+			PortalSettings.openInstanceSettingsAdmin(baseURL = "http://www.able.com:8080");
+
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "SSO",
+				configurationName = "OpenID Connect Provider Connection",
+				configurationScope = "Virtual Instance Scope");
+
+			OpenIDConnect.addProvider(
+				openIDConnectClientID = "${openIDConnectClientID1}",
+				openIDConnectClientSecret = "${openIDConnectClientSecret1}",
+				providerName = "Test Google");
+		}
+
+		task ("Sign out and go to able.com") {
+			UserBar.signOut();
+
+			Navigator.openSpecificURL(url = "http://www.able.com:8080/");
+		}
+
+		task ("View provider and assert openID connect login option") {
+			OpenIDConnect.viewProvider();
+
+			AssertElementPresent(
+				key_providerNname = "Test Google",
+				locator1 = "OpenIDConnectLogin#OPENID_CONNECT_DROPDOWN_OPTION");
+		}
+
+		task ("Login and logout at baker.com and view provider") {
+			User.firstLoginPG(
+				password = "test",
+				userEmailAddress = "test@www.baker.com",
+				virtualHostsURL = "http://www.baker.com:8080");
+
+			UserBar.signOut();
+
+			Navigator.openSpecificURL(url = "http://www.baker.com:8080/");
+
+			OpenIDConnect.viewProvider();
+		}
+	}
+
 	@description = "This is a use case for LPS-72398. Users could login to Portal when the default langauge is not English."
 	@priority = "5"
 	@uitest
@@ -255,126 +313,6 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-105151. Users could login and logout using multiple OpenID Connect providers."
-	@priority = "4"
-	test MultipleOpenIDConnectProvider {
-		property dummy.socket.proxy.disabled = "true";
-		property test.name.skip.portal.instance = "Login#MultipleOpenIDConnectProvider";
-
-		var openIDConnectClientID = PropsUtil.get("google.client.id.2");
-		var openIDConnectClientSecret = PropsUtil.get("google.client.secret.2");
-		var openIDConnectClientID1 = PropsUtil.get("google.client.id.3");
-		var openIDConnectClientSecret1 = PropsUtil.get("google.client.secret.3");
-		var userEmailAddress = PropsUtil.get("email.address.2");
-		var userPassword = PropsUtil.get("email.password.2");
-
-		task ("Login and add CP www.able.com") {
-			User.firstLoginPG();
-
-			ApplicationsMenu.gotoPortlet(
-				category = "System",
-				panel = "Control Panel",
-				portlet = "Virtual Instances");
-
-			PortalInstances.addCP(
-				mailDomain = "www.able.com",
-				virtualHost = "www.able.com",
-				webId = "www.able.com");
-
-			PortalInstances.viewCP(virtualHost = "www.able.com");
-		}
-
-		task ("add CP www.baker.com") {
-			ApplicationsMenu.gotoPortlet(
-				category = "System",
-				panel = "Control Panel",
-				portlet = "Virtual Instances");
-
-			PortalInstances.addCP(
-				mailDomain = "www.baker.com",
-				virtualHost = "www.baker.com",
-				webId = "www.baker.com");
-
-			PortalInstances.viewCP(virtualHost = "www.baker.com");
-		}
-
-		task ("Inable OpenID connection CP") {
-			Navigator.openURL();
-
-			SystemSettings.openSystemSettingsAdmin();
-
-			SystemSettings.gotoConfiguration(
-				configurationCategory = "SSO",
-				configurationName = "OpenID Connect",
-				configurationScope = "System Scope");
-
-			PortalSettings.enableOpenIDConnectCP(systemLevel = "true");
-		}
-
-		task ("Add SSO openID connect provider") {
-			SystemSettings.openSystemSettingsAdmin();
-
-			SystemSettings.gotoConfiguration(
-				configurationCategory = "SSO",
-				configurationName = "OpenID Connect Provider Connection",
-				configurationScope = "Virtual Instance Scope");
-
-			OpenIDConnect.addProvider(
-				openIDConnectClientID = "${openIDConnectClientID}",
-				openIDConnectClientSecret = "${openIDConnectClientSecret}",
-				providerName = "Google");
-		}
-
-		task ("Login at www.able.com and add SSO openID connect provider") {
-			User.firstLoginPG(
-				password = "test",
-				userEmailAddress = "test@www.able.com",
-				virtualHostsURL = "http://www.able.com:8080");
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Instance Settings");
-
-			SystemSettings.gotoConfiguration(
-				configurationCategory = "SSO",
-				configurationName = "OpenID Connect Provider Connection",
-				configurationScope = "Virtual Instance Scope");
-
-			OpenIDConnect.addProvider(
-				openIDConnectClientID = "${openIDConnectClientID1}",
-				openIDConnectClientSecret = "${openIDConnectClientSecret1}",
-				providerName = "Test Google");
-		}
-
-		task ("Sign out and go to able.com") {
-			UserBar.signOut();
-
-			Navigator.openSpecificURL(url = "http://www.able.com:8080/");
-		}
-
-		task ("View provider and assert openID connect login option") {
-			OpenIDConnect.viewProvider();
-
-			AssertElementPresent(
-				key_providerNname = "Test Google",
-				locator1 = "OpenIDConnectLogin#OPENID_CONNECT_DROPDOWN_OPTION");
-		}
-
-		task ("Login and logout at baker.com and view provider") {
-			User.firstLoginPG(
-				password = "test",
-				userEmailAddress = "test@www.baker.com",
-				virtualHostsURL = "http://www.baker.com:8080");
-
-			UserBar.signOut();
-
-			Navigator.openSpecificURL(url = "http://www.baker.com:8080/");
-
-			OpenIDConnect.viewProvider();
-		}
-	}
-
 	@description = "This is a use case for LPS-105151. Users could login with instance-level configured OpenID Connect provider."
 	@priority = "4"
 	@uitest
@@ -390,10 +328,7 @@ definition {
 		task ("Login and add CP") {
 			User.firstLoginPG();
 
-			ApplicationsMenu.gotoPortlet(
-				category = "System",
-				panel = "Control Panel",
-				portlet = "Virtual Instances");
+			PortalInstances.openVirtualInstancesAdmin();
 
 			PortalInstances.addCP(
 				mailDomain = "www.able.com",
@@ -419,10 +354,7 @@ definition {
 		}
 
 		task ("Add SSO openID connect provider") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Instance Settings");
+			PortalSettings.openInstanceSettingsAdmin(baseURL = "http://www.able.com:8080");
 
 			SystemSettings.gotoConfiguration(
 				configurationCategory = "SSO",
@@ -578,6 +510,43 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LRQA-48218. User should be redirected to the changed landing page upon login."
+	@priority = "5"
+	@uitest
+	test RedirectToDefaultPortalLandingPageOnLogin {
+		property test.name.skip.portal.instance = "Login#DefaultPortalLandingPage";
+
+		task ("Login and configure landing page CP") {
+			User.firstLoginPG();
+
+			PortalSettings.gotoConfiguration(
+				baseURL = "http://localhost:8080",
+				configurationCategory = "Instance Configuration",
+				configurationName = "General",
+				configurationScope = "Virtual Instance Scope");
+
+			PortalSettings.editDefaultLandingPageCP(defaultLandingPage = "/web/guest/landing");
+		}
+
+		task ("Add public page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "landing");
+		}
+
+		task ("Logout and login") {
+			User.logoutPG();
+
+			User.firstLoginUI(
+				password = "test",
+				userEmailAddress = "test@liferay.com");
+		}
+
+		task ("Assert url value") {
+			AssertLocation(value1 = "http://localhost:8080/web/guest/landing");
+		}
+	}
+
 	@description = "This is a use case for LRQA-27622. Users could login using Token Based SSO."
 	@priority = "5"
 	@uitest
@@ -630,10 +599,7 @@ definition {
 				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Instance Settings");
+			PortalSettings.openInstanceSettingsAdmin(baseURL = "http://www.able.com:8080");
 
 			SystemSettings.gotoConfiguration(
 				configurationCategory = "SSO",

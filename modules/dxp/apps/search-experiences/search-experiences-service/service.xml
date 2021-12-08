@@ -63,6 +63,10 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
+		<finder name="C_R" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="readOnly" />
+		</finder>
 		<finder name="C_T" return-type="Collection">
 			<finder-column name="companyId" />
 			<finder-column name="type" />

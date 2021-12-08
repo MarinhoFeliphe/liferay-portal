@@ -30,8 +30,20 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
+import com.liferay.portal.workflow.kaleo.definition.NodeType;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
+import com.liferay.portal.workflow.kaleo.model.KaleoNode;
+import com.liferay.portal.workflow.kaleo.model.KaleoTask;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance;
+import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
+import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
+import com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
+import com.liferay.portal.workflow.metrics.model.AddTaskRequest;
+import com.liferay.portal.workflow.metrics.model.AddTransitionRequest;
 import com.liferay.portal.workflow.metrics.model.Assignment;
+import com.liferay.portal.workflow.metrics.model.DeleteTransitionRequest;
 import com.liferay.portal.workflow.metrics.model.RoleAssignment;
 import com.liferay.portal.workflow.metrics.model.UserAssignment;
 
@@ -53,6 +65,106 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = IndexerHelper.class)
 public class IndexerHelper {
+
+	public AddTaskRequest createAddTaskRequest(
+		KaleoInstance kaleoInstance,
+		KaleoTaskInstanceToken kaleoTaskInstanceToken, String processVersion) {
+
+		AddTaskRequest.Builder addTaskRequestBuilder =
+			new AddTaskRequest.Builder();
+
+		addTaskRequestBuilder.assetTitleMap(
+			createAssetTitleLocalizationMap(
+				kaleoTaskInstanceToken.getClassName(),
+				kaleoTaskInstanceToken.getClassPK(),
+				kaleoTaskInstanceToken.getGroupId())
+		).assetTypeMap(
+			createAssetTypeLocalizationMap(
+				kaleoTaskInstanceToken.getClassName(),
+				kaleoTaskInstanceToken.getGroupId())
+		).assignments(
+			() -> toAssignments(
+				_kaleoTaskAssignmentInstanceLocalService.
+					getKaleoTaskAssignmentInstances(
+						kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId()))
+		).className(
+			kaleoTaskInstanceToken.getClassName()
+		).classPK(
+			kaleoTaskInstanceToken.getClassPK()
+		).companyId(
+			kaleoTaskInstanceToken.getCompanyId()
+		).completed(
+			kaleoTaskInstanceToken.isCompleted()
+		).completionDate(
+			kaleoTaskInstanceToken.getCompletionDate()
+		).completionUserId(
+			kaleoTaskInstanceToken.getCompletionUserId()
+		).createDate(
+			kaleoTaskInstanceToken.getCreateDate()
+		);
+
+		if (kaleoInstance != null) {
+			addTaskRequestBuilder.instanceCompleted(
+				kaleoInstance.isCompleted()
+			).instanceCompletionDate(
+				kaleoInstance.getCompletionDate()
+			);
+		}
+
+		return addTaskRequestBuilder.instanceId(
+			kaleoTaskInstanceToken.getKaleoInstanceId()
+		).modifiedDate(
+			kaleoTaskInstanceToken.getModifiedDate()
+		).name(
+			kaleoTaskInstanceToken.getKaleoTaskName()
+		).nodeId(
+			kaleoTaskInstanceToken.getKaleoTaskId()
+		).processId(
+			kaleoTaskInstanceToken.getKaleoDefinitionId()
+		).processVersion(
+			processVersion
+		).taskId(
+			kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId()
+		).userId(
+			kaleoTaskInstanceToken.getUserId()
+		).build();
+	}
+
+	public AddTransitionRequest createAddTransitionRequest(
+			KaleoTransition kaleoTransition, String processVersion)
+		throws PortalException {
+
+		AddTransitionRequest.Builder addTransitionRequestBuilder =
+			new AddTransitionRequest.Builder();
+
+		return addTransitionRequestBuilder.companyId(
+			kaleoTransition.getCompanyId()
+		).createDate(
+			kaleoTransition.getCreateDate()
+		).modifiedDate(
+			kaleoTransition.getModifiedDate()
+		).name(
+			kaleoTransition.getName()
+		).nodeId(
+			_getNodeId(kaleoTransition.getKaleoNodeId())
+		).processId(
+			kaleoTransition.getKaleoDefinitionId()
+		).processVersion(
+			processVersion
+		).sourceNodeId(
+			_getNodeId(kaleoTransition.getSourceKaleoNodeId())
+		).sourceNodeName(
+			kaleoTransition.getSourceKaleoNodeName()
+		).targetNodeId(
+			_getNodeId(kaleoTransition.getTargetKaleoNodeId())
+		).targetNodeName(
+			kaleoTransition.getTargetKaleoNodeName()
+		).transitionId(
+			kaleoTransition.getKaleoTransitionId()
+		).userId(
+			kaleoTransition.getUserId()
+		).build();
+	}
 
 	public Map<Locale, String> createAssetTitleLocalizationMap(
 		String className, long classPK, long groupId) {
@@ -105,6 +217,19 @@ public class IndexerHelper {
 		}
 
 		return localizationMap;
+	}
+
+	public DeleteTransitionRequest createDeleteTransitionRequest(
+		KaleoTransition kaleoTransition) {
+
+		DeleteTransitionRequest.Builder builder =
+			new DeleteTransitionRequest.Builder();
+
+		return builder.companyId(
+			kaleoTransition.getCompanyId()
+		).transitionId(
+			kaleoTransition.getKaleoTransitionId()
+		).build();
 	}
 
 	public List<Assignment> toAssignments(
@@ -170,10 +295,36 @@ public class IndexerHelper {
 		return null;
 	}
 
+	private long _getNodeId(long kaleoNodeId) throws PortalException {
+		KaleoNode kaleoNode = _kaleoNodeLocalService.fetchKaleoNode(
+			kaleoNodeId);
+
+		if ((kaleoNode == null) ||
+			!Objects.equals(kaleoNode.getType(), NodeType.TASK.name())) {
+
+			return kaleoNodeId;
+		}
+
+		KaleoTask kaleoTask = _kaleoTaskLocalService.getKaleoNodeKaleoTask(
+			kaleoNode.getKaleoNodeId());
+
+		return kaleoTask.getKaleoTaskId();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(IndexerHelper.class);
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private KaleoNodeLocalService _kaleoNodeLocalService;
+
+	@Reference
+	private KaleoTaskAssignmentInstanceLocalService
+		_kaleoTaskAssignmentInstanceLocalService;
+
+	@Reference
+	private KaleoTaskLocalService _kaleoTaskLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

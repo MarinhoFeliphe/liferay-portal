@@ -178,6 +178,16 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 					</clay:col>
 				</clay:row>
 			</clay:sheet-section>
+
+			<clay:sheet-section>
+				<h3 class="sheet-subtitle">
+					<%= LanguageUtil.get(request, "display") %>
+				</h3>
+
+				<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+					<aui:input disabled="<%= !objectDefinitionsDetailsDisplayContext.hasUpdateObjectDefinitionPermission() %>" label="" labelOff='<%= LanguageUtil.get(request, "hide-widget") %>' labelOn='<%= LanguageUtil.get(request, "show-widget") %>' name="portlet" type="toggle-switch" value="<%= objectDefinition.isPortlet() %>" />
+				</aui:field-wrapper>
+			</clay:sheet-section>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 

@@ -97,7 +97,7 @@ public class BatchPlannerLogManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"name"};
+		return new String[] {"createDate"};
 	}
 
 }

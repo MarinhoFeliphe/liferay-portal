@@ -151,7 +151,6 @@ definition {
 			userLoginFullName = "userfn userln");
 
 		JSONMBMessage.addMessage(
-			addGuestPermissions = "true",
 			categoryName = "MB Category Name",
 			groupName = "Guest",
 			threadBody = "MB Thread Message Body",
@@ -201,6 +200,17 @@ definition {
 			groupName = "Guest",
 			threadBody = "MB Thread Message Body",
 			threadSubject = "MB Thread Message Subject");
+
+		MessageboardsCategory.openToCategory(
+			categoryName = "MB Category Name",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		MessageboardsThread.viewCP(
+			replyCount = "0",
+			threadBody = "MB Thread Message Body",
+			threadSubject = "MB Thread Message Subject",
+			userName = "Test Test");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "userea@liferay.com",
@@ -308,6 +318,17 @@ definition {
 			groupName = "Guest",
 			threadBody = "MB Thread Message Body",
 			threadSubject = "MB Thread Message Subject");
+
+		MessageboardsCategory.openToCategory(
+			categoryName = "MB Category Name",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		MessageboardsThread.viewCP(
+			replyCount = "0",
+			threadBody = "MB Thread Message Body",
+			threadSubject = "MB Thread Message Subject",
+			userName = "Test Test");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "userea@liferay.com",

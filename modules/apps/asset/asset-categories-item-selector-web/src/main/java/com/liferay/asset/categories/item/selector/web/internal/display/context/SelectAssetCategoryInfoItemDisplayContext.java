@@ -14,12 +14,14 @@
 
 package com.liferay.asset.categories.item.selector.web.internal.display.context;
 
+import com.liferay.asset.categories.item.selector.web.internal.configuration.FFAssetCategoriesItemSelectorConfigurationUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetCategoryServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -52,10 +54,12 @@ import javax.servlet.http.HttpServletRequest;
 public class SelectAssetCategoryInfoItemDisplayContext {
 
 	public SelectAssetCategoryInfoItemDisplayContext(
-		HttpServletRequest httpServletRequest, String itemSelectedEventName,
-		RenderResponse renderResponse) {
+		HttpServletRequest httpServletRequest,
+		InfoItemItemSelectorCriterion infoItemItemSelectorCriterion,
+		String itemSelectedEventName, RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
+		_infoItemItemSelectorCriterion = infoItemItemSelectorCriterion;
 		_itemSelectedEventName = itemSelectedEventName;
 		_renderResponse = renderResponse;
 
@@ -63,33 +67,19 @@ public class SelectAssetCategoryInfoItemDisplayContext {
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public JSONArray getCategoriesJSONArray() throws Exception {
-		return JSONUtil.put(
-			JSONUtil.put(
-				"children", _getVocabulariesJSONArray()
-			).put(
-				"disabled", true
-			).put(
-				"expanded", true
-			).put(
-				"icon", "folder"
-			).put(
-				"id", "0"
-			).put(
-				"name",
-				LanguageUtil.get(_themeDisplay.getLocale(), "vocabularies")
-			).put(
-				"vocabulary", true
-			));
-	}
-
 	public Map<String, Object> getData() throws Exception {
 		return HashMapBuilder.<String, Object>put(
+			"categoriesMultipleSelectionEnabled",
+			FFAssetCategoriesItemSelectorConfigurationUtil.
+				categoriesMultipleSelectionEnabled()
+		).put(
 			"itemSelectedEventName", _itemSelectedEventName
+		).put(
+			"multiSelection", _infoItemItemSelectorCriterion.isMultiSelection()
 		).put(
 			"namespace", _renderResponse.getNamespace()
 		).put(
-			"nodes", getCategoriesJSONArray()
+			"nodes", _getVocabulariesJSONArray()
 		).build();
 	}
 
@@ -221,6 +211,7 @@ public class SelectAssetCategoryInfoItemDisplayContext {
 	}
 
 	private final HttpServletRequest _httpServletRequest;
+	private final InfoItemItemSelectorCriterion _infoItemItemSelectorCriterion;
 	private final String _itemSelectedEventName;
 	private final RenderResponse _renderResponse;
 	private final ThemeDisplay _themeDisplay;

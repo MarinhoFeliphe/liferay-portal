@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
@@ -331,14 +332,25 @@ public class DDLDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
-			_ddlRequestHelper.getRenderRequest(), "orderByCol",
-			"modified-date");
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, DDLPortletKeys.DYNAMIC_DATA_LISTS, "modified-date");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(
-			_ddlRequestHelper.getRenderRequest(), "orderByType", "asc");
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, DDLPortletKeys.DYNAMIC_DATA_LISTS, "asc");
+
+		return _orderByType;
 	}
 
 	public PortletURL getPortletURL() {
@@ -454,22 +466,18 @@ public class DDLDisplayContext {
 		RecordSetSearch recordSetSearch = new RecordSetSearch(
 			_renderRequest, portletURL);
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<DDLRecordSet> orderByComparator =
-			getDDLRecordSetOrderByComparator(orderByCol, orderByType);
-
-		recordSetSearch.setOrderByCol(orderByCol);
-		recordSetSearch.setOrderByComparator(orderByComparator);
-		recordSetSearch.setOrderByType(orderByType);
-
 		if (recordSetSearch.isSearch()) {
 			recordSetSearch.setEmptyResultsMessage("no-lists-were-found");
 		}
 		else {
 			recordSetSearch.setEmptyResultsMessage("there-are-no-lists");
 		}
+
+		recordSetSearch.setOrderByCol(getOrderByCol());
+		recordSetSearch.setOrderByComparator(
+			getDDLRecordSetOrderByComparator(
+				getOrderByCol(), getOrderByType()));
+		recordSetSearch.setOrderByType(getOrderByType());
 
 		setDDLRecordSetSearchResults(recordSetSearch);
 		setDDLRecordSetSearchTotal(recordSetSearch);
@@ -933,6 +941,8 @@ public class DDLDisplayContext {
 	private Boolean _hasEditFormDDMTemplatePermission;
 	private Boolean _hasShowIconsActionPermission;
 	private Boolean _hasViewPermission;
+	private String _orderByCol;
+	private String _orderByType;
 	private DDLRecordSet _recordSet;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;

@@ -22,7 +22,7 @@ definition {
 			Navigator.openURL();
 
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				portlet = "Forms");
 
 			FormsAdmin.teardownForms();
@@ -34,8 +34,6 @@ definition {
 	@description = "Verify that Entries can be deleted"
 	@priority = "5"
 	test CanBeDeleted {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -76,8 +74,6 @@ definition {
 	@description = "Verify that Entries can be edited"
 	@priority = "5"
 	test CanBeEdited {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -120,13 +116,12 @@ definition {
 	@description = "Verify that a user can navigate to the correct metric by using the list on the right"
 	@priority = "5"
 	test CanBeNavigatedUsingNavigationList {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
 
 		Form.addTextField(fieldPositionNumber = "0");
+
 		Form.closeSidebar();
 
 		Form.gotoAddField(
@@ -164,10 +159,11 @@ definition {
 			fieldValue = "5");
 
 		FormPortlet.submitSuccessfully();
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoEditFormByName(formName = "Form 1");
@@ -186,8 +182,6 @@ definition {
 	@description = "Verify that Entries can be viewed"
 	@priority = "5"
 	test CanBeViewed {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -266,7 +260,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoViewEntries();
@@ -279,7 +273,7 @@ definition {
 			selectOption = "Select 2");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoEditFormByName(formName = "Delete Select Option Test");
@@ -297,7 +291,7 @@ definition {
 		Form.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoViewEntries();
@@ -313,8 +307,6 @@ definition {
 	@description = "Verify that Entries Previews display the correct information"
 	@priority = "5"
 	test DisplayCorrectInfoInPreviews {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -373,8 +365,6 @@ definition {
 	@description = "Verify that the correct number of Entries are displayed"
 	@priority = "3"
 	test DisplayCorrectNumberOfEntries {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form1");
@@ -425,8 +415,6 @@ definition {
 	@description = "Verify that Entries for the Color, Date and Text Fields display a Field List in the Summary Tab"
 	@priority = "5"
 	test DisplayFieldListInSummaryTab {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -500,8 +488,6 @@ definition {
 	@description = "Verify that Entries for the Paragraph, Rich Text, Separator, Image, and Upload Fields do not display any metrics in the Summary Tab"
 	@priority = "5"
 	test DisplayNoMetricsInSummaryTab {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -580,8 +566,6 @@ definition {
 	@description = "Verify that Entries for the Numeric Field display a Field List, Average, Maximum Value, Minimum Value, and Sum in the Summary Tab"
 	@priority = "5"
 	test DisplayStatisticsInSummaryTab {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -725,8 +709,6 @@ definition {
 	@description = "Verify that with Single Approver Workflow enabled and after the form entry was approved, the entry will have an approved label"
 	@priority = "5"
 	test WorkflowApprovalChangesLabelToApproved {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -745,9 +727,7 @@ definition {
 
 		FormsAdminNavigator.gotoPublishCopyURLLink();
 
-		var publishedFormURL = Form.getPublishedFormPublicURL(
-			publishedFormPublicURL = "${publishedFormPublicURL}"
-		);
+		var publishedFormURL = Form.getPublishedFormPublicURL(publishedFormPublicURL = "${publishedFormPublicURL}");
 
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -828,8 +808,6 @@ definition {
 	@description = "Verify that with Single Approver Workflow enabled, the Submit button now reads "Submit for Publication""
 	@priority = "5"
 	test WorkflowChangesSubmitButtonToSubmitForPublication {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -854,8 +832,6 @@ definition {
 	@description = "Verify that with Single Approver Workflow enabled and after the user Submit for Publication, the form entry will have a pending label"
 	@priority = "5"
 	test WorkflowSubmissionChangesLabelToPending {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");

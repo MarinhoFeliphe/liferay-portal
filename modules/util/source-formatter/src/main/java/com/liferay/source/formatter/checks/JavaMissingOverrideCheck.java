@@ -17,14 +17,12 @@ package com.liferay.source.formatter.checks;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.source.formatter.checks.util.SourceUtil;
 import com.liferay.source.formatter.parser.JavaClass;
 import com.liferay.source.formatter.parser.JavaMethod;
 import com.liferay.source.formatter.parser.JavaParameter;
 import com.liferay.source.formatter.parser.JavaSignature;
 import com.liferay.source.formatter.parser.JavaTerm;
-
-import java.io.IOException;
+import com.liferay.source.formatter.util.SourceFormatterUtil;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -47,7 +45,7 @@ public class JavaMissingOverrideCheck extends BaseJavaTermCheck {
 	protected String doProcess(
 			String fileName, String absolutePath, JavaTerm javaTerm,
 			String fileContent)
-		throws IOException {
+		throws Exception {
 
 		JavaClass javaClass = (JavaClass)javaTerm;
 
@@ -166,15 +164,19 @@ public class JavaMissingOverrideCheck extends BaseJavaTermCheck {
 		return content;
 	}
 
-	private synchronized JSONObject _getPortalJSONObject() throws IOException {
-		if (_portalJSONObject != null) {
-			return _portalJSONObject;
+	private synchronized JSONObject _getJavaClassesJSONObject()
+		throws Exception {
+
+		if (_javaClassesJSONObject != null) {
+			return _javaClassesJSONObject;
 		}
 
-		_portalJSONObject = SourceUtil.getPortalJSONObject(
+		JSONObject portalJSONObject = SourceFormatterUtil.getPortalJSONObject(
 			getBaseDirName(), getSourceFormatterExcludes(), getMaxLineLength());
 
-		return _portalJSONObject;
+		_javaClassesJSONObject = portalJSONObject.getJSONObject("javaClasses");
+
+		return _javaClassesJSONObject;
 	}
 
 	private boolean _hasMethod(
@@ -199,7 +201,7 @@ public class JavaMissingOverrideCheck extends BaseJavaTermCheck {
 
 	private boolean _hasSuperMethod(
 			JavaMethod javaMethod, JSONArray classNamesJSONArray)
-		throws IOException {
+		throws Exception {
 
 		if (classNamesJSONArray == null) {
 			return false;
@@ -218,11 +220,12 @@ public class JavaMissingOverrideCheck extends BaseJavaTermCheck {
 
 	private boolean _hasSuperMethod(
 			JavaMethod javaMethod, String className, boolean superClass)
-		throws IOException {
+		throws Exception {
 
-		JSONObject portalJSONObject = _getPortalJSONObject();
+		JSONObject javaClassesJSONObject = _getJavaClassesJSONObject();
 
-		JSONObject classJSONObject = portalJSONObject.getJSONObject(className);
+		JSONObject classJSONObject = javaClassesJSONObject.getJSONObject(
+			className);
 
 		if (classJSONObject == null) {
 			return false;
@@ -242,6 +245,6 @@ public class JavaMissingOverrideCheck extends BaseJavaTermCheck {
 		return false;
 	}
 
-	private JSONObject _portalJSONObject;
+	private JSONObject _javaClassesJSONObject;
 
 }

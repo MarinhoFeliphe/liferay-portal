@@ -38,8 +38,10 @@ public class OpenIdConnectSessionSoap implements Serializable {
 		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setOpenIdConnectSessionId(model.getOpenIdConnectSessionId());
 		soapModel.setCompanyId(model.getCompanyId());
+		soapModel.setUserId(model.getUserId());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setAccessToken(model.getAccessToken());
+		soapModel.setConfigurationPid(model.getConfigurationPid());
 		soapModel.setIdToken(model.getIdToken());
 		soapModel.setProviderName(model.getProviderName());
 		soapModel.setRefreshToken(model.getRefreshToken());
@@ -129,6 +131,14 @@ public class OpenIdConnectSessionSoap implements Serializable {
 		_companyId = companyId;
 	}
 
+	public long getUserId() {
+		return _userId;
+	}
+
+	public void setUserId(long userId) {
+		_userId = userId;
+	}
+
 	public Date getModifiedDate() {
 		return _modifiedDate;
 	}
@@ -143,6 +153,14 @@ public class OpenIdConnectSessionSoap implements Serializable {
 
 	public void setAccessToken(String accessToken) {
 		_accessToken = accessToken;
+	}
+
+	public String getConfigurationPid() {
+		return _configurationPid;
+	}
+
+	public void setConfigurationPid(String configurationPid) {
+		_configurationPid = configurationPid;
 	}
 
 	public String getIdToken() {
@@ -172,8 +190,10 @@ public class OpenIdConnectSessionSoap implements Serializable {
 	private long _mvccVersion;
 	private long _openIdConnectSessionId;
 	private long _companyId;
+	private long _userId;
 	private Date _modifiedDate;
 	private String _accessToken;
+	private String _configurationPid;
 	private String _idToken;
 	private String _providerName;
 	private String _refreshToken;

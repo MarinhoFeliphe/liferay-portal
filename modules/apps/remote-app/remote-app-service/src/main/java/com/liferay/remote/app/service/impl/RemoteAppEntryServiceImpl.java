@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.remote.app.constants.RemoteAppConstants;
 import com.liferay.remote.app.model.RemoteAppEntry;
 import com.liferay.remote.app.service.base.RemoteAppEntryServiceBaseImpl;
@@ -44,9 +45,10 @@ public class RemoteAppEntryServiceImpl extends RemoteAppEntryServiceBaseImpl {
 	@Override
 	public RemoteAppEntry addCustomElementRemoteAppEntry(
 			String customElementCSSURLs, String customElementHTMLElementName,
-			String customElementURLs, String friendlyURLMapping,
-			boolean instanceable, Map<Locale, String> nameMap,
-			String portletCategoryName, String properties)
+			String customElementURLs, String description,
+			String friendlyURLMapping, boolean instanceable,
+			Map<Locale, String> nameMap, String portletCategoryName,
+			String properties, String sourceCodeURL)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -54,23 +56,25 @@ public class RemoteAppEntryServiceImpl extends RemoteAppEntryServiceBaseImpl {
 
 		return remoteAppEntryLocalService.addCustomElementRemoteAppEntry(
 			getUserId(), customElementCSSURLs, customElementHTMLElementName,
-			customElementURLs, friendlyURLMapping, instanceable, nameMap,
-			portletCategoryName, properties);
+			customElementURLs, description, friendlyURLMapping, instanceable,
+			nameMap, portletCategoryName, properties, sourceCodeURL,
+			WorkflowConstants.STATUS_DRAFT);
 	}
 
 	@Override
 	public RemoteAppEntry addIFrameRemoteAppEntry(
-			String friendlyURLMapping, String iFrameURL, boolean instanceable,
-			Map<Locale, String> nameMap, String portletCategoryName,
-			String properties)
+			String description, String friendlyURLMapping, String iFrameURL,
+			boolean instanceable, Map<Locale, String> nameMap,
+			String portletCategoryName, String properties, String sourceCodeURL)
 		throws PortalException {
 
 		_portletResourcePermission.check(
 			getPermissionChecker(), null, ActionKeys.ADD_ENTRY);
 
 		return remoteAppEntryLocalService.addIFrameRemoteAppEntry(
-			getUserId(), friendlyURLMapping, iFrameURL, instanceable, nameMap,
-			portletCategoryName, properties);
+			getUserId(), description, friendlyURLMapping, iFrameURL,
+			instanceable, nameMap, portletCategoryName, properties,
+			sourceCodeURL);
 	}
 
 	@Override
@@ -98,8 +102,9 @@ public class RemoteAppEntryServiceImpl extends RemoteAppEntryServiceBaseImpl {
 	public RemoteAppEntry updateCustomElementRemoteAppEntry(
 			long remoteAppEntryId, String customElementCSSURLs,
 			String customElementHTMLElementName, String customElementURLs,
-			String friendlyURLMapping, Map<Locale, String> nameMap,
-			String portletCategoryName, String properties)
+			String description, String friendlyURLMapping,
+			Map<Locale, String> nameMap, String portletCategoryName,
+			String properties, String sourceCodeURL)
 		throws PortalException {
 
 		_remoteAppEntryModelResourcePermission.check(
@@ -107,23 +112,25 @@ public class RemoteAppEntryServiceImpl extends RemoteAppEntryServiceBaseImpl {
 
 		return remoteAppEntryLocalService.updateCustomElementRemoteAppEntry(
 			remoteAppEntryId, customElementCSSURLs,
-			customElementHTMLElementName, customElementURLs, friendlyURLMapping,
-			nameMap, portletCategoryName, properties);
+			customElementHTMLElementName, customElementURLs, description,
+			friendlyURLMapping, nameMap, portletCategoryName, properties,
+			sourceCodeURL);
 	}
 
 	@Override
 	public RemoteAppEntry updateIFrameRemoteAppEntry(
-			long remoteAppEntryId, String friendlyURLMapping, String iFrameURL,
+			long remoteAppEntryId, String description,
+			String friendlyURLMapping, String iFrameURL,
 			Map<Locale, String> nameMap, String portletCategoryName,
-			String properties)
+			String properties, String sourceCodeURL)
 		throws PortalException {
 
 		_remoteAppEntryModelResourcePermission.check(
 			getPermissionChecker(), remoteAppEntryId, ActionKeys.UPDATE);
 
 		return remoteAppEntryLocalService.updateIFrameRemoteAppEntry(
-			remoteAppEntryId, friendlyURLMapping, iFrameURL, nameMap,
-			portletCategoryName, properties);
+			remoteAppEntryId, description, friendlyURLMapping, iFrameURL,
+			nameMap, portletCategoryName, properties, sourceCodeURL);
 	}
 
 	@Reference(

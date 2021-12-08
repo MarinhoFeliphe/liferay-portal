@@ -123,6 +123,10 @@ public class LayoutSiteNavigationMenuItemType
 		return true;
 	}
 
+	public String getAddTitle(Locale locale) {
+		return LanguageUtil.format(locale, "select-x", "pages");
+	}
+
 	@Override
 	public PortletURL getAddURL(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
@@ -187,6 +191,12 @@ public class LayoutSiteNavigationMenuItemType
 		SiteNavigationMenuItem siteNavigationMenuItem, Locale locale) {
 
 		Layout layout = _fetchLayout(siteNavigationMenuItem);
+
+		Group group = layout.getGroup();
+
+		if (!group.isPrivateLayoutsEnabled()) {
+			return LanguageUtil.get(locale, "page");
+		}
 
 		if (layout.isPublicLayout()) {
 			return LanguageUtil.get(locale, "public-page");

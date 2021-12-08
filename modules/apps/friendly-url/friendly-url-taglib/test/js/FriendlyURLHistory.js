@@ -29,6 +29,7 @@ const defaultProps = {
 	defaultLanguageId: 'en_US',
 	elementId: 'elementId',
 	friendlyURLEntryURL: 'friendly_url_history',
+	localizable: true,
 };
 
 const fetchResponse = {
@@ -102,7 +103,7 @@ describe('FriendlyURLHistory', () => {
 	});
 
 	it('renders a button', () => {
-		const {getByRole} = renderComponent({...defaultProps});
+		const {getByRole} = renderComponent(defaultProps);
 
 		historyButton = getByRole('button');
 
@@ -110,7 +111,7 @@ describe('FriendlyURLHistory', () => {
 	});
 
 	it('renders a restore icon inside the button', () => {
-		renderComponent({...defaultProps});
+		renderComponent(defaultProps);
 
 		expect(historyButton.querySelector('svg').classList).toContain(
 			'lexicon-icon-restore'
@@ -127,7 +128,7 @@ describe('FriendlyURLHistory', () => {
 		beforeEach(async () => {
 			fetch.mockResponseOnce(JSON.stringify(fetchResponse));
 
-			result = renderComponent({...defaultProps});
+			result = renderComponent(defaultProps);
 
 			historyButton = result.getByRole('button');
 
@@ -153,11 +154,19 @@ describe('FriendlyURLHistory', () => {
 		});
 
 		it('renders the old friendly urls', async () => {
-			const listItems = await waitForElement(() =>
-				result.getAllByRole('listitem')
+			await waitForElement(() => result.getAllByRole('listitem'));
+
+			const listUrlItems = result.baseElement.querySelectorAll(
+				'.modal-content li.list-group-item'
 			);
 
-			expect(listItems.length).toBe(4);
+			// LPS-141143
+
+			expect(
+				Array.from(listUrlItems).map(({textContent}) => textContent)
+			).toMatchSnapshot();
+
+			expect(listUrlItems.length).toBe(3);
 		});
 
 		it('deletes the third old friendly url', async () => {
@@ -176,8 +185,9 @@ describe('FriendlyURLHistory', () => {
 			});
 
 			expect(
-				document.querySelectorAll('.modal-content li.list-group-item')
-					.length
+				result.baseElement.querySelectorAll(
+					'.modal-content li.list-group-item'
+				).length
 			).toBe(2);
 
 			expect(fetch.mock.calls.length).toEqual(2);
@@ -202,8 +212,9 @@ describe('FriendlyURLHistory', () => {
 			expect(fetch.mock.calls.length).toEqual(3);
 
 			expect(
-				document.querySelector('.modal-content .active-url-text')
-					.innerHTML
+				result.baseElement.querySelector(
+					'.modal-content .active-url-text'
+				).textContent
 			).toBe('/test-2');
 		});
 	});

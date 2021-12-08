@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.search.experiences.exception.SXPElementElementDefinitionJSONException;
-import com.liferay.search.experiences.exception.SXPElementReadOnlyException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
 import com.liferay.search.experiences.model.SXPElement;
 import com.liferay.search.experiences.service.base.SXPElementLocalServiceBaseImpl;
@@ -87,6 +86,18 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	}
 
 	@Override
+	public void deleteCompanySXPElements(long companyId)
+		throws PortalException {
+
+		List<SXPElement> sxpElements = sxpElementPersistence.findByCompanyId(
+			companyId);
+
+		for (SXPElement sxpElement : sxpElements) {
+			sxpElementLocalService.deleteSXPElement(sxpElement);
+		}
+	}
+
+	@Override
 	public SXPElement deleteSXPElement(long sxpElementId)
 		throws PortalException {
 
@@ -102,12 +113,6 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	public SXPElement deleteSXPElement(SXPElement sxpElement)
 		throws PortalException {
 
-		// TODO Who can and delete create read only search experiences elements?
-
-		if (sxpElement.isReadOnly()) {
-			throw new SXPElementReadOnlyException();
-		}
-
 		sxpElement = sxpElementPersistence.remove(sxpElement);
 
 		_resourceLocalService.deleteResource(
@@ -117,8 +122,8 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	}
 
 	@Override
-	public List<SXPElement> getSXPElements(long companyId) {
-		return sxpElementPersistence.findByCompanyId(companyId);
+	public List<SXPElement> getSXPElements(long companyId, boolean readOnly) {
+		return sxpElementPersistence.findByC_R(companyId, readOnly);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)

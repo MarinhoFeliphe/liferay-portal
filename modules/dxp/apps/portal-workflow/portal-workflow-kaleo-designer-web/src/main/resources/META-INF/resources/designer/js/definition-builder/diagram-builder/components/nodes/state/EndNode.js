@@ -10,22 +10,35 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useContext} from 'react';
 
+import {DefinitionBuilderContext} from '../../../../DefinitionBuilderContext';
 import BaseNode from '../BaseNode';
 
 export default function EndNode({
-	data: {description} = {},
+	data: {description, label} = {},
 	descriptionSidebar,
+	id,
 	...otherProps
 }) {
+	const {defaultLanguageId} = useContext(DefinitionBuilderContext);
+
+	if (!label || !label[defaultLanguageId]) {
+		const defaultLanguageId = themeDisplay.getLanguageId();
+
+		label = {
+			[defaultLanguageId]: Liferay.Language.get('end'),
+		};
+	}
+
 	return (
 		<BaseNode
 			className="end-node"
 			description={description}
 			descriptionSidebar={descriptionSidebar}
 			icon="flag-full"
-			label={Liferay.Language.get('end')}
+			id={id}
+			label={label}
 			type="end"
 			{...otherProps}
 		/>
@@ -35,4 +48,5 @@ export default function EndNode({
 EndNode.propTypes = {
 	data: PropTypes.object,
 	descriptionSidebar: PropTypes.string,
+	id: PropTypes.string.isRequired,
 };

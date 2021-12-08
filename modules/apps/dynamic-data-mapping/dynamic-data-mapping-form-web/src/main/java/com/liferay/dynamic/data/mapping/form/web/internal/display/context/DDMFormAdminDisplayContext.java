@@ -106,6 +106,7 @@ import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -925,12 +926,27 @@ public class DDMFormAdminDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
-			renderRequest, "orderByCol", "modified-date");
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
+			"modified-date");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(renderRequest, "orderByType", "desc");
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
+			"desc");
+
+		return _orderByType;
 	}
 
 	public PermissionChecker getPermissionChecker() {
@@ -1044,16 +1060,6 @@ public class DDMFormAdminDisplayContext {
 		DDMFormInstanceSearch ddmFormInstanceSearch = new DDMFormInstanceSearch(
 			renderRequest, portletURL);
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<DDMFormInstance> orderByComparator =
-			getDDMFormInstanceOrderByComparator(orderByCol, orderByType);
-
-		ddmFormInstanceSearch.setOrderByCol(orderByCol);
-		ddmFormInstanceSearch.setOrderByComparator(orderByComparator);
-		ddmFormInstanceSearch.setOrderByType(orderByType);
-
 		if (ddmFormInstanceSearch.isSearch()) {
 			ddmFormInstanceSearch.setEmptyResultsMessage("no-forms-were-found");
 		}
@@ -1061,6 +1067,11 @@ public class DDMFormAdminDisplayContext {
 			ddmFormInstanceSearch.setEmptyResultsMessage("there-are-no-forms");
 		}
 
+		ddmFormInstanceSearch.setOrderByCol(getOrderByCol());
+		ddmFormInstanceSearch.setOrderByComparator(
+			getDDMFormInstanceOrderByComparator(
+				getOrderByCol(), getOrderByType()));
+		ddmFormInstanceSearch.setOrderByType(getOrderByType());
 		ddmFormInstanceSearch.setRowChecker(
 			new DDMFormInstanceRowChecker(renderResponse));
 
@@ -1215,6 +1226,11 @@ public class DDMFormAdminDisplayContext {
 		}
 
 		return true;
+	}
+
+	public boolean isExpirationDateEnabled() {
+		return _ffSubmissionsSettingsConfigurationActivator.
+			expirationDateEnabled();
 	}
 
 	public boolean isFormExpired(DDMFormInstance ddmFormInstance)
@@ -1844,6 +1860,8 @@ public class DDMFormAdminDisplayContext {
 	private final Map<Long, String> _invalidDDMFormFieldTypes = new HashMap<>();
 	private final NPMResolver _npmResolver;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
+	private String _orderByCol;
+	private String _orderByType;
 	private final Portal _portal;
 
 }

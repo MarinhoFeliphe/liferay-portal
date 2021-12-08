@@ -273,6 +273,10 @@ definition {
 			locator1 = "DataEngineRenderer#FIELD_BUTTON_INDEXED");
 	}
 
+	macro clickCollapseFieldsGroup {
+		Click(locator1 = "Form#COLLAPSE_BUTTON");
+	}
+
 	macro clickOnPreviewSourceContent {
 		Click(locator1 = "CKEditor#TOOLBAR_PREVIEW_BUTTON");
 

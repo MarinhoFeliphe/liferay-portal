@@ -15,6 +15,7 @@
 package com.liferay.fragment.web.internal.display.context;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
@@ -24,9 +25,9 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -98,7 +99,9 @@ public class GroupFragmentEntryLinkDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(_renderRequest, "orderByCol", "name");
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, FragmentPortletKeys.FRAGMENT,
+			"group-fragment-entry-link-order-by-col", "name");
 
 		return _orderByCol;
 	}
@@ -108,8 +111,9 @@ public class GroupFragmentEntryLinkDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "asc");
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, FragmentPortletKeys.FRAGMENT,
+			"group-fragment-entry-link-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -149,25 +153,21 @@ public class GroupFragmentEntryLinkDisplayContext {
 
 		boolean orderByAsc = false;
 
-		String orderByType = getOrderByType();
-
-		if (orderByType.equals("asc")) {
+		if (getOrderByType().equals("asc")) {
 			orderByAsc = true;
 		}
 
-		OrderByComparator<Group> orderByComparator = new GroupNameComparator(
-			orderByAsc);
-
 		groupsSearchContainer.setOrderByCol(getOrderByCol());
-		groupsSearchContainer.setOrderByComparator(orderByComparator);
-		groupsSearchContainer.setOrderByType(orderByType);
+		groupsSearchContainer.setOrderByComparator(
+			new GroupNameComparator(orderByAsc));
+		groupsSearchContainer.setOrderByType(getOrderByType());
 
 		Map<Group, Long> groupFragmentEntryUsages =
 			_getGroupFragmentEntryUsages();
 
 		List<Group> groups = new ArrayList<>(groupFragmentEntryUsages.keySet());
 
-		Collections.sort(groups, orderByComparator);
+		Collections.sort(groups, groupsSearchContainer.getOrderByComparator());
 
 		groupsSearchContainer.setResults(groups);
 

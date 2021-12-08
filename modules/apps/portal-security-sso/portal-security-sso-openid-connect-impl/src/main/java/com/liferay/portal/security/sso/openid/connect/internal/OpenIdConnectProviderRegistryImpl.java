@@ -27,6 +27,7 @@ import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProvider;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProviderRegistry;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectServiceException;
 import com.liferay.portal.security.sso.openid.connect.internal.configuration.OpenIdConnectProviderConfiguration;
+import com.liferay.portal.security.sso.openid.connect.persistence.service.OpenIdConnectSessionLocalService;
 
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.rp.OIDCClientMetadata;
@@ -66,6 +67,8 @@ public class OpenIdConnectProviderRegistryImpl
 	public void deleted(String pid) {
 		Dictionary<String, ?> properties = _configurationPidsProperties.remove(
 			pid);
+
+		_openIdConnectSessionLocalService.deleteOpenIdConnectSessions(pid);
 
 		long companyId = GetterUtil.getLong(properties.get("companyId"));
 
@@ -174,6 +177,7 @@ public class OpenIdConnectProviderRegistryImpl
 
 	protected OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>
 			createOpenIdConnectProvider(
+				String configurationPid,
 				OpenIdConnectProviderConfiguration
 					openIdConnectProviderConfiguration)
 		throws ConfigurationException {
@@ -183,7 +187,7 @@ public class OpenIdConnectProviderRegistryImpl
 				openIdConnectProviderConfiguration.providerName(),
 				openIdConnectProviderConfiguration.openIdConnectClientId(),
 				openIdConnectProviderConfiguration.openIdConnectClientSecret(),
-				openIdConnectProviderConfiguration.scopes(),
+				configurationPid, openIdConnectProviderConfiguration.scopes(),
 				getOpenIdConnectMetadataFactory(
 					openIdConnectProviderConfiguration),
 				openIdConnectProviderConfiguration.tokenConnectionTimeout());
@@ -254,37 +258,40 @@ public class OpenIdConnectProviderRegistryImpl
 			 OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>>
 				openIdConnectProviderMap = new TreeMap<>();
 
-		for (Dictionary<String, ?> properties :
-				_configurationPidsProperties.values()) {
+		_configurationPidsProperties.forEach(
+			(configurationPid, properties) -> {
+				if (companyId != GetterUtil.getLong(
+						properties.get("companyId"))) {
 
-			if (companyId != GetterUtil.getLong(properties.get("companyId"))) {
-				continue;
-			}
-
-			try {
-				OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>
-					openIdConnectProvider = createOpenIdConnectProvider(
-						ConfigurableUtil.createConfigurable(
-							OpenIdConnectProviderConfiguration.class,
-							properties));
-
-				if (openIdConnectProviderMap.containsKey(
-						openIdConnectProvider.getName())) {
-
-					_log.error(
-						"Duplicate OpenId Connect provider name \"" +
-							openIdConnectProvider.getName() + "\"");
-
-					continue;
+					return;
 				}
 
-				openIdConnectProviderMap.put(
-					openIdConnectProvider.getName(), openIdConnectProvider);
-			}
-			catch (ConfigurationException configurationException) {
-				_log.error(configurationException, configurationException);
-			}
-		}
+				try {
+					OpenIdConnectProvider
+						<OIDCClientMetadata, OIDCProviderMetadata>
+							openIdConnectProvider = createOpenIdConnectProvider(
+								configurationPid,
+								ConfigurableUtil.createConfigurable(
+									OpenIdConnectProviderConfiguration.class,
+									properties));
+
+					if (openIdConnectProviderMap.containsKey(
+							openIdConnectProvider.getName())) {
+
+						_log.error(
+							"Duplicate OpenId Connect provider name \"" +
+								openIdConnectProvider.getName() + "\"");
+
+						return;
+					}
+
+					openIdConnectProviderMap.put(
+						openIdConnectProvider.getName(), openIdConnectProvider);
+				}
+				catch (ConfigurationException configurationException) {
+					_log.error(configurationException, configurationException);
+				}
+			});
 
 		if (companyId != CompanyConstants.SYSTEM) {
 			_addDefaults(
@@ -313,5 +320,8 @@ public class OpenIdConnectProviderRegistryImpl
 
 	private final Map<String, Dictionary<String, ?>>
 		_configurationPidsProperties = new ConcurrentHashMap<>();
+
+	@Reference
+	private OpenIdConnectSessionLocalService _openIdConnectSessionLocalService;
 
 }

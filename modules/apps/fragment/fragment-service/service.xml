@@ -147,6 +147,7 @@
 		<column name="js" type="String" />
 		<column name="cacheable" type="boolean" />
 		<column name="configuration" type="String" />
+		<column name="icon" type="String" />
 		<column name="previewFileEntryId" type="long" />
 		<column name="readOnly" type="boolean" />
 		<column name="type" type="int" />
@@ -268,6 +269,11 @@
 		</finder>
 		<finder name="G_P" return-type="Collection">
 			<finder-column name="groupId" />
+			<finder-column name="plid" />
+		</finder>
+		<finder name="G_OFELI_P" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="originalFragmentEntryLinkId" />
 			<finder-column name="plid" />
 		</finder>
 		<finder name="G_F_C" return-type="Collection">

@@ -50,7 +50,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 
@@ -63,6 +62,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8907 | Test Summary: Expand activity in individual overview"
 	@priority = "3"
 	test CanExpandActivityInIndividualOverview {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
@@ -255,6 +256,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8906 | Test Summary: As a Business User, I should be able to select a point on individual overview activities graph"
 	@priority = "3"
 	test SelectDataOnIndividualsActivitiesChart {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
@@ -309,8 +312,8 @@ definition {
 
 		task ("Hover on the Individual Events graph and assert the elements that are shown on the tooltip") {
 			for (var current : list "Events-1,Sessions-1") {
-				var item = StringUtil.extractFirst("${current}","-");
-				var value = StringUtil.extractLast("${current}","-");
+				var item = StringUtil.extractFirst("${current}", "-");
+				var value = StringUtil.extractLast("${current}", "-");
 
 				AssertElementPresent(
 					key_value = "${value}",
@@ -380,7 +383,6 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 			var portalURL = StringUtil.replace("${portalURL}", "http://", "");
 			var portalURL = StringUtil.replace("${portalURL}", ":8080", "");
-
 			var n = "0";
 
 			while ("${n}" != "5") {

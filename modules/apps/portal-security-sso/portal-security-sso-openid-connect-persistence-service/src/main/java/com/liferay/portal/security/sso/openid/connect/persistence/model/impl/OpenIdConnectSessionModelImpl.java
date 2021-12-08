@@ -18,10 +18,14 @@ import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.sso.openid.connect.persistence.model.OpenIdConnectSession;
@@ -68,8 +72,9 @@ public class OpenIdConnectSessionModelImpl
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"openIdConnectSessionId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"modifiedDate", Types.TIMESTAMP},
-		{"accessToken", Types.VARCHAR}, {"idToken", Types.VARCHAR},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"modifiedDate", Types.TIMESTAMP}, {"accessToken", Types.VARCHAR},
+		{"configurationPid", Types.VARCHAR}, {"idToken", Types.VARCHAR},
 		{"providerName", Types.VARCHAR}, {"refreshToken", Types.VARCHAR}
 	};
 
@@ -80,15 +85,17 @@ public class OpenIdConnectSessionModelImpl
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("openIdConnectSessionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("accessToken", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("configurationPid", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("idToken", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("providerName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("refreshToken", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table OpenIdConnectSession (mvccVersion LONG default 0 not null,openIdConnectSessionId LONG not null primary key,companyId LONG,modifiedDate DATE null,accessToken VARCHAR(3000) null,idToken VARCHAR(3999) null,providerName VARCHAR(75) null,refreshToken VARCHAR(2000) null)";
+		"create table OpenIdConnectSession (mvccVersion LONG default 0 not null,openIdConnectSessionId LONG not null primary key,companyId LONG,userId LONG,modifiedDate DATE null,accessToken VARCHAR(3000) null,configurationPid VARCHAR(256) null,idToken VARCHAR(3999) null,providerName VARCHAR(75) null,refreshToken VARCHAR(2000) null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table OpenIdConnectSession";
@@ -106,11 +113,23 @@ public class OpenIdConnectSessionModelImpl
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
 	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long CONFIGURATIONPID_COLUMN_BITMASK = 1L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long USERID_COLUMN_BITMASK = 2L;
+
+	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OPENIDCONNECTSESSIONID_COLUMN_BITMASK = 1L;
+	public static final long OPENIDCONNECTSESSIONID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -273,6 +292,11 @@ public class OpenIdConnectSessionModelImpl
 			"companyId",
 			(BiConsumer<OpenIdConnectSession, Long>)
 				OpenIdConnectSession::setCompanyId);
+		attributeGetterFunctions.put("userId", OpenIdConnectSession::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<OpenIdConnectSession, Long>)
+				OpenIdConnectSession::setUserId);
 		attributeGetterFunctions.put(
 			"modifiedDate", OpenIdConnectSession::getModifiedDate);
 		attributeSetterBiConsumers.put(
@@ -285,6 +309,12 @@ public class OpenIdConnectSessionModelImpl
 			"accessToken",
 			(BiConsumer<OpenIdConnectSession, String>)
 				OpenIdConnectSession::setAccessToken);
+		attributeGetterFunctions.put(
+			"configurationPid", OpenIdConnectSession::getConfigurationPid);
+		attributeSetterBiConsumers.put(
+			"configurationPid",
+			(BiConsumer<OpenIdConnectSession, String>)
+				OpenIdConnectSession::setConfigurationPid);
 		attributeGetterFunctions.put(
 			"idToken", OpenIdConnectSession::getIdToken);
 		attributeSetterBiConsumers.put(
@@ -353,6 +383,45 @@ public class OpenIdConnectSessionModelImpl
 	}
 
 	@Override
+	public long getUserId() {
+		return _userId;
+	}
+
+	@Override
+	public void setUserId(long userId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_userId = userId;
+	}
+
+	@Override
+	public String getUserUuid() {
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException portalException) {
+			return "";
+		}
+	}
+
+	@Override
+	public void setUserUuid(String userUuid) {
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public long getOriginalUserId() {
+		return GetterUtil.getLong(this.<Long>getColumnOriginalValue("userId"));
+	}
+
+	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
 	}
@@ -389,6 +458,34 @@ public class OpenIdConnectSessionModelImpl
 		}
 
 		_accessToken = accessToken;
+	}
+
+	@Override
+	public String getConfigurationPid() {
+		if (_configurationPid == null) {
+			return "";
+		}
+		else {
+			return _configurationPid;
+		}
+	}
+
+	@Override
+	public void setConfigurationPid(String configurationPid) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_configurationPid = configurationPid;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public String getOriginalConfigurationPid() {
+		return getColumnOriginalValue("configurationPid");
 	}
 
 	@Override
@@ -510,8 +607,10 @@ public class OpenIdConnectSessionModelImpl
 		openIdConnectSessionImpl.setOpenIdConnectSessionId(
 			getOpenIdConnectSessionId());
 		openIdConnectSessionImpl.setCompanyId(getCompanyId());
+		openIdConnectSessionImpl.setUserId(getUserId());
 		openIdConnectSessionImpl.setModifiedDate(getModifiedDate());
 		openIdConnectSessionImpl.setAccessToken(getAccessToken());
+		openIdConnectSessionImpl.setConfigurationPid(getConfigurationPid());
 		openIdConnectSessionImpl.setIdToken(getIdToken());
 		openIdConnectSessionImpl.setProviderName(getProviderName());
 		openIdConnectSessionImpl.setRefreshToken(getRefreshToken());
@@ -532,10 +631,14 @@ public class OpenIdConnectSessionModelImpl
 			this.<Long>getColumnOriginalValue("openIdConnectSessionId"));
 		openIdConnectSessionImpl.setCompanyId(
 			this.<Long>getColumnOriginalValue("companyId"));
+		openIdConnectSessionImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
 		openIdConnectSessionImpl.setModifiedDate(
 			this.<Date>getColumnOriginalValue("modifiedDate"));
 		openIdConnectSessionImpl.setAccessToken(
 			this.<String>getColumnOriginalValue("accessToken"));
+		openIdConnectSessionImpl.setConfigurationPid(
+			this.<String>getColumnOriginalValue("configurationPid"));
 		openIdConnectSessionImpl.setIdToken(
 			this.<String>getColumnOriginalValue("idToken"));
 		openIdConnectSessionImpl.setProviderName(
@@ -628,6 +731,8 @@ public class OpenIdConnectSessionModelImpl
 
 		openIdConnectSessionCacheModel.companyId = getCompanyId();
 
+		openIdConnectSessionCacheModel.userId = getUserId();
+
 		Date modifiedDate = getModifiedDate();
 
 		if (modifiedDate != null) {
@@ -644,6 +749,15 @@ public class OpenIdConnectSessionModelImpl
 
 		if ((accessToken != null) && (accessToken.length() == 0)) {
 			openIdConnectSessionCacheModel.accessToken = null;
+		}
+
+		openIdConnectSessionCacheModel.configurationPid = getConfigurationPid();
+
+		String configurationPid =
+			openIdConnectSessionCacheModel.configurationPid;
+
+		if ((configurationPid != null) && (configurationPid.length() == 0)) {
+			openIdConnectSessionCacheModel.configurationPid = null;
 		}
 
 		openIdConnectSessionCacheModel.idToken = getIdToken();
@@ -765,9 +879,11 @@ public class OpenIdConnectSessionModelImpl
 	private long _mvccVersion;
 	private long _openIdConnectSessionId;
 	private long _companyId;
+	private long _userId;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
 	private String _accessToken;
+	private String _configurationPid;
 	private String _idToken;
 	private String _providerName;
 	private String _refreshToken;
@@ -803,8 +919,10 @@ public class OpenIdConnectSessionModelImpl
 		_columnOriginalValues.put(
 			"openIdConnectSessionId", _openIdConnectSessionId);
 		_columnOriginalValues.put("companyId", _companyId);
+		_columnOriginalValues.put("userId", _userId);
 		_columnOriginalValues.put("modifiedDate", _modifiedDate);
 		_columnOriginalValues.put("accessToken", _accessToken);
+		_columnOriginalValues.put("configurationPid", _configurationPid);
 		_columnOriginalValues.put("idToken", _idToken);
 		_columnOriginalValues.put("providerName", _providerName);
 		_columnOriginalValues.put("refreshToken", _refreshToken);
@@ -827,15 +945,19 @@ public class OpenIdConnectSessionModelImpl
 
 		columnBitmasks.put("companyId", 4L);
 
-		columnBitmasks.put("modifiedDate", 8L);
+		columnBitmasks.put("userId", 8L);
 
-		columnBitmasks.put("accessToken", 16L);
+		columnBitmasks.put("modifiedDate", 16L);
 
-		columnBitmasks.put("idToken", 32L);
+		columnBitmasks.put("accessToken", 32L);
 
-		columnBitmasks.put("providerName", 64L);
+		columnBitmasks.put("configurationPid", 64L);
 
-		columnBitmasks.put("refreshToken", 128L);
+		columnBitmasks.put("idToken", 128L);
+
+		columnBitmasks.put("providerName", 256L);
+
+		columnBitmasks.put("refreshToken", 512L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

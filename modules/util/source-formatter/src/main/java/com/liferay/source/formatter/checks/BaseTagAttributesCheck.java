@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.source.formatter.checks.util.SourceUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,9 @@ import java.util.regex.Pattern;
  */
 public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 
-	protected abstract Tag doFormatLineBreaks(Tag tag, String absolutePath);
+	protected Tag doFormatLineBreaks(Tag tag, String absolutePath) {
+		return tag;
+	}
 
 	protected String formatIncorrectLineBreak(String fileName, String content) {
 		Matcher matcher = _incorrectLineBreakPattern.matcher(content);
@@ -106,6 +109,9 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 
 			String tag = matcher.group(1);
 
+			//System.out.println("---");
+			//System.out.println(tag);
+
 			String lastLine = StringUtil.trim(
 				getLine(content, getLineNumber(content, matcher.end(1))));
 
@@ -152,7 +158,7 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 			boolean forceSingleLine)
 		throws Exception {
 
-		Tag tag = _parseTag(s, escapeQuotes);
+		Tag tag = parseTag(s, escapeQuotes);
 
 		if (tag == null) {
 			return s;
@@ -175,193 +181,43 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 		return tag;
 	}
 
-	protected Tag sortHTMLTagAttributes(Tag tag) {
-		String tagName = tag.getName();
+	protected List<String> getJSPTags(String line) {
+		List<String> jspTags = new ArrayList<>();
 
-		if (tagName.equals("liferay-ui:tabs")) {
-			return tag;
+		Matcher matcher = _jspTaglibPattern.matcher(line);
+
+		while (matcher.find()) {
+			String tag = getTag(line, matcher.start());
+
+			if (tag == null) {
+				return jspTags;
+			}
+
+			jspTags.add(tag);
 		}
 
-		Map<String, String> attributesMap = tag.getAttributesMap();
-
-		for (Map.Entry<String, String> entry : attributesMap.entrySet()) {
-			String attributeName = entry.getKey();
-
-			if (tagName.equals("svg") && attributeName.equals("viewBox")) {
-				continue;
-			}
-
-			String attributeValue = entry.getValue();
-
-			if (attributeValue.matches("([-a-z0-9]+ )+[-a-z0-9]+")) {
-				List<String> htmlAttributes = ListUtil.fromArray(
-					StringUtil.split(attributeValue, StringPool.SPACE));
-
-				Collections.sort(htmlAttributes);
-
-				tag.putAttribute(
-					attributeName,
-					StringUtil.merge(htmlAttributes, StringPool.SPACE));
-			}
-			else if (attributeValue.matches("([-a-z0-9]+,)+[-a-z0-9]+")) {
-				if (!tagName.equals("aui:script") ||
-					!attributeName.equals("use")) {
-
-					continue;
-				}
-
-				List<String> htmlAttributes = ListUtil.fromArray(
-					StringUtil.split(attributeValue, StringPool.COMMA));
-
-				Collections.sort(htmlAttributes);
-
-				tag.putAttribute(
-					attributeName,
-					StringUtil.merge(htmlAttributes, StringPool.COMMA));
-			}
-		}
-
-		return tag;
+		return jspTags;
 	}
 
-	protected class Tag {
+	protected String getTag(String s, int fromIndex) {
+		int x = fromIndex;
 
-		public Tag(
-			String name, String indent, boolean multiLine,
-			boolean escapeQuotes) {
+		while (true) {
+			x = s.indexOf(">", x + 1);
 
-			_name = name;
-			_indent = indent;
-			_multiLine = multiLine;
-			_escapeQuotes = escapeQuotes;
-		}
-
-		public Map<String, String> getAttributesMap() {
-			return _attributesMap;
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		public void putAttribute(String attributeName, String attributeValue) {
-			_attributesMap.put(attributeName, attributeValue);
-		}
-
-		public void setClosingTag(String closingTag) {
-			_closingTag = closingTag;
-		}
-
-		public void setMultiLine(boolean multiLine) {
-			_multiLine = multiLine;
-		}
-
-		@Override
-		public String toString() {
-			StringBundler sb = new StringBundler();
-
-			sb.append(_indent);
-			sb.append(StringPool.LESS_THAN);
-			sb.append(_name);
-
-			for (Map.Entry<String, String> entry : _attributesMap.entrySet()) {
-				if (_multiLine) {
-					sb.append(StringPool.NEW_LINE);
-					sb.append(_indent);
-					sb.append(StringPool.TAB);
-				}
-				else {
-					sb.append(StringPool.SPACE);
-				}
-
-				sb.append(entry.getKey());
-
-				sb.append(StringPool.EQUAL);
-
-				String delimeter = null;
-
-				String attributeValue = entry.getValue();
-
-				if (_escapeQuotes ||
-					!attributeValue.contains(StringPool.QUOTE) ||
-					!_name.contains(StringPool.COLON)) {
-
-					delimeter = StringPool.QUOTE;
-				}
-				else {
-					delimeter = StringPool.APOSTROPHE;
-				}
-
-				sb.append(delimeter);
-
-				if (!_escapeQuotes) {
-					sb.append(attributeValue);
-				}
-				else {
-					sb.append(
-						StringUtil.replace(
-							attributeValue, CharPool.QUOTE, "&quot;"));
-				}
-
-				sb.append(delimeter);
+			if (x == -1) {
+				return null;
 			}
 
-			if (_multiLine) {
-				sb.append(StringPool.NEW_LINE);
-				sb.append(_indent);
-			}
-			else if (_closingTag.equals("/>")) {
-				sb.append(StringPool.SPACE);
-			}
+			String part = s.substring(fromIndex, x + 1);
 
-			sb.append(_closingTag);
-
-			return sb.toString();
+			if (getLevel(part, "<", ">") == 0) {
+				return part;
+			}
 		}
-
-		private Map<String, String> _attributesMap = new TreeMap<>(
-			new NaturalOrderStringComparator());
-		private String _closingTag;
-		private final boolean _escapeQuotes;
-		private final String _indent;
-		private boolean _multiLine;
-		private final String _name;
-
 	}
 
-	private String _getStrippedTag(String tag, String... quotes) {
-		for (String quote : quotes) {
-			while (true) {
-				int x = tag.indexOf(quote + "<%=");
-
-				if (x == -1) {
-					break;
-				}
-
-				int y = tag.indexOf("%>" + quote, x);
-
-				if (y == -1) {
-					return tag;
-				}
-
-				tag = tag.substring(0, x) + tag.substring(y + 3);
-			}
-		}
-
-		return tag;
-	}
-
-	private boolean _isValidAttributName(String attributeName) {
-		if (Validator.isNull(attributeName)) {
-			return false;
-		}
-
-		Matcher matcher = _attributeNamePattern.matcher(attributeName);
-
-		return matcher.matches();
-	}
-
-	private Tag _parseTag(String s, boolean escapeQuotes) {
+	protected Tag parseTag(String s, boolean escapeQuotes) {
 		String indent = SourceUtil.getIndent(s);
 
 		s = StringUtil.trim(s);
@@ -388,6 +244,17 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 		Tag tag = new Tag(tagName, indent, multiLine, escapeQuotes);
 
 		s = s.substring(x + 1);
+
+		if (s.equals(">") || s.equals("/>") ||
+			(tagName.matches("[-\\w:]+") &&
+			 s.matches(">\\s*</" + tagName + "\\s*>"))) {
+
+			tag.setClosingTag(
+				StringUtil.removeChars(
+					s, CharPool.NEW_LINE, CharPool.SPACE, CharPool.TAB));
+
+			return tag;
+		}
 
 		while (true) {
 			x = s.indexOf(CharPool.EQUAL);
@@ -456,10 +323,219 @@ public abstract class BaseTagAttributesCheck extends BaseFileCheck {
 		}
 	}
 
+	protected Tag sortHTMLTagAttributes(Tag tag) {
+		String tagFullName = tag.getFullName();
+
+		if (tagFullName.equals("liferay-ui:tabs")) {
+			return tag;
+		}
+
+		Map<String, String> attributesMap = tag.getAttributesMap();
+
+		for (Map.Entry<String, String> entry : attributesMap.entrySet()) {
+			String attributeName = entry.getKey();
+
+			if (tagFullName.equals("svg") && attributeName.equals("viewBox")) {
+				continue;
+			}
+
+			String attributeValue = entry.getValue();
+
+			if (attributeValue.matches("([-a-z0-9]+ )+[-a-z0-9]+")) {
+				List<String> htmlAttributes = ListUtil.fromArray(
+					StringUtil.split(attributeValue, StringPool.SPACE));
+
+				Collections.sort(htmlAttributes);
+
+				tag.putAttribute(
+					attributeName,
+					StringUtil.merge(htmlAttributes, StringPool.SPACE));
+			}
+			else if (attributeValue.matches("([-a-z0-9]+,)+[-a-z0-9]+")) {
+				if (!tagFullName.equals("aui:script") ||
+					!attributeName.equals("use")) {
+
+					continue;
+				}
+
+				List<String> htmlAttributes = ListUtil.fromArray(
+					StringUtil.split(attributeValue, StringPool.COMMA));
+
+				Collections.sort(htmlAttributes);
+
+				tag.putAttribute(
+					attributeName,
+					StringUtil.merge(htmlAttributes, StringPool.COMMA));
+			}
+		}
+
+		return tag;
+	}
+
+	protected class Tag {
+
+		public Tag(
+			String fullName, String indent, boolean multiLine,
+			boolean escapeQuotes) {
+
+			_fullName = fullName;
+			_indent = indent;
+			_multiLine = multiLine;
+			_escapeQuotes = escapeQuotes;
+
+			int x = _fullName.indexOf(":");
+
+			if (x != -1) {
+				_name = _fullName.substring(x + 1);
+				_taglibName = _fullName.substring(0, x);
+			}
+			else {
+				_name = _fullName;
+				_taglibName = null;
+			}
+		}
+
+		public Map<String, String> getAttributesMap() {
+			return _attributesMap;
+		}
+
+		public String getFullName() {
+			return _fullName;
+		}
+
+		public String getName() {
+			return _name;
+		}
+
+		public String getTaglibName() {
+			return _taglibName;
+		}
+
+		public void putAttribute(String attributeName, String attributeValue) {
+			_attributesMap.put(attributeName, attributeValue);
+		}
+
+		public void setClosingTag(String closingTag) {
+			_closingTag = closingTag;
+		}
+
+		public void setMultiLine(boolean multiLine) {
+			_multiLine = multiLine;
+		}
+
+		@Override
+		public String toString() {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_indent);
+			sb.append(StringPool.LESS_THAN);
+			sb.append(_fullName);
+
+			for (Map.Entry<String, String> entry : _attributesMap.entrySet()) {
+				if (_multiLine) {
+					sb.append(StringPool.NEW_LINE);
+					sb.append(_indent);
+					sb.append(StringPool.TAB);
+				}
+				else {
+					sb.append(StringPool.SPACE);
+				}
+
+				sb.append(entry.getKey());
+
+				sb.append(StringPool.EQUAL);
+
+				String delimeter = null;
+
+				String attributeValue = entry.getValue();
+
+				if (_escapeQuotes ||
+					!attributeValue.contains(StringPool.QUOTE) ||
+					!_fullName.contains(StringPool.COLON)) {
+
+					delimeter = StringPool.QUOTE;
+				}
+				else {
+					delimeter = StringPool.APOSTROPHE;
+				}
+
+				sb.append(delimeter);
+
+				if (!_escapeQuotes) {
+					sb.append(attributeValue);
+				}
+				else {
+					sb.append(
+						StringUtil.replace(
+							attributeValue, CharPool.QUOTE, "&quot;"));
+				}
+
+				sb.append(delimeter);
+			}
+
+			if (_multiLine) {
+				sb.append(StringPool.NEW_LINE);
+				sb.append(_indent);
+			}
+			else if (_closingTag.equals("/>")) {
+				sb.append(StringPool.SPACE);
+			}
+
+			sb.append(_closingTag);
+
+			return sb.toString();
+		}
+
+		private Map<String, String> _attributesMap = new TreeMap<>(
+			new NaturalOrderStringComparator());
+		private String _closingTag;
+		private final boolean _escapeQuotes;
+		private final String _fullName;
+		private final String _indent;
+		private boolean _multiLine;
+		private final String _name;
+		private final String _taglibName;
+
+	}
+
+	private String _getStrippedTag(String tag, String... quotes) {
+		for (String quote : quotes) {
+			while (true) {
+				int x = tag.indexOf(quote + "<%=");
+
+				if (x == -1) {
+					break;
+				}
+
+				int y = tag.indexOf("%>" + quote, x);
+
+				if (y == -1) {
+					return tag;
+				}
+
+				tag = tag.substring(0, x) + tag.substring(y + 3);
+			}
+		}
+
+		return tag;
+	}
+
+	private boolean _isValidAttributName(String attributeName) {
+		if (Validator.isNull(attributeName)) {
+			return false;
+		}
+
+		Matcher matcher = _attributeNamePattern.matcher(attributeName);
+
+		return matcher.matches();
+	}
+
 	private static final Pattern _attributeNamePattern = Pattern.compile(
 		"[a-zA-Z]+[-_:a-zA-Z0-9]*");
 	private static final Pattern _incorrectLineBreakPattern = Pattern.compile(
 		"\n(\t*)(<\\w[-_:\\w]*) (.*)([\"']|%=)\n[\\s\\S]*?>\n");
+	private static final Pattern _jspTaglibPattern = Pattern.compile(
+		"\t*<[-\\w]+:[-\\w]+ .");
 	private static final Pattern _multilineTagPattern = Pattern.compile(
 		"(([ \t]*)<[-\\w:]+\n.*?([^%])(/?>))(\n|$)", Pattern.DOTALL);
 

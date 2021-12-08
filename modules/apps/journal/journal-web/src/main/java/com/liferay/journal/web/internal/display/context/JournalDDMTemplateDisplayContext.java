@@ -31,9 +31,9 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -117,18 +117,11 @@ public class JournalDDMTemplateDisplayContext {
 			ddmTemplateSearch.setEmptyResultsMessage("no-templates-were-found");
 		}
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<DDMTemplate> orderByComparator =
+		ddmTemplateSearch.setOrderByCol(getOrderByCol());
+		ddmTemplateSearch.setOrderByComparator(
 			DDMUtil.getTemplateOrderByComparator(
-				getOrderByCol(), getOrderByType());
-
-		ddmTemplateSearch.setOrderByCol(orderByCol);
-		ddmTemplateSearch.setOrderByComparator(orderByComparator);
-		ddmTemplateSearch.setOrderByType(orderByType);
-		ddmTemplateSearch.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
+				getOrderByCol(), getOrderByType()));
+		ddmTemplateSearch.setOrderByType(getOrderByType());
 
 		long[] groupIds = {themeDisplay.getScopeGroupId()};
 
@@ -177,7 +170,8 @@ public class JournalDDMTemplateDisplayContext {
 		}
 
 		ddmTemplateSearch.setResults(results);
-
+		ddmTemplateSearch.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
 		ddmTemplateSearch.setTotal(total);
 
 		_ddmTemplateSearch = ddmTemplateSearch;
@@ -215,23 +209,25 @@ public class JournalDDMTemplateDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (_orderByCol != null) {
+		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(
-			_renderRequest, "orderByCol", "modified-date");
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_httpServletRequest, JournalPortletKeys.JOURNAL,
+			"ddm-template-order-by-col", "modified-date");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "desc");
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, JournalPortletKeys.JOURNAL,
+			"ddm-template-order-by-type", "desc");
 
 		return _orderByType;
 	}

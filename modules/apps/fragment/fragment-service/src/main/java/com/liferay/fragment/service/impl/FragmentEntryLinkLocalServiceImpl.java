@@ -80,28 +80,6 @@ import org.osgi.service.component.annotations.Reference;
 public class FragmentEntryLinkLocalServiceImpl
 	extends FragmentEntryLinkLocalServiceBaseImpl {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #addFragmentEntryLink(long, long, long, long, long, long,
-	 *             String, String, String, String, String, String, int, String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FragmentEntryLink addFragmentEntryLink(
-			long userId, long groupId, long originalFragmentEntryLinkId,
-			long fragmentEntryId, long segmentsExperienceId, long classNameId,
-			long classPK, String css, String html, String js,
-			String configuration, String editableValues, String namespace,
-			int position, String rendererKey, ServiceContext serviceContext)
-		throws PortalException {
-
-		return addFragmentEntryLink(
-			userId, groupId, originalFragmentEntryLinkId, fragmentEntryId,
-			segmentsExperienceId, classPK, css, html, js, configuration,
-			editableValues, namespace, position, rendererKey, serviceContext);
-	}
-
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -306,27 +284,20 @@ public class FragmentEntryLinkLocalServiceImpl
 	}
 
 	@Override
+	public FragmentEntryLink getFragmentEntryLink(
+		long groupId, long originalFragmentEntryLinkId, long plid) {
+
+		return fragmentEntryLinkPersistence.fetchByG_OFELI_P_First(
+			groupId, originalFragmentEntryLinkId, plid, null);
+	}
+
+	@Override
 	public List<FragmentEntryLink> getFragmentEntryLinks(
 		int type, int start, int end,
 		OrderByComparator<FragmentEntryLink> orderByComparator) {
 
 		return fragmentEntryLinkFinder.findByType(
 			type, start, end, orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getAllFragmentEntryLinksByFragmentEntryId(long, long, int,
-	 *             int, OrderByComparator)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long groupId, long fragmentEntryId, int start, int end,
-		OrderByComparator<FragmentEntryLink> orderByComparator) {
-
-		return fragmentEntryLinkFinder.findByG_F(
-			groupId, fragmentEntryId, start, end, orderByComparator);
 	}
 
 	/**
@@ -340,39 +311,6 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		return fragmentEntryLinkPersistence.findByG_C_C(
 			groupId, classNameId, classPK);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getLayoutPageTemplateFragmentEntryLinksByFragmentEntryId(
-	 *             long, long, int, int, int, OrderByComparator)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long groupId, long fragmentEntryId, long classNameId,
-		int layoutPageTemplateType, int start, int end,
-		OrderByComparator<FragmentEntryLink> orderByComparator) {
-
-		return fragmentEntryLinkFinder.findByG_F_C_L(
-			groupId, fragmentEntryId, classNameId, layoutPageTemplateType,
-			start, end, orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getFragmentEntryLinks(long, long, int, int,
-	 *             OrderByComparator)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long groupId, long fragmentEntryId, long classNameId, int start,
-		int end, OrderByComparator<FragmentEntryLink> orderByComparator) {
-
-		return fragmentEntryLinkFinder.findByG_F_C(
-			groupId, fragmentEntryId, classNameId, start, end,
-			orderByComparator);
 	}
 
 	@Override
@@ -403,21 +341,6 @@ public class FragmentEntryLinkLocalServiceImpl
 			groupId, segmentsExperienceId, plid);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getFragmentEntryLinksBySegmentsExperienceId(long, long,
-	 *             long)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinksBySegmentsExperienceId(
-		long groupId, long segmentsExperienceId, long classNameId,
-		long classPK) {
-
-		return fragmentEntryLinkPersistence.findByG_S_C_C(
-			groupId, segmentsExperienceId, classNameId, classPK);
-	}
-
 	@Override
 	public List<FragmentEntryLink> getFragmentEntryLinksBySegmentsExperienceId(
 		long groupId, long segmentsExperienceId, long plid,
@@ -425,44 +348,6 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		return fragmentEntryLinkPersistence.findByG_S_P_R(
 			groupId, segmentsExperienceId, plid, rendererKey);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getAllFragmentEntryLinksCountByFragmentEntryId(long, long)}
-	 */
-	@Deprecated
-	@Override
-	public int getFragmentEntryLinksCount(long groupId, long fragmentEntryId) {
-		return fragmentEntryLinkFinder.countByG_F(groupId, fragmentEntryId);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getFragmentEntryLinksCount(long, long)}
-	 */
-	@Deprecated
-	@Override
-	public int getFragmentEntryLinksCount(
-		long groupId, long fragmentEntryId, long classNameId) {
-
-		return fragmentEntryLinkFinder.countByG_F_C(
-			groupId, fragmentEntryId, classNameId);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getLayoutPageTemplateFragmentEntryLinksCountByFragmentEntryId(
-	 *             long, long, int)}
-	 */
-	@Deprecated
-	@Override
-	public int getFragmentEntryLinksCount(
-		long groupId, long fragmentEntryId, long classNameId,
-		int layoutPageTemplateType) {
-
-		return fragmentEntryLinkFinder.countByG_F_C_L(
-			groupId, fragmentEntryId, classNameId, layoutPageTemplateType);
 	}
 
 	@Override
@@ -528,18 +413,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		_layoutLocalService.updateLayout(layout);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateClassedModel(long)}
-	 */
-	@Deprecated
-	@Override
-	public void updateClassedModel(long classNameId, long classPK)
-		throws PortalException {
-
-		updateClassedModel(classPK);
-	}
-
 	@Override
 	public FragmentEntryLink updateFragmentEntryLink(
 			long fragmentEntryLinkId, int position)
@@ -551,28 +424,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLink.setPosition(position);
 
 		return fragmentEntryLinkPersistence.update(fragmentEntryLink);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateFragmentEntryLink(long, long, long, long, long,
-	 *             String, String, String, String, String, String, int,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FragmentEntryLink updateFragmentEntryLink(
-			long userId, long fragmentEntryLinkId,
-			long originalFragmentEntryLinkId, long fragmentEntryId,
-			long classNameId, long classPK, String css, String html, String js,
-			String configuration, String editableValues, String namespace,
-			int position, ServiceContext serviceContext)
-		throws PortalException {
-
-		return updateFragmentEntryLink(
-			userId, fragmentEntryLinkId, originalFragmentEntryLinkId,
-			fragmentEntryId, classPK, css, html, js, configuration,
-			editableValues, namespace, position, serviceContext);
 	}
 
 	@Override
@@ -639,24 +490,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		}
 
 		return fragmentEntryLinkPersistence.update(fragmentEntryLink);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateFragmentEntryLinks(long, long, long, long[], String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public void updateFragmentEntryLinks(
-			long userId, long groupId, long classNameId, long classPK,
-			long[] fragmentEntryIds, String editableValues,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		updateFragmentEntryLinks(
-			userId, groupId, classPK, fragmentEntryIds, editableValues,
-			serviceContext);
 	}
 
 	@Override

@@ -6,9 +6,62 @@ definition {
 			panel = "Control Panel",
 			portlet = "Sites");
 
-		Site.addCustomCP(
-			siteName = "${siteName}",
-			siteTemplateName = "Masterclass");
+		LexiconEntry.gotoAdd();
+
+		LexiconCard.clickCard(card = "Masterclass");
+
+		PortletEntry.inputName(name = "${siteName}");
+
+		Modal.save();
+
+		while (IsElementNotPresent(locator1 = "Raylife#SITE_TITLE", siteTitle = "${siteName}")) {
+			WaitForPageLoad();
+		}
+
+		Click(locator1 = "ProductMenu#TOGGLE");
+
+		WaitForElementPresent(
+			locator1 = "Raylife#SITE_TITLE",
+			siteTitle = "${siteName}");
+	}
+
+	macro previewPageandAssertFragment {
+		PageEditor.openPreviewMode();
+
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "Masterclass#FRAGMENT_NAME");
+	}
+
+	macro simulateAndViewPageElements {
+		MobileDevice.previewPG(deviceType = "${deviceType}");
+
+		for (var element : list "${elementsList}") {
+			AssertElementPresent(
+				key_fragmentName = "${element}",
+				locator1 = "Masterclass#FRAGMENTS_IN_SIMULATION");
+		}
+	}
+
+	macro viewCoursesInPage {
+		if (isSet(title)) {
+			AssertElementPresent(
+				key_title = "${key_title}",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
+
+		if (isSet(description)) {
+			AssertElementPresent(
+				key_description = "${key_description}",
+				locator1 = "Masterclass#FRAGMENT_TEXT_BLOCK");
+		}
+
+		if (isSet(link)) {
+			AssertElementPresent(
+				key_buttonName = "${key_buttonName}",
+				key_href = "${key_href}",
+				locator1 = "Masterclass#FRAGMENT_LINK");
+		}
 	}
 
 }

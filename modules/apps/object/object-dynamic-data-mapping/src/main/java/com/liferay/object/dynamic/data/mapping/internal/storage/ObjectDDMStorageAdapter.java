@@ -46,11 +46,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -63,10 +65,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -303,6 +307,9 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 		Map<String, String> objectFieldTypes = stream.collect(
 			Collectors.toMap(ObjectField::getName, ObjectField::getType));
 
+		Map<String, ObjectField> objectFieldsMap = _toObjectFieldsMap(
+			objectFields);
+
 		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
 			if (StringUtil.equals(
 					ddmFormFieldValue.getType(),
@@ -320,11 +327,25 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 
 				Value value = ddmFormFieldValue.getValue();
 
-				properties.put(
-					objectFieldName,
-					_getOptionReferenceValue(
-						ddmFormFieldValue, ddmFormFieldsMap, objectFieldName,
-						objectFieldTypes, value));
+				ObjectField objectField = objectFieldsMap.get(objectFieldName);
+
+				if (objectField.getListTypeDefinitionId() > 0) {
+					properties.put(
+						objectFieldName,
+						HashMapBuilder.put(
+							"key",
+							_getOptionReferenceValue(
+								ddmFormFieldValue, ddmFormFieldsMap,
+								objectFieldName, objectFieldTypes, value)
+						).build());
+				}
+				else {
+					properties.put(
+						objectFieldName,
+						_getOptionReferenceValue(
+							ddmFormFieldValue, ddmFormFieldsMap,
+							objectFieldName, objectFieldTypes, value));
+				}
 			}
 		}
 
@@ -388,6 +409,47 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 		}
 		else if (StringUtil.equals(
 					ddmFormFieldValue.getType(),
+					DDMFormFieldTypeConstants.GRID)) {
+
+			DDMFormFieldOptions columnsDDMFormFieldOptions =
+				(DDMFormFieldOptions)ddmFormField.getProperty("columns");
+
+			Map<String, String> columnOptionsReferences =
+				columnsDDMFormFieldOptions.getOptionsReferences();
+
+			DDMFormFieldOptions rowsDDMFormFieldOptions =
+				(DDMFormFieldOptions)ddmFormField.getProperty("rows");
+
+			Map<String, String> rowOptionsReferences =
+				rowsDDMFormFieldOptions.getOptionsReferences();
+
+			JSONObject optionValueJSONObject = _jsonFactory.createJSONObject(
+				value.getString(value.getDefaultLocale()));
+
+			Set<String> rowValues = optionValueJSONObject.keySet();
+
+			StringBundler sb = new StringBundler((rowValues.size() * 2) - 1);
+
+			for (String rowValue : rowValues) {
+				sb.append(rowOptionsReferences.get(rowValue));
+
+				sb.append(StringPool.COLON + StringPool.SPACE);
+
+				sb.append(
+					columnOptionsReferences.get(
+						optionValueJSONObject.get(rowValue)));
+
+				sb.append(StringPool.COMMA_AND_SPACE);
+			}
+
+			if (sb.index() > 0) {
+				sb.setIndex(sb.index() - 1);
+			}
+
+			return sb.toString();
+		}
+		else if (StringUtil.equals(
+					ddmFormFieldValue.getType(),
 					DDMFormFieldTypeConstants.RADIO)) {
 
 			return ddmFormFieldOptions.getOptionReference(
@@ -435,6 +497,18 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 		else {
 			return value;
 		}
+	}
+
+	private Map<String, ObjectField> _toObjectFieldsMap(
+		List<ObjectField> objectFields) {
+
+		Map<String, ObjectField> objectFieldsMap = new LinkedHashMap<>();
+
+		for (ObjectField objectField : objectFields) {
+			objectFieldsMap.put(objectField.getName(), objectField);
+		}
+
+		return objectFieldsMap;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

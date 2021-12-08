@@ -35,7 +35,7 @@ definition {
 	}
 
 	test AssertGuestCartIsTransferredToAccount {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Speedwell");
 
@@ -133,7 +133,7 @@ definition {
 	}
 
 	test AssertGuestCartItemIsNotTransferredIfSkuIsAlreadyPresent {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Speedwell");
 
@@ -261,7 +261,7 @@ definition {
 	}
 
 	test AssertGuestCartItemIsTransferredToExistingCart {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Speedwell");
 
@@ -628,7 +628,9 @@ definition {
 
 		CommerceNavigator.gotoEntry(entryName = "Address Name");
 
-		var guestAccountEmail = CommerceJSONAccountsAPI._getCommerceAccountEmail(accountName = "Address Name", accountType = "Guest");
+		var guestAccountEmail = CommerceJSONAccountsAPI._getCommerceAccountEmail(
+			accountName = "Address Name",
+			accountType = "Guest");
 
 		TestUtils.assertEquals(
 			actual = "${guestAccountEmail}",
@@ -1020,7 +1022,7 @@ definition {
 	}
 
 	test GuestCheckoutWithNoShippableProduct {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Speedwell");
 
@@ -1159,7 +1161,7 @@ definition {
 	}
 
 	test UserAccountIsNotCombinedWithExistingGuestAccount {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 		property test.name.skip.portal.instance = "GuestCheckout#UserAccountIsNotCombinedWithExistingGuestAccount";
 
 		ApplicationsMenu.gotoPortlet(

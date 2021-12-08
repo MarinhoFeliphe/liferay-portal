@@ -22,7 +22,7 @@ definition {
 			Navigator.openURL();
 
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				portlet = "Forms");
 
 			FormsAdmin.teardownForms();
@@ -34,10 +34,8 @@ definition {
 	@description = "Verify that a Form can be published after adding a Fieldset"
 	@priority = "5"
 	test AddedToAFormCanBePublished {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -82,10 +80,8 @@ definition {
 	@description = "Verify that a Form can be saved after adding a Fieldset"
 	@priority = "5"
 	test AddedToAFormCanBeSaved {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -128,10 +124,8 @@ definition {
 	@description = "Verify that a Form can be submitted after adding a Fieldset"
 	@priority = "5"
 	test AddedToAFormCanBeSubmitted {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -186,10 +180,8 @@ definition {
 	@description = "Verify that a Color Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddAColorFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -238,10 +230,8 @@ definition {
 	@description = "Verify that a Date Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddADateFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -290,10 +280,8 @@ definition {
 	@description = "Verify that a Grid Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddAGridFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -372,10 +360,8 @@ definition {
 	@description = "Verify that an Image Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddAImageFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -424,10 +410,8 @@ definition {
 	@description = "Verify that a Multiple Selection Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddAMultipleSelectionFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -506,10 +490,8 @@ definition {
 	@description = "Verify that a Numeric Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddANumericFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -558,10 +540,8 @@ definition {
 	@description = "Verify that a Paragraph Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddAParagraphFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -614,10 +594,8 @@ definition {
 	@description = "Verify that a Rich Text Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddARichTextFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -660,10 +638,8 @@ definition {
 	@description = "Verify that a Select From List Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddASelectFromListFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -726,10 +702,8 @@ definition {
 	@description = "Verify that a Separator Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddASeparatorFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -778,10 +752,8 @@ definition {
 	@description = "Verify that a Single Selection Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddASingleSelectionFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -847,10 +819,8 @@ definition {
 	@description = "Verify that a Text Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddATextFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -895,10 +865,8 @@ definition {
 	@description = "Verify that an Upload Field can be added to a Form via Fieldset"
 	@priority = "5"
 	test CanAddAUploadFieldToAForm {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -941,10 +909,8 @@ definition {
 	@description = "Verify that a Fieldset can be added to a Fieldset"
 	@priority = "4"
 	test CanBeAddedToAFieldset {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Form.gotoElementSetsTab();
@@ -999,10 +965,8 @@ definition {
 	@description = "Verify that a Fieldset can be added multiple times to Form"
 	@priority = "3"
 	test CanBeAddedToAFormMultipleTimes {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Form.gotoElementSetsTab();
@@ -1055,10 +1019,8 @@ definition {
 	@description = "Verify that a Fieldset can be created"
 	@priority = "5"
 	test CanBeCreated {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1093,10 +1055,8 @@ definition {
 	@description = "Verify that a Fieldset can be deleted"
 	@priority = "5"
 	test CanBeDeleted {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1131,10 +1091,8 @@ definition {
 	@description = "Verify that a Fieldset can be edited"
 	@priority = "5"
 	test CanBeEdited {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1181,10 +1139,8 @@ definition {
 	@description = "Verify that Options persist after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveOptions {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Form.gotoElementSetsTab();
@@ -1250,10 +1206,8 @@ definition {
 	@description = "Verify that a Field with the Autocomplete Property persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveTheAutoCompleteProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1334,10 +1288,8 @@ definition {
 	@description = "Verify that the Help Text property persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveTheHelpText {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1388,10 +1340,8 @@ definition {
 	@description = "Verify that a Hide Label Property persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveTheHideLabelProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1449,10 +1399,8 @@ definition {
 	@description = "Verify that an Inline Property persists after being added to a Form via Fieldset"
 	@priority = "4"
 	test PreserveTheInlineProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1525,10 +1473,8 @@ definition {
 	@description = "Verify that an Allow Multiple Selections Property persists after being added to a Form via Fieldset"
 	@priority = "4"
 	test PreserveTheMultipleSelectionsProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1599,10 +1545,8 @@ definition {
 	@description = "Verify that a Placeholder Text persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveThePlaceholderText {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1657,10 +1601,8 @@ definition {
 	@description = "Verify that a Predefined Value persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveThePredefinedValue {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1715,10 +1657,8 @@ definition {
 	@description = "Verify that a Repeatable Property persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveTheRepeatableProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1788,10 +1728,8 @@ definition {
 	@description = "Verify that a Required Field Property persists after being added to a Form via Fieldset"
 	@priority = "5"
 	test PreserveTheRequiredFieldProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1844,10 +1782,8 @@ definition {
 	@description = "Verify that a Show as Switch Property persists after being added to a Form via Fieldset"
 	@priority = "4"
 	test PreserveTheShowAsSwitchProperty {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");
@@ -1922,10 +1858,8 @@ definition {
 	@description = "Verify that leaving a Fieldset without saving will prompt a notification warning the user that any unsaved changes wil be lost"
 	@priority = "5"
 	test WillWarnUsersWhenExitingWithoutSaving {
-		property forms.functional = "true";
-
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		Navigator.gotoNavItem(navItem = "Element Sets");

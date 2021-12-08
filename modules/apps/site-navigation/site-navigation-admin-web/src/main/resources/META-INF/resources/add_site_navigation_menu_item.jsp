@@ -38,7 +38,7 @@ if (addURL == null) {
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenuItemType.getLabel(locale)));
+renderResponse.setTitle(siteNavigationMenuItemType.getAddTitle(locale));
 %>
 
 <liferay-ui:error exception="<%= SiteNavigationMenuItemNameException.class %>">
@@ -61,7 +61,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenu
 	</aui:fieldset-group>
 
 	<aui:button-row>
-		<aui:button name="addButton" type="submit" value="add" />
+		<aui:button name="addButton" type="submit" value='<%= type.equals("layout") ? "select" : "add" %>' />
 
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>

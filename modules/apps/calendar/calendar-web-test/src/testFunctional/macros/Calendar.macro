@@ -163,6 +163,12 @@ definition {
 		}
 	}
 
+	macro chooseCalendarColor {
+		Click(
+			key_myCalendarColor = "${myCalendarColor}",
+			locator1 = "CalendarEditCalendar#CHOOSE_MY_CALENDAR_COLOR");
+	}
+
 	macro chooseOtherCalendarMenulistOption {
 		Calendar._gotoOtherCalendarMenulist(calendarName = "${calendarName}");
 
@@ -750,6 +756,12 @@ definition {
 			value1 = "${eventTitle}");
 
 		AssertElementPresent(locator1 = "CalendarRSS#FEED_EVENT_DATES");
+	}
+
+	macro viewSelectedNameLanguage {
+		AssertElementPresent(
+			key_locale = "${language}",
+			locator1 = "Calendar#VIEW_SELECTED_NAME_LANGUAGE");
 	}
 
 	macro viewSelectedTimeZone {

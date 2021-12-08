@@ -37,6 +37,7 @@ definition {
 	@refactordone
 	test CanAccessPermanentEntry {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
@@ -55,7 +56,6 @@ definition {
 			${portalURL}/web/test-site-name/test-source-page \
 				-w %{http_code}
 		''';
-
 		var output = JSONCurlUtil.post("${curl}");
 
 		if (contains("${output}", "301")) {
@@ -71,6 +71,7 @@ definition {
 	@refactordone
 	test CanAccessTemporaryEntry {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
@@ -86,7 +87,6 @@ definition {
 			${portalURL}/web/test-site-name/test-source-page \
 				-w %{http_code}
 		''';
-
 		var output = JSONCurlUtil.post("${curl}");
 
 		if (contains("${output}", "302")) {
@@ -102,6 +102,7 @@ definition {
 	@refactordone
 	test CanAccessUpdatedPermanentEntry {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -135,6 +136,7 @@ definition {
 	@refactordone
 	test CanAccessUpdatedTemporaryEntry {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -519,6 +521,7 @@ definition {
 	@refactordone
 	test CanCheckDestinationURL {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -682,6 +685,7 @@ definition {
 	@refactordone
 	test CanEditEntry {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
@@ -775,6 +779,21 @@ definition {
 			siteName = "test-site-name",
 			sourceURL = "test-source-page",
 			sourceURLVariation = "Duplicate");
+	}
+
+	@description = "This ensures that a user cannot create a redirect if the sourceURL is too long."
+	@priority = "4"
+	test CannotAddEntryWithTooLongSourceURL {
+		var portalURL = PropsUtil.get("portal.url");
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.addEntry(
+			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
+			redirectType = "Temporary (302)",
+			siteName = "test-site-name",
+			sourceURL = "test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long-test-source-page-too-long",
+			sourceURLVariation = "LengthLimit");
 	}
 
 	@description = "This ensures that a user cannot create a redirect if the sourceURL has invalid characters."
@@ -1054,6 +1073,8 @@ definition {
 	@priority = "5"
 	@refactordone
 	test CanViewEntryInfo {
+		property custom.properties = "company.default.time.zone=America/Los_Angeles";
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		JSONRedirect.addRedirect(
@@ -1067,7 +1088,25 @@ definition {
 			Redirect.viewEntryFloatingURL(redirectURL = "${redirectURL}");
 		}
 
-		Redirect.viewEntryInfo();
+		var currentDate = DateUtil.getFormattedCurrentDate("MMMM d, yyyy");
+
+		Redirect.viewEntryInfo(
+			createDate = "${currentDate}",
+			createdBy = "Test Test",
+			expirationDate = "January 1, 2100",
+			latestOccurrence = "Never",
+			type = "Temporary");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.viewEntryInfo(
+			createDate = "${currentDate}",
+			createdBy = "Test Test",
+			expirationDate = "January 1, 2100",
+			latestOccurrence = "${currentDate}",
+			type = "Temporary");
 	}
 
 	@description = "This ensures that an expired temporary redirect can be reactivated."
@@ -1075,6 +1114,7 @@ definition {
 	@refactordone
 	test CanViewExpiredAndActiveEntries {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
@@ -1174,6 +1214,10 @@ definition {
 		Redirect.view404URLs(
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page1",
 			requestNumber = "1");
+
+		Search.clearSearchResult();
+
+		Redirect.view404URLsDefault();
 	}
 
 	@description = "This ensures that a permanent redirect can be added."

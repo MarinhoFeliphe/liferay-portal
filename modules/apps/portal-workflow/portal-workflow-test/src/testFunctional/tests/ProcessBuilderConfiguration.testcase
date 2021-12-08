@@ -178,99 +178,55 @@ definition {
 	@description = "Verify that the user is able to order by Resource"
 	@priority = "3"
 	test CanOrderByResource {
-		property portal.upstream = "quarantine";
+		Workflow.openWorkflowProcessBuilderConfiguration();
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Workflow",
-			panel = "Applications",
-			portlet = "Process Builder");
+		ProcessBuilderConfiguration.chooseSortOption(key_menuItem = "Resource");
 
-		Navigator.gotoNavItem(navItem = "Configuration");
-
-		Click(locator1 = "ManagementBar#FILTER_AND_ORDER");
-
-		Click(
-			key_menuItem = "Resource",
-			locator1 = "ManagementBar#FILTER_AND_ORDER_ITEM");
-
-		AssertTextEquals(
-			key_rowNumber = "1",
-			locator1 = "ProcessBuilderListView#PROCESS_NAME_TABLE_ROW",
-			value1 = "Blogs Entry");
-
-		AssertTextEquals(
-			key_rowNumber = "14",
-			locator1 = "ProcessBuilderListView#PROCESS_NAME_TABLE_ROW",
-			value1 = "Knowledge Base Article");
-
-		AssertTextEquals(
-			key_rowNumber = "20",
-			locator1 = "ProcessBuilderListView#PROCESS_NAME_TABLE_ROW",
-			value1 = "Wiki Page");
+		ProcessBuilderConfiguration.viewSpecificOrder(resultsList = "Blogs Entry,Calendar Event,Comment");
 	}
 
 	@description = "Verify that the user is able to order by Workflow"
 	@priority = "3"
 	test CanOrderByWorkflow {
-		property portal.upstream = "quarantine";
+		property test.name.skip.portal.instance = "ProcessBuilderConfiguration#CanOrderByWorkflow";
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Workflow",
-			panel = "Applications",
-			portlet = "Process Builder");
+		Workflow.openWorkflowListView();
 
-		Navigator.gotoNavItem(navItem = "Configuration");
+		Workflow.duplicateSingleApproverWorkflow(workflowName = "ASingle Approver");
+
+		Workflow.duplicateSingleApproverWorkflow(workflowName = "BSingle Approver");
+
+		Workflow.duplicateSingleApproverWorkflow(workflowName = "CSingle Approver");
+
+		Workflow.openWorkflowProcessBuilderConfiguration();
 
 		Workflow.configureWorkflow(
-			workflowDefinition = "Single Approver",
-			workflowResourceValue = "Blogs Entry");
+			workflowDefinition = "ASingle Approver",
+			workflowResourceValue = "Translation");
 
 		Workflow.configureWorkflow(
-			workflowDefinition = "Single Approver",
+			workflowDefinition = "BSingle Approver",
 			workflowResourceValue = "Comment");
 
 		Workflow.configureWorkflow(
-			workflowDefinition = "Single Approver",
-			workflowResourceValue = "Translation");
+			workflowDefinition = "CSingle Approver",
+			workflowResourceValue = "User");
 
-		ContentDashboard.filterByAuthorAll(filterOption = "Workflow");
+		ProcessBuilderConfiguration.chooseSortOption(key_menuItem = "Workflow");
 
-		AssertElementPresent(
-			key_workflowResourceValue = "Comment",
-			locator1 = "WorkflowConfiguration#RESOURCE_TABLE_WORKFLOW");
-
-		AssertElementPresent(
-			key_workflowResourceValue = "Blogs Entry",
-			locator1 = "WorkflowConfiguration#RESOURCE_TABLE_WORKFLOW");
-
-		AssertElementPresent(
-			key_workflowResourceValue = "Translation",
-			locator1 = "WorkflowConfiguration#RESOURCE_TABLE_WORKFLOW");
+		ProcessBuilderConfiguration.viewSpecificOrder(resultsList = "Translation,Comment,User");
 	}
 
 	@description = "Verify that the user is able to reverse sort direction"
 	@priority = "2"
 	test CanReverseSortDirection {
-		property portal.upstream = "quarantine";
+		Workflow.openWorkflowProcessBuilderConfiguration();
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Workflow",
-			panel = "Applications",
-			portlet = "Process Builder");
-
-		Navigator.gotoNavItem(navItem = "Configuration");
+		ProcessBuilderConfiguration.chooseSortOption(key_menuItem = "Resource");
 
 		Workflow.clickRevertSortDirection();
 
-		AssertElementPresent(
-			key_fieldName = "Wiki Page",
-			key_order = "1",
-			locator1 = "WorkflowConfiguration#PROCESS_BUILDER_TABLE_FIELD_NAME");
-
-		AssertElementPresent(
-			key_fieldName = "Blogs Entry",
-			key_order = "20",
-			locator1 = "WorkflowConfiguration#PROCESS_BUILDER_TABLE_FIELD_NAME");
+		ProcessBuilderConfiguration.viewSpecificOrder(resultsList = "Wiki Page,Web Content Article,User");
 	}
 
 	@description = "Verify that the user is able to search by Asset Type"

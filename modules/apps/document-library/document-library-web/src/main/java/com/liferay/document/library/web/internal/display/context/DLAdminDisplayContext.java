@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -209,23 +210,12 @@ public class DLAdminDisplayContext {
 	}
 
 	public String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
-		String orderByType = ParamUtil.getString(
-			_httpServletRequest, "orderByType");
-
-		if (Validator.isNotNull(orderByType)) {
-			_portalPreferences.setValue(
-				DLPortletKeys.DOCUMENT_LIBRARY, "order-by-type", orderByType);
-		}
-		else {
-			orderByType = _portalPreferences.getValue(
-				DLPortletKeys.DOCUMENT_LIBRARY, "order-by-type", "desc");
-		}
-
-		_orderByType = orderByType;
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, DLPortletKeys.DOCUMENT_LIBRARY, "desc");
 
 		return _orderByType;
 	}
@@ -487,6 +477,15 @@ public class DLAdminDisplayContext {
 		if (fileEntryTypeId >= 0) {
 			portletURL.setParameter(
 				"fileEntryTypeId", String.valueOf(fileEntryTypeId));
+
+			if (fileEntryTypeId > 0) {
+				DLFileEntryType dlFileEntryType =
+					DLFileEntryTypeLocalServiceUtil.getFileEntryType(
+						fileEntryTypeId);
+
+				dlFileEntryTypeName = dlFileEntryType.getName(
+					_httpServletRequest.getLocale());
+			}
 		}
 
 		SearchContainer<RepositoryEntry> dlSearchContainer =
@@ -494,6 +493,18 @@ public class DLAdminDisplayContext {
 				_liferayPortletRequest, null, null, "curEntry",
 				_dlPortletInstanceSettings.getEntriesPerPage(), portletURL,
 				null, null);
+
+		if (fileEntryTypeId >= 0) {
+			dlSearchContainer.setEmptyResultsMessage(
+				LanguageUtil.format(
+					_httpServletRequest,
+					"there-are-no-documents-or-media-files-of-type-x",
+					HtmlUtil.escape(dlFileEntryTypeName)));
+		}
+		else {
+			dlSearchContainer.setEmptyResultsMessage(
+				"there-are-no-documents-or-media-files-in-this-folder");
+		}
 
 		dlSearchContainer.setHeaderNames(
 			ListUtil.fromArray(
@@ -526,15 +537,6 @@ public class DLAdminDisplayContext {
 		if (fileEntryTypeId >= 0) {
 			Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
 				DLFileEntryConstants.getClassName());
-
-			if (fileEntryTypeId > 0) {
-				DLFileEntryType dlFileEntryType =
-					DLFileEntryTypeLocalServiceUtil.getFileEntryType(
-						fileEntryTypeId);
-
-				dlFileEntryTypeName = dlFileEntryType.getName(
-					_httpServletRequest.getLocale());
-			}
 
 			SearchContext searchContext = SearchContextFactory.getInstance(
 				_httpServletRequest);
@@ -689,18 +691,6 @@ public class DLAdminDisplayContext {
 		}
 
 		dlSearchContainer.setResults(results);
-
-		if (fileEntryTypeId >= 0) {
-			dlSearchContainer.setEmptyResultsMessage(
-				LanguageUtil.format(
-					_httpServletRequest,
-					"there-are-no-documents-or-media-files-of-type-x",
-					HtmlUtil.escape(dlFileEntryTypeName)));
-		}
-		else {
-			dlSearchContainer.setEmptyResultsMessage(
-				"there-are-no-documents-or-media-files-in-this-folder");
-		}
 
 		return dlSearchContainer;
 	}

@@ -1,12 +1,10 @@
 {
 	"configuration": {
-		"advanced": {
+		"advancedConfiguration": {
 		},
 		"aggregationConfiguration": {
 		},
-		"facet": {
-		},
-		"general": {
+		"generalConfiguration": {
 			"clauseContributorsExcludes": [
 			],
 			"clauseContributorsIncludes": [
@@ -109,7 +107,7 @@
 				"com.liferay.wiki.model.WikiPage"
 			]
 		},
-		"highlight": {
+		"highlightConfiguration": {
 			"fields": {
 				"content${context.language_id}": {
 				},
@@ -128,7 +126,7 @@
 			],
 			"require_field_match": true
 		},
-		"parameters": {
+		"parameterConfiguration": {
 		},
 		"queryConfiguration": {
 			"applyIndexerClauses": true

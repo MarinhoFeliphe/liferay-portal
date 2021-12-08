@@ -1,10 +1,12 @@
 Bundle-Name: Liferay Frontend Data Set API
 Bundle-SymbolicName: com.liferay.frontend.data.set.api
-Bundle-Version: 2.0.1
+Bundle-Version: 2.1.1
 Export-Package:\
 	com.liferay.frontend.data.set.constants,\
 	com.liferay.frontend.data.set.filter,\
 	com.liferay.frontend.data.set.model,\
+	com.liferay.frontend.data.set.provider,\
+	com.liferay.frontend.data.set.provider.search,\
 	com.liferay.frontend.data.set.view,\
 	com.liferay.frontend.data.set.view.cards,\
 	com.liferay.frontend.data.set.view.list,\

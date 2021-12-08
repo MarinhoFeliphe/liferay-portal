@@ -448,14 +448,13 @@ definition {
 		var baseURL = "${baseURL}";
 
 		if (contains("${baseURL}", "{baseURL}")) {
-			baseURL = PropsUtil.get("portal.url");
+			var baseURL = PropsUtil.get("portal.url");
 		}
 
-		key_friendlyURL = "";
-
+		var key_friendlyURL = "";
 		var friendlyURL = selenium.getElementValue("SitePages#FRIENDLY_URL");
 
-		return "${baseURL}${friendlyURL}";
+		return "${baseURL}/web/guest${friendlyURL}";
 	}
 
 	@summary = "Go to the page creation form through the empty-result-message taglib"
@@ -512,7 +511,7 @@ definition {
 	macro togglePrivacy {
 		WaitForPageLoad();
 
-		if (IsElementNotPresent(locator1 = "Breadcrumb#BREADCRUMB_ENTRY_EXACT_MATCH", key_breadcrumbName = "${privacy}")) {
+		if (IsElementNotPresent(key_breadcrumbName = "${privacy}", locator1 = "Breadcrumb#BREADCRUMB_ENTRY_EXACT_MATCH")) {
 			Click(
 				key_itemName = "${privacy}",
 				locator1 = "SitePages#LIST_GROUP_ITEM");
@@ -526,7 +525,12 @@ definition {
 	}
 
 	macro viewPageStatus {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
 		AssertTextEquals(
+			index = "${index}",
 			key_itemName = "${pageName}",
 			locator1 = "SitePages#LIST_GROUP_ITEM_PAGE_STATUS",
 			value1 = "${status}");

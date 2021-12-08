@@ -5,9 +5,13 @@
 		<field name="mvccVersion" type="long" />
 		<field name="openIdConnectSessionId" type="long" />
 		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
 		<field name="modifiedDate" type="Date" />
 		<field name="accessToken" type="String">
 			<hint name="max-length">3000</hint>
+		</field>
+		<field name="configurationPid" type="String">
+			<hint name="max-length">256</hint>
 		</field>
 		<field name="idToken" type="String">
 			<hint name="max-length">3999</hint>

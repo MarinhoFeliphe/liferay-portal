@@ -24,16 +24,65 @@
 		}
 	}
 
+	.sidebar-body {
+		.panel .sheet-subtitle {
+			align-items: center;
+			cursor: pointer;
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+		}
+
+		span svg:hover {
+			color: #6b6c7e !important;
+		}
+	}
+
 	.sidebar-header {
 		align-items: center;
 		border-bottom: 1px solid #e7e7ed;
 		display: flex;
 		height: 75px;
 
+		.spaced-items {
+			align-items: center;
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+
+			.trash-button {
+				height: 32px;
+				width: 32px;
+
+				svg {
+					height: 16px;
+					width: 16px;
+				}
+
+				&:hover {
+					background: #feefef;
+					border-radius: 4px;
+					height: 32px;
+					padding: 8px;
+					width: 32px;
+
+					svg {
+						fill: #da1414;
+						height: 16px;
+						width: 16px;
+					}
+				}
+			}
+		}
+
 		.title {
 			color: #272833;
 			font-size: 20px;
 			font-weight: 700;
+
+			&:first-letter {
+				text-transform: capitalize;
+			}
 		}
 	}
 }

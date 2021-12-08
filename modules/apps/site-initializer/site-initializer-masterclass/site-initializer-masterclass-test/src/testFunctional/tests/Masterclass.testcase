@@ -32,10 +32,8 @@ definition {
 	@description = "This is a test for LPS-137508. Create a Site with the Masterclass Site initializer"
 	@priority = "5"
 	test AddMasterclassSite {
-		task ("Go to Masterclass site") {
-			var portalURL = PropsUtil.get("portal.url");
-
-			Navigator.openSpecificURL(url = "${portalURL}/web/test-masterclass-name");
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
 		}
 
 		task ("Assert the Masterclass Welcome Page is present") {
@@ -57,9 +55,7 @@ definition {
 		}
 
 		task ("Assert the default Masterclass Moderns is applied to Home page") {
-			var portalURL = PropsUtil.get("portal.url");
-
-			Navigator.openSpecificURL(url = "${portalURL}/web/test-masterclass-name");
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
 
 			AssertCssValue(
 				key_content = "Read More",
@@ -72,157 +68,490 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-136183. Can use a Masterclass Border and Classroom Header fragments"
-	@ignore = "Test Stub"
+	@description = "This is a test for LPS-136183. Can use a Masterclass Border fragment"
 	@priority = "3"
-	test CanUseMasterclassBorderandHeader {
+	test CanUseMasterclassBorder {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Border fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Border");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "component-border");
+		}
 	}
 
-	@description = "This is a test for LPS-136183. Can use a Masterclass button and link fragments"
-	@ignore = "Test Stub"
+	@description = "This is a test for LPS-136183. Can use a Masterclass button fragment"
 	@priority = "3"
-	test CanUseMasterclassButtonandLink {
+	test CanUseMasterclassButton {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Button fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Button");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-button");
+		}
 	}
 
-	@description = "This is a test for LPS-136183. Can use a Masterclass  container and image fragments"
-	@ignore = "Test Stub"
+	@description = "This is a test for LPS-136183. Can use a Masterclass Classroom Header fragment"
 	@priority = "3"
-	test CanUseMasterclassContainerandImage {
+	test CanUseMasterclassClassroomHeader {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Classroom Header fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Classroom Header");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-classroom-header");
+		}
+	}
+
+	@description = "This is a test for LPS-136183. Can use a Masterclass Container fragment"
+	@priority = "3"
+	test CanUseMasterclassContainer {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
+
+		task ("Drag and Drop the Masterclass Container fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
+
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Container");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-container");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Cookie Banner fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassCookieBanner {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Cookie Banner fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Cookie Banner");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "cookie-banner");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Footer fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassFooter {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Footer fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Footer");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-footer");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Heading fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassHeading {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Heading fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Heading");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "component-heading");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Hero fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassHero {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Hero fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Hero");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "container-fluid-max-xl hero");
+		}
+	}
+
+	@description = "This is a test for LPS-136183. Can use a Masterclass Image fragment"
+	@priority = "3"
+	test CanUseMasterclassImage {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
+
+		task ("Drag and Drop the Masterclass Image fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
+
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Image");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "component-image");
+		}
+	}
+
+	@description = "This is a test for LPS-136183. Can use a Masterclass link fragment"
+	@priority = "3"
+	test CanUseMasterclassLink {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
+
+		task ("Drag and Drop the Masterclass Link fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
+
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Link");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-link");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Map Video fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassMapVideo {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Video Map fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Video Map");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "component-video");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Navbar fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassNavbar {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Navbar fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Navbar");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-navbar");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Private Header fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassPrivateHeader {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Private Header fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Private Header");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-private-header");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Sign In fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassSignIn {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Sign In fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Sign In");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "sign-in vh-100");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Subscribe Form fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassSubscribeForm {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Subscribe Form fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Subscribe Form");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "newsletter-form");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Tabs fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassTabs {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Tabs fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Tabs");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "masterclass-tabs");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Text Block fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassTextBlock {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Text Block fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Text Block");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "component-text-block");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Video fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassVideo {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Video fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Video");
+
+			PageEditor.gotoConfiguration(fragmentName = "Masterclass Video");
+
+			PageEditor.addVideoFragmentURL(videoLink = "https://www.youtube.com/watch?v=2EPZxIC5ogU");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "video");
+
+			YoutubePortlet.assertVideoTitle(videoTitle = "Life at Liferay - A Look into Liferay Culture");
+		}
 	}
 
 	@description = "This is a test for LPS-136183. Can use a Masterclass Video Player fragment"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanUseMasterclassVideoPlayer {
+		task ("Create a new Page by Json") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Masterclass Name",
+				layoutName = "Test Page Name",
+				type = "content");
+		}
 
-		// TODO Create the automation about the LPS-136183.
+		task ("Drag and Drop the Masterclass Video Player fragment") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Masterclass Name");
 
+			PageEditor.addFragment(
+				collectionName = "Masterclass",
+				fragmentName = "Masterclass Video Player");
+		}
+
+		task ("Preview the Page and Assert the fragment is present") {
+			Masterclass.previewPageandAssertFragment(fragmentName = "courses");
+		}
 	}
 
 	@description = "This is a test for LPS-141370. Can change the Number of Blogs in the List at Display Page Template of Blogs"
 	@priority = "4"
 	test ChangetheNumberofBlogsinBlogsListatDPT {
-		task ("Go to Masterclass Site") {
-			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
-		}
-
 		task ("Go to Display Page Templates") {
 			ProductMenu.gotoPortlet(
 				category = "Design",
@@ -254,174 +583,473 @@ definition {
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Apply Page in Desktop size"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test MasterclassApplyinDesktopSize {
+		task ("Go to Apply Page") {
+			Navigator.gotoSitePage(
+				pageName = "Apply",
+				siteName = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Desktop Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "desktop",
+				elementsList = "navbar,heading,text-block,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Apply Page in Mobile size"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test MasterclassApplyinMobileSize {
+		task ("Go to Apply Page") {
+			Navigator.gotoSitePage(
+				pageName = "Apply",
+				siteName = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Mobile Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "smartphone",
+				elementsList = "navbar,heading,text-block,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Apply Page in Tablet size"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test MasterclassApplyinTabletSize {
+		task ("Go to Apply Page") {
+			Navigator.gotoSitePage(
+				pageName = "Apply",
+				siteName = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Tablet Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "tablet",
+				elementsList = "navbar,heading,text-block,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Blog Page in Desktop size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassBloginDesktopSize {
+		task ("Go to Blog Page") {
+			Navigator.gotoSitePage(
+				pageName = "Blog",
+				siteName = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Desktop Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "desktop",
+				elementsList = "navbar,heading,text-block,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Blog Page in Mobile size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassBloginMobileSize {
+		task ("Go to Blog Page") {
+			Navigator.gotoSitePage(
+				pageName = "Blog",
+				siteName = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Mobile Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "smartphone",
+				elementsList = "navbar,heading,text-block,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Blog Page in Tablet size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassBloginTabletSize {
+		task ("Go to Blog Page") {
+			Navigator.gotoSitePage(
+				pageName = "Blog",
+				siteName = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Tablet Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "tablet",
+				elementsList = "navbar,heading,text-block,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Home Page in Desktop size"
 	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassHomeinDesktopSize {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Desktop Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "desktop",
+				elementsList = "navbar,hero,align-items-lg-start,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Home Page in Mobile size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassHomeinMobileSize {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Mobile Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "smartphone",
+				elementsList = "navbar,hero,align-items-lg-start,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Home Page in Tablet size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassHomeinTabletSize {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
-
+		task ("Select Tablet Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "tablet",
+				elementsList = "navbar,hero,align-items-lg-start,footer");
+		}
 	}
 
-	@description = "This is a test for LPS-140611. Masterclass My Learning Page in Mobile size"
-	@ignore = "Test Stub"
+	@description = "This is a test for LPS-140611. Masterclass My Learning Page in Desktop size"
 	@priority = "4"
 	test MasterclassMyLearninginDesktopSize {
+		task ("Go to My Learning Page") {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
 
-		// TODO Create the automation about the LPS-140611.
+			SitePages.gotoPageMenuItem(
+				menuItem = "View",
+				pageName = "My Learning");
+		}
 
+		task ("Select Desktop Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "desktop",
+				elementsList = "navbar,private-header,portlet-body,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass My Learning Page in Mobile size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassMyLearninginMobileSize {
+		task ("Go to My Learning Page") {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
 
-		// TODO Create the automation about the LPS-140611.
+			SitePages.gotoPageMenuItem(
+				menuItem = "View",
+				pageName = "My Learning");
+		}
 
+		task ("Select Mobile Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "smartphone",
+				elementsList = "navbar,private-header,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass My Learning Page in Tablet size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassMyLearninginTabletSize {
+		task ("Go to My Learning Page") {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
 
-		// TODO Create the automation about the LPS-140611.
+			SitePages.gotoPageMenuItem(
+				menuItem = "View",
+				pageName = "My Learning");
+		}
 
+		task ("Select Tablet Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "tablet",
+				elementsList = "navbar,private-header,footer");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Sign In Page in Desktop size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassSignIninDesktopSize {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
+		task ("Go to Sign In Page") {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
 
+			SitePages.gotoPageMenuItem(
+				menuItem = "View",
+				pageName = "Sign In");
+		}
+
+		task ("Select Desktop Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "desktop",
+				elementsList = "sign-in-logo,sign-in-form");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Sign In Page in Mobile size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassSignIninMobileSize {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
+		task ("Go to Sign In Page") {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
 
+			SitePages.gotoPageMenuItem(
+				menuItem = "View",
+				pageName = "Sign In");
+		}
+
+		task ("Select Mobile Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "smartphone",
+				elementsList = "sign-in-logo,sign-in-form");
+		}
 	}
 
 	@description = "This is a test for LPS-140611. Masterclass Sign In Page in Tablet size"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test MasterclassSignIninTabletSize {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-140611.
+		task ("Go to Sign In Page") {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
 
+			SitePages.gotoPageMenuItem(
+				menuItem = "View",
+				pageName = "Sign In");
+		}
+
+		task ("Select Tablet Device in simulation menu and Assert the page elements presence") {
+			Masterclass.simulateAndViewPageElements(
+				deviceType = "tablet",
+				elementsList = "sign-in-logo,sign-in-form");
+		}
 	}
 
 	@description = "This is a test for LPS-141768. View the READ MORE links of the three courses redirect to the course display page"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ReadMoreLinksRedirectToCourseDisplayPage {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-141768.
+		task ("Go to Courses Page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+		}
 
+		task ("Assert the Read More link of the first course redirects to the course display page") {
+			Click(
+				key_buttonName = "Read More",
+				key_href = "product-design-bootcamp",
+				locator1 = "Masterclass#FRAGMENT_LINK");
+
+			AssertElementPresent(
+				key_title = "Product Design Bootcamp",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
+
+		task ("Assert the Read More link of the second course redirects to the course display page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+
+			Click(
+				key_buttonName = "Read More",
+				key_href = "project-manager-certification",
+				locator1 = "Masterclass#FRAGMENT_LINK");
+
+			AssertElementPresent(
+				key_title = "Project Manager Certification",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
+
+		task ("Assert the Read More link of the third course redirects to the course display page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+
+			Click(
+				key_buttonName = "Read More",
+				key_href = "digital-marketing-bootcamp",
+				locator1 = "Masterclass#FRAGMENT_LINK");
+
+			AssertElementPresent(
+				key_title = "Digital Marketing Bootcamp",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
 	}
 
 	@description = "This is a test for LPS-140613. View if the Student can have permissions set"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test SetStudentPermission {
+		task ("Add Pages permissions to Student under the Site and Asset Library Administration tab") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
 
-		// TODO Create the automation about the LPS-140613.
+			Role.definePermissionCP(
+				permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_GENERAL_PERMISSIONS_VIEW_CHECKBOX",
+				permissionDefinitionValue = "View",
+				roleTitle = "Student",
+				roleType = "Site");
 
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
+
+			Role.definePermissionCP(
+				permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_VIEW_CHECKBOX",
+				permissionDefinitionValue = "View",
+				roleTitle = "Student",
+				roleType = "Site");
+
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
+
+			Role.definePermissionCP(
+				permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_SITE_VIEW_CHECKBOX",
+				permissionDefinitionValue = "View",
+				roleTitle = "Student",
+				roleType = "Site");
+		}
+
+		task ("View table permissions to Student") {
+			AssertElementPresent(
+				key_permissionDefinitionValue = "Pages",
+				key_permissionNavigationValue = "Pages: View",
+				locator1 = "RolesPermissionsSummary#PERMISSION_TABLE_PERMISSIONS");
+
+			AssertElementPresent(
+				key_permissionDefinitionValue = "Pages",
+				key_permissionNavigationValue = "Page: View",
+				locator1 = "RolesPermissionsSummary#PERMISSION_TABLE_PERMISSIONS");
+
+			AssertElementPresent(
+				key_permissionDefinitionValue = "Site Settings",
+				key_permissionNavigationValue = "Site: View",
+				locator1 = "RolesPermissionsSummary#PERMISSION_TABLE_PERMISSIONS");
+		}
 	}
 
 	@description = "This is a test for LPS-140613. View if the Teacher can have permissions set"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test SetTeacherPermission {
+		task ("Add Pages permissions to Teacher under the Site and Asset Library Administration tab") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
 
-		// TODO Create the automation about the LPS-140613.
+			Role.definePermissionCP(
+				permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_GENERAL_PERMISSIONS_VIEW_CHECKBOX",
+				permissionDefinitionValue = "View",
+				roleTitle = "Teacher",
+				roleType = "Site");
 
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
+
+			Role.definePermissionCP(
+				permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_VIEW_CHECKBOX",
+				permissionDefinitionValue = "View",
+				roleTitle = "Teacher",
+				roleType = "Site");
+
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
+
+			Role.definePermissionCP(
+				permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_SITE_VIEW_CHECKBOX",
+				permissionDefinitionValue = "View",
+				roleTitle = "Teacher",
+				roleType = "Site");
+		}
+
+		task ("View table permissions to Teacher") {
+			AssertElementPresent(
+				key_permissionDefinitionValue = "Pages",
+				key_permissionNavigationValue = "Pages: View",
+				locator1 = "RolesPermissionsSummary#PERMISSION_TABLE_PERMISSIONS");
+
+			AssertElementPresent(
+				key_permissionDefinitionValue = "Pages",
+				key_permissionNavigationValue = "Page: View",
+				locator1 = "RolesPermissionsSummary#PERMISSION_TABLE_PERMISSIONS");
+
+			AssertElementPresent(
+				key_permissionDefinitionValue = "Site Settings",
+				key_permissionNavigationValue = "Site: View",
+				locator1 = "RolesPermissionsSummary#PERMISSION_TABLE_PERMISSIONS");
+		}
 	}
 
 	@description = "This is a test for LPS-141768. View the three available courses in Home content page"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ViewAvailableCoursesinHomeCP {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-141768.
+		task ("Assert the first course is present in Home page") {
+			Masterclass.viewCoursesInPage(
+				key_buttonName = "Read More",
+				key_description = "This is a short description to introduce the key aspects of the course.",
+				key_href = "product-design-bootcamp",
+				key_title = "Product Design Bootcamp");
+		}
 
+		task ("Assert the second course is present in Home page") {
+			Masterclass.viewCoursesInPage(
+				key_buttonName = "Read More",
+				key_description = "This is a short description to introduce the key aspects of the course.",
+				key_href = "project-manager-certification",
+				key_title = "Project Manager Certification");
+		}
+
+		task ("Assert the third course is present in Home page") {
+			Masterclass.viewCoursesInPage(
+				key_buttonName = "Read More",
+				key_description = "This is a short description to introduce the key aspects of the course.",
+				key_href = "digital-marketing-bootcamp",
+				key_title = "Digital Marketing Bootcamp");
+		}
 	}
 
 	@description = "This is a test for LPS-141370. View a Blog Collection in Display Page Template of Blogs"
@@ -445,8 +1073,6 @@ definition {
 			Click(
 				key_assetType = "Blog Entry",
 				locator1 = "Sharing#SHARED_CONTENT_ASSET_TYPE");
-
-			PageEditor.openPreviewMode();
 
 			AssertElementPresent(
 				key_colummnsNumber = "3",
@@ -475,12 +1101,41 @@ definition {
 	}
 
 	@description = "This is a test for LPS-141768. View list to the three available courses pages"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ViewListofAvailableCoursesPage {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-141768.
+		task ("Go to Courses Page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+		}
 
+		task ("Assert the first course is present in Courses Page") {
+			Masterclass.viewCoursesInPage(
+				key_buttonName = "Read More",
+				key_description = "This is a short description to introduce the key aspects of the course.",
+				key_href = "product-design-bootcamp",
+				key_title = "Product Design Bootcamp");
+		}
+
+		task ("Assert the second course is present in Courses Page") {
+			Masterclass.viewCoursesInPage(
+				key_buttonName = "Read More",
+				key_description = "This is a short description to introduce the key aspects of the course.",
+				key_href = "project-manager-certification",
+				key_title = "Project Manager Certification");
+		}
+
+		task ("Assert the third course is present in Courses Page") {
+			Masterclass.viewCoursesInPage(
+				key_buttonName = "Read More",
+				key_description = "This is a short description to introduce the key aspects of the course.",
+				key_href = "digital-marketing-bootcamp",
+				key_title = "Digital Marketing Bootcamp");
+		}
 	}
 
 	@description = "This is a test for LPS-137508. View the Masterclass Categories"
@@ -720,30 +1375,110 @@ definition {
 	}
 
 	@description = "This is a test for LPS-141768. View the names of the three courses redirect to the course display page"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ViewNameofCoursesRedirectToCourseDisplayPage {
+		task ("Go to Masterclass Site") {
+			ApplicationsMenu.gotoSite(site = "Test Masterclass Name");
+		}
 
-		// TODO Create the automation about the LPS-141768.
+		task ("Go to Courses Page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+		}
 
+		task ("Assert the title of the first course redirects to the course display page") {
+			Click(
+				key_title = "Product Design Bootcamp",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+
+			AssertElementPresent(
+				key_title = "Product Design Bootcamp",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
+
+		task ("Assert the title of the second course redirects to the course display page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+
+			Click(
+				key_title = "Project Manager Certification",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+
+			AssertElementPresent(
+				key_title = "Project Manager Certification",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
+
+		task ("Assert the title of the third course redirects to the course display page") {
+			Navigator.gotoSitePage(
+				pageName = "Courses",
+				siteName = "Test Masterclass Name");
+
+			Click(
+				key_title = "Digital Marketing Bootcamp",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+
+			AssertElementPresent(
+				key_title = "Digital Marketing Bootcamp",
+				locator1 = "Masterclass#FRAGMENT_HEADING");
+		}
 	}
 
 	@description = "This is a test for LPS-140613. View the Student and Teacher are present in Site Roles"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ViewStudentandTeacheronSiteRoles {
+		task ("Go to Site Roles") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
 
-		// TODO Create the automation about the LPS-140613.
+			RoleNavigator.gotoRoleType(roleType = "Site");
+		}
 
+		task ("Assert the Student and Teacher are present") {
+			for (var roleTitle : list "Student,Teacher") {
+				AssertElementPresent(
+					key_itemName = "${roleTitle}",
+					locator1 = "ListGroupItem#ITEM_NAME_LINK",
+					value1 = "${roleTitle}");
+			}
+		}
 	}
 
 	@description = "This is a test for LPS-140613. View permissions for Student and Teacher"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ViewStudentandTeacherPermissions {
+		task ("Go to Site Roles") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Roles");
 
-		// TODO Create the automation about the LPS-140613.
+			RoleNavigator.gotoRoleType(roleType = "Site");
+		}
 
+		task ("Set all permissons for Student") {
+			PermissionsInline.gotoRolePermissions(roleName = "Student");
+
+			Role.definePermissionPG(
+				permissionsList = "CONTENT_PERMISSIONS_DELETE_CHECKBOX,CONTENT_PERMISSIONS_PERMISSIONS_CHECKBOX,CONTENT_PERMISSIONS_DEFINE_PERMISSIONS_CHECKBOX,CONTENT_PERMISSIONS_ASSIGN_MEMBERS_CHECKBOX,CONTENT_PERMISSIONS_MANAGE_ANNOUNCEMENTS_CHECKBOX,CONTENT_PERMISSIONS_UPDATE_CHECKBOX,CONTENT_PERMISSIONS_VIEW_CHECKBOX",
+				roleTitle = "Student");
+
+			IFrame.closeFrame();
+		}
+
+		task ("Set all permissons for Teacher") {
+			PermissionsInline.gotoRolePermissions(roleName = "Teacher");
+
+			Role.definePermissionPG(
+				permissionsList = "CONTENT_PERMISSIONS_DELETE_CHECKBOX,CONTENT_PERMISSIONS_PERMISSIONS_CHECKBOX,CONTENT_PERMISSIONS_DEFINE_PERMISSIONS_CHECKBOX,CONTENT_PERMISSIONS_ASSIGN_MEMBERS_CHECKBOX,CONTENT_PERMISSIONS_MANAGE_ANNOUNCEMENTS_CHECKBOX,CONTENT_PERMISSIONS_UPDATE_CHECKBOX,CONTENT_PERMISSIONS_VIEW_CHECKBOX",
+				roleTitle = "Teacher");
+
+			IFrame.closeFrame();
+		}
 	}
 
 }

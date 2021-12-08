@@ -10,22 +10,35 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useContext} from 'react';
 
+import {DefinitionBuilderContext} from '../../../../DefinitionBuilderContext';
 import BaseNode from '../BaseNode';
 
 export default function StartNode({
-	data: {description} = {},
+	data: {description, label} = {},
 	descriptionSidebar,
+	id,
 	...otherProps
 }) {
+	const {defaultLanguageId} = useContext(DefinitionBuilderContext);
+
+	if (!label || !label[defaultLanguageId]) {
+		const defaultLanguageId = themeDisplay.getLanguageId();
+
+		label = {
+			[defaultLanguageId]: Liferay.Language.get('start'),
+		};
+	}
+
 	return (
 		<BaseNode
 			className="start-node"
 			description={description}
 			descriptionSidebar={descriptionSidebar}
 			icon="play"
-			label={Liferay.Language.get('start')}
+			id={id}
+			label={label}
 			type="start"
 			{...otherProps}
 		/>
@@ -35,4 +48,5 @@ export default function StartNode({
 StartNode.propTypes = {
 	data: PropTypes.object,
 	descriptionSidebar: PropTypes.string,
+	id: PropTypes.string.isRequired,
 };

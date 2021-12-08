@@ -78,7 +78,7 @@ public class OpenIdConnectSessionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -86,10 +86,14 @@ public class OpenIdConnectSessionCacheModel
 		sb.append(openIdConnectSessionId);
 		sb.append(", companyId=");
 		sb.append(companyId);
+		sb.append(", userId=");
+		sb.append(userId);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
 		sb.append(", accessToken=");
 		sb.append(accessToken);
+		sb.append(", configurationPid=");
+		sb.append(configurationPid);
 		sb.append(", idToken=");
 		sb.append(idToken);
 		sb.append(", providerName=");
@@ -110,6 +114,7 @@ public class OpenIdConnectSessionCacheModel
 		openIdConnectSessionImpl.setOpenIdConnectSessionId(
 			openIdConnectSessionId);
 		openIdConnectSessionImpl.setCompanyId(companyId);
+		openIdConnectSessionImpl.setUserId(userId);
 
 		if (modifiedDate == Long.MIN_VALUE) {
 			openIdConnectSessionImpl.setModifiedDate(null);
@@ -123,6 +128,13 @@ public class OpenIdConnectSessionCacheModel
 		}
 		else {
 			openIdConnectSessionImpl.setAccessToken(accessToken);
+		}
+
+		if (configurationPid == null) {
+			openIdConnectSessionImpl.setConfigurationPid("");
+		}
+		else {
+			openIdConnectSessionImpl.setConfigurationPid(configurationPid);
 		}
 
 		if (idToken == null) {
@@ -158,8 +170,11 @@ public class OpenIdConnectSessionCacheModel
 		openIdConnectSessionId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
+
+		userId = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 		accessToken = objectInput.readUTF();
+		configurationPid = objectInput.readUTF();
 		idToken = objectInput.readUTF();
 		providerName = objectInput.readUTF();
 		refreshToken = objectInput.readUTF();
@@ -172,6 +187,8 @@ public class OpenIdConnectSessionCacheModel
 		objectOutput.writeLong(openIdConnectSessionId);
 
 		objectOutput.writeLong(companyId);
+
+		objectOutput.writeLong(userId);
 		objectOutput.writeLong(modifiedDate);
 
 		if (accessToken == null) {
@@ -179,6 +196,13 @@ public class OpenIdConnectSessionCacheModel
 		}
 		else {
 			objectOutput.writeUTF(accessToken);
+		}
+
+		if (configurationPid == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(configurationPid);
 		}
 
 		if (idToken == null) {
@@ -206,8 +230,10 @@ public class OpenIdConnectSessionCacheModel
 	public long mvccVersion;
 	public long openIdConnectSessionId;
 	public long companyId;
+	public long userId;
 	public long modifiedDate;
 	public String accessToken;
+	public String configurationPid;
 	public String idToken;
 	public String providerName;
 	public String refreshToken;

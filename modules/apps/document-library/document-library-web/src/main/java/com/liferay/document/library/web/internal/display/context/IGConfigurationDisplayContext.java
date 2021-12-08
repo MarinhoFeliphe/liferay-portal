@@ -140,7 +140,7 @@ public class IGConfigurationDisplayContext {
 
 		folderItemSelectorCriterion.setIgnoreRootFolder(true);
 		folderItemSelectorCriterion.setSelectedFolderId(getRootFolderId());
-		folderItemSelectorCriterion.setRepositoryId(getRepositoryId());
+		folderItemSelectorCriterion.setSelectedRepositoryId(getRepositoryId());
 		folderItemSelectorCriterion.setShowGroupSelector(true);
 
 		return _itemSelector.getItemSelectorURL(

@@ -28,7 +28,7 @@ definition {
 	@description = "This is a test for COMMERCE-5839. As a system admin i want to be able to create / update and delete a new currency"
 	@priority = "3"
 	test CreateAndUpdateNewCurrency {
-		property portal.acceptance = "Intern Test";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -51,8 +51,8 @@ definition {
 		CommerceNavigator.gotoEntry(entryName = "Test Currency");
 
 		for (var current : list "Name/Test Currency Edited,Code/TCYE,Exchange Rate with US Dollar/1") {
-			var fieldLabel = StringUtil.extractFirst("${current}","/");
-			var value = StringUtil.extractLast("${current}","/");
+			var fieldLabel = StringUtil.extractFirst("${current}", "/");
+			var value = StringUtil.extractLast("${current}", "/");
 
 			Type(
 				key_fieldLabel = "${fieldLabel}",
@@ -127,7 +127,7 @@ definition {
 
 	test ViewInstanceCurrenciesAvailable {
 		property environment.acceptance = "true";
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 		property portal.upstream = "true";
 
 		CommerceNavigator.gotoPortlet(

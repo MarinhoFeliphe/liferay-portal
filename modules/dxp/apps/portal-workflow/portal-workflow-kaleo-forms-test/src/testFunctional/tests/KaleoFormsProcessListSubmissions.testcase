@@ -15,7 +15,7 @@ definition {
 		User.firstLoginPG();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.addProcess();
@@ -159,6 +159,15 @@ definition {
 	test CanSearchByColunmValue {
 
 		// TODO LRQA-70696 CanSearchByColunmValue pending implementation
+
+	}
+
+	@description = "Verify that the user is able to track the workflow through the Kebab Menu."
+	@ignore = "Test Stub"
+	@priority = "5"
+	test CanViewTrackApprovalThroughKebabMenu {
+
+		// TODO LRQA-70645 CanViewTrackApprovalThroughKebabMenu pending implementation
 
 	}
 

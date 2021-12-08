@@ -30,8 +30,12 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.script.ScriptBuilder;
 import com.liferay.portal.search.script.ScriptType;
 import com.liferay.portal.workflow.metrics.internal.search.index.util.WorkflowMetricsIndexerUtil;
+import com.liferay.portal.workflow.metrics.model.AddTaskRequest;
 import com.liferay.portal.workflow.metrics.model.Assignment;
+import com.liferay.portal.workflow.metrics.model.CompleteTaskRequest;
+import com.liferay.portal.workflow.metrics.model.DeleteTaskRequest;
 import com.liferay.portal.workflow.metrics.model.RoleAssignment;
+import com.liferay.portal.workflow.metrics.model.UpdateTaskRequest;
 import com.liferay.portal.workflow.metrics.model.UserAssignment;
 import com.liferay.portal.workflow.metrics.search.index.TaskWorkflowMetricsIndexer;
 
@@ -40,8 +44,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -55,24 +57,19 @@ public class TaskWorkflowMetricsIndexerImpl
 	extends BaseWorkflowMetricsIndexer implements TaskWorkflowMetricsIndexer {
 
 	@Override
-	public Document addTask(
-		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
-		List<Assignment> assignments, String className, long classPK,
-		long companyId, boolean completed, Date completionDate,
-		Long completionUserId, Date createDate, boolean instanceCompleted,
-		Date instanceCompletionDate, long instanceId, Date modifiedDate,
-		String name, long nodeId, long processId, String processVersion,
-		long taskId, long userId) {
-
+	public Document addTask(AddTaskRequest addTaskRequest) {
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
+
+		documentBuilder.setValue("active", Boolean.TRUE);
 
 		List<Long> assignmentGroupIds = new ArrayList<>();
 		List<Long> assignmentIds = new ArrayList<>();
 
 		_populateTaskAssignments(
-			assignmentGroupIds, assignmentIds, assignments);
+			assignmentGroupIds, assignmentIds, addTaskRequest.getAssignments());
 
-		String assignmentType = _getAssignmentType(assignments);
+		String assignmentType = _getAssignmentType(
+			addTaskRequest.getAssignments());
 
 		if (!assignmentIds.isEmpty()) {
 			documentBuilder.setLongs(
@@ -81,22 +78,24 @@ public class TaskWorkflowMetricsIndexerImpl
 		}
 
 		documentBuilder.setString(
-			"className", className
+			"className", addTaskRequest.getClassName()
 		).setLong(
-			"classPK", classPK
+			"classPK", addTaskRequest.getClassPK()
 		).setLong(
-			"companyId", companyId
+			"companyId", addTaskRequest.getCompanyId()
 		).setValue(
-			"completed", completed
+			"completed", addTaskRequest.isCompleted()
 		);
 
-		if (completed) {
+		if (addTaskRequest.isCompleted()) {
 			documentBuilder.setDate(
-				"completionDate", getDate(completionDate)
+				"completionDate", getDate(addTaskRequest.getCompletionDate())
 			).setLong(
-				"completionUserId", completionUserId
+				"completionUserId", addTaskRequest.getCompletionUserId()
 			);
 		}
+
+		Date createDate = addTaskRequest.getCreateDate();
 
 		documentBuilder.setDate(
 			"createDate", getDate(createDate)
@@ -107,37 +106,42 @@ public class TaskWorkflowMetricsIndexerImpl
 			"deleted", false
 		);
 
-		if (completed) {
+		if (addTaskRequest.isCompleted()) {
 			documentBuilder.setLong(
-				"duration", _getDuration(completionDate, createDate));
+				"duration",
+				_getDuration(addTaskRequest.getCompletionDate(), createDate));
 		}
 
 		documentBuilder.setValue(
-			"instanceCompleted", instanceCompleted
+			"instanceCompleted", addTaskRequest.isInstanceCompleted()
 		).setDate(
-			"instanceCompletionDate", getDate(instanceCompletionDate)
+			"instanceCompletionDate",
+			getDate(addTaskRequest.getInstanceCompletionDate())
 		).setLong(
-			"instanceId", instanceId
+			"instanceId", addTaskRequest.getInstanceId()
 		).setDate(
-			"modifiedDate", getDate(modifiedDate)
+			"modifiedDate", getDate(addTaskRequest.getModifiedDate())
 		).setString(
-			"name", name
+			"name", addTaskRequest.getName()
 		).setLong(
-			"nodeId", nodeId
+			"nodeId", addTaskRequest.getNodeId()
 		).setLong(
-			"processId", processId
+			"processId", addTaskRequest.getProcessId()
 		).setLong(
-			"taskId", taskId
+			"taskId", addTaskRequest.getTaskId()
 		).setString(
-			"uid", digest(companyId, taskId)
+			"uid",
+			digest(addTaskRequest.getCompanyId(), addTaskRequest.getTaskId())
 		).setLong(
-			"userId", userId
+			"userId", addTaskRequest.getUserId()
 		).setString(
-			"version", processVersion
+			"version", addTaskRequest.getProcessVersion()
 		);
 
-		setLocalizedField(documentBuilder, "assetTitle", assetTitleMap);
-		setLocalizedField(documentBuilder, "assetType", assetTypeMap);
+		setLocalizedField(
+			documentBuilder, "assetTitle", addTaskRequest.getAssetTitleMap());
+		setLocalizedField(
+			documentBuilder, "assetType", addTaskRequest.getAssetTypeMap());
 
 		Document document = documentBuilder.build();
 
@@ -145,7 +149,7 @@ public class TaskWorkflowMetricsIndexerImpl
 			() -> {
 				addDocument(document);
 
-				if (completed) {
+				if (addTaskRequest.isCompleted()) {
 					return;
 				}
 
@@ -153,10 +157,12 @@ public class TaskWorkflowMetricsIndexerImpl
 
 				UpdateDocumentRequest updateDocumentRequest =
 					new UpdateDocumentRequest(
-						_instanceWorkflowMetricsIndex.getIndexName(companyId),
+						_instanceWorkflowMetricsIndex.getIndexName(
+							addTaskRequest.getCompanyId()),
 						WorkflowMetricsIndexerUtil.digest(
 							_instanceWorkflowMetricsIndex.getIndexType(),
-							companyId, instanceId),
+							addTaskRequest.getCompanyId(),
+							addTaskRequest.getInstanceId()),
 						scriptBuilder.idOrCode(
 							StringUtil.read(
 								getClass(),
@@ -171,13 +177,15 @@ public class TaskWorkflowMetricsIndexerImpl
 							).put(
 								"assigneeIds", assignmentIds
 							).put(
-								"assigneeName", _getAssigneeName(assignments)
+								"assigneeName",
+								_getAssigneeName(
+									addTaskRequest.getAssignments())
 							).put(
 								"assigneeType", assignmentType
 							).put(
-								"taskId", taskId
+								"taskId", addTaskRequest.getTaskId()
 							).put(
-								"taskName", name
+								"taskName", addTaskRequest.getName()
 							).build()
 						).scriptType(
 							ScriptType.INLINE
@@ -196,30 +204,30 @@ public class TaskWorkflowMetricsIndexerImpl
 	}
 
 	@Override
-	public Document completeTask(
-		long companyId, Date completionDate, long completionUserId,
-		long duration, Date modifiedDate, long taskId, long userId) {
-
+	public Document completeTask(CompleteTaskRequest completeTaskRequest) {
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
 		documentBuilder.setLong(
-			"companyId", companyId
+			"companyId", completeTaskRequest.getCompanyId()
 		).setValue(
 			"completed", true
 		).setDate(
-			"completionDate", getDate(completionDate)
+			"completionDate", getDate(completeTaskRequest.getCompletionDate())
 		).setLong(
-			"completionUserId", completionUserId
+			"completionUserId", completeTaskRequest.getCompletionUserId()
 		).setLong(
-			"duration", duration
+			"duration", completeTaskRequest.getDuration()
 		).setDate(
-			"modifiedDate", getDate(modifiedDate)
+			"modifiedDate", getDate(completeTaskRequest.getModifiedDate())
 		).setLong(
-			"taskId", taskId
+			"taskId", completeTaskRequest.getTaskId()
 		).setString(
-			"uid", digest(companyId, taskId)
+			"uid",
+			digest(
+				completeTaskRequest.getCompanyId(),
+				completeTaskRequest.getTaskId())
 		).setLong(
-			"userId", userId
+			"userId", completeTaskRequest.getUserId()
 		);
 
 		Document document = documentBuilder.build();
@@ -228,16 +236,19 @@ public class TaskWorkflowMetricsIndexerImpl
 			() -> {
 				updateDocument(document);
 
-				_deleteTask(companyId, taskId);
+				_deleteTask(
+					completeTaskRequest.getCompanyId(),
+					completeTaskRequest.getTaskId());
 
 				BooleanQuery booleanQuery = queries.booleanQuery();
 
 				booleanQuery.addMustQueryClauses(
-					queries.term("companyId", companyId),
-					queries.term("taskId", taskId));
+					queries.term(
+						"companyId", completeTaskRequest.getCompanyId()),
+					queries.term("taskId", completeTaskRequest.getTaskId()));
 
 				_slaTaskResultWorkflowMetricsIndexer.updateDocuments(
-					companyId,
+					completeTaskRequest.getCompanyId(),
 					HashMapBuilder.<String, Object>put(
 						"completionDate", document.getDate("completionDate")
 					).put(
@@ -250,22 +261,26 @@ public class TaskWorkflowMetricsIndexerImpl
 	}
 
 	@Override
-	public void deleteTask(long companyId, long taskId) {
+	public void deleteTask(DeleteTaskRequest deleteTaskRequest) {
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
 		documentBuilder.setLong(
-			"companyId", companyId
+			"companyId", deleteTaskRequest.getCompanyId()
 		).setLong(
-			"taskId", taskId
+			"taskId", deleteTaskRequest.getTaskId()
 		).setString(
-			"uid", digest(companyId, taskId)
+			"uid",
+			digest(
+				deleteTaskRequest.getCompanyId(), deleteTaskRequest.getTaskId())
 		);
 
 		workflowMetricsPortalExecutor.execute(
 			() -> {
 				deleteDocument(documentBuilder);
 
-				_deleteTask(companyId, taskId);
+				_deleteTask(
+					deleteTaskRequest.getCompanyId(),
+					deleteTaskRequest.getTaskId());
 			});
 	}
 
@@ -280,20 +295,18 @@ public class TaskWorkflowMetricsIndexerImpl
 	}
 
 	@Override
-	public Document updateTask(
-		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
-		List<Assignment> assignments, long companyId, Date modifiedDate,
-		long taskId, long userId) {
-
+	public Document updateTask(UpdateTaskRequest updateTaskRequest) {
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
 		List<Long> assignmentGroupIds = new ArrayList<>();
 		List<Long> assignmentIds = new ArrayList<>();
 
 		_populateTaskAssignments(
-			assignmentGroupIds, assignmentIds, assignments);
+			assignmentGroupIds, assignmentIds,
+			updateTaskRequest.getAssignments());
 
-		String assignmentType = _getAssignmentType(assignments);
+		String assignmentType = _getAssignmentType(
+			updateTaskRequest.getAssignments());
 
 		if (!assignmentIds.isEmpty()) {
 			documentBuilder.setLongs(
@@ -302,19 +315,24 @@ public class TaskWorkflowMetricsIndexerImpl
 		}
 
 		documentBuilder.setLong(
-			"companyId", companyId
+			"companyId", updateTaskRequest.getCompanyId()
 		).setDate(
-			"modifiedDate", getDate(modifiedDate)
+			"modifiedDate", getDate(updateTaskRequest.getModifiedDate())
 		).setLong(
-			"taskId", taskId
+			"taskId", updateTaskRequest.getTaskId()
 		).setString(
-			"uid", digest(companyId, taskId)
+			"uid",
+			digest(
+				updateTaskRequest.getCompanyId(), updateTaskRequest.getTaskId())
 		).setLong(
-			"userId", userId
+			"userId", updateTaskRequest.getUserId()
 		);
 
-		setLocalizedField(documentBuilder, "assetTitle", assetTitleMap);
-		setLocalizedField(documentBuilder, "assetType", assetTypeMap);
+		setLocalizedField(
+			documentBuilder, "assetTitle",
+			updateTaskRequest.getAssetTitleMap());
+		setLocalizedField(
+			documentBuilder, "assetType", updateTaskRequest.getAssetTypeMap());
 
 		Document document = documentBuilder.build();
 
@@ -333,7 +351,7 @@ public class TaskWorkflowMetricsIndexerImpl
 					queries.term("taskId", document.getLong("taskId")));
 
 				_slaTaskResultWorkflowMetricsIndexer.updateDocuments(
-					companyId,
+					updateTaskRequest.getCompanyId(),
 					HashMapBuilder.<String, Object>put(
 						"assigneeIds", assignmentIds
 					).put(
@@ -357,11 +375,12 @@ public class TaskWorkflowMetricsIndexerImpl
 					).put(
 						"assigneeIds", assignmentIds
 					).put(
-						"assigneeName", _getAssigneeName(assignments)
+						"assigneeName",
+						_getAssigneeName(updateTaskRequest.getAssignments())
 					).put(
 						"assigneeType", assignmentType
 					).put(
-						"taskId", taskId
+						"taskId", updateTaskRequest.getTaskId()
 					).build()
 				).scriptType(
 					ScriptType.INLINE
@@ -370,9 +389,12 @@ public class TaskWorkflowMetricsIndexerImpl
 				UpdateByQueryDocumentRequest updateByQueryDocumentRequest =
 					new UpdateByQueryDocumentRequest(
 						queries.nested(
-							"tasks", queries.term("tasks.taskId", taskId)),
+							"tasks",
+							queries.term(
+								"tasks.taskId", updateTaskRequest.getTaskId())),
 						scriptBuilder.build(),
-						_instanceWorkflowMetricsIndex.getIndexName(companyId));
+						_instanceWorkflowMetricsIndex.getIndexName(
+							updateTaskRequest.getCompanyId()));
 
 				updateByQueryDocumentRequest.setRefresh(true);
 

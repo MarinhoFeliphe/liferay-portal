@@ -92,6 +92,7 @@ definition {
 				groupName = "Site Name");
 
 			var portalURL = PropsUtil.get("portal.url");
+
 			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			ACAssets.viewAssetAppearsOnMetric(
@@ -149,7 +150,6 @@ definition {
 		// AC Quarantine ticket: LRAC-9805
 
 		var usernameList = "ac,liferay";
-
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 
 		task ("Add 2 more new users") {
@@ -229,7 +229,6 @@ definition {
 		// AC Quarantine ticket: LRAC-9806
 
 		var userNames = "ac,ac2,ac3";
-
 		var emailList = "ac@liferay.com,ac2@liferay.com,ac3@liferay.com";
 
 		task ("Create new users and connect the DXP to AC") {
@@ -401,6 +400,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8116 | Test Summary: Assert clicking a document in the documents and media list navigates to the documents overview page"
 	@priority = "5"
 	test CanNavigatesToDocumentsOverviewPage {
+		property portal.upstream = "quarantine";
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		JSONUser.addUser(
@@ -525,6 +526,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8415 | Test Summary: Documents downloads by technology card shows downloads by the expected browser"
 	@priority = "5"
 	test DocumentsTechnologyCardShowsViewsByExpectedBrowser {
+		property portal.upstream = "quarantine";
+
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("Download the document") {
@@ -575,6 +578,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8414 | Test Summary: Documents downloads by technology card shows downloads by the expected device"
 	@priority = "5"
 	test DocumentsTechnologyCardShowsViewsByExpectedDevice {
+		property portal.upstream = "quarantine";
+
 		var documentNameList = "DM AC Title,DM AC Title";
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -628,9 +633,7 @@ definition {
 		// AC Quarantine ticket: LRAC-9807
 
 		var usernameList = "ac,liferay";
-
 		var emailList = "ac@liferay.com,liferay@liferay.com";
-
 		var nameList = "ac ac,liferay liferay";
 
 		for (var name : list "${usernameList}") {
@@ -742,6 +745,8 @@ definition {
 	@description = "Documents visitor behavior card shows expected amount of views"
 	@priority = "5"
 	test VisitorBehaviorCardShowsExpectedAmountOfPreviewsInDM {
+		property portal.upstream = "quarantine";
+
 		var documentNameList = "DM AC Title,DM AC Title,DM AC Title,DM AC Title";
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");

@@ -15,6 +15,7 @@
 import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
+import {EXPORT_FILE_NAME} from '../../../src/main/resources/META-INF/resources/js/constants';
 import ExportModalBody from '../../../src/main/resources/META-INF/resources/js/export/ExportModalBody';
 
 describe('ExportModalBody', () => {
@@ -34,7 +35,7 @@ describe('ExportModalBody', () => {
 			<ExportModalBody contentType="CSV" percentage={50} />
 		);
 
-		getByText('Export.csv');
+		getByText(EXPORT_FILE_NAME);
 		getByText('50%');
 		getByText(Liferay.Language.get('being-created'));
 		getByText(Liferay.Language.get('export-file-is-being-created'));
@@ -49,7 +50,7 @@ describe('ExportModalBody', () => {
 			/>
 		);
 
-		getByText('Export.csv');
+		getByText(EXPORT_FILE_NAME);
 		getByText(Liferay.Language.get('created'));
 		getByText(
 			Liferay.Language.get(

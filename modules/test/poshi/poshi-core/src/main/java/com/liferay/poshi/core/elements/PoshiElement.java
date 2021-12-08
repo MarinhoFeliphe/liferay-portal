@@ -15,7 +15,6 @@
 package com.liferay.poshi.core.elements;
 
 import com.liferay.poshi.core.PoshiContext;
-import com.liferay.poshi.core.PoshiGetterUtil;
 import com.liferay.poshi.core.script.PoshiScriptParserException;
 import com.liferay.poshi.core.script.UnbalancedCodeException;
 import com.liferay.poshi.core.util.Dom4JUtil;
@@ -446,43 +445,43 @@ public abstract class PoshiElement
 		return RegexUtil.getGroup(poshiScript, ".*?\\[(.*)\\]", 1);
 	}
 
-	protected String getClassName(String classCommand) {
+	protected String getClassCommandName(String classCommand) {
 		classCommand = classCommand.trim();
 
 		if (classCommand.contains("(")) {
 			int index = classCommand.indexOf("(");
 
 			classCommand = classCommand.substring(0, index);
-		}
-
-		int index = classCommand.length();
-
-		if (classCommand.contains(".")) {
-			index = classCommand.lastIndexOf(".");
-		}
-		else if (classCommand.contains("#")) {
-			index = classCommand.lastIndexOf("#");
-		}
-
-		return classCommand.substring(0, index);
-	}
-
-	protected String getCommandName(String classCommand) {
-		classCommand = classCommand.trim();
-
-		if (classCommand.contains("(")) {
-			int index = classCommand.indexOf("(");
-
-			classCommand = classCommand.substring(0, index);
-		}
-
-		if (classCommand.contains(".")) {
-			int index = classCommand.lastIndexOf(".");
-
-			return classCommand.substring(index + 1);
 		}
 
 		return classCommand;
+	}
+
+	protected String getClassName(String classCommand) {
+		String classCommandName = getClassCommandName(classCommand);
+
+		int index = classCommandName.length();
+
+		if (classCommandName.contains(".")) {
+			index = classCommandName.lastIndexOf(".");
+		}
+		else if (classCommandName.contains("#")) {
+			index = classCommandName.lastIndexOf("#");
+		}
+
+		return classCommandName.substring(0, index);
+	}
+
+	protected String getCommandName(String classCommand) {
+		String classCommandName = getClassCommandName(classCommand);
+
+		if (classCommandName.contains(".")) {
+			int index = classCommandName.lastIndexOf(".");
+
+			return classCommandName.substring(index + 1);
+		}
+
+		return classCommandName;
 	}
 
 	protected Pattern getConditionPattern() {
@@ -806,7 +805,9 @@ public abstract class PoshiElement
 
 				Character topCodeBoundary = poshiScript.charAt(topIndex);
 
-				if (c == _codeBoundariesMap.get(topCodeBoundary)) {
+				if ((c == _codeBoundariesMap.get(topCodeBoundary)) && (i > 0) &&
+					(poshiScript.charAt(i - 1) != '\\')) {
+
 					stack.pop();
 
 					continue;
@@ -905,11 +906,16 @@ public abstract class PoshiElement
 	protected boolean isValidFunctionFileName(String poshiScriptInvocation) {
 		poshiScriptInvocation = poshiScriptInvocation.trim();
 
-		String className = getClassName(poshiScriptInvocation);
-
 		Set<String> functionFileNames = PoshiContext.getFunctionFileNames();
 
-		return functionFileNames.contains(className);
+		if (functionFileNames.contains(getClassName(poshiScriptInvocation)) ||
+			functionFileNames.contains(
+				getClassCommandName(poshiScriptInvocation))) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	protected boolean isValidMacroFileName(String poshiScriptInvocation) {
@@ -920,11 +926,16 @@ public abstract class PoshiElement
 				poshiScriptInvocation);
 		}
 
-		String className = getClassName(poshiScriptInvocation);
-
 		Set<String> macroFileNames = PoshiContext.getMacroFileNames();
 
-		return macroFileNames.contains(className);
+		if (macroFileNames.contains(getClassName(poshiScriptInvocation)) ||
+			macroFileNames.contains(
+				getClassCommandName(poshiScriptInvocation))) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	protected boolean isValidPoshiScriptBlock(
@@ -957,29 +968,6 @@ public abstract class PoshiElement
 
 		if (poshiScriptStatementMatcher.find()) {
 			return true;
-		}
-
-		return false;
-	}
-
-	protected boolean isValidUtilityClassName(String classCommandName) {
-		String className = getClassName(classCommandName);
-
-		if (className.equals("selenium")) {
-			return true;
-		}
-
-		try {
-			if (!className.contains(".")) {
-				className = PoshiGetterUtil.getUtilityClassName(className);
-			}
-
-			if (PoshiGetterUtil.isValidUtilityClass(className)) {
-				return true;
-			}
-		}
-		catch (IllegalArgumentException illegalArgumentException) {
-			return false;
 		}
 
 		return false;

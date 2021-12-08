@@ -22,9 +22,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -43,11 +40,10 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.navigation.admin.constants.SiteNavigationAdminPortletKeys;
+import com.liferay.site.navigation.admin.web.internal.configuration.FFSiteNavigationAdminConfigurationUtil;
 import com.liferay.site.navigation.admin.web.internal.security.permission.resource.SiteNavigationMenuPermission;
 import com.liferay.site.navigation.admin.web.internal.util.SiteNavigationMenuPortletUtil;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
-import com.liferay.site.navigation.model.SiteNavigationMenuItem;
-import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
 import com.liferay.site.navigation.service.SiteNavigationMenuService;
 import com.liferay.site.navigation.type.DefaultSiteNavigationMenuItemTypeContext;
@@ -262,9 +258,17 @@ public class SiteNavigationAdminDisplayContext {
 	}
 
 	public Map<String, Object> getSiteNavigationContext() throws Exception {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		return HashMapBuilder.<String, Object>put(
 			"addSiteNavigationMenuItemOptions",
 			getAddSiteNavigationMenuItemDropdownItems()
+		).put(
+			"categoriesMultipleSelectionEnabled",
+			FFSiteNavigationAdminConfigurationUtil.
+				categoriesMultipleSelectionEnabled()
 		).put(
 			"deleteSiteNavigationMenuItemURL",
 			() -> PortletURLBuilder.createActionURL(
@@ -302,20 +306,16 @@ public class SiteNavigationAdminDisplayContext {
 		).put(
 			"id", _liferayPortletResponse.getNamespace() + "sidebar"
 		).put(
-			"languageId",
-			() -> {
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)_httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				return themeDisplay.getLanguageId();
-			}
+			"languageId", themeDisplay.getLanguageId()
 		).put(
 			"redirect", PortalUtil.getCurrentURL(_liferayPortletRequest)
 		).put(
 			"siteNavigationMenuId", getSiteNavigationMenuId()
 		).put(
-			"siteNavigationMenuItems", _getSiteNavigationMenuItemsJSONArray(0)
+			"siteNavigationMenuItems",
+			SiteNavigationMenuPortletUtil.getSiteNavigationMenuItemsJSONArray(
+				0, getSiteNavigationMenuId(),
+				_siteNavigationMenuItemTypeRegistry, themeDisplay)
 		).put(
 			"siteNavigationMenuName", getSiteNavigationMenuName()
 		).build();
@@ -475,63 +475,20 @@ public class SiteNavigationAdminDisplayContext {
 					return addURL.toString();
 				}
 			).put(
+				"addTitle",
+				siteNavigationMenuItemType.getAddTitle(themeDisplay.getLocale())
+			).put(
 				"href", _getAddURL(siteNavigationMenuItemType)
 			).put(
 				"itemSelector", siteNavigationMenuItemType.isItemSelector()
+			).put(
+				"multiSelection", siteNavigationMenuItemType.isMultiSelection()
 			).put(
 				"siteNavigationMenuId", getSiteNavigationMenuId()
 			).build()
 		).setLabel(
 			siteNavigationMenuItemType.getLabel(themeDisplay.getLocale())
 		).build();
-	}
-
-	private JSONArray _getSiteNavigationMenuItemsJSONArray(
-		long parentSiteNavigationMenuItemId) {
-
-		List<SiteNavigationMenuItem> siteNavigationMenuItems =
-			SiteNavigationMenuItemLocalServiceUtil.getSiteNavigationMenuItems(
-				getSiteNavigationMenuId(), parentSiteNavigationMenuItemId);
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		JSONArray siteNavigationMenuItemsJSONArray =
-			JSONFactoryUtil.createJSONArray();
-
-		for (SiteNavigationMenuItem siteNavigationMenuItem :
-				siteNavigationMenuItems) {
-
-			long siteNavigationMenuItemId =
-				siteNavigationMenuItem.getSiteNavigationMenuItemId();
-			SiteNavigationMenuItemType siteNavigationMenuItemType =
-				_siteNavigationMenuItemTypeRegistry.
-					getSiteNavigationMenuItemType(
-						siteNavigationMenuItem.getType());
-
-			siteNavigationMenuItemsJSONArray.put(
-				JSONUtil.put(
-					"children",
-					_getSiteNavigationMenuItemsJSONArray(
-						siteNavigationMenuItemId)
-				).put(
-					"parentSiteNavigationMenuItemId",
-					parentSiteNavigationMenuItemId
-				).put(
-					"siteNavigationMenuItemId", siteNavigationMenuItemId
-				).put(
-					"title",
-					siteNavigationMenuItemType.getTitle(
-						siteNavigationMenuItem, themeDisplay.getLocale())
-				).put(
-					"type",
-					siteNavigationMenuItemType.getSubtitle(
-						siteNavigationMenuItem, themeDisplay.getLocale())
-				));
-		}
-
-		return siteNavigationMenuItemsJSONArray;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.order.content.web.internal.importer.type.util;
 
+import com.liferay.commerce.configuration.CommerceOrderImporterTypeConfiguration;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.context.CommerceContextFactory;
 import com.liferay.commerce.exception.CommerceOrderValidatorException;
@@ -24,7 +25,11 @@ import com.liferay.commerce.order.importer.item.CommerceOrderImporterItemImpl;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderService;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -36,8 +41,11 @@ import com.liferay.portal.vulcan.util.TransformUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVFormat;
+
 /**
  * @author Alessio Antonio Rendina
+ * @author Luca Pellizzon
  */
 public class CommerceOrderImporterTypeUtil {
 
@@ -64,15 +72,10 @@ public class CommerceOrderImporterTypeUtil {
 
 		ServiceContext serviceContext = _getServiceContext(userLocalService);
 
-		for (CommerceOrderItem commerceOrderItem :
-				commerceOrder.getCommerceOrderItems()) {
-
-			commerceOrderItemService.addCommerceOrderItem(
-				tempCommerceOrder.getCommerceOrderId(),
-				commerceOrderItem.getCPInstanceId(),
-				commerceOrderItem.getJson(), commerceOrderItem.getQuantity(), 0,
-				commerceContext, serviceContext);
-		}
+		_addPreviousCommerceOrderItems(
+			commerceContext, commerceOrder,
+			tempCommerceOrder.getCommerceOrderId(), commerceOrderItemService,
+			serviceContext);
 
 		for (CommerceOrderImporterItemImpl commerceOrderImporterItemImpl :
 				commerceOrderImporterItemImpls) {
@@ -82,7 +85,7 @@ public class CommerceOrderImporterTypeUtil {
 				// Temporary commerce order item
 
 				CommerceOrderItem commerceOrderItem =
-					commerceOrderItemService.addCommerceOrderItem(
+					commerceOrderItemService.addOrUpdateCommerceOrderItem(
 						tempCommerceOrder.getCommerceOrderId(),
 						commerceOrderImporterItemImpl.getCPInstanceId(),
 						commerceOrderImporterItemImpl.getJSON(),
@@ -163,6 +166,11 @@ public class CommerceOrderImporterTypeUtil {
 
 		ServiceContext serviceContext = _getServiceContext(userLocalService);
 
+		_addPreviousCommerceOrderItems(
+			commerceContext, commerceOrder,
+			tempCommerceOrder.getCommerceOrderId(), commerceOrderItemService,
+			serviceContext);
+
 		for (CommerceOrderItem commerceOrderItem : commerceOrderItems) {
 			CommerceOrderImporterItemImpl commerceOrderImporterItemImpl =
 				new CommerceOrderImporterItemImpl();
@@ -187,7 +195,7 @@ public class CommerceOrderImporterTypeUtil {
 				// Temporary commerce order item
 
 				CommerceOrderItem tempCommerceOrderItem =
-					commerceOrderItemService.addCommerceOrderItem(
+					commerceOrderItemService.addOrUpdateCommerceOrderItem(
 						tempCommerceOrder.getCommerceOrderId(),
 						commerceOrderItem.getCPInstanceId(),
 						commerceOrderItem.getJson(),
@@ -222,6 +230,51 @@ public class CommerceOrderImporterTypeUtil {
 		return commerceOrderImporterItems;
 	}
 
+	public static CSVFormat getCSVFormat(
+		CommerceOrderImporterTypeConfiguration
+			commerceOrderImporterTypeConfiguration) {
+
+		CSVFormat csvFormat = CSVFormat.DEFAULT;
+
+		String csvSeparator =
+			commerceOrderImporterTypeConfiguration.csvSeparator();
+
+		if (StringPool.SEMICOLON.equals(csvSeparator)) {
+			csvFormat = csvFormat.withDelimiter(CharPool.SEMICOLON);
+		}
+
+		csvFormat = csvFormat.withFirstRecordAsHeader();
+		csvFormat = csvFormat.withIgnoreEmptyLines();
+		csvFormat = csvFormat.withIgnoreSurroundingSpaces();
+		csvFormat = csvFormat.withNullString(StringPool.BLANK);
+
+		return csvFormat;
+	}
+
+	private static void _addPreviousCommerceOrderItems(
+		CommerceContext commerceContext, CommerceOrder commerceOrder,
+		long tempCommerceOrderId,
+		CommerceOrderItemService commerceOrderItemService,
+		ServiceContext serviceContext) {
+
+		try {
+			for (CommerceOrderItem commerceOrderItem :
+					commerceOrder.getCommerceOrderItems()) {
+
+				commerceOrderItemService.addCommerceOrderItem(
+					tempCommerceOrderId, commerceOrderItem.getCPInstanceId(),
+					commerceOrderItem.getJson(),
+					commerceOrderItem.getQuantity(), 0, commerceContext,
+					serviceContext);
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+	}
+
 	private static ServiceContext _getServiceContext(
 			UserLocalService userLocalService)
 		throws Exception {
@@ -237,5 +290,8 @@ public class CommerceOrderImporterTypeUtil {
 
 		return serviceContext;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CommerceOrderImporterTypeUtil.class);
 
 }

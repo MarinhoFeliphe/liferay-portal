@@ -15,8 +15,6 @@
 package com.liferay.portal.security.sso.openid.connect.internal.session.manager;
 
 import com.liferay.counter.kernel.service.CounterLocalService;
-import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -49,7 +47,6 @@ import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -67,17 +64,6 @@ import org.osgi.service.component.annotations.Reference;
 public class OfflineOpenIdConnectSessionManager {
 
 	public void endOpenIdConnectSession(long openIdConnectSessionId) {
-		OpenIdConnectSession openIdConnectSession =
-			_openIdConnectSessionLocalService.fetchOpenIdConnectSession(
-				openIdConnectSessionId);
-
-		if (openIdConnectSession == null) {
-			return;
-		}
-
-		_openIdConnectSessionLocalService.deleteOpenIdConnectSession(
-			openIdConnectSession);
-
 		try {
 			_openIdConnectTokenRefreshScheduler.unschedule(
 				openIdConnectSessionId);
@@ -136,18 +122,26 @@ public class OfflineOpenIdConnectSessionManager {
 	}
 
 	public long startOpenIdConnectSession(
-		OIDCTokens oidcTokens, String providerName) {
+		String configurationPid, OIDCTokens oidcTokens, String providerName,
+		long userId) {
 
 		OpenIdConnectSession openIdConnectSession =
-			_openIdConnectSessionLocalService.createOpenIdConnectSession(
-				_counterLocalService.increment(
-					OpenIdConnectSession.class.getName()));
+			_openIdConnectSessionLocalService.fetchOpenIdConnectSession(
+				userId, configurationPid);
+
+		if (openIdConnectSession == null) {
+			openIdConnectSession =
+				_openIdConnectSessionLocalService.createOpenIdConnectSession(
+					_counterLocalService.increment(
+						OpenIdConnectSession.class.getName()));
+		}
 
 		AccessToken accessToken = oidcTokens.getAccessToken();
 
 		_updateOpenIdConnectSession(
-			accessToken, oidcTokens.getIDTokenString(),
-			oidcTokens.getRefreshToken(), openIdConnectSession, providerName);
+			accessToken, configurationPid, oidcTokens.getIDTokenString(),
+			oidcTokens.getRefreshToken(), openIdConnectSession, providerName,
+			userId);
 
 		if (openIdConnectSession.getRefreshToken() != null) {
 			try {
@@ -206,20 +200,6 @@ public class OfflineOpenIdConnectSessionManager {
 		}
 
 		_bundleContext = null;
-
-		List<?> clusterNodes = ClusterExecutorUtil.getClusterNodes();
-
-		if ((clusterNodes != null) && (clusterNodes.size() > 1)) {
-			return;
-		}
-
-		for (OpenIdConnectSession openIdConnectSession :
-				_openIdConnectSessionLocalService.getOpenIdConnectSessions(
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
-
-			_openIdConnectSessionLocalService.deleteOpenIdConnectSession(
-				openIdConnectSession);
-		}
 	}
 
 	private void _extendOpenIdConnectSession(
@@ -296,10 +276,12 @@ public class OfflineOpenIdConnectSessionManager {
 	}
 
 	private void _updateOpenIdConnectSession(
-		AccessToken accessToken, String idTokenString,
+		AccessToken accessToken, String configurationPid, String idTokenString,
 		RefreshToken refreshToken, OpenIdConnectSession openIdConnectSession,
-		String providerName) {
+		String providerName, long userId) {
 
+		openIdConnectSession.setUserId(userId);
+		openIdConnectSession.setConfigurationPid(configurationPid);
 		openIdConnectSession.setIdToken(idTokenString);
 		openIdConnectSession.setProviderName(providerName);
 

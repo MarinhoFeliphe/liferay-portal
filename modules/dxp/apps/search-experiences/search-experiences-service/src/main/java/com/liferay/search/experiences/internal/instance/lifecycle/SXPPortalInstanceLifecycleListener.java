@@ -19,22 +19,25 @@ import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
 import com.liferay.search.experiences.rest.dto.v1_0.util.SXPElementUtil;
 import com.liferay.search.experiences.service.SXPElementLocalService;
 
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author André de Oliveira
+ * @author Petteri Karttunen
  */
 @Component(
 	enabled = true, immediate = true,
@@ -45,9 +48,11 @@ public class SXPPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
-		for (String fileName : FILE_NAMES) {
-			_addSXPElement(company, fileName);
-		}
+
+		// TODO Move to an upgrade process for existing companies. For new
+		// companies, use a model listener.
+
+		_addSXPElements(company);
 	}
 
 	protected SXPElement readSXPElement(String fileName) {
@@ -71,8 +76,8 @@ public class SXPPortalInstanceLifecycleListener
 		"boost_items_for_my_commerce_account_groups", "boost_longer_contents",
 		"boost_proximity", "boost_tagged_contents", "boost_tags_match",
 		"boost_web_contents_by_keyword_match", "filter_by_exact_terms_match",
-		"filter_by_exact_terms_match", "hide_by_an_exact_term_match",
-		"hide_comments", "hide_contents_in_a_category_for_guest_users",
+		"hide_by_an_exact_term_match", "hide_comments",
+		"hide_contents_in_a_category_for_guest_users",
 		"hide_contents_in_a_category", "hide_default_user",
 		"hide_hidden_contents",
 		"limit_search_to_contents_created_within_a_period_of_time",
@@ -85,41 +90,50 @@ public class SXPPortalInstanceLifecycleListener
 		"text_match_over_multiple_fields"
 	};
 
-	private void _addSXPElement(Company company, String fileName)
-		throws Exception {
+	private void _addSXPElements(Company company) throws Exception {
+		Set<String> titles = new HashSet<>();
 
-		SXPElement sxpElement = readSXPElement(fileName);
+		for (com.liferay.search.experiences.model.SXPElement sxpPElement :
+				_sxpElementLocalService.getSXPElements(
+					company.getCompanyId(), true)) {
 
-		if (ListUtil.exists(
-				_sxpElementLocalService.getSXPElements(company.getCompanyId()),
-				serviceBuilderSXPElement -> Objects.equals(
-					MapUtil.getString(sxpElement.getTitle_i18n(), "en_US"),
-					serviceBuilderSXPElement.getTitle(LocaleUtil.US)))) {
-
-			// TODO Fix performance issue with getting every SXP element
-
-			return;
+			titles.add(sxpPElement.getTitle(LocaleUtil.US));
 		}
 
-		User defaultUser = company.getDefaultUser();
+		for (SXPElement sxpElement : _sxpElements) {
 
-		_sxpElementLocalService.addSXPElement(
-			defaultUser.getUserId(),
-			LocalizedMapUtil.getLocalizedMap(sxpElement.getDescription_i18n()),
-			String.valueOf(sxpElement.getElementDefinition()), true,
-			LocalizedMapUtil.getLocalizedMap(sxpElement.getTitle_i18n()), 0,
-			new ServiceContext() {
-				{
-					setAddGroupPermissions(true);
-					setAddGuestPermissions(true);
-					setCompanyId(company.getCompanyId());
-					setScopeGroupId(company.getGroupId());
-					setUserId(defaultUser.getUserId());
-				}
-			});
+			// TODO Should this be en_US or en-US?
+
+			if (titles.contains(
+					MapUtil.getString(sxpElement.getTitle_i18n(), "en_US"))) {
+
+				continue;
+			}
+
+			User user = company.getDefaultUser();
+
+			_sxpElementLocalService.addSXPElement(
+				user.getUserId(),
+				LocalizedMapUtil.getLocalizedMap(
+					sxpElement.getDescription_i18n()),
+				String.valueOf(sxpElement.getElementDefinition()), true,
+				LocalizedMapUtil.getLocalizedMap(sxpElement.getTitle_i18n()), 0,
+				new ServiceContext() {
+					{
+						setAddGroupPermissions(true);
+						setAddGuestPermissions(true);
+						setCompanyId(company.getCompanyId());
+						setScopeGroupId(company.getGroupId());
+						setUserId(user.getUserId());
+					}
+				});
+		}
 	}
 
 	@Reference
 	private SXPElementLocalService _sxpElementLocalService;
+
+	private final List<SXPElement> _sxpElements = TransformUtil.transformToList(
+		FILE_NAMES, fileName -> readSXPElement(fileName));
 
 }

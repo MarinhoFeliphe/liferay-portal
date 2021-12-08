@@ -15,6 +15,7 @@
 package com.liferay.asset.list.web.internal.display.context;
 
 import com.liferay.asset.list.constants.AssetListEntryUsageConstants;
+import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryUsage;
 import com.liferay.asset.list.service.AssetListEntryUsageLocalServiceUtil;
@@ -27,9 +28,9 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -203,6 +204,8 @@ public class AssetListEntryUsagesDisplayContext {
 				_renderRequest, _renderResponse.createRenderURL(), null,
 				"there-are-no-collection-usages");
 
+		assetListEntryUsagesSearchContainer.setOrderByCol(_getOrderByCol());
+
 		boolean orderByAsc = false;
 
 		String orderByType = _getOrderByType();
@@ -211,13 +214,10 @@ public class AssetListEntryUsagesDisplayContext {
 			orderByAsc = true;
 		}
 
-		OrderByComparator<AssetListEntryUsage> orderByComparator =
-			new AssetListEntryUsageModifiedDateComparator(orderByAsc);
-
-		assetListEntryUsagesSearchContainer.setOrderByCol(_getOrderByCol());
 		assetListEntryUsagesSearchContainer.setOrderByComparator(
-			orderByComparator);
-		assetListEntryUsagesSearchContainer.setOrderByType(_getOrderByType());
+			new AssetListEntryUsageModifiedDateComparator(orderByAsc));
+
+		assetListEntryUsagesSearchContainer.setOrderByType(orderByType);
 
 		List<AssetListEntryUsage> assetListEntryUsages = null;
 
@@ -232,7 +232,7 @@ public class AssetListEntryUsagesDisplayContext {
 					AssetListEntryUsageConstants.TYPE_LAYOUT,
 					assetListEntryUsagesSearchContainer.getStart(),
 					assetListEntryUsagesSearchContainer.getEnd(),
-					orderByComparator);
+					assetListEntryUsagesSearchContainer.getOrderByComparator());
 
 			assetListEntryUsagesCount = getPagesUsageCount();
 		}
@@ -245,7 +245,7 @@ public class AssetListEntryUsagesDisplayContext {
 					AssetListEntryUsageConstants.TYPE_PAGE_TEMPLATE,
 					assetListEntryUsagesSearchContainer.getStart(),
 					assetListEntryUsagesSearchContainer.getEnd(),
-					orderByComparator);
+					assetListEntryUsagesSearchContainer.getOrderByComparator());
 
 			assetListEntryUsagesCount = getDisplayPagesUsageCount();
 		}
@@ -258,7 +258,7 @@ public class AssetListEntryUsagesDisplayContext {
 					AssetListEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE,
 					assetListEntryUsagesSearchContainer.getStart(),
 					assetListEntryUsagesSearchContainer.getEnd(),
-					orderByComparator);
+					assetListEntryUsagesSearchContainer.getOrderByComparator());
 
 			assetListEntryUsagesCount = getDisplayPagesUsageCount();
 		}
@@ -270,7 +270,7 @@ public class AssetListEntryUsagesDisplayContext {
 					String.valueOf(getAssetListEntryId()),
 					assetListEntryUsagesSearchContainer.getStart(),
 					assetListEntryUsagesSearchContainer.getEnd(),
-					orderByComparator);
+					assetListEntryUsagesSearchContainer.getOrderByComparator());
 
 			assetListEntryUsagesCount = getAllUsageCount();
 		}
@@ -294,8 +294,9 @@ public class AssetListEntryUsagesDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(
-			_renderRequest, "orderByCol", "modified-date");
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, AssetListPortletKeys.ASSET_LIST,
+			"entry-usages-order-by-col", "modified-date");
 
 		return _orderByCol;
 	}
@@ -305,8 +306,9 @@ public class AssetListEntryUsagesDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "asc");
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, AssetListPortletKeys.ASSET_LIST,
+			"entry-usages-order-by-type", "asc");
 
 		return _orderByType;
 	}
