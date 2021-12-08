@@ -310,6 +310,14 @@ definition {
 			value1 = "Propagate Changes");
 	}
 
+	macro collapsibleFieldsGroup {
+		Click(
+			key_fieldLabel = "${fieldsGroup}",
+			locator1 = "FormFields#LABEL");
+
+		FormFields.enableSwitch(fieldName = "Collapsible");
+	}
+
 	macro deleteFieldsetFromSideBar {
 		Navigator.gotoSidebarTab(tabName = "Builder");
 

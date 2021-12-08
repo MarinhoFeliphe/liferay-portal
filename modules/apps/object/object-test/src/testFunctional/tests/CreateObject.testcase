@@ -63,22 +63,79 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to add Entries with Custom Layout Created"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanAddEntriesWithCustomLayout {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141515 CanAddEntriesWithCustomLayout pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.markLayoutAsDefault();
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "2",
+			fieldLabelName = "Custom Field",
+			tabName = "Field Tab");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectAdmin.addObjectStringFieldEntryViaUI(entryValue = "Entry 1");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.viewEntry(entry = "Entry 1");
 	}
 
 	@description = "LPS-135635 - Verify it is possible to add a field after the Object is published and submit entries to it"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanAddFieldAndViewEntriesAfterPublished {
-		property portal.acceptance = "true";
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-138853 CanAddFieldAndViewEntriesAfterPublished pending implementation
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.addSingleFieldEntryViaUI(entry = "String Entry");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.viewEntry(entry = "String Entry");
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to add a Field for the Block with one column"
@@ -419,12 +476,50 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify it is possible to collapse and expand a block of fields"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanCollapseAndExpandBlock {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141525 CanCollapseAndExpandBlock pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.markLayoutAsDefault();
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "2",
+			fieldLabelName = "Custom Field",
+			isCollapsible = "Yes",
+			tabName = "Field Tab");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		CreateObject.assertCanCollapseAndExpandEntryField();
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create a BigDecimal field"
@@ -899,12 +994,28 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify that the Relationship tab cannot be added first"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotAddRelationshipTabFirst {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141521 CannotAddRelationshipTabFirst pending implementation
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout Name",
+			objectName = "CustomObject");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutTabOnLayouts();
+
+		CreateObject.assertCannotAddRelationshipTabFirst();
 	}
 
 	@description = "LPS-135549 - Verify that it is not possible to create a Field with a duplicated Field Name"
@@ -1675,23 +1786,52 @@ definition {
 	}
 
 	@description = "LPS-135551 - Verify it is possible to scope the Object by Company"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanScopeObjectByCompany {
 		property portal.acceptance = "true";
 
-		// TODO LPS-141645 CanScopeObjectByCompany pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			panelCategoryKey = "control_panel.account_entries_admin",
+			pluralLabelName = "Custom Objects",
+			scope = "company");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		Navigator.openURL();
+
+		ApplicationsMenuHelper.openApplicationsMenu();
+
+		ApplicationsMenu.gotoPanel(panel = "Control Panel");
+
+		AssertElementPresent(locator1 = "ObjectPortlet#CUSTOM_OBJECT_ON_CONTROL_PANEL");
 	}
 
 	@description = "LPS-135551 - Verify it is possible to scope the Object by Site"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanScopeObjectBySite {
 		property portal.acceptance = "true";
 
-		// TODO LPS-141646 CanScopeObjectBySite pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			panelCategoryKey = "site_administration.content",
+			pluralLabelName = "Custom Objects",
+			scope = "site");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		Navigator.openURL();
+
+		ProductMenuHelper.openProductMenu();
+
+		ProductMenuHelper.expandCategory(category = "Content & Data");
+
+		AssertElementPresent(
+			key_portlet = "Custom Objects",
+			locator1 = "ProductMenu#PORTLET",
+			value1 = "Custom Objects");
 	}
 
 	@description = "LPS-135547 - Verify it is possible to search for a Custom Object"
@@ -2590,13 +2730,69 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to view the Entry with two columns"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewEntryWithTwoColumns {
 		property portal.acceptance = "true";
 
-		// TODO LPS-141512 CanViewEntryWithTwoColumns pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject");
+		}
+
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "2",
+			fieldList = "Custom Field A,Custom Field B",
+			tabName = "Field Tab");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_INFO_TAB");
+
+		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		LexiconEntry.gotoAdd();
+
+		AssertElementPresent(
+			key_fieldColumnNumber = "0",
+			key_fieldLabel = "Custom Field A",
+			locator1 = "ObjectAdmin#FIELD_COLUMN_POSITION_ON_ENTRY_PAGE");
+
+		AssertElementPresent(
+			key_fieldColumnNumber = "1",
+			key_fieldLabel = "Custom Field B",
+			locator1 = "ObjectAdmin#FIELD_COLUMN_POSITION_ON_ENTRY_PAGE");
 	}
 
 	@description = "LPS-135400 - There is an explanation about each Relationship type"
@@ -2859,13 +3055,81 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to view a tab of relationship with entries"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewRelationshipTab {
 		property portal.acceptance = "true";
 
-		// TODO LPS-141514 CanViewRelationshipTab pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
+
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObject",
+			objectName_2 = "CustomObject",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "oneToMany");
+
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "2",
+			fieldLabelName = "Custom Field",
+			tabName = "Field Tab");
+
+		ObjectAdmin.addTabRelationshipsOnLayout(
+			relationshipsLabelName = "Relationship",
+			tabName = "Relationship Tab");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_INFO_TAB");
+
+		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject",
+			value = "Entry 1");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		Click(
+			key_tabName = "Relationship Tab",
+			locator1 = "ObjectAdmin#ANY_TAB_ON_ENTRY");
+
+		AssertElementPresent(
+			key_tabName = "Relationship Tab",
+			locator1 = "ObjectAdmin#ANY_TAB_ON_ENTRY");
 	}
 
 	@description = "LPS-135401 - Verify if Cascade deletion type of Relationship Many to Many will allow to delete only the entry with relation but not its relations"
@@ -3083,12 +3347,33 @@ definition {
 	}
 
 	@description = "LPS-135635 - Verify that the options Keyword and Text appears under the Searchable section when updating the field type to String"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test KeywordAndTextAppearsWhenUpdateFieldType {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-138851 KeywordAndTextAppearsWhenUpdateFieldType pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Integer",
+			fieldName = "customObjectField",
+			fieldType = "Integer",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.goToFieldsDetails(label = "Integer");
+
+		CreateObject.editType(fieldType = "String");
+
+		CreateObject.assertSearchableSectionOptionsAppears(radioOption = "Keyword");
+
+		CreateObject.assertSearchableSectionOptionsAppears(radioOption = "Text");
 	}
 
 	@description = "LPS-135635 - Verify that the options Keyword and Text disappears under the Searchable section when updating the field type from String to another type"

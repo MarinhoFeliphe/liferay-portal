@@ -13,6 +13,7 @@ import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
+import {DefinitionBuilderContext} from '../../../DefinitionBuilderContext';
 import {DiagramBuilderContext} from '../../DiagramBuilderContext';
 import {nodeDescription} from './utils';
 
@@ -21,11 +22,17 @@ export default function BaseNode({
 	description,
 	descriptionSidebar,
 	icon,
+	id,
 	label,
 	type,
 	...otherProps
 }) {
-	const {availableArea} = useContext(DiagramBuilderContext);
+	const {defaultLanguageId, selectedLanguageId} = useContext(
+		DefinitionBuilderContext
+	);
+	const {availableArea, selectedNode, setSelectedNode} = useContext(
+		DiagramBuilderContext
+	);
 
 	const borderAreaColor = availableArea ? 'blue' : 'red';
 	const displayBorderArea = !descriptionSidebar && availableArea !== null;
@@ -38,14 +45,44 @@ export default function BaseNode({
 		description = nodeDescription[type];
 	}
 
+	if (selectedNode?.id === id) {
+		className = `${className} selected`;
+	}
+
+	let nodeLabel;
+
+	if (selectedLanguageId) {
+		if (!label[selectedLanguageId]) {
+			nodeLabel = label[defaultLanguageId];
+		}
+		else {
+			nodeLabel = label[selectedLanguageId];
+		}
+	}
+	else {
+		nodeLabel = label[defaultLanguageId];
+	}
+
 	return (
-		<div style={{position: 'relative'}}>
+		<div className="base-node">
 			{displayBorderArea && (
 				<div className={`node-border-area ${borderAreaColor}`} />
 			)}
 
 			<div
 				className={`node ${className}`}
+				onClick={() => {
+					if (!descriptionSidebar) {
+						setSelectedNode({
+							data: {
+								description,
+								label,
+							},
+							id,
+							type,
+						});
+					}
+				}}
 				style={{
 					position: displayBorderArea ? 'absolute' : 'unset',
 				}}
@@ -62,9 +99,9 @@ export default function BaseNode({
 				<div className="node-info">
 					<span
 						className="node-label truncate-container"
-						title={label}
+						title={nodeLabel}
 					>
-						{label}
+						{nodeLabel}
 					</span>
 
 					<span
@@ -84,6 +121,7 @@ BaseNode.propTypes = {
 	description: PropTypes.string,
 	descriptionSidebar: PropTypes.string,
 	icon: PropTypes.string.isRequired,
-	label: PropTypes.string,
+	id: PropTypes.string.isRequired,
+	label: PropTypes.object,
 	type: PropTypes.string.isRequired,
 };

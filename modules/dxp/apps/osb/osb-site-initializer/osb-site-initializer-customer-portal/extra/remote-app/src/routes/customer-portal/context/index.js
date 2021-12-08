@@ -1,11 +1,11 @@
 import {useQuery} from '@apollo/client';
 import {createContext, useEffect, useReducer} from 'react';
-import {LiferayTheme} from '~/common/services/liferay';
-import {getUserAccountById} from '~/common/services/liferay/graphql/queries';
+import {LiferayTheme} from '../../../common/services/liferay';
+import {getUserAccount} from '../../../common/services/liferay/graphql/queries';
 import {
 	PARAMS_KEYS,
 	SearchParams,
-} from '~/common/services/liferay/search-params';
+} from '../../../common/services/liferay/search-params';
 import {CUSTOM_EVENTS} from '../utils/constants';
 import reducer, {actionTypes} from './reducer';
 
@@ -19,8 +19,8 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 		userAccount: undefined,
 	});
 
-	const {data} = useQuery(getUserAccountById, {
-		variables: {userAccountId: LiferayTheme.getUserId()},
+	const {data} = useQuery(getUserAccount, {
+		variables: {id: LiferayTheme.getUserId()},
 	});
 
 	const userAccount = data?.userAccount;

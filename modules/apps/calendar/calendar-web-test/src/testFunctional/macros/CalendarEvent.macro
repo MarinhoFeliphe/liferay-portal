@@ -382,6 +382,7 @@ definition {
 				optionSetValue = "${optionSetValue}",
 				specificOptionSetValue = "${specificOptionSetValue}");
 		}
+
 		CalendarEvent.publish();
 
 		Navigator.gotoSitePage(
@@ -1405,6 +1406,18 @@ definition {
 		}
 	}
 
+	macro viewCalendarCommentsMessagePresent {
+		AssertElementPresent(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+		AssertElementPresent(locator1 = "CalendarViewEventDetails#CALENDAR_COMMENT_DEFAULT_MESSAGE");
+	}
+
+	macro viewCalendarCommentsNotPresent {
+		AssertElementNotPresent(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+		AssertElementNotPresent(locator1 = "CalendarViewEventDetails#CALENDAR_COMMENT_DEFAULT_MESSAGE");
+	}
+
 	macro viewComment {
 		CalendarEvent.viewDetails(
 			calendarName = "${calendarName}",
@@ -1606,7 +1619,6 @@ definition {
 
 		var key_siteCalendarName = "${siteCalendarName}";
 		var key_siteName = "${siteName}";
-
 		var key_eventTitle = "${eventTitle}";
 
 		AssertClick(

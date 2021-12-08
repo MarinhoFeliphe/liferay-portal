@@ -114,6 +114,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9020 | Test Summary: Search associated segment will not return results in the individual List"
 	@priority = "3"
 	test AssertNoIndividualsAssociatedSegmentsResults {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
@@ -381,10 +383,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9032 | Test Summary: Search and Clear Field"
 	@priority = "1"
 	test SearchAndClearField {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2";
-
 		var emailList = "user1@liferay.com,user2@liferay.com";
-
 		var nameList = "user1 user1,user2 user2";
 
 		task ("Get site assigned property name") {
@@ -444,10 +446,12 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9024 | Test Summary: Search an Individual's Details in the individual List"
 	@priority = "4"
 	test SearchIndividualDetails {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-			var dataSource = StringUtil.extractFirst("${propertyName}"," ");
+			var dataSource = StringUtil.extractFirst("${propertyName}", " ");
 		}
 
 		task ("Add new users in DXP and sync the Contact Data") {
@@ -644,6 +648,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9022 | Test Summary: Search an Individual's Activities List"
 	@priority = "4"
 	test SearchIndividualsActivitiesList {
+		property portal.upstream = "quarantine";
+
 		task ("Create a Document And Media") {
 			ACUtils.createDMAndAddToPage();
 		}
@@ -782,8 +788,9 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9029 | Test Summary: Sort Individuals List"
 	@priority = "3"
 	test SortIndividualList {
-		var usernameList = "user1,user2,user3";
+		property portal.upstream = "quarantine";
 
+		var usernameList = "user1,user2,user3";
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
 
 		task ("Get site assigned property name") {
@@ -841,6 +848,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9030 | Test Summary: Sorting a List Returns a User to the First Page"
 	@priority = "3"
 	test SortingReturnsUserToFirstPage {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2,user3,user4,user5,user6,user7";
 
 		task ("Get site assigned property name") {
@@ -918,6 +927,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9031 | Test Summary: Table Pagination"
 	@priority = "4"
 	test TablePagination {
+		property portal.upstream = "quarantine";
+
 		var usernameList = "user1,user2,user3,user4,user5,user6";
 
 		task ("Get site assigned property name") {

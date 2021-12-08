@@ -14,47 +14,14 @@
 
 import {fetch} from 'frontend-js-web';
 
-import {EXPORT_PROCESS_COMPLETED, EXPORT_PROCESS_FAILED} from './constants';
-
-const HEADERS = new Headers({
-	'Accept': 'application/json',
-	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
-});
+import {HEADERS, HEADLESS_BATCH_ENGINE_URL} from './constants';
 
 export function getExportTaskStatusURL(taskId) {
-	return `/o/headless-batch-engine/v1.0/export-task/${taskId}`;
+	return `${HEADLESS_BATCH_ENGINE_URL}/export-task/${taskId}`;
 }
 
 export function getExportFileURL(taskId) {
-	return `/o/headless-batch-engine/v1.0/export-task/${taskId}/content`;
-}
-
-export async function saveTemplateAPI(formDataQuerySelector, updateData, url) {
-	const mainFormData = document.querySelector(formDataQuerySelector);
-	Liferay.Util.setFormValues(mainFormData, updateData);
-
-	const formData = new FormData(mainFormData);
-	const response = await fetch(url, {
-		body: formData,
-		headers: HEADERS,
-		method: 'POST',
-	});
-
-	return await response.json();
-}
-
-export async function startExport(formDataQuerySelector, url) {
-	const mainFormData = document.querySelector(formDataQuerySelector);
-
-	const formData = new FormData(mainFormData);
-
-	const response = await fetch(url, {
-		body: formData,
-		headers: HEADERS,
-		method: 'POST',
-	});
-
-	return await response.json();
+	return `${HEADLESS_BATCH_ENGINE_URL}/export-task/${taskId}/content`;
 }
 
 export async function exportStatus(exportTaskId) {
@@ -62,38 +29,11 @@ export async function exportStatus(exportTaskId) {
 		headers: HEADERS,
 	});
 
+	if (!response.ok) {
+		throw new Error(response);
+	}
+
 	return await response.json();
-}
-
-export async function getExportStatus({onFail, onProgress, onSuccess, taskId}) {
-	try {
-		const {
-			contentType,
-			errorMessage,
-			executeStatus,
-			processedItemsCount,
-			totalItemsCount,
-		} = await exportStatus(taskId);
-
-		switch (executeStatus) {
-			case EXPORT_PROCESS_FAILED:
-				onFail(
-					errorMessage || Liferay.Language.get('unexpected-error')
-				);
-				break;
-			case EXPORT_PROCESS_COMPLETED:
-				onSuccess(contentType);
-				break;
-			default:
-				onProgress(
-					contentType,
-					Math.round((processedItemsCount / totalItemsCount) * 100)
-				);
-		}
-	}
-	catch (error) {
-		onFail(Liferay.Language.get('unexpected-error'));
-	}
 }
 
 export async function fetchExportedFile(taskId) {

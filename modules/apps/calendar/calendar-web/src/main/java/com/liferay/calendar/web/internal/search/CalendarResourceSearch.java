@@ -21,12 +21,9 @@ import com.liferay.calendar.util.comparator.CalendarResourceNameComparator;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,41 +82,21 @@ public class CalendarResourceSearch extends SearchContainer<CalendarResource> {
 			String.valueOf(displayTerms.getScope()));
 
 		try {
-			PortalPreferences preferences =
-				PortletPreferencesFactoryUtil.getPortalPreferences(
-					portletRequest);
-
-			String orderByCol = ParamUtil.getString(
-				portletRequest, "orderByCol");
-			String orderByType = ParamUtil.getString(
-				portletRequest, "orderByType");
-
-			if (Validator.isNotNull(orderByCol) &&
-				Validator.isNotNull(orderByType)) {
-
-				preferences.setValue(
-					CalendarPortletKeys.CALENDAR,
-					"users-resources-order-by-col", orderByCol);
-				preferences.setValue(
-					CalendarPortletKeys.CALENDAR,
-					"users-resources-order-by-type", orderByType);
-			}
-			else {
-				orderByCol = preferences.getValue(
-					CalendarPortletKeys.CALENDAR,
-					"users-resources-order-by-col", "last-name");
-				orderByType = preferences.getValue(
-					CalendarPortletKeys.CALENDAR,
-					"users-resources-order-by-type", "asc");
-			}
-
-			OrderByComparator<CalendarResource> orderByComparator =
-				_getOrderByComparator(orderByCol, orderByType);
-
 			setOrderableHeaders(orderableHeaders);
+
+			String orderByCol = SearchOrderByUtil.getOrderByCol(
+				portletRequest, CalendarPortletKeys.CALENDAR,
+				"users-resources-order-by-col", "last-name");
+
 			setOrderByCol(orderByCol);
+
+			String orderByType = SearchOrderByUtil.getOrderByType(
+				portletRequest, CalendarPortletKeys.CALENDAR,
+				"users-resources-order-by-type", "asc");
+
+			setOrderByComparator(
+				_getOrderByComparator(orderByCol, orderByType));
 			setOrderByType(orderByType);
-			setOrderByComparator(orderByComparator);
 		}
 		catch (Exception exception) {
 			_log.error(

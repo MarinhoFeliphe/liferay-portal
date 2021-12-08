@@ -17,6 +17,7 @@ package com.liferay.saml.opensaml.integration.internal.resolver;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.saml.opensaml.integration.internal.metadata.MetadataManager;
 import com.liferay.saml.opensaml.integration.resolver.NameIdResolver;
@@ -54,10 +55,8 @@ public class DefaultNameIdResolver implements NameIdResolver {
 	protected String getNameIdValue(User user, String entityId) {
 		String nameIdAttributeName = getNameIdAttributeName(entityId);
 
-		String nameIdValue = user.getEmailAddress();
-
 		if (Validator.isNull(nameIdAttributeName)) {
-			return nameIdValue;
+			return user.getEmailAddress();
 		}
 
 		if (nameIdAttributeName.startsWith("expando:")) {
@@ -65,18 +64,16 @@ public class DefaultNameIdResolver implements NameIdResolver {
 
 			ExpandoBridge expandoBridge = user.getExpandoBridge();
 
-			nameIdValue = String.valueOf(
+			return GetterUtil.getString(
 				expandoBridge.getAttribute(attributeName));
 		}
-		else if (nameIdAttributeName.startsWith("static:")) {
-			nameIdValue = nameIdAttributeName.substring(7);
-		}
-		else {
-			nameIdValue = String.valueOf(
-				BeanPropertiesUtil.getObject(user, nameIdAttributeName));
+
+		if (nameIdAttributeName.startsWith("static:")) {
+			return nameIdAttributeName.substring(7);
 		}
 
-		return nameIdValue;
+		return GetterUtil.getString(
+			BeanPropertiesUtil.getObject(user, nameIdAttributeName));
 	}
 
 	private MetadataManager _metadataManager;

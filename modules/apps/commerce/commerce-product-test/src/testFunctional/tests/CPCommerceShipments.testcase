@@ -144,8 +144,8 @@ definition {
 		Refresh();
 
 		for (var column : list "2-${orderId},3-Italy,4-0,5-1") {
-			key_columnNumber = StringUtil.extractFirst("${column}","-");
-			var currentValue = StringUtil.extractLast("${column}","-");
+			var key_columnNumber = StringUtil.extractFirst("${column}", "-");
+			var currentValue = StringUtil.extractLast("${column}", "-");
 
 			AssertTextEquals(
 				key_entryName = "MIN55861",
@@ -157,7 +157,7 @@ definition {
 	@description = "This is a test for COMMERCE-6248. It should not be possible to add non-shippable items to a shipment"
 	@priority = "3"
 	test AssertAddingNonShippableItemToShipmentNotPossible {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
 
@@ -253,7 +253,7 @@ definition {
 	@description = "This is a test for COMMERCE-6249. Shipment items should be taken only from active warehouses"
 	@priority = "3"
 	test AssertShipmentItemTakenFromActiveWarehouses {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -678,7 +678,7 @@ definition {
 	@description = "This is a test for COMMERCE-6250. Delete shipment"
 	@priority = "3"
 	test DeleteShipment {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -921,6 +921,7 @@ definition {
 	@description = "This is a test for COMMERCE-6240. Remove shipment items from a shipment"
 	@priority = "3"
 	test RemoveItemFromShipment {
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -1173,7 +1174,7 @@ definition {
 		for (var search : list "${ship1Id},${ship2Id},account1,account2") {
 			CommerceNavigator.searchEntry(entryName = "${search}");
 
-			if ("${search}" == "account1" || "${search}" == "${ship1Id}") {
+			if (("${search}" == "account1") || ("${search}" == "${ship1Id}")) {
 				AssertElementPresent(
 					key_entryName = "${ship1Id}",
 					locator1 = "CommerceNavigation#ENTRY_NAME");
@@ -1350,6 +1351,7 @@ definition {
 	@description = "This is a test for COMMERCE-6239. Update shipment items to a shipment"
 	@priority = "3"
 	test UpdateShipmentItems {
+		property portal.acceptance = "false";
 
 		// TODO Review
 
@@ -1500,8 +1502,8 @@ definition {
 		Refresh();
 
 		for (var column : list "3;United States - Southwest,5;1") {
-			key_columnNumber = StringUtil.extractFirst("${column}",";");
-			var currentValue = StringUtil.extractLast("${column}",";");
+			var key_columnNumber = StringUtil.extractFirst("${column}", ";");
+			var currentValue = StringUtil.extractLast("${column}", ";");
 
 			AssertTextEquals(
 				key_entryName = "MIN55861",
@@ -1731,7 +1733,7 @@ definition {
 	@description = "This is a test for COMMERCE-6246. Check that shipping discount amount is correctly calculated in the order"
 	@priority = "3"
 	test ViewOrderShipmentDiscountAmountIsCorrect {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 

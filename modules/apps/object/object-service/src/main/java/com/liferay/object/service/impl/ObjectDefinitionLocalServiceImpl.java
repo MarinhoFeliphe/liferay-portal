@@ -48,6 +48,9 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -56,6 +59,7 @@ import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -75,6 +79,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.search.batch.DynamicQueryBatchIndexingActionableFactory;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchRegistrarHelper;
@@ -524,8 +529,8 @@ public class ObjectDefinitionLocalServiceImpl
 			Long objectDefinitionId, long descriptionObjectFieldId,
 			long titleObjectFieldId, boolean active,
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
-			String scope)
+			String panelCategoryKey, boolean portlet,
+			Map<Locale, String> pluralLabelMap, String scope)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
@@ -538,8 +543,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return _updateObjectDefinition(
 			objectDefinition, descriptionObjectFieldId, titleObjectFieldId,
-			active, null, labelMap, name, panelAppOrder, panelCategoryKey, null,
-			null, pluralLabelMap, scope);
+			active, null, labelMap, name, panelAppOrder, panelCategoryKey,
+			portlet, null, null, pluralLabelMap, scope);
 	}
 
 	@Activate
@@ -802,9 +807,9 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition objectDefinition, long descriptionObjectFieldId,
 			long titleObjectFieldId, boolean active, String dbTableName,
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, String pkObjectFieldDBColumnName,
-			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
-			String scope)
+			String panelCategoryKey, boolean portlet,
+			String pkObjectFieldDBColumnName, String pkObjectFieldName,
+			Map<Locale, String> pluralLabelMap, String scope)
 		throws PortalException {
 
 		boolean originalActive = objectDefinition.isActive();
@@ -818,9 +823,10 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setDescriptionObjectFieldId(descriptionObjectFieldId);
 		objectDefinition.setTitleObjectFieldId(titleObjectFieldId);
 		objectDefinition.setActive(active);
+		objectDefinition.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectDefinition.setPanelAppOrder(panelAppOrder);
 		objectDefinition.setPanelCategoryKey(panelCategoryKey);
-		objectDefinition.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+		objectDefinition.setPortlet(portlet);
 		objectDefinition.setPluralLabelMap(pluralLabelMap);
 
 		if (objectDefinition.isApproved()) {
@@ -831,6 +837,10 @@ public class ObjectDefinitionLocalServiceImpl
 			else if (active) {
 				objectDefinitionLocalService.deployObjectDefinition(
 					objectDefinition);
+			}
+
+			if (active != originalActive) {
+				_updateWorkflowInstances(objectDefinition);
 			}
 
 			return objectDefinitionPersistence.update(objectDefinition);
@@ -864,6 +874,48 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setScope(scope);
 
 		return objectDefinitionPersistence.update(objectDefinition);
+	}
+
+	private void _updateWorkflowInstances(ObjectDefinition objectDefinition)
+		throws PortalException {
+
+		ActionableDynamicQuery actionableDynamicQuery =
+			_objectEntryLocalService.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> {
+				Property objectDefinitionIdProperty =
+					PropertyFactoryUtil.forName("objectDefinitionId");
+
+				dynamicQuery.add(
+					objectDefinitionIdProperty.eq(
+						objectDefinition.getObjectDefinitionId()));
+
+				Property statusProperty = PropertyFactoryUtil.forName("status");
+
+				dynamicQuery.add(
+					statusProperty.ne(WorkflowConstants.STATUS_APPROVED));
+			});
+		actionableDynamicQuery.setParallel(true);
+		actionableDynamicQuery.setPerformActionMethod(
+			(ObjectEntry objectEntry) -> {
+				WorkflowInstanceLink workflowInstanceLink =
+					_workflowInstanceLinkLocalService.fetchWorkflowInstanceLink(
+						objectEntry.getCompanyId(),
+						objectEntry.getNonzeroGroupId(),
+						objectDefinition.getClassName(),
+						objectEntry.getObjectEntryId());
+
+				if (workflowInstanceLink != null) {
+					_workflowInstanceManager.updateActive(
+						objectDefinition.getUserId(),
+						objectDefinition.getCompanyId(),
+						workflowInstanceLink.getWorkflowInstanceId(),
+						objectDefinition.isActive());
+				}
+			});
+
+		actionableDynamicQuery.performActions();
 	}
 
 	private void _validateActive(
@@ -1088,6 +1140,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
+
+	@Reference
+	private WorkflowInstanceManager _workflowInstanceManager;
 
 	@Reference(target = "(model.pre.filter.contributor.id=WorkflowStatus)")
 	private ModelPreFilterContributor _workflowStatusModelPreFilterContributor;

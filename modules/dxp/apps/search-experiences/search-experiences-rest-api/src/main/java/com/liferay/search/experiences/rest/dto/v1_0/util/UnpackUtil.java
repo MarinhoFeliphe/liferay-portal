@@ -18,7 +18,9 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -27,6 +29,10 @@ import java.util.Map;
 public class UnpackUtil {
 
 	public static Object unpack(Object value) {
+		if (value instanceof Collection) {
+			return JSONFactoryUtil.createJSONArray((Collection<?>)value);
+		}
+
 		if (value instanceof Map) {
 			return JSONFactoryUtil.createJSONObject((Map<?, ?>)value);
 		}
@@ -36,6 +42,10 @@ public class UnpackUtil {
 		}
 
 		if (value instanceof String) {
+			if (Validator.isNull((String)value)) {
+				return value;
+			}
+
 			try {
 				return JSONFactoryUtil.createJSONObject((String)value);
 			}

@@ -14,6 +14,10 @@
 
 package com.liferay.commerce.product.internal.data.source;
 
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.constants.CommerceWebKeys;
+import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPQuery;
 import com.liferay.commerce.product.configuration.CPDefinitionLinkTypeConfiguration;
@@ -84,6 +88,23 @@ public class CPDataSourceDefinitionLinkTypeImpl implements CPDataSource {
 			HashMapBuilder.<String, Serializable>put(
 				Field.STATUS, WorkflowConstants.STATUS_APPROVED
 			).put(
+				"commerceAccountGroupIds",
+				() -> {
+					CommerceContext commerceContext =
+						(CommerceContext)httpServletRequest.getAttribute(
+							CommerceWebKeys.COMMERCE_CONTEXT);
+
+					CommerceAccount commerceAccount =
+						commerceContext.getCommerceAccount();
+
+					if (commerceAccount == null) {
+						return null;
+					}
+
+					return _commerceAccountHelper.getCommerceAccountGroupIds(
+						commerceAccount.getCommerceAccountId());
+				}
+			).put(
 				"definitionLinkCPDefinitionId",
 				cpCatalogEntry.getCPDefinitionId()
 			).put(
@@ -105,6 +126,9 @@ public class CPDataSourceDefinitionLinkTypeImpl implements CPDataSource {
 			ConfigurableUtil.createConfigurable(
 				CPDefinitionLinkTypeConfiguration.class, properties);
 	}
+
+	@Reference
+	private CommerceAccountHelper _commerceAccountHelper;
 
 	@Reference
 	private CPDefinitionHelper _cpDefinitionHelper;

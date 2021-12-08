@@ -21,10 +21,13 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.highlight.FieldConfig;
+import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.internal.aggregation.AggregationsImpl;
 import com.liferay.portal.search.internal.filter.ComplexQueryPartBuilderFactoryImpl;
 import com.liferay.portal.search.internal.geolocation.GeoBuildersImpl;
@@ -45,12 +48,17 @@ import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterDataCreator;
+import com.liferay.search.experiences.rest.dto.v1_0.AdvancedConfiguration;
+import com.liferay.search.experiences.rest.dto.v1_0.AggregationConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
-import com.liferay.search.experiences.rest.dto.v1_0.Highlight;
+import com.liferay.search.experiences.rest.dto.v1_0.GeneralConfiguration;
+import com.liferay.search.experiences.rest.dto.v1_0.HighlightConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.HighlightField;
 import com.liferay.search.experiences.rest.dto.v1_0.Parameter;
+import com.liferay.search.experiences.rest.dto.v1_0.ParameterConfiguration;
+import com.liferay.search.experiences.rest.dto.v1_0.QueryConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
-import com.liferay.search.experiences.rest.dto.v1_0.ValueDefinition;
+import com.liferay.search.experiences.rest.dto.v1_0.SortConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
 
 import java.io.InputStream;
@@ -143,7 +151,37 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 	}
 
 	@Test
-	public void testHighlight() throws Exception {
+	public void testEmptyConfigurations() throws Exception {
+		SXPBlueprint sxpBlueprint = _createSXPBlueprint();
+
+		Configuration configuration = sxpBlueprint.getConfiguration();
+
+		configuration.setAdvancedConfiguration(new AdvancedConfiguration());
+		configuration.setAggregationConfiguration(
+			new AggregationConfiguration());
+		configuration.setGeneralConfiguration(new GeneralConfiguration());
+		configuration.setHighlightConfiguration(new HighlightConfiguration());
+		configuration.setParameterConfiguration(new ParameterConfiguration());
+		configuration.setQueryConfiguration(new QueryConfiguration());
+		configuration.setSortConfiguration(new SortConfiguration());
+
+		SearchRequest searchRequest = _toSearchRequest(sxpBlueprint);
+
+		Assert.assertTrue(MapUtil.isEmpty(searchRequest.getAggregationsMap()));
+		Assert.assertTrue(
+			ListUtil.isEmpty(searchRequest.getComplexQueryParts()));
+
+		Highlight highlight = searchRequest.getHighlight();
+
+		Assert.assertTrue(ListUtil.isEmpty(highlight.getFieldConfigs()));
+
+		Assert.assertTrue(ListUtil.isEmpty(searchRequest.getSorts()));
+
+		_assert(sxpBlueprint);
+	}
+
+	@Test
+	public void testHighlightConfiguration() throws Exception {
 		SXPBlueprint sxpBlueprint = _createSXPBlueprint();
 
 		Configuration configuration = sxpBlueprint.getConfiguration();
@@ -152,8 +190,8 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 		String[] postTags = {RandomTestUtil.randomString()};
 		String[] preTags = {RandomTestUtil.randomString()};
 
-		configuration.setHighlight(
-			new Highlight() {
+		configuration.setHighlightConfiguration(
+			new HighlightConfiguration() {
 				{
 					fields = HashMapBuilder.<String, HighlightField>put(
 						RandomTestUtil.randomString(),
@@ -170,8 +208,7 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 
 		SearchRequest searchRequest = _toSearchRequest(sxpBlueprint);
 
-		com.liferay.portal.search.highlight.Highlight highlight =
-			searchRequest.getHighlight();
+		Highlight highlight = searchRequest.getHighlight();
 
 		List<FieldConfig> fieldConfigs = highlight.getFieldConfigs();
 
@@ -187,28 +224,27 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 	}
 
 	@Test
-	public void testParameters() throws Exception {
+	public void testParameterConfiguration() throws Exception {
 		SXPBlueprint sxpBlueprint = _createSXPBlueprint();
 
 		Configuration configuration = sxpBlueprint.getConfiguration();
 
-		configuration.setParameters(
-			HashMapBuilder.put(
-				RandomTestUtil.randomString(),
-				() -> {
-					Parameter parameter = new Parameter();
+		configuration.setParameterConfiguration(
+			new ParameterConfiguration() {
+				{
+					parameters = HashMapBuilder.put(
+						RandomTestUtil.randomString(),
+						() -> {
+							Parameter parameter = new Parameter();
 
-					parameter.setValueDefinition(
-						new ValueDefinition() {
-							{
-								setDefaultValueString(
-									RandomTestUtil.randomString());
-							}
-						});
+							parameter.setDefaultValue(
+								RandomTestUtil.randomString());
 
-					return parameter;
+							return parameter;
+						}
+					).build();
 				}
-			).build());
+			});
 
 		SearchRequest searchRequest = _toSearchRequest(sxpBlueprint);
 

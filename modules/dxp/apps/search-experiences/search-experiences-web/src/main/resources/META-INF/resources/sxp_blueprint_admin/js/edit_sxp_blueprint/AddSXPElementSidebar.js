@@ -28,7 +28,7 @@ import React, {
 import SearchInput from '../shared/SearchInput';
 import ThemeContext from '../shared/ThemeContext';
 import {CUSTOM_JSON_SXP_ELEMENT, DEFAULT_SXP_ELEMENT_ICON} from '../utils/data';
-import {fetchData} from '../utils/fetch';
+import {addParams, fetchData} from '../utils/fetch';
 import {getLocalizedText} from '../utils/language';
 
 const DEFAULT_CATEGORY = 'other';
@@ -290,9 +290,13 @@ function AddSXPElementSidebar(props) {
 	const {defaultLocale} = useContext(ThemeContext);
 	const [querySXPElements, setQuerySXPElements] = useState(null);
 
+	// TODO check pagesize
+
 	useEffect(() => {
 		fetchData(
-			'/o/search-experiences-rest/v1.0/sxp-elements',
+			addParams('/o/search-experiences-rest/v1.0/sxp-elements', {
+				pageSize: 200,
+			}),
 			{method: 'GET'},
 			(responseContent) =>
 				setQuerySXPElements(

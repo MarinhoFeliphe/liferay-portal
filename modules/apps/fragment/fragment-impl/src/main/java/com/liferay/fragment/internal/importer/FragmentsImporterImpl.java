@@ -87,26 +87,6 @@ import org.osgi.service.component.annotations.Reference;
 public class FragmentsImporterImpl implements FragmentsImporter {
 
 	@Override
-	public List<String> importFile(
-			long userId, long groupId, long fragmentCollectionId, File file,
-			boolean overwrite)
-		throws Exception {
-
-		List<FragmentsImporterResultEntry> fragmentsImporterResultEntries =
-			importFragmentEntries(
-				userId, groupId, fragmentCollectionId, file, overwrite);
-
-		Stream<FragmentsImporterResultEntry> stream =
-			fragmentsImporterResultEntries.stream();
-
-		return stream.map(
-			FragmentsImporterResultEntry::getName
-		).collect(
-			Collectors.toList()
-		);
-	}
-
-	@Override
 	public List<FragmentsImporterResultEntry> importFragmentEntries(
 			long userId, long groupId, long fragmentCollectionId, File file,
 			boolean overwrite)
@@ -153,7 +133,8 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 				_importResources(
 					userId, groupId,
 					fragmentCollection.getFragmentCollectionId(),
-					fragmentCollection.getResourcesFolderId(), zipFile);
+					fragmentCollection.getResourcesFolderId(), entry.getKey(),
+					zipFile);
 
 				_importFragmentCompositions(
 					userId, groupId, zipFile,
@@ -240,8 +221,8 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 	private FragmentEntry _addFragmentEntry(
 			long fragmentCollectionId, String fragmentEntryKey, String name,
 			String css, String html, String js, boolean cacheable,
-			String configuration, boolean readOnly, String typeLabel,
-			boolean overwrite)
+			String configuration, String icon, boolean readOnly,
+			String typeLabel, boolean overwrite)
 		throws Exception {
 
 		FragmentCollection fragmentCollection =
@@ -290,13 +271,13 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 				fragmentEntry = _fragmentEntryService.addFragmentEntry(
 					fragmentCollection.getGroupId(), fragmentCollectionId,
 					fragmentEntryKey, name, css, html, js, cacheable,
-					configuration, 0, type, status,
+					configuration, icon, 0, type, status,
 					ServiceContextThreadLocal.getServiceContext());
 			}
 			else {
 				fragmentEntry = _fragmentEntryService.updateFragmentEntry(
 					fragmentEntry.getFragmentEntryId(), fragmentCollectionId,
-					name, css, html, js, cacheable, configuration,
+					name, css, html, js, cacheable, configuration, icon,
 					fragmentEntry.getPreviewFileEntryId(), status);
 			}
 
@@ -707,6 +688,7 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 			String js = StringPool.BLANK;
 			boolean cacheable = false;
 			String configuration = StringPool.BLANK;
+			String icon = StringPool.BLANK;
 			boolean readOnly = false;
 			String typeLabel = StringPool.BLANK;
 
@@ -729,12 +711,13 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 					zipFile, entry.getValue(),
 					jsonObject.getString("configurationPath"));
 				readOnly = jsonObject.getBoolean("readOnly");
+				icon = jsonObject.getString("icon");
 				typeLabel = jsonObject.getString("type");
 			}
 
 			FragmentEntry fragmentEntry = _addFragmentEntry(
 				fragmentCollectionId, entry.getKey(), name, css, html, js,
-				cacheable, configuration, readOnly, typeLabel, overwrite);
+				cacheable, configuration, icon, readOnly, typeLabel, overwrite);
 
 			if (fragmentEntry == null) {
 				continue;
@@ -766,7 +749,7 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 
 	private void _importResources(
 			long userId, long groupId, long fragmentCollectionId, long folderId,
-			ZipFile zipFile)
+			String fragmentCollectionKey, ZipFile zipFile)
 		throws Exception {
 
 		Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
@@ -810,6 +793,7 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 							path + jsonObject.getString("configuration"),
 							path + jsonObject.getString("cssPath"),
 							path + jsonObject.getString("htmlPath"),
+							path + jsonObject.getString("icon"),
 							path + jsonObject.getString("jsPath"),
 							path + jsonObject.getString("thumbnailPath")
 						});
@@ -832,8 +816,11 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 			String[] paths = StringUtil.split(
 				zipEntry.getName(), StringPool.FORWARD_SLASH);
 
+			String fileName = zipEntry.getName();
+
 			if (!ArrayUtil.contains(paths, "resources") ||
-				excludePaths.contains(zipEntry.getName())) {
+				excludePaths.contains(zipEntry.getName()) ||
+				!fileName.contains(fragmentCollectionKey)) {
 
 				continue;
 			}

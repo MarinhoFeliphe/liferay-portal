@@ -111,6 +111,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>DISABLED_TAB_TYPE_RELATIONSHIPS</td>
+		<td>//div[@class = 'layout-tab__tab-types disabled']//h4[@class = 'layout-tab__tab-types__title' and contains(text(),'Relationships')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>OBJECT_NAME</td>
 		<td>//div[(@class='table-list-title') and contains(.,'${key_labelName}')]</td>
 		<td></td>
@@ -123,6 +128,11 @@
 	<tr>
 		<td>KEBAB_MENU_BLOCK_FIELD_OPTION_DELETE</td>
 		<td>xpath=(//button[(@class='dropdown-item') and contains(text(),'Delete')])[3]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD</td>
+		<td>//button[contains(@class,'collapse-icon collapse-icon-middle panel-header panel-header-link')]</td>
 		<td></td>
 	</tr>
 </tbody>

@@ -182,9 +182,8 @@ definition {
 				pageName = "Content Page Name",
 				siteName = "Test Site Name");
 
-			var screenWidth	= selenium.getElementWidth("//body");
-
-			var containerWidth	= selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]");
+			var screenWidth = selenium.getElementWidth("//body");
+			var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-4')][contains(@class,'pt-2')]");
 
 			TestUtils.assertNotEquals(
 				actual = "${containerWidth}",
@@ -563,10 +562,10 @@ definition {
 				locator1 = "ControlMenu#HEADING",
 				value1 = "Display Page Name");
 
-			AssertVisible(
-				key_assetContent = "Web Content Content",
-				key_assetTitle = "Web Content Title",
-				locator1 = "PageEditor#ASSET_CONTENT");
+			ContentPages.viewFragmentText(
+				assetType = "journal",
+				fragmentName = "Display Page Content",
+				text = "Web Content Content");
 		}
 	}
 

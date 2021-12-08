@@ -203,6 +203,16 @@ definition {
 			value1 = "INFO:Comments are unavailable in staged sites.");
 	}
 
+	macro viewNoActions {
+		Click.mouseOverClick(
+			key_entryComment = "${entryComment}",
+			locator1 = "Comments#COMMENT_BODY_SPECIFIC");
+
+		AssertElementNotPresent(
+			key_entryComment = "${entryComment}",
+			locator1 = "Comments#COMMENT_ACTIONS");
+	}
+
 	macro viewNoComments {
 		AssertElementNotPresent(
 			locator1 = "Comments#ENTRY_COUNT_PANEL",
@@ -237,7 +247,6 @@ definition {
 				locator1 = "Comments#ENTRY_COUNT_PANEL",
 				value1 = "${commentCount} COMMENT");
 		}
-
 		else {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Comments#ENTRY_COUNT_PANEL",
@@ -252,7 +261,6 @@ definition {
 
 			AssertElementPresent(locator1 = "Comments#COMMENT_BODY");
 		}
-
 		else {
 			var key_userFullName = "${userFullName}";
 

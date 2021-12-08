@@ -29,10 +29,10 @@ import {
 	getExportTaskStatusURL,
 } from '../../../src/main/resources/META-INF/resources/js/BatchPlannerExport';
 import {
-	EXPORT_POLL_INTERVAL,
-	EXPORT_PROCESS_COMPLETED,
-	EXPORT_PROCESS_FAILED,
-	EXPORT_PROCESS_STARTED,
+	POLL_INTERVAL,
+	PROCESS_COMPLETED,
+	PROCESS_FAILED,
+	PROCESS_STARTED,
 } from '../../../src/main/resources/META-INF/resources/js/constants';
 import Export from '../../../src/main/resources/META-INF/resources/js/export/Export';
 
@@ -149,7 +149,7 @@ describe('Export', () => {
 				contentType: 'CSV',
 				endTime: null,
 				errorMessage: null,
-				executeStatus: EXPORT_PROCESS_STARTED,
+				executeStatus: PROCESS_STARTED,
 				id: mockTaskID,
 				processedItemsCount: 25,
 				startTime: '2021-11-10T10:36:08Z',
@@ -164,7 +164,7 @@ describe('Export', () => {
 		});
 
 		await wait(() => {
-			jest.advanceTimersByTime(EXPORT_POLL_INTERVAL);
+			jest.advanceTimersByTime(POLL_INTERVAL);
 			expect(getByText('50%')).toBeInTheDocument();
 		});
 
@@ -189,7 +189,7 @@ describe('Export', () => {
 					contentType: 'CSV',
 					endTime: null,
 					errorMessage: error,
-					executeStatus: EXPORT_PROCESS_FAILED,
+					executeStatus: PROCESS_FAILED,
 					id: mockTaskID,
 					processedItemsCount: 25,
 					startTime: '2021-11-10T10:36:08Z',
@@ -204,7 +204,7 @@ describe('Export', () => {
 		});
 
 		await wait(() => {
-			jest.advanceTimersByTime(EXPORT_POLL_INTERVAL);
+			jest.advanceTimersByTime(POLL_INTERVAL);
 			expect(getByText(error)).toBeInTheDocument();
 		});
 
@@ -224,7 +224,7 @@ describe('Export', () => {
 				contentType: 'CSV',
 				endTime: null,
 				errorMessage: null,
-				executeStatus: EXPORT_PROCESS_COMPLETED,
+				executeStatus: PROCESS_COMPLETED,
 				id: mockTaskID,
 				processedItemsCount: 50,
 				startTime: '2021-11-10T10:36:08Z',
@@ -239,7 +239,7 @@ describe('Export', () => {
 		});
 
 		await wait(() => {
-			jest.advanceTimersByTime(EXPORT_POLL_INTERVAL);
+			jest.advanceTimersByTime(POLL_INTERVAL);
 			expect(
 				getByText(Liferay.Language.get('download'), {
 					selector: 'button',
@@ -263,7 +263,7 @@ describe('Export', () => {
 				contentType: 'CSV',
 				endTime: null,
 				errorMessage: null,
-				executeStatus: EXPORT_PROCESS_COMPLETED,
+				executeStatus: PROCESS_COMPLETED,
 				id: mockTaskID,
 				processedItemsCount: 50,
 				startTime: '2021-11-10T10:36:08Z',
@@ -278,7 +278,7 @@ describe('Export', () => {
 		});
 
 		await wait(() => {
-			jest.advanceTimersByTime(EXPORT_POLL_INTERVAL);
+			jest.advanceTimersByTime(POLL_INTERVAL);
 
 			getByText(Liferay.Language.get('download'), {
 				selector: 'button',

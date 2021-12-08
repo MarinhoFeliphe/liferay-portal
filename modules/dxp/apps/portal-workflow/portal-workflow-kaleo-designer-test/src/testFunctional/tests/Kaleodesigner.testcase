@@ -425,6 +425,51 @@ definition {
 		KaleoDesigner.deleteNode(nodeNodeLabel = "Task");
 	}
 
+	@description = "This is a use case for LPS-124984."
+	@priority = "5"
+	test AssertReceiveNotificationAfterEditSingleApprover {
+		property test.name.skip.portal.instance = "Kaleodesigner#AssertReceiveNotificationAfterEditSingleApprover";
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Workflow",
+			panel = "Applications",
+			portlet = "Process Builder");
+
+		Workflow.gotoEditWorkflowDefinition(workflowDefinitionTitle = "Single Approver");
+
+		KaleoDesigner.selectNode(nodeNodeLabel = "review");
+
+		KaleoDesigner.removeAllNodeAssignments();
+
+		KaleoDesigner.editNodeAssignments(
+			autoCreate = "true",
+			nodeAssignmentType = "Role Type",
+			roleName = "Portal Content Reviewer",
+			roleType = "Regular");
+
+		Navigator.gotoBack();
+
+		Navigator.gotoNavItem(navItem = "Configuration");
+
+		Workflow.configureWorkflow(
+			workflowDefinition = "Single Approver",
+			workflowResourceValue = "Blogs Entry");
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			portlet = "Blogs");
+
+		Blogs.addWithWorkflow(
+			entryContent = "Blog Content",
+			entryTitle = "Blog Title");
+
+		Notifications.gotoNotifications();
+
+		Notifications.viewNoNotificationEntry();
+	}
+
 	@description = "This is a use case for LPS-37209."
 	@priority = "4"
 	test ConfigureTaskTimersViaSourceTab {
@@ -792,6 +837,7 @@ definition {
 
 	@priority = "3"
 	test PublishWorkflowDefinitionWithInvalidConditionNodeAndViewErrorMessage {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "Kaleodesigner#PublishWorkflowDefinitionWithInvalidConditionNodeAndViewErrorMessage";
 
 		ApplicationsMenu.gotoPortlet(
@@ -814,6 +860,7 @@ definition {
 
 	@priority = "3"
 	test PublishWorkflowDefinitionWithInvalidConditionNodeSettingsAndViewErrorMessage {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "Kaleodesigner#PublishWorkflowDefinitionWithInvalidConditionNodeSettingsAndViewErrorMessage";
 
 		var nodeScript = '''
@@ -1294,7 +1341,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.addFieldSet(

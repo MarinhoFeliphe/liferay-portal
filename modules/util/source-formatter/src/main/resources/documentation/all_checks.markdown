@@ -145,6 +145,7 @@ JSPTagAttributesCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prev
 [JSPTaglibVariableCheck](checks/jsp_taglib_variable_check.markdown#jsptaglibvariablecheck) | [Naming Conventions](naming_conventions_checks.markdown#naming-conventions-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks if variable names follow naming conventions. |
 [JSPUnusedJSPFCheck](checks/jsp_unused_jspf_check.markdown#jspunusedjspfcheck) | [Performance](performance_checks.markdown#performance-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds `.jspf` files that are not used. |
 JSPUnusedTermsCheck | [Performance](performance_checks.markdown#performance-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds taglibs, variables and imports that are unused. |
+JSPUpgradeRemovedTagsCheck | [Upgrade](upgrade_checks.markdown#upgrade-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds removed tags when upgrading. |
 JSPVarNameCheck | [Styling](styling_checks.markdown#styling-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks that values of attribute `var` follow naming conventions. |
 JSPVariableOrderCheck | [Styling](styling_checks.markdown#styling-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks if variable names are in alphabetical order. |
 JSPWhitespaceCheck | [Styling](styling_checks.markdown#styling-checks) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds missing and unnecessary whitespace in `.jsp` files. |
@@ -319,14 +320,8 @@ PersistenceCallCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-preve
 [PersistenceUpdateCheck](checks/persistence_update_check.markdown#persistenceupdatecheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .java | Checks that there are no stale references in service code from persistence updates. |
 PlusStatementCheck | [Styling](styling_checks.markdown#styling-checks) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Performs several checks to statements where `+` is used for concatenation. |
 [PortletURLBuilderCheck](checks/builder_check.markdown#buildercheck) | [Miscellaneous](miscellaneous_checks.markdown#miscellaneous-checks) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks that `PortletURLBuilder` is used when possible. |
-PoshiAnnotationsOrderCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Checks the order of annotations. |
-PoshiCommandsOrderCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Checks the order of poshi commands. |
 PoshiDependenciesFileLocationCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .function, .macro or .testcase | Checks that dependencies files are located in the correct directory. |
-PoshiEmptyLinesCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Finds missing and unnecessary empty lines. |
-PoshiIndentationCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Finds incorrect indentation in poshi files. |
-PoshiParametersOrderCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Checks the order of parameters in `.function` and `.macro` files. |
 PoshiStylingCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Applies rules to enforce consisteny in code style. |
-PoshiWhitespaceCheck | [Styling](styling_checks.markdown#styling-checks) | .function, .macro or .testcase | Finds missing and unnecessary whitespace in poshi files. |
 PrimitiveWrapperInstantiationCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds cases where `new Type` is used for primitive types (use `Type.valueOf` instead). |
 PrincipalExceptionCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds calls to `PrincipalException.class.getName()` (use `PrincipalException.getNestedClasses()` instead). |
 PropertiesArchivedModulesCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Finds `test.batch.class.names.includes` property value pointing to archived modules in `test.properties`. |

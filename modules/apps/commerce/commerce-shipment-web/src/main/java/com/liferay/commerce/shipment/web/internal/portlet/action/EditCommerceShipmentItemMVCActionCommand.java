@@ -240,6 +240,13 @@ public class EditCommerceShipmentItemMVCActionCommand
 					_commerceShipmentItemService.updateCommerceShipmentItem(
 						commerceShipmentItem.getCommerceShipmentItemId(),
 						commerceInventoryWarehouseId, quantity);
+
+				if (quantity == 0) {
+					commerceShipmentItem =
+						_commerceShipmentItemService.updateCommerceShipmentItem(
+							commerceShipmentItem.getCommerceShipmentItemId(), 0,
+							quantity);
+				}
 			}
 		}
 

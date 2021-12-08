@@ -14,6 +14,7 @@
 
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import ClayModal from '@clayui/modal';
 import {openToast} from 'frontend-js-web';
 import PropTypes from 'prop-types';
@@ -27,6 +28,9 @@ import FormField from './FormField';
 
 const CreateLayoutPageTemplateEntryModal = ({observer, onClose}) => {
 	const [error, setError] = useState(null);
+	const hasMultipleSegmentsExperienceIds = useSelector(
+		(state) => Object.keys(state.availableSegmentsExperiences).length > 1
+	);
 	const [
 		layoutPageTemplateCollections,
 		setLayoutPageTemplateCollections,
@@ -140,6 +144,20 @@ const CreateLayoutPageTemplateEntryModal = ({observer, onClose}) => {
 					</ClayAlert>
 				)}
 
+				{hasMultipleSegmentsExperienceIds && (
+					<div className="form-feedback-group mb-3">
+						<div className="form-feedback-item text-info">
+							<ClayIcon className="mr-2" symbol="info-circle" />
+
+							<span>
+								{Liferay.Language.get(
+									'the-page-template-is-based-on-the-current-experience'
+								)}
+							</span>
+						</div>
+					</div>
+				)}
+
 				<form onSubmit={handleSubmit}>
 					<FormField
 						error={error && error.name}
@@ -215,7 +233,7 @@ const CreateLayoutPageTemplateEntryModal = ({observer, onClose}) => {
 								</span>
 							)}
 
-							{Liferay.Language.get('save')}
+							{Liferay.Language.get('create')}
 						</ClayButton>
 					</ClayButton.Group>
 				}

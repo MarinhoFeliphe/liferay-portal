@@ -70,7 +70,7 @@ definition {
 	@description = "COMMERCE-6326. As a buyer, I want to be able to search an entry in All Content using Global Search and the results should be visible on Search page"
 	@priority = "3"
 	test GlobalSearchSearchEntryInAllContent {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -177,6 +177,7 @@ definition {
 		AssertElementPresent(
 			key_errorMessage = "Exhaust Clamps",
 			locator1 = "WorkflowMetricsSLA#SLA_ERROR_MESSAGE");
+
 		AssertElementPresent(
 			key_errorMessage = "Catalytic Converters",
 			locator1 = "WorkflowMetricsSLA#SLA_ERROR_MESSAGE");
@@ -198,6 +199,7 @@ definition {
 		AssertElementPresent(
 			key_errorMessage = "Exhaust Clamps",
 			locator1 = "WorkflowMetricsSLA#SLA_ERROR_MESSAGE");
+
 		AssertElementPresent(
 			key_errorMessage = "Catalytic Converters",
 			locator1 = "WorkflowMetricsSLA#SLA_ERROR_MESSAGE");
@@ -210,7 +212,7 @@ definition {
 	@description = "COMMERCE-6327. As a buyer, I want to search for different products by typing their SKUs in the Global Search and I want to see the products with that SKUs in the suggestions(single SKU, multiple SKUs)"
 	@priority = "3"
 	test GlobalSearchSearchProductsBySKUs {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -456,7 +458,7 @@ definition {
 	@description = "COMMERCE-6148. As a buyer, I want to search a product by its name using the Search Bar widget and I want the results to be visible on the Search Results widget"
 	@priority = "3"
 	test SearchBarWidgetSearchProductByName {
-		property portal.acceptance = "Intern Test";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -574,7 +576,7 @@ definition {
 	@description = "COMMERCE-6155. As a buyer, I want to search for products by typing a Category in Search Bar widget and the results should be visible on Search Results widget"
 	@priority = "3"
 	test SearchBarWidgetSearchProductsByCategory {
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		// TODO Review
 
@@ -775,13 +777,13 @@ definition {
 
 			WaitForElementPresent(locator1 = "CommerceFrontStore#FS_PRODUCT_NAME");
 
-			curr_productNamePage1 = selenium.getText("CommerceFrontStore#FS_PRODUCT_NAME");
+			var curr_productNamePage1 = selenium.getText("CommerceFrontStore#FS_PRODUCT_NAME");
 
 			if ("${iterator}" == "1") {
-				productsNamePage1 = "${curr_productNamePage1}";
+				var productsNamePage1 = "${curr_productNamePage1}";
 			}
 			else {
-				productsNamePage1 = "${productsNamePage1},${curr_productNamePage1}";
+				var productsNamePage1 = "${productsNamePage1},${curr_productNamePage1}";
 			}
 
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Catalog");
@@ -791,7 +793,7 @@ definition {
 			key_pageNumber = "2",
 			locator1 = "Pagination#ANY_PAGE");
 
-		iterator = "1";
+		var iterator = "1";
 
 		for (var curr_productNamePage1 : list "${productsNamePage1}") {
 			AssertTextNotEquals(
@@ -799,7 +801,7 @@ definition {
 				locator1 = "CommerceAccelerators#PRODUCT_CARD_NAME_BY_INDEX",
 				value1 = "${curr_productNamePage1}");
 
-			var iterator = MathUtil.sum("${iterator}", "1");
+			var iterator = ${iterator} + 1;
 		}
 	}
 

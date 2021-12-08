@@ -22,7 +22,7 @@ definition {
 			Navigator.openURL();
 
 			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
+				category = "Content & Data",
 				portlet = "Forms");
 
 			FormsAdmin.teardownForms();
@@ -140,8 +140,6 @@ definition {
 	@description = "Verify that a Date Field can be created"
 	@priority = "5"
 	test CanBeCreated {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -164,8 +162,6 @@ definition {
 	@description = "Verify that a Date Field can be deleted"
 	@priority = "5"
 	test CanBeDeleted {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -198,8 +194,6 @@ definition {
 	@description = "Verify that a Date Field can be duplicated"
 	@priority = "5"
 	test CanBeDuplicated {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -244,8 +238,6 @@ definition {
 	@description = "Verify that a Date Field can be edited"
 	@priority = "5"
 	test CanBeEdited {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -307,7 +299,7 @@ definition {
 		Form.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoEditFormByName();
@@ -349,7 +341,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoViewEntries();
@@ -365,8 +357,6 @@ definition {
 	@description = "Verify that a Date Field can be Repeatable"
 	@priority = "5"
 	test CanBeSetAsRepeatable {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -449,8 +439,6 @@ definition {
 	@description = "Verify that a Form can be submitted with the Date Field"
 	@priority = "5"
 	test CanBeSubmitted {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -479,7 +467,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			portlet = "Forms");
 
 		FormsAdminNavigator.gotoViewEntries();
@@ -495,11 +483,8 @@ definition {
 	@description = "Verify that its possible to have more than one Date field using the Validation with custom date in a form"
 	@priority = "5"
 	test CanHaveMoreThanOneDateFieldUsingDateValidation {
-		var displayDateDay = DateUtil.getCurrentDate();
-		var displayDateMonth = DateUtil.getCurrentMonth();
 		var displayDateYear = DateUtil.getCurrentYear();
 		var futureYear = ${displayDateYear} + 1;
-		var displayFutureDate = "${displayDateMonth}/${displayDateDay}/${futureYear}";
 
 		FormsAdmin.addForm();
 
@@ -545,11 +530,11 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date",
-			fieldValue = "${displayFutureDate}");
+			fieldValue = "01/01/${futureYear}");
 
 		FormViewBuilder.editDate(
 			fieldName = "Copy of Date",
-			fieldValue = "${displayFutureDate}");
+			fieldValue = "01/01/${futureYear}");
 
 		FormPortlet.submitSuccessfully();
 
@@ -559,18 +544,17 @@ definition {
 
 		FormsAdmin.viewFormTableEntry(
 			fieldLabel = "Date",
-			fieldValue = "${displayFutureDate}");
+			fieldValue = "01/01/${futureYear}");
 
 		FormsAdmin.viewFormTableEntry(
 			fieldLabel = "Copy of Date",
-			fieldValue = "${displayFutureDate}");
+			fieldValue = "01/01/${futureYear}");
 	}
 
 	@description = "Verify that changes to the Field can be canceled"
 	@ignore = "Test Stub"
 	@priority = "4"
 	test ChangesCanBeCanceled {
-		property forms.functional = "false";
 		property portal.acceptance = "false";
 
 		// TODO LPS-132819 ChangesCanBeCanceled pending implementation
@@ -580,8 +564,6 @@ definition {
 	@description = "Verify that a help text can be added"
 	@priority = "5"
 	test HelpTextCanBeAdded {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -617,8 +599,6 @@ definition {
 	@description = "Verify that the Field Label can be edited"
 	@priority = "5"
 	test LabelCanBeEdited {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -644,8 +624,6 @@ definition {
 	@description = "Veriy that the Field Label can be hidden"
 	@priority = "5"
 	test LabelCanBeHidden {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -670,8 +648,6 @@ definition {
 	@description = "Verify that a Predefined Value can be applied"
 	@priority = "5"
 	test PredefinedValueCanBeAdded {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
 
 		Form.editName(formName = "Form 1");
@@ -705,9 +681,8 @@ definition {
 	@description = "Verify that the Field Reference can be Edited"
 	@priority = "5"
 	test ReferenceCanBeEdited {
-		property forms.functional = "true";
-
 		FormsAdmin.addForm();
+
 		Form.editName(formName = "Form 1");
 
 		Form.gotoAddField(
@@ -733,7 +708,6 @@ definition {
 	@ignore = "Test Stub"
 	@priority = "5"
 	test TypeCanBeChanged {
-		property forms.functional = "false";
 		property portal.acceptance = "false";
 
 		// TODO LPS-132818 TypeCanBeChanged pending implementation
@@ -799,12 +773,9 @@ definition {
 	@description = "Verify if the Date field using the Validation with custom date can be translated"
 	@priority = "4"
 	test ValidationCanBeTranslated {
-		var displayDateDay = DateUtil.getCurrentDate();
-		var displayDateMonth = DateUtil.getCurrentMonth();
 		var displayDateYear = DateUtil.getCurrentYear();
 		var futureYear = ${displayDateYear} + 1;
-		var displayDate = "${displayDateMonth}/${displayDateDay}/${displayDateYear}";
-		var displayFutureDate = "${displayDateMonth}/${displayDateDay}/${futureYear}";
+		var pastYear = ${displayDateYear} - 1;
 
 		FormsAdmin.addForm();
 
@@ -856,13 +827,13 @@ definition {
 
 		FormFields.editDate(
 			fieldName = "Date",
-			fieldValue = "${displayDate}");
+			fieldValue = "01/01/${pastYear}");
 
 		FormPortlet.submitWithValidationError(validationErrorMessage = "This field is invalid.");
 
 		FormFields.editDate(
 			fieldName = "Date",
-			fieldValue = "${displayFutureDate}");
+			fieldValue = "01/01/${futureYear}");
 
 		FormPortlet.submitSuccessfully();
 
@@ -872,13 +843,13 @@ definition {
 
 		FormFields.editDate(
 			fieldName = "Date",
-			fieldValue = "${displayDateDay}/${displayDateMonth}/${displayDateYear}");
+			fieldValue = "01/01/${pastYear}");
 
 		FormPortlet.viewValidationErrorMessage(validationErrorMessage = "Esse campo e invalido.");
 
 		FormFields.editDate(
 			fieldName = "Date",
-			fieldValue = "${displayDateDay}/${displayDateMonth}/${futureYear}");
+			fieldValue = "01/01/${futureYear}");
 
 		FormPortlet.submitLocalizedSuccessfully(buttonName = "Submeter");
 	}

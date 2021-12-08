@@ -51,6 +51,22 @@ public class InputTag extends IncludeTag {
 		return _name;
 	}
 
+	public boolean isDisabled() {
+		return _disabled;
+	}
+
+	public boolean isLocalizable() {
+		return _localizable;
+	}
+
+	public boolean isShowHistory() {
+		return _showHistory;
+	}
+
+	public boolean isShowLabel() {
+		return _showLabel;
+	}
+
 	public void setClassName(String className) {
 		_className = className;
 	}
@@ -59,8 +75,16 @@ public class InputTag extends IncludeTag {
 		_classPK = classPK;
 	}
 
+	public void setDisabled(boolean disabled) {
+		_disabled = disabled;
+	}
+
 	public void setInputAddon(String inputAddon) {
 		_inputAddon = inputAddon;
+	}
+
+	public void setLocalizable(boolean localizable) {
+		_localizable = localizable;
 	}
 
 	public void setName(String name) {
@@ -74,14 +98,26 @@ public class InputTag extends IncludeTag {
 		setServletContext(ServletContextUtil.getServletContext());
 	}
 
+	public void setShowHistory(boolean showHistory) {
+		_showHistory = showHistory;
+	}
+
+	public void setShowLabel(boolean showLabel) {
+		_showLabel = showLabel;
+	}
+
 	@Override
 	protected void cleanUp() {
 		super.cleanUp();
 
 		_className = null;
 		_classPK = 0;
+		_disabled = false;
 		_inputAddon = null;
+		_localizable = true;
 		_name = _DEFAULT_NAME;
+		_showHistory = true;
+		_showLabel = true;
 	}
 
 	@Override
@@ -98,14 +134,22 @@ public class InputTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"liferay-friendly-url:input:classPK", getClassPK());
 		httpServletRequest.setAttribute(
+			"liferay-friendly-url:input:disabled", isDisabled());
+		httpServletRequest.setAttribute(
 			"liferay-friendly-url:input:friendlyURLMaxLength",
 			_FRIENDLY_URL_MAX_LENGTH);
 		httpServletRequest.setAttribute(
-			"liferay-friendly-url:input:friendlyURLXML", _getFriendlyURLXML());
-		httpServletRequest.setAttribute(
 			"liferay-friendly-url:input:inputAddon", getInputAddon());
 		httpServletRequest.setAttribute(
+			"liferay-friendly-url:input:localizable", isLocalizable());
+		httpServletRequest.setAttribute(
 			"liferay-friendly-url:input:name", getName());
+		httpServletRequest.setAttribute(
+			"liferay-friendly-url:input:showHistory", _isShowHistory());
+		httpServletRequest.setAttribute(
+			"liferay-friendly-url:input:showLabel", isShowLabel());
+		httpServletRequest.setAttribute(
+			"liferay-friendly-url:input:value", _getValue());
 	}
 
 	private String _getActualClassName() throws PortalException {
@@ -118,18 +162,34 @@ public class InputTag extends IncludeTag {
 		return getClassName() + StringPool.DASH + layout.isPrivateLayout();
 	}
 
-	private String _getFriendlyURLXML() {
+	private String _getValue() {
 		try {
+			if (getClassPK() == 0) {
+				return StringPool.BLANK;
+			}
+
 			FriendlyURLEntry mainFriendlyURLEntry =
 				FriendlyURLEntryLocalServiceUtil.getMainFriendlyURLEntry(
 					PortalUtil.getClassNameId(_getActualClassName()),
 					getClassPK());
 
-			return mainFriendlyURLEntry.getUrlTitleMapAsXML();
+			if (isLocalizable()) {
+				return mainFriendlyURLEntry.getUrlTitleMapAsXML();
+			}
+
+			return mainFriendlyURLEntry.getUrlTitle();
 		}
 		catch (PortalException portalException) {
 			return ReflectionUtil.throwException(portalException);
 		}
+	}
+
+	private boolean _isShowHistory() {
+		if (isShowHistory() && (getClassPK() != 0)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final String _DEFAULT_NAME = "friendlyURL";
@@ -140,7 +200,11 @@ public class InputTag extends IncludeTag {
 
 	private String _className;
 	private long _classPK;
+	private boolean _disabled;
 	private String _inputAddon;
+	private boolean _localizable = true;
 	private String _name = _DEFAULT_NAME;
+	private boolean _showHistory = true;
+	private boolean _showLabel = true;
 
 }

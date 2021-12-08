@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -230,11 +231,34 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					targetLayoutLayoutClassedModelUsages,
 					sourceLayoutLayoutClassedModelUsage)) {
 
+				String containerKey =
+					sourceLayoutLayoutClassedModelUsage.getContainerKey();
+
+				long containerType =
+					sourceLayoutLayoutClassedModelUsage.getContainerType();
+
+				if (containerType == _portal.getClassNameId(
+						FragmentEntryLink.class.getName())) {
+
+					long fragmentEntryLinkId = GetterUtil.getLong(
+						sourceLayoutLayoutClassedModelUsage.getContainerKey());
+
+					FragmentEntryLink fragmentEntryLink =
+						_fragmentEntryLinkLocalService.getFragmentEntryLink(
+							sourceLayout.getGroupId(), fragmentEntryLinkId,
+							targetLayout.getPlid());
+
+					if (fragmentEntryLink != null) {
+						containerKey = String.valueOf(
+							fragmentEntryLink.getFragmentEntryLinkId());
+					}
+				}
+
 				_layoutClassedModelUsageLocalService.addLayoutClassedModelUsage(
 					sourceLayoutLayoutClassedModelUsage.getGroupId(),
 					sourceLayoutLayoutClassedModelUsage.getClassNameId(),
 					sourceLayoutLayoutClassedModelUsage.getClassPK(),
-					sourceLayoutLayoutClassedModelUsage.getContainerKey(),
+					containerKey,
 					sourceLayoutLayoutClassedModelUsage.getContainerType(),
 					targetLayout.getPlid(), serviceContext);
 			}
@@ -780,6 +804,8 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				serviceContext.getCreateDate(new Date()));
 			newFragmentEntryLink.setModifiedDate(
 				serviceContext.getModifiedDate(new Date()));
+			newFragmentEntryLink.setOriginalFragmentEntryLinkId(
+				fragmentEntryLink.getFragmentEntryLinkId());
 			newFragmentEntryLink.setSegmentsExperienceId(
 				targetSegmentsExperienceId);
 			newFragmentEntryLink.setClassNameId(

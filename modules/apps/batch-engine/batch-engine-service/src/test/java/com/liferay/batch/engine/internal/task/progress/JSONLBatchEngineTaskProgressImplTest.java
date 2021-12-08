@@ -47,7 +47,7 @@ public class JSONLBatchEngineTaskProgressImplTest
 		StringBundler sb = new StringBundler();
 
 		for (int i = 0; i < expectedTotalItemsCount; i++) {
-			sb.append(productJSONObject);
+			sb.append(productJSONObject.toString());
 
 			if (i < (PRODUCTS_COUNT - 1)) {
 				sb.append(StringPool.NEW_LINE);

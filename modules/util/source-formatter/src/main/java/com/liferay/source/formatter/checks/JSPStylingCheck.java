@@ -104,6 +104,8 @@ public class JSPStylingCheck extends BaseStylingCheck {
 			addMessage(
 				fileName, "'<%!...%>' block should come after <%...%> blcok",
 				getLineNumber(content, x));
+
+			return content;
 		}
 
 		y = x;
@@ -120,8 +122,8 @@ public class JSPStylingCheck extends BaseStylingCheck {
 					fileName,
 					StringBundler.concat(
 						"Combine <%!...%> blocks at line '",
-						getLineNumber(content, x), "' and ",
-						getLineNumber(content, y)));
+						getLineNumber(content, x), "' and '",
+						getLineNumber(content, y), "'"));
 
 				return content;
 			}
