@@ -66,11 +66,21 @@ import com.liferay.portal.workflow.metrics.search.index.NodeWorkflowMetricsIndex
 import com.liferay.portal.workflow.metrics.search.index.ProcessWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.TaskWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.junit.Assert;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import java.io.Serializable;
-
 import java.lang.reflect.Method;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -83,21 +93,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.time.DateUtils;
-
-import org.junit.Assert;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Inácio Nery
@@ -447,23 +442,30 @@ public class WorkflowMetricsRESTTestHelper {
 		throws Exception {
 
 		for (SLAResult slaResult : slaResults) {
-			_invokeAddDocument(
-				_getIndexer(_CLASS_NAME_SLA_INSTANCE_RESULT_INDEXER),
-				_creatWorkflowMetricsSLAInstanceResultDocument(
-					companyId, instance, slaResult));
-
-			_assertCount(
-				_slaInstanceResultWorkflowMetricsIndexNameBuilder.getIndexName(
-					companyId),
-				"companyId", companyId, "deleted", false, "instanceCompleted",
-				Objects.nonNull(instance.getDateCompletion()), "instanceId",
-				instance.getId(), "onTime", slaResult.getOnTime(), "processId",
-				instance.getProcessId(), "remainingTime",
-				slaResult.getRemainingTime(), "slaDefinitionId",
-				slaResult.getId());
+			addSLAInstanceResult(companyId, false, instance, slaResult);
 		}
 
 		_updateInstance(companyId, instance, slaResults);
+	}
+
+	public void addSLAInstanceResult(
+		long companyId, boolean deleted, Instance instance, SLAResult slaResult)
+		throws Exception {
+
+		_invokeAddDocument(
+			_getIndexer(_CLASS_NAME_SLA_INSTANCE_RESULT_INDEXER),
+			_creatWorkflowMetricsSLAInstanceResultDocument(
+				companyId, deleted, instance, slaResult));
+
+		_assertCount(
+			_slaInstanceResultWorkflowMetricsIndexNameBuilder.getIndexName(
+				companyId),
+			"companyId", companyId, "deleted", deleted, "instanceCompleted",
+			Objects.nonNull(instance.getDateCompletion()), "instanceId",
+			instance.getId(), "onTime", slaResult.getOnTime(), "processId",
+			instance.getProcessId(), "remainingTime",
+			slaResult.getRemainingTime(), "slaDefinitionId",
+			slaResult.getId());
 	}
 
 	public void addSLATaskResult(
@@ -1043,7 +1045,7 @@ public class WorkflowMetricsRESTTestHelper {
 	}
 
 	private Document _creatWorkflowMetricsSLAInstanceResultDocument(
-		long companyId, Instance instance, SLAResult slaResult) {
+		long companyId, boolean deleted, Instance instance, SLAResult slaResult) {
 
 		DocumentBuilder documentBuilder = _documentBuilderFactory.builder();
 
@@ -1052,7 +1054,7 @@ public class WorkflowMetricsRESTTestHelper {
 		).setValue(
 			"companyId", companyId
 		).setValue(
-			"deleted", false
+			"deleted", deleted
 		).setValue(
 			"elapsedTime", slaResult.getOnTime() ? 1000 : -1000
 		).setValue(
