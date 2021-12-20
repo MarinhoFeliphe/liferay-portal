@@ -12,22 +12,23 @@
  * details.
  */
 
-package com.liferay.portal.kernel.workflow;
+package com.liferay.portal.workflow.kaleo.internal.upgrade.v3_4_0;
 
-import java.util.Locale;
-import java.util.Map;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v3_4_0.util.KaleoTransitionTable;
 
 /**
  * @author Feliphe Marinho
  */
-public interface WorkflowTransition {
+public class KaleoTransitionUpgradeProcess extends UpgradeProcess {
 
-	public Map<Locale, String> getLabelMap();
-
-	public String getName();
-
-	public String getSourceNodeName();
-
-	public String getTargetNodeName();
+	@Override
+	protected void doUpgrade() throws Exception {
+		if (!hasColumn("KaleoTransition", "label")) {
+			alter(
+				KaleoTransitionTable.class,
+				new UpgradeProcess.AlterTableAddColumn("label", "STRING null"));
+		}
+	}
 
 }

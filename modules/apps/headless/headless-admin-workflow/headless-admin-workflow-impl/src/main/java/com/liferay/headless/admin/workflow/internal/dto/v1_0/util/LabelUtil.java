@@ -12,7 +12,10 @@
  * details.
  */
 
-package com.liferay.portal.kernel.workflow;
+package com.liferay.headless.admin.workflow.internal.dto.v1_0.util;
+
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -20,14 +23,16 @@ import java.util.Map;
 /**
  * @author Feliphe Marinho
  */
-public interface WorkflowTransition {
+public class LabelUtil {
 
-	public Map<Locale, String> getLabelMap();
+	public static String getLabel(
+		String key, Map<Locale, String> labelMap, Locale locale) {
 
-	public String getName();
+		if (MapUtil.isNotEmpty(labelMap) && (labelMap.get(locale) != null)) {
+			return labelMap.get(locale);
+		}
 
-	public String getSourceNodeName();
-
-	public String getTargetNodeName();
+		return LanguageUtil.get(locale, key);
+	}
 
 }
