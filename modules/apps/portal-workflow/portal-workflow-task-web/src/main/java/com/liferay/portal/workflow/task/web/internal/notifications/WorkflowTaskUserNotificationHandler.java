@@ -15,26 +15,34 @@
 package com.liferay.portal.workflow.task.web.internal.notifications;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.notifications.BaseUserNotificationHandler;
+import com.liferay.portal.kernel.notifications.UserNotificationFeedEntry;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil;
 import com.liferay.portal.workflow.task.web.internal.permission.WorkflowTaskPermissionChecker;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import java.util.Locale;
 
 /**
  * @author Jonathan Lee
@@ -51,6 +59,53 @@ public class WorkflowTaskUserNotificationHandler
 	public WorkflowTaskUserNotificationHandler() {
 		setOpenDialog(true);
 		setPortletId(PortletKeys.MY_WORKFLOW_TASK);
+	}
+
+	@Override
+	public UserNotificationFeedEntry interpret(
+		UserNotificationEvent userNotificationEvent,
+		ServiceContext serviceContext) throws PortalException {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			userNotificationEvent.getPayload());
+
+		WorkflowHandler<?> workflowHandler =
+			WorkflowHandlerRegistryUtil.getWorkflowHandler(
+				jsonObject.getString("entryClassName"));
+
+		if (workflowHandler != null) {
+			return super.interpret(userNotificationEvent, serviceContext);
+		}
+
+		try {
+			UserNotificationFeedEntry userNotificationFeedEntry;
+
+			Locale locale = serviceContext.getLocale();
+
+			String portletTitle = PortalUtil.getPortletTitle(
+				getPortletId(), locale);
+
+			String body = StringUtil.replace(
+				_BODY_TEMPLATE_DEFAULT,
+				new String[] {"[$BODY$]", "[$TITLE$]"},
+				new String[] {
+					LanguageUtil.format(
+						locale, "notification-for-x-was-deleted",
+						portletTitle, false),
+					LanguageUtil.get(
+						locale, "notification-no-longer-applies")
+				});
+
+			userNotificationFeedEntry = new UserNotificationFeedEntry(
+				false, body, StringPool.BLANK, false);
+
+			return userNotificationFeedEntry;
+		}
+		catch (Exception exception) {
+			_log.error("Unable to interpret notification", exception);
+		}
+
+		return null;
 	}
 
 	@Override
@@ -153,6 +208,13 @@ public class WorkflowTaskUserNotificationHandler
 		return _workflowTaskPermissionChecker.hasPermission(
 			groupId, workflowTask, themeDisplay.getPermissionChecker());
 	}
+
+	private static final String _BODY_TEMPLATE_DEFAULT =
+		"<div class=\"title\">[$TITLE$]</div><div class=\"body\">[$BODY$]" +
+		"</div>";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		WorkflowTaskUserNotificationHandler.class);
 
 	private UserNotificationEventLocalService
 		_userNotificationEventLocalService;
