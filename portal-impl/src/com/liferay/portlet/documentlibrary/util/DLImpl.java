@@ -1095,9 +1095,8 @@ public class DLImpl implements DL {
 
 		WorkflowHandlerRegistryUtil.startWorkflowInstance(
 			dlFileVersion.getCompanyId(), dlFileVersion.getGroupId(), userId,
-			DLFileEntryConstants.getClassName(),
-			dlFileVersion.getFileVersionId(), dlFileVersion, serviceContext,
-			workflowContext);
+			DLFileEntryConstants.getClassName(), dlFileVersion.getFileEntryId(),
+			dlFileVersion, serviceContext, workflowContext);
 	}
 
 	protected String getEntryURL(
