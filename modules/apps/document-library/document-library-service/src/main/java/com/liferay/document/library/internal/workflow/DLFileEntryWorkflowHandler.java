@@ -56,25 +56,6 @@ public class DLFileEntryWorkflowHandler
 	extends BaseWorkflowHandler<DLFileEntry> {
 
 	@Override
-	public AssetRenderer<DLFileEntry> getAssetRenderer(long classPK)
-		throws PortalException {
-
-		AssetRendererFactory<DLFileEntry> assetRendererFactory =
-			getAssetRendererFactory();
-
-		if (assetRendererFactory != null) {
-			DLFileVersion dlFileVersion =
-				_dlFileVersionLocalService.getFileVersion(classPK);
-
-			return assetRendererFactory.getAssetRenderer(
-				dlFileVersion.getFileEntryId(),
-				AssetRendererFactory.TYPE_LATEST);
-		}
-
-		return null;
-	}
-
-	@Override
 	public AssetRendererFactory<DLFileEntry> getAssetRendererFactory() {
 		return (AssetRendererFactory<DLFileEntry>)
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
