@@ -121,15 +121,14 @@ public class DLFileEntryWorkflowHandler
 
 		long userId = GetterUtil.getLong(
 			(String)workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));
-		long classPK = GetterUtil.getLong(
-			(String)workflowContext.get(
-				WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
+		long fileVersionId = GetterUtil.getLong(
+			workflowContext.get("fileVersionId"));
 
 		ServiceContext serviceContext = (ServiceContext)workflowContext.get(
 			"serviceContext");
 
 		return _dlFileEntryLocalService.updateStatus(
-			userId, classPK, status, serviceContext, workflowContext);
+			userId, fileVersionId, status, serviceContext, workflowContext);
 	}
 
 	@Reference(unbind = "-")
