@@ -15,11 +15,9 @@
 package com.liferay.document.library.internal.workflow;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
-import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
-import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
@@ -77,10 +75,10 @@ public class DLFileEntryWorkflowHandler
 			long companyId, long groupId, long classPK)
 		throws PortalException {
 
-		DLFileVersion dlFileVersion = _dlFileVersionLocalService.getFileVersion(
+		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
 			classPK);
 
-		long folderId = dlFileVersion.getFolderId();
+		long folderId = dlFileEntry.getFolderId();
 
 		while (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			DLFolder dlFolder = _dlFolderLocalService.getFolder(folderId);
@@ -97,7 +95,7 @@ public class DLFileEntryWorkflowHandler
 		WorkflowDefinitionLink workflowDefinitionLink =
 			_workflowDefinitionLinkLocalService.fetchWorkflowDefinitionLink(
 				companyId, groupId, DLFolder.class.getName(), folderId,
-				dlFileVersion.getFileEntryTypeId(), true);
+				dlFileEntry.getFileEntryTypeId(), true);
 
 		if (workflowDefinitionLink == null) {
 			workflowDefinitionLink =
