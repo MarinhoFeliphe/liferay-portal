@@ -34,14 +34,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
-
-import java.io.Serializable;
-
-import java.util.Locale;
-import java.util.Map;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Bruno Farache
@@ -63,12 +61,8 @@ public class DLFileEntryWorkflowHandler
 			getAssetRendererFactory();
 
 		if (assetRendererFactory != null) {
-			DLFileVersion dlFileVersion =
-				_dlFileVersionLocalService.getFileVersion(classPK);
-
 			return assetRendererFactory.getAssetRenderer(
-				dlFileVersion.getFileEntryId(),
-				AssetRendererFactory.TYPE_LATEST);
+				classPK, AssetRendererFactory.TYPE_LATEST);
 		}
 
 		return null;
@@ -96,8 +90,11 @@ public class DLFileEntryWorkflowHandler
 			long companyId, long groupId, long classPK)
 		throws PortalException {
 
-		DLFileVersion dlFileVersion = _dlFileVersionLocalService.getFileVersion(
+		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
 			classPK);
+
+		DLFileVersion dlFileVersion = _dlFileVersionLocalService.getFileVersion(
+			dlFileEntry.getFileEntryId(), dlFileEntry.getVersion());
 
 		long folderId = dlFileVersion.getFolderId();
 
@@ -147,8 +144,15 @@ public class DLFileEntryWorkflowHandler
 		ServiceContext serviceContext = (ServiceContext)workflowContext.get(
 			"serviceContext");
 
+		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
+			classPK);
+
+		DLFileVersion dlFileVersion = _dlFileVersionLocalService.getFileVersion(
+			classPK, dlFileEntry.getVersion());
+
 		return _dlFileEntryLocalService.updateStatus(
-			userId, classPK, status, serviceContext, workflowContext);
+			userId, dlFileVersion.getFileVersionId(), status, serviceContext,
+			workflowContext);
 	}
 
 	@Reference(unbind = "-")
