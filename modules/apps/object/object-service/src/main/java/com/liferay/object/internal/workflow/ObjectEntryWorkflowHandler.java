@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
-
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
