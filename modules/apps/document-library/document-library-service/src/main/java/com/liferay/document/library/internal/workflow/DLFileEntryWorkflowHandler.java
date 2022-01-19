@@ -26,6 +26,8 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -84,6 +86,23 @@ public class DLFileEntryWorkflowHandler
 	@Override
 	public String getClassName() {
 		return DLFileEntry.class.getName();
+	}
+
+	@Override
+	public long getEntryClassPK(long classPK) {
+		try {
+			DLFileVersion dlFileVersion =
+				_dlFileVersionLocalService.getFileVersion(classPK);
+
+			return dlFileVersion.getFileEntryId();
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException, portalException);
+			}
+		}
+
+		return super.getEntryClassPK(classPK);
 	}
 
 	@Override
@@ -181,6 +200,9 @@ public class DLFileEntryWorkflowHandler
 	}
 
 	private static final boolean _VISIBLE = false;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileEntryWorkflowHandler.class);
 
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 	private DLFileVersionLocalService _dlFileVersionLocalService;
