@@ -51,6 +51,10 @@ public interface WorkflowHandler<T> {
 
 	public String getClassName();
 
+	public default long getEntryClassPK(long classPK) {
+		return classPK;
+	}
+
 	public String getIconCssClass();
 
 	public default String getNotificationLink(

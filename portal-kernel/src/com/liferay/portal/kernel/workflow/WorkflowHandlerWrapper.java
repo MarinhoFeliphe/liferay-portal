@@ -62,6 +62,11 @@ public class WorkflowHandlerWrapper<T> implements WorkflowHandler<T> {
 	}
 
 	@Override
+	public long getEntryClassPK(long classPK) {
+		return _workflowHandler.getEntryClassPK(classPK);
+	}
+
+	@Override
 	public String getIconCssClass() {
 		return _workflowHandler.getIconCssClass();
 	}
