@@ -14,8 +14,10 @@
 
 package com.liferay.object.internal.deployer;
 
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.asset.model.ObjectEntryAssetRendererFactory;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.internal.info.collection.provider.ObjectEntrySingleFormVariationInfoCollectionProvider;
 import com.liferay.object.internal.language.ObjectResourceBundle;
@@ -59,13 +61,13 @@ import com.liferay.portal.search.spi.model.index.contributor.ModelIndexerWriterC
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchRegistrarHelper;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
+import javax.servlet.ServletContext;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Brian Wing Shun Chan
@@ -86,6 +88,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
 		ResourceActions resourceActions,
+		ServletContext servletContext,
 		ModelPreFilterContributor workflowStatusModelPreFilterContributor) {
 
 		_bundleContext = bundleContext;
@@ -101,6 +104,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
 		_resourceActions = resourceActions;
+		_servletContext = servletContext;
 		_workflowStatusModelPreFilterContributor =
 			workflowStatusModelPreFilterContributor;
 	}
@@ -132,7 +136,20 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				objectDefinition.getResourceName(),
 				new ObjectEntryPortletResourcePermissionLogic());
 
+		ObjectEntryModelResourcePermission objectEntryModelResourcePermission =
+			new ObjectEntryModelResourcePermission(
+				objectDefinition.getClassName(), _objectEntryLocalService,
+				portletResourcePermission);
+
 		List<ServiceRegistration<?>> serviceRegistrations = ListUtil.fromArray(
+			_bundleContext.registerService(
+				AssetRendererFactory.class,
+				new ObjectEntryAssetRendererFactory(
+					objectDefinition.getClassName(),
+					_objectDefinitionLocalService,
+					objectEntryModelResourcePermission,
+					_objectEntryLocalService, _servletContext),
+				null),
 			_bundleContext.registerService(
 				InfoCollectionProvider.class,
 				new ObjectEntrySingleFormVariationInfoCollectionProvider(
@@ -173,9 +190,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				).build()),
 			_bundleContext.registerService(
 				ModelResourcePermission.class,
-				new ObjectEntryModelResourcePermission(
-					objectDefinition.getClassName(), _objectEntryLocalService,
-					portletResourcePermission),
+				objectEntryModelResourcePermission,
 				HashMapDictionaryBuilder.<String, Object>put(
 					"com.liferay.object", "true"
 				).put(
@@ -284,6 +299,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private final PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
 	private final ResourceActions _resourceActions;
+	private final ServletContext _servletContext;
 	private final ModelPreFilterContributor
 		_workflowStatusModelPreFilterContributor;
 
