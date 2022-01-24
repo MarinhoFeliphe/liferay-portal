@@ -37,24 +37,7 @@ portletDisplay.setURLBack(backURL);
 	<aui:input name="objectEntryId" type="hidden" value="<%= (objectEntry == null) ? 0 : objectEntry.getObjectEntryId() %>" />
 	<aui:input name="objectRelationshipPrimaryKey2" type="hidden" value="" />
 
-	<frontend-data-set:classic-display
-		contextParams='<%=
-			HashMapBuilder.<String, String>put(
-				"objectEntryId", String.valueOf(objectEntry.getObjectEntryId())
-			).put(
-				"objectRelationshipId", String.valueOf(objectLayoutTab.getObjectRelationshipId())
-			).build()
-		%>'
-		creationMenu="<%= objectEntryDisplayContext.getRelatedModelCreationMenu() %>"
-		dataProviderKey="<%= ObjectEntriesFDSNames.RELATED_MODELS %>"
-		formName="fm"
-		id="<%= ObjectEntriesFDSNames.RELATED_MODELS %>"
-		itemsPerPage="<%= 20 %>"
-		namespace="<%= liferayPortletResponse.getNamespace() %>"
-		pageNumber="<%= 1 %>"
-		portletURL="<%= liferayPortletResponse.createRenderURL() %>"
-		style="fluid"
-	/>
+	<%@ include file="/object_entries/object_entry/relationship.jspf" %>
 </aui:form>
 
 <aui:script sandbox="<%= true %>">

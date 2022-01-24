@@ -24,10 +24,7 @@ ObjectEntryDisplayContext objectEntryDisplayContext = (ObjectEntryDisplayContext
 ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab();
 %>
 
-<clay:navigation-bar
-	inverted="<%= false %>"
-	navigationItems="<%= objectEntryDisplayContext.getNavigationItems() %>"
-/>
+<%@ include file="/object_entries/object_entry/tabs.jspf" %>
 
 <c:choose>
 	<c:when test="<%= (objectLayoutTab != null) && (objectLayoutTab.getObjectRelationshipId() > 0) %>">
