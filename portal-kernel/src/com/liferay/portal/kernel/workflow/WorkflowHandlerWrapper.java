@@ -23,17 +23,14 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.ServiceContext;
 
-import java.io.Serializable;
-
-import java.util.Locale;
-import java.util.Map;
-
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Adolfo Pérez
@@ -59,6 +56,11 @@ public class WorkflowHandlerWrapper<T> implements WorkflowHandler<T> {
 	@Override
 	public String getClassName() {
 		return _workflowHandler.getClassName();
+	}
+
+	@Override
+	public long getEntryId(WorkflowTask workflowTask) {
+		return _workflowHandler.getEntryId(workflowTask);
 	}
 
 	@Override
