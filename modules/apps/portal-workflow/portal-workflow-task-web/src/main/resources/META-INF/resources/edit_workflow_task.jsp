@@ -33,11 +33,10 @@ String languageId = LanguageUtil.getLanguageId(request);
 
 WorkflowTask workflowTask = workflowTaskDisplayContext.getWorkflowTask();
 
-long classPK = workflowTaskDisplayContext.getWorkflowContextEntryClassPK(workflowTask);
-
 WorkflowHandler<?> workflowHandler = workflowTaskDisplayContext.getWorkflowHandler(workflowTask);
 
-AssetRenderer<?> assetRenderer = workflowHandler.getAssetRenderer(classPK);
+AssetRenderer<?> assetRenderer = workflowHandler.getAssetRenderer(
+	workflowTaskDisplayContext.getWorkflowContextEntryClassPK(workflowTask));
 
 AssetRendererFactory<?> assetRendererFactory = null;
 
@@ -279,8 +278,8 @@ renderResponse.setTitle(workflowTaskDisplayContext.getHeaderTitle(workflowTask))
 							<liferay-comment:discussion
 								assetEntryVisible="<%= false %>"
 								className="<%= assetRenderer.getClassName() %>"
-								classPK="<%= classPK %>"
-								formName='<%= "fm" + classPK %>'
+								classPK="<%= workflowHandler.getEntryId(workflowTask) %>"
+								formName='<%= "fm" + workflowHandler.getEntryId(workflowTask) %>'
 								ratingsEnabled="<%= false %>"
 								redirect="<%= currentURL %>"
 								userId="<%= user.getUserId() %>"
