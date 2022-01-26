@@ -19,7 +19,6 @@
 <%
 ObjectEntryDisplayContext objectEntryDisplayContext = (ObjectEntryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
-ObjectEntry objectEntry = objectEntryDisplayContext.getObjectEntry();
 ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab();
 %>
 
