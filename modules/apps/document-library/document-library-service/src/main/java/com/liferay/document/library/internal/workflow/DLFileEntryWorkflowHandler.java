@@ -34,14 +34,13 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
-
-import java.io.Serializable;
-
-import java.util.Locale;
-import java.util.Map;
-
+import com.liferay.portal.kernel.workflow.WorkflowTask;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Bruno Farache
@@ -84,6 +83,23 @@ public class DLFileEntryWorkflowHandler
 	@Override
 	public String getClassName() {
 		return DLFileEntry.class.getName();
+	}
+
+	@Override
+	public long getEntryId(
+		WorkflowTask workflowTask) {
+
+		try {
+			AssetRenderer<DLFileEntry> dlFileEntryAssetRenderer =
+				getAssetRenderer(super.getEntryId(workflowTask));
+
+			return dlFileEntryAssetRenderer.getClassPK();
+		}
+		catch (PortalException portalException) {
+			portalException.printStackTrace();
+		}
+
+		return super.getEntryId(workflowTask);
 	}
 
 	@Override

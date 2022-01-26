@@ -23,18 +23,16 @@ import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.ServiceContext;
-
-import java.io.Serializable;
-
-import java.util.Locale;
-import java.util.Map;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Bruno Farache
@@ -50,6 +48,14 @@ public interface WorkflowHandler<T> {
 	public AssetRendererFactory<T> getAssetRendererFactory();
 
 	public String getClassName();
+
+	public default long getEntryId(WorkflowTask workflowTask) {
+		Map<String, Serializable> optionalAttributes =
+			workflowTask.getOptionalAttributes();
+
+		return GetterUtil.getLong(
+			optionalAttributes.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
+	}
 
 	public String getIconCssClass();
 
