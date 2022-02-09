@@ -104,7 +104,7 @@ public class WorkflowTaskUserNotificationHandler
 				userNotificationEvent.getPayload());
 
 			for (User user :
-					WorkflowTaskManagerUtil.getAssignableUsers(
+					WorkflowTaskManagerUtil.getUsersThatCanSee(
 						jsonObject.getLong("companyId"),
 						jsonObject.getLong("workflowTaskId"))) {
 
