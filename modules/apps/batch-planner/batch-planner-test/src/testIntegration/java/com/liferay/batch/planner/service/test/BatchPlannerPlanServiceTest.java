@@ -20,6 +20,7 @@ import com.liferay.batch.planner.exception.BatchPlannerPlanExternalTypeException
 import com.liferay.batch.planner.exception.BatchPlannerPlanInternalClassNameException;
 import com.liferay.batch.planner.exception.BatchPlannerPlanNameException;
 import com.liferay.batch.planner.exception.DuplicateBatchPlannerPlanException;
+import com.liferay.batch.planner.exception.RequiredBatchPlannerPlanException;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.batch.planner.service.BatchPlannerPlanService;
 import com.liferay.petra.string.StringBundler;
@@ -153,6 +154,33 @@ public class BatchPlannerPlanServiceTest {
 
 		_batchPlannerPlanService.deleteBatchPlannerPlan(
 			batchPlannerPlan.getBatchPlannerPlanId());
+	}
+
+	@Test
+	public void testUpdateBatchPlannerPlan() throws Exception {
+		BatchPlannerPlan batchPlannerPlan =
+			_batchPlannerPlanService.addBatchPlannerPlan(
+				true, BatchPlannerPlanConstants.EXTERNAL_TYPE_CSV,
+				"/" + RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				null, false);
+
+		try {
+			_batchPlannerPlanService.updateBatchPlannerPlan(
+				batchPlannerPlan.getBatchPlannerPlanId(),
+				batchPlannerPlan.getExternalType(),
+				batchPlannerPlan.getInternalClassName(),
+				RandomTestUtil.randomString());
+
+			Assert.fail();
+		}
+		catch (RequiredBatchPlannerPlanException
+					requiredBatchPlannerPlanException) {
+
+			Assert.assertEquals(
+				"Batch planner plan is not a template",
+				requiredBatchPlannerPlanException.getMessage());
+		}
 	}
 
 	@Inject

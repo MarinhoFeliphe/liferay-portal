@@ -396,10 +396,10 @@ definition {
 	}
 
 	macro closeAllSessions {
-		var analyticsCloudAsahCuratorBatchUrl = PropsUtil.get("analytics.cloud.asah.curator.batch.url");
+		var analyticsCloudAsahCuratorBatchURL = PropsUtil.get("analytics.cloud.asah.curator.batch.url");
 
 		var cleanCurl = '''
-			${analyticsCloudAsahCuratorBatchUrl}/admin/sessions/close \
+			${analyticsCloudAsahCuratorBatchURL}/admin/sessions/close \
 			-H 'Content-Type: application/json' \
 			-H 'osb-asah-project-id: osbasah'
 		''';
@@ -488,7 +488,7 @@ definition {
 			layoutName = "${layoutName}",
 			widgetName = "Form");
 
-		FormsAdmin.openFormsAdmin(siteUrlKey = "site-name");
+		FormsAdmin.openFormsAdmin(siteURLKey = "site-name");
 
 		FormsAdminNavigator.gotoAddForm();
 
@@ -607,9 +607,9 @@ definition {
 	}
 
 	macro launchAC {
-		var analyticsCloudUrl = PropsUtil.get("analytics.cloud.url");
+		var analyticsCloudURL = PropsUtil.get("analytics.cloud.url");
 
-		Open(locator1 = "${analyticsCloudUrl}");
+		Open(locator1 = "${analyticsCloudURL}");
 
 		if (!(isSet(emailAddress))) {
 			var emailAddress = "test@liferay.com";
@@ -702,6 +702,12 @@ definition {
 
 			Pause(locator1 = "5000");
 		}
+	}
+
+	macro orderAnyTable {
+		var key_columnName = "${columnName}";
+
+		Click(locator1 = "ACUtils#GENERIC_ORDER_BUTTON");
 	}
 
 	macro orderArrow {
@@ -842,6 +848,18 @@ definition {
 		AssertTextEquals(
 			locator1 = "ACUtils#PAGINATION_ITEMS_PER_PAGE_SELECT",
 			value1 = "${itemsPerPage} Items");
+	}
+
+	macro viewPartialNameList {
+		for (var name : list "${nameList}") {
+			var key_nameList = "${name}";
+
+			WaitForPageLoad();
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "ACUtils#PARTIAL_NAME_LIST",
+				value1 = "${name}");
+		}
 	}
 
 	macro viewResultsMessage {

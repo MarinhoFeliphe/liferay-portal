@@ -63,8 +63,8 @@ function EditTitleModal({
 			<ClayForm onSubmit={_handleSubmit}>
 				<ClayModal.Body>
 					<ClayForm.Group className={hasError ? 'has-error' : ''}>
-						<label htmlFor="name">
-							{Liferay.Language.get('name')}
+						<label htmlFor="title">
+							{Liferay.Language.get('title')}
 
 							<ClayIcon
 								className="ml-1 reference-mark"
@@ -75,8 +75,8 @@ function EditTitleModal({
 						</label>
 
 						<ClayInput
-							autoFocus={modalFieldFocus === 'name'}
-							id="name"
+							autoFocus={modalFieldFocus === 'title'}
+							id="title"
 							onBlur={({currentTarget}) => {
 								setHasError(!currentTarget.value);
 							}}
@@ -172,7 +172,7 @@ export default function PageToolbar({
 		[newDefaultLocale]: getLocalizedText(initialTitle, newDefaultLocale),
 	});
 
-	const [modalFieldFocus, setModalFieldFocus] = useState('name');
+	const [modalFieldFocus, setModalFieldFocus] = useState('title');
 	const [modalVisible, setModalVisible] = useState(false);
 
 	const {observer, onClose} = useModal({
@@ -228,12 +228,12 @@ export default function PageToolbar({
 							<div>
 								<ClayButton
 									aria-label={Liferay.Language.get(
-										'edit-name'
+										'edit-title'
 									)}
 									className="entry-heading-edit-button"
 									displayType="unstyled"
 									monospaced={false}
-									onClick={_handleClickEdit('name')}
+									onClick={_handleClickEdit('title')}
 								>
 									<div className="entry-title text-truncate">
 										{title[newDefaultLocale]}

@@ -51,6 +51,9 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.dao.jdbc.postgresql.PostgreSQLJDBCUtil;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -666,10 +669,15 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
 
-		boolean visible = false;
+		String title = StringPool.BLANK;
 
-		if (objectEntry.isApproved()) {
-			visible = true;
+		try {
+			title = objectEntry.getTitleValue();
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException, portalException);
+			}
 		}
 
 		AssetEntry assetEntry = _assetEntryLocalService.updateEntry(
@@ -677,8 +685,8 @@ public class ObjectEntryLocalServiceImpl
 			objectEntry.getCreateDate(), objectEntry.getModifiedDate(),
 			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
 			objectEntry.getUuid(), 0, assetCategoryIds, assetTagNames, true,
-			visible, null, null, null, null, ContentTypes.TEXT_PLAIN,
-			String.valueOf(objectEntry.getObjectEntryId()),
+			objectEntry.isApproved(), null, null, null, null,
+			ContentTypes.TEXT_PLAIN, title,
 			String.valueOf(objectEntry.getObjectEntryId()), null, null, null, 0,
 			0, priority);
 
@@ -979,6 +987,12 @@ public class ObjectEntryLocalServiceImpl
 			return resultSet.getBoolean(name);
 		}
 		else if (sqlType == Types.CLOB) {
+			DB db = DBManagerUtil.getDB();
+
+			if (db.getDBType() == DBType.POSTGRESQL) {
+				return resultSet.getString(name);
+			}
+
 			return resultSet.getClob(name);
 		}
 		else if (sqlType == Types.DATE) {
@@ -1270,19 +1284,26 @@ public class ObjectEntryLocalServiceImpl
 				values.put(name, StringPool.BLANK);
 			}
 			else {
-				Clob clob = (Clob)object;
+				DB db = DBManagerUtil.getDB();
 
-				try {
-					InputStream inputStream = clob.getAsciiStream();
-
-					values.put(
-						name,
-						GetterUtil.getString(
-							IOUtils.toString(
-								inputStream, StandardCharsets.UTF_8)));
+				if (db.getDBType() == DBType.POSTGRESQL) {
+					values.put(name, (String)object);
 				}
-				catch (IOException | SQLException exception) {
-					throw new SystemException(exception);
+				else {
+					Clob clob = (Clob)object;
+
+					try {
+						InputStream inputStream = clob.getAsciiStream();
+
+						values.put(
+							name,
+							GetterUtil.getString(
+								IOUtils.toString(
+									inputStream, StandardCharsets.UTF_8)));
+					}
+					catch (IOException | SQLException exception) {
+						throw new SystemException(exception);
+					}
 				}
 			}
 		}
@@ -1370,8 +1391,15 @@ public class ObjectEntryLocalServiceImpl
 			preparedStatement.setBoolean(index, GetterUtil.getBoolean(value));
 		}
 		else if (sqlType == Types.CLOB) {
-			preparedStatement.setClob(
-				index, new StringReader(String.valueOf(value)));
+			DB db = DBManagerUtil.getDB();
+
+			if (db.getDBType() == DBType.POSTGRESQL) {
+				preparedStatement.setString(index, String.valueOf(value));
+			}
+			else {
+				preparedStatement.setClob(
+					index, new StringReader(String.valueOf(value)));
+			}
 		}
 		else if (sqlType == Types.DATE) {
 			String valueString = GetterUtil.getString(value);

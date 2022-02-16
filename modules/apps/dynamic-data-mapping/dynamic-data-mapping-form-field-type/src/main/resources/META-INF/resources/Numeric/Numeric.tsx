@@ -19,11 +19,8 @@ import classNames from 'classnames';
 
 import {SettingsContext, useFormState} from 'data-engine-js-components-web';
 import React, {ChangeEventHandler, FocusEventHandler, useMemo} from 'react';
-import createNumberMask from 'text-mask-addons/dist/createNumberMask';
-
-// @ts-ignore
-
-import {conformToMask} from 'vanilla-text-mask';
+import {createNumberMask} from 'text-mask-addons';
+import {conformToMask} from 'text-mask-core';
 
 // @ts-ignore
 
@@ -36,6 +33,8 @@ import {trimLeftZero} from '../util/numericalOperations';
 import withConfirmationField from '../util/withConfirmationField.es';
 
 import './Numeric.scss';
+
+import type {FieldChangeEventHandler, Locale, LocalizedValue} from '../types';
 
 const NON_NUMERIC_REGEX = /[\D]/g;
 

@@ -167,8 +167,6 @@
 	<classpathentry kind="lib" path="lib/portal/jackson-databind.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai-imageio-core.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai-imageio-jpeg2000.jar"/>
-	<classpathentry kind="lib" path="lib/portal/jai_codec.jar"/>
-	<classpathentry kind="lib" path="lib/portal/jai_core.jar"/>
 	<classpathentry kind="lib" path="lib/portal/java-libpst.jar"/>
 	<classpathentry kind="lib" path="lib/portal/javassist.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxb-api.jar"/>
@@ -192,7 +190,6 @@
 	<classpathentry kind="lib" path="lib/portal/jodd-proxetta.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jodd-util.jar"/>
 	<classpathentry kind="lib" path="lib/portal/json-java.jar"/>
-	<classpathentry kind="lib" path="lib/portal/jsr107cache.jar"/>
 	<classpathentry kind="lib" path="lib/portal/juniversalchardet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jws-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/kxml2.jar"/>
@@ -208,12 +205,6 @@
 	<classpathentry kind="lib" path="lib/portal/mp4parser.jar"/>
 	<classpathentry kind="lib" path="lib/portal/nekohtml.jar"/>
 	<classpathentry kind="lib" path="lib/portal/netcdf.jar"/>
-	<classpathentry kind="lib" path="lib/portal/netty-buffer.jar"/>
-	<classpathentry kind="lib" path="lib/portal/netty-codec.jar"/>
-	<classpathentry kind="lib" path="lib/portal/netty-common.jar"/>
-	<classpathentry kind="lib" path="lib/portal/netty-handler.jar"/>
-	<classpathentry kind="lib" path="lib/portal/netty-resolver.jar"/>
-	<classpathentry kind="lib" path="lib/portal/netty-transport.jar"/>
 	<classpathentry kind="lib" path="lib/portal/odmg.jar"/>
 	<classpathentry kind="lib" path="lib/portal/pdfbox.jar"/>
 	<classpathentry kind="lib" path="lib/portal/persistence.jar"/>
@@ -223,7 +214,6 @@
 	<classpathentry kind="lib" path="lib/portal/poi-scratchpad.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portlet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portletmvc4spring-framework.jar"/>
-	<classpathentry kind="lib" path="lib/portal/rhino.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rmi-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rometools-utils.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rometools.jar"/>
@@ -252,7 +242,6 @@
 	<classpathentry kind="lib" path="lib/portal/stax.jar"/>
 	<classpathentry kind="lib" path="lib/portal/stax-ex.jar"/>
 	<classpathentry kind="lib" path="lib/portal/streambuffer.jar"/>
-	<classpathentry kind="lib" path="lib/portal/stringtemplate.jar"/>
 	<classpathentry kind="lib" path="lib/portal/tagsoup.jar"/>
 	<classpathentry kind="lib" path="lib/portal/tika-core.jar"/>
 	<classpathentry kind="lib" path="lib/portal/tika-parsers.jar"/>
@@ -261,7 +250,6 @@
 	<classpathentry kind="lib" path="lib/portal/transaction.jar"/>
 	<classpathentry kind="lib" path="lib/portal/vorbis-java-core.jar"/>
 	<classpathentry kind="lib" path="lib/portal/vorbis-java-tika.jar"/>
-	<classpathentry kind="lib" path="lib/portal/wsdl4j.jar"/>
 	<classpathentry kind="lib" path="lib/portal/wstx.jar"/>
 	<classpathentry kind="lib" path="lib/portal/xalan.jar"/>
 	<classpathentry kind="lib" path="lib/portal/xbean.jar"/>

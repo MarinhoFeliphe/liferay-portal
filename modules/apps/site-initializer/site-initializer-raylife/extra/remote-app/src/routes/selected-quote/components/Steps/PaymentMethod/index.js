@@ -43,10 +43,25 @@ const PaymentMethod = () => {
 	] = useContext(SelectedQuoteContext);
 
 	const productPrice = Number(product.price);
+	const productPriceParcel = productPrice / 2;
 	const promoPrice = productPrice * PRODUCT_DISCOUNT;
 	const productDiscount = productPrice - promoPrice;
 
 	const checkedMethod = methods.find(({checked}) => checked);
+
+	function setPaymentFormat(value) {
+		const currency = {
+			currency: 'USD',
+			style: 'currency',
+		};
+
+		return value.toLocaleString(
+			'en-US',
+			value % 1 === 0
+				? Object.assign(currency, {maximumFractionDigits: 0})
+				: currency
+		);
+	}
 
 	const setPaymentMethods = async () => {
 		const getSkuByName = (name) =>
@@ -65,9 +80,7 @@ const PaymentMethod = () => {
 				options: [
 					{
 						checked: true,
-						description: `Save $${promoPrice.toLocaleString(
-							'en-US'
-						)}`,
+						description: `Save ${setPaymentFormat(promoPrice)}`,
 						id: 0,
 						orderItem: {
 							discountAmount: promoPrice,
@@ -76,8 +89,8 @@ const PaymentMethod = () => {
 							skuId: fullPriceSKU.id,
 							unitPrice: productDiscount,
 						},
-						title: `Pay in full – $${productDiscount.toLocaleString(
-							'en-US'
+						title: `Pay in full - ${setPaymentFormat(
+							productDiscount
 						)}`,
 					},
 					{
@@ -85,14 +98,14 @@ const PaymentMethod = () => {
 						description: '',
 						id: 1,
 						orderItem: {
-							finalPrice: product.price / 2,
+							finalPrice: productPriceParcel,
 							quantity: 1,
 							skuId: installmentSKU.id,
-							unitPrice: product.price / 2,
+							unitPrice: productPriceParcel,
 						},
-						title: `2 payments of $${Number(
-							product.price / 2
-						).toLocaleString('en-US')}`,
+						title: `2 payments of ${setPaymentFormat(
+							productPriceParcel
+						)}`,
 					},
 				],
 				title: item.name,
@@ -155,7 +168,7 @@ const PaymentMethod = () => {
 	};
 
 	return (
-		<div className="c-mb-4 c-mt-5 ml-6">
+		<div className="c-mb-4 c-mt-5 ml-1 ml-sm-3">
 			<div className="c-mb-3 c-mt-5 d-flex flex-column">
 				<h5 className="mb-3">Payment Method</h5>
 
@@ -191,12 +204,12 @@ const PaymentMethod = () => {
 
 						{checkedMethod.options.length ? (
 							<>
-								<div className="c-mb-3 d-flex flex-row">
+								<div className="c-px-3 d-flex row">
 									{checkedMethod.options.map(
 										(option, index) => (
 											<div
 												className={classNames(
-													'align-items-center c-mr-3 c-px-5 c-py-3 d-flex flex-column justify-content-center rounded-sm',
+													'align-items-center billing-options c-mb-3 c-mr-3 c-px-5 c-py-3 d-flex flex-column justify-content-center rounded-sm',
 													{
 														'border': !option.checked,
 														'selected shadow-lg type-payment-card-solid':
@@ -209,7 +222,7 @@ const PaymentMethod = () => {
 												}
 											>
 												<div>
-													<p className="text-center text-link-md">
+													<p className="text-center text-link-sm">
 														{option.title}
 													</p>
 
@@ -231,7 +244,7 @@ const PaymentMethod = () => {
 									)}
 								</div>
 								<div className="d-flex flex-row">
-									<div className="agree-check c-mr-2">
+									<div className="c-mr-2">
 										<ClayCheckbox
 											checked={agree}
 											name="agree-check"
@@ -241,14 +254,16 @@ const PaymentMethod = () => {
 										/>
 									</div>
 
-									<p className="align-items-center c-mb-6 d-flex justify-content-center">
-										I have read and agree to the&nbsp;
-										<strong>
-											Raylife Terms and Conditions
-										</strong>
+									<p className="align-items-center c-mb-6 d-flex justify-content-center justify-content-md-end text-paragraph-sm">
+										<span>
+											I have read and agree to the&nbsp;
+											<strong>
+												Raylife Terms and Conditions
+											</strong>
+										</span>
 									</p>
 								</div>
-								<div className="c-mb-2 c-mt-10 d-flex justify-content-end payment-button">
+								<div className="c-mb-2 c-mt-7 d-flex justify-content-center justify-content-lg-end payment-button">
 									<ClayButton
 										className="btn-solid c-px-5 display-4 text-link-md text-uppercase"
 										disabled={!agree}
@@ -261,7 +276,7 @@ const PaymentMethod = () => {
 									</ClayButton>
 								</div>
 								{checkedMethod.value === 'paypal' && (
-									<p className="d-flex justify-content-end option-message">
+									<p className="d-flex justify-content-center justify-content-lg-end option-message text-center">
 										You will be redirected to PayPal to
 										complete payment
 									</p>

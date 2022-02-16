@@ -31,13 +31,9 @@ import {
 	publishDefinitionRequest,
 	saveDefinitionRequest,
 } from '../../../util/fetchUtil';
+import {isObjectEmpty} from '../../../util/utils';
 
-export default function UpperToolbar({
-	displayNames,
-	languageIds,
-	translations,
-	version,
-}) {
+export default function UpperToolbar({displayNames, languageIds, version}) {
 	const {
 		active,
 		currentEditor,
@@ -51,10 +47,13 @@ export default function UpperToolbar({
 		setSelectedLanguageId,
 		setShowInvalidContentMessage,
 		setSourceView,
+		setTranslations,
 		sourceView,
+		translations,
 	} = useContext(DefinitionBuilderContext);
 	const inputRef = useRef(null);
 	const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+	const [showDangerAlert, setShowDangerAlert] = useState(false);
 	const [alertMessage, setAlertMessage] = useState('');
 
 	const availableLocales = getAvailableLocalesObject(
@@ -92,40 +91,58 @@ export default function UpperToolbar({
 	};
 
 	const onInputBlur = () => {
-		if (definitionTitle && selectedLanguageId) {
-			translations[selectedLanguageId] = definitionTitle;
+		if (definitionTitle) {
+			let languageId = defaultLanguageId;
+
+			if (selectedLanguageId) {
+				languageId = selectedLanguageId;
+			}
+
+			setTranslations((previous) => {
+				return {...previous, [languageId]: definitionTitle};
+			});
 		}
 	};
 
 	const definitionNotPublished = version === '0' || !active;
 
 	const publishDefinition = () => {
-		let successMessage;
+		let alertMessage;
 
-		if (definitionNotPublished) {
-			successMessage = Liferay.Language.get(
-				'workflow-published-successfully'
-			);
+		if (!definitionTitle) {
+			alertMessage = Liferay.Language.get('name-workflow-before-publish');
+			setAlertMessage(alertMessage);
+			setShowDangerAlert(true);
 		}
 		else {
-			successMessage = Liferay.Language.get(
-				'workflow-updated-successfully'
-			);
-		}
-
-		setAlertMessage(successMessage);
-
-		publishDefinitionRequest({
-			active,
-			content: getXMLContent(true),
-			name: definitionId,
-			title: definitionTitle,
-			version,
-		}).then((response) => {
-			if (response.ok) {
-				setShowSuccessAlert(true);
+			if (definitionNotPublished) {
+				alertMessage = Liferay.Language.get(
+					'workflow-published-successfully'
+				);
 			}
-		});
+			else {
+				alertMessage = Liferay.Language.get(
+					'workflow-updated-successfully'
+				);
+			}
+
+			setAlertMessage(alertMessage);
+
+			publishDefinitionRequest({
+				active,
+				content: getXMLContent(true),
+				name: definitionId,
+				title: definitionTitle,
+				title_i18n: translations,
+				version,
+			}).then((response) => {
+				if (response.ok) {
+					setShowSuccessAlert(true);
+
+					window.history.back();
+				}
+			});
+		}
 	};
 
 	const saveDefinition = () => {
@@ -138,19 +155,28 @@ export default function UpperToolbar({
 			content: getXMLContent(),
 			name: definitionId,
 			title: definitionTitle,
+			title_i18n: translations,
 			version,
 		}).then((response) => {
 			if (response.ok) {
 				setShowSuccessAlert(true);
+
+				window.history.back();
 			}
 		});
 	};
 
 	useEffect(() => {
+		if (isObjectEmpty(translations)) {
+			setTranslations({
+				[defaultLanguageId]: Liferay.Language.get('new-workflow'),
+			});
+		}
+
 		if (selectedLanguageId) {
 			setDefinitionTitle(translations[selectedLanguageId]);
 		}
-	}, [selectedLanguageId, setDefinitionTitle, translations]);
+	}, [selectedLanguageId, setDefinitionTitle, setTranslations, translations]);
 
 	return (
 		<>
@@ -172,6 +198,7 @@ export default function UpperToolbar({
 
 						<ClayToolbar.Item expand>
 							<ClayInput
+								autoComplete="off"
 								className="form-control-inline"
 								id="definition-title"
 								onBlur={() => onInputBlur()}
@@ -277,6 +304,19 @@ export default function UpperToolbar({
 						displayType="success"
 						onClose={() => setShowSuccessAlert(false)}
 						title={`${Liferay.Language.get('success')}:`}
+					>
+						{alertMessage}
+					</ClayAlert>
+				</ClayAlert.ToastContainer>
+			)}
+
+			{showDangerAlert && (
+				<ClayAlert.ToastContainer>
+					<ClayAlert
+						autoClose={5000}
+						displayType="danger"
+						onClose={() => setShowDangerAlert(false)}
+						title={`${Liferay.Language.get('error')}:`}
 					>
 						{alertMessage}
 					</ClayAlert>

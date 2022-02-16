@@ -134,9 +134,9 @@ public class SampleSQLBuilderTest {
 			BenchmarksPropsKeys.MAX_ASSET_ENTRY_TO_ASSET_CATEGORY_COUNT, "1");
 		properties.put(
 			BenchmarksPropsKeys.MAX_ASSET_ENTRY_TO_ASSET_TAG_COUNT, "1");
-		properties.put(BenchmarksPropsKeys.MAX_ASSETPUBLISHER_PAGE_COUNT, "2");
 		properties.put(BenchmarksPropsKeys.MAX_ASSET_TAG_COUNT, "1");
 		properties.put(BenchmarksPropsKeys.MAX_ASSET_VUCABULARY_COUNT, "1");
+		properties.put(BenchmarksPropsKeys.MAX_ASSETPUBLISHER_PAGE_COUNT, "2");
 		properties.put(BenchmarksPropsKeys.MAX_BLOGS_ENTRY_COMMENT_COUNT, "1");
 		properties.put(BenchmarksPropsKeys.MAX_BLOGS_ENTRY_COUNT, "1");
 		properties.put(
@@ -163,6 +163,8 @@ public class SampleSQLBuilderTest {
 		properties.put(
 			BenchmarksPropsKeys.MAX_COMMERCE_PRODUCT_OPTION_CATEGORY_COUNT,
 			"1");
+		properties.put(BenchmarksPropsKeys.MAX_COMPANY_COUNT, "2");
+		properties.put(BenchmarksPropsKeys.MAX_COMPANY_USER_COUNT, "1");
 		properties.put(BenchmarksPropsKeys.MAX_CONTENT_LAYOUT_COUNT, "1");
 		properties.put(
 			BenchmarksPropsKeys.MAX_CP_DEFINITION_ATTACHMENT_TYPE_IMAGE_COUNT,
@@ -205,7 +207,7 @@ public class SampleSQLBuilderTest {
 				"assetPublisher,blog,company,commerceInventoryWarehouseItem,",
 				"commerceOrder,commerceProduct,cpDefinition,documentLibrary,",
 				"dynamicDataList,fragment,layout,mbCategory,mbThread,",
-				"repository,wiki"));
+				"repository,user,wiki"));
 		properties.put(BenchmarksPropsKeys.OUTPUT_DIR, outputDir);
 		properties.put(BenchmarksPropsKeys.OUTPUT_MERGE, "true");
 		properties.put(

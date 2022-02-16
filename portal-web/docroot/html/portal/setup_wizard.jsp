@@ -53,7 +53,7 @@
 					boolean defaultDatabase = SetupWizardUtil.isDefaultDatabase(request);
 					%>
 
-					<aui:form action='<%= themeDisplay.getPathMain() + "/portal/setup_wizard" %>' method="post" name="fm" onSubmit="event.preventDefault();">
+					<aui:form action='<%= themeDisplay.getPathMain() + "/portal/setup_wizard" %>' method="post" name="fm" onSubmit="updateConfiguration(event);">
 						<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 
 						<div class="row">
@@ -265,10 +265,6 @@
 					</aui:form>
 
 					<aui:script use="aui-base,aui-loading-mask-deprecated,io">
-						var adminEmailAddress = A.one('#<portlet:namespace />adminEmailAddress');
-						var adminFirstName = A.one('#<portlet:namespace />adminFirstName');
-						var adminLastName = A.one('#<portlet:namespace />adminLastName');
-						var companyName = A.one('#<portlet:namespace />companyName');
 						var customDatabaseOptions = A.one('#customDatabaseOptions');
 						var customDatabaseOptionsLink = A.one('#customDatabaseOptionsLink');
 						var databaseSelector = A.one('#databaseType');
@@ -378,58 +374,53 @@
 							loadingMask.show();
 						};
 
-						A.one('#fm').on(
-							'submit',
-							function(event) {
-								var form = document.fm;
+						var updateConfiguration = function(event) {
+							var form = document.fm;
 
-								if ((adminEmailAddress && (adminEmailAddress.val() != '')) && (adminFirstName && (adminFirstName.val() != '')) && (adminLastName && (adminLastName.val() != '')) && (companyName && (companyName.val() != '')) && (jdbcDefaultDriverClassName && (jdbcDefaultDriverClassName.val() != '')) && (jdbcDefaultURL && (jdbcDefaultURL.val() != ''))) {
-									if (defaultDatabase.val() == 'true') {
-										startInstall();
+							if (defaultDatabase.val() == 'true') {
+								startInstall();
 
+								command.val('<%= Constants.UPDATE %>');
+
+								submitForm(form);
+							}
+							else {
+								command.val('<%= Constants.TEST %>');
+
+								startInstall();
+
+								Liferay.Util.fetch(
+									form.action,
+									{
+										body: new FormData(form),
+										method: 'POST'
+									}
+								).then(
+									function(response) {
+										return response.json();
+									}
+								).then(
+									function(responseData) {
 										command.val('<%= Constants.UPDATE %>');
 
-										submitForm(form);
+										if (!responseData.success) {
+											updateMessage(responseData.message);
+
+											loadingMask.hide();
+										}
+										else {
+											submitForm(form);
+										}
 									}
-									else {
-										command.val('<%= Constants.TEST %>');
+								).catch(
+									function() {
+										loadingMask.hide();
 
-										startInstall();
-
-										Liferay.Util.fetch(
-											form.action,
-											{
-												body: new FormData(form),
-												method: 'POST'
-											}
-										).then(
-											function(response) {
-												return response.json();
-											}
-										).then(
-											function(responseData) {
-												command.val('<%= Constants.UPDATE %>');
-
-												if (!responseData.success) {
-													updateMessage(responseData.message);
-
-													loadingMask.hide();
-												}
-												else {
-													submitForm(form);
-												}
-											}
-										).catch(
-											function() {
-												loadingMask.hide();
-
-												updateMessage('<%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-connecting-to-the-database") %>');
-											}
-										);
+										updateMessage('<%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-connecting-to-the-database") %>');
 									}
-								}
+								);
 							}
-						);
+						};
 					</aui:script>
 				</c:when>
 				<c:otherwise>

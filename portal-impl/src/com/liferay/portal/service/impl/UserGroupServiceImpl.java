@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
 import com.liferay.portal.kernel.security.membershippolicy.UserGroupMembershipPolicyUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
@@ -66,6 +67,34 @@ public class UserGroupServiceImpl extends UserGroupServiceBaseImpl {
 			getPermissionChecker(), groupId, ActionKeys.ASSIGN_MEMBERS);
 
 		userGroupLocalService.addGroupUserGroups(groupId, userGroupIds);
+	}
+
+	@Override
+	public UserGroup addOrUpdateUserGroup(
+			String externalReferenceCode, String name, String description,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		UserGroup userGroup =
+			userGroupLocalService.fetchUserGroupByExternalReferenceCode(
+				permissionChecker.getCompanyId(), externalReferenceCode);
+
+		if (userGroup == null) {
+			PortalPermissionUtil.check(
+				permissionChecker, ActionKeys.ADD_USER_GROUP);
+		}
+		else {
+			UserGroupPermissionUtil.check(
+				permissionChecker, userGroup.getUserGroupId(),
+				ActionKeys.UPDATE);
+		}
+
+		return userGroupLocalService.addOrUpdateUserGroup(
+			externalReferenceCode, permissionChecker.getUserId(),
+			permissionChecker.getCompanyId(), name, description,
+			serviceContext);
 	}
 
 	/**

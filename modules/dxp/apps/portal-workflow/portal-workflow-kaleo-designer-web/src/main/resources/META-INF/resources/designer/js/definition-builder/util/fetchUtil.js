@@ -11,14 +11,15 @@
 
 import {fetch} from 'frontend-js-web';
 
-const baseURL = '/o/headless-admin-workflow/v1.0';
+const userBaseURL = '/o/headless-admin-user/v1.0';
+const workflowBaseURL = '/o/headless-admin-workflow/v1.0';
 
 const headers = {
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 };
 
 function publishDefinitionRequest(requestBody) {
-	return fetch(`${baseURL}/workflow-definitions/deploy`, {
+	return fetch(`${workflowBaseURL}/workflow-definitions/deploy`, {
 		body: JSON.stringify(requestBody),
 		headers: {
 			...headers,
@@ -28,15 +29,57 @@ function publishDefinitionRequest(requestBody) {
 	});
 }
 
+function retrieveAccountRoles(accountId) {
+	return fetch(`${userBaseURL}/accounts/${accountId}/account-roles`, {
+		headers,
+		method: 'GET',
+	});
+}
+
 function retrieveDefinitionRequest(definitionId) {
-	return fetch(`${baseURL}/workflow-definitions/by-name/${definitionId}`, {
+	return fetch(
+		`${workflowBaseURL}/workflow-definitions/by-name/${definitionId}`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+}
+
+function retrieveRolesBy(filterType, keywords) {
+	if (filterType === 'roleId') {
+		return fetch(
+			`${window.location.origin}${userBaseURL}/roles/` + keywords,
+			{
+				headers,
+				method: 'GET',
+			}
+		);
+	}
+}
+
+function retrieveUsersBy(filterType, keywords) {
+	let filterParameter = String();
+	for (const keyword of keywords) {
+		filterParameter =
+			filterParameter + filterType + " eq '" + keyword + "' or ";
+	}
+	filterParameter = encodeURIComponent(filterParameter)
+		.replace(/'/g, '%27')
+		.slice(0, -8);
+
+	const url = new URL(
+		`${window.location.origin}${userBaseURL}/user-accounts?filter=${filterParameter}`
+	);
+
+	return fetch(url, {
 		headers,
 		method: 'GET',
 	});
 }
 
 function saveDefinitionRequest(requestBody) {
-	return fetch(`${baseURL}/workflow-definitions/save`, {
+	return fetch(`${workflowBaseURL}/workflow-definitions/save`, {
 		body: JSON.stringify(requestBody),
 		headers: {
 			...headers,
@@ -47,9 +90,13 @@ function saveDefinitionRequest(requestBody) {
 }
 
 export {
-	baseURL,
 	headers,
+	userBaseURL,
+	workflowBaseURL,
 	publishDefinitionRequest,
+	retrieveAccountRoles,
 	retrieveDefinitionRequest,
+	retrieveRolesBy,
+	retrieveUsersBy,
 	saveDefinitionRequest,
 };

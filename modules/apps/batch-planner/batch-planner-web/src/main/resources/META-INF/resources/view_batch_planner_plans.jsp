@@ -34,9 +34,9 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 />
 
 <clay:container-fluid>
-	<form id="<portlet:namespace />fm" method="post" name="<portlet:namespace />fm">
-		<input id="<portlet:namespace />batchPlannerPlanIds" name="<portlet:namespace />batchPlannerPlanIds" type="hidden" />
-		<input id="<portlet:namespace />redirect" name="<portlet:namespace />redirect" type="hidden" value="<%= currentURL %>" />
+	<aui:form method="post" name="fm">
+		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="batchPlannerPlanIds" type="hidden" />
 
 		<liferay-ui:search-container
 			searchContainer="<%= batchPlannerPlanSearchContainer %>"
@@ -56,8 +56,9 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 
 				<portlet:renderURL var="rowURL">
 					<portlet:param name="mvcRenderCommandName" value='<%= batchPlannerPlan.isExport() ?"/batch_planner/edit_export_batch_planner_plan" : "/batch_planner/edit_import_batch_planner_plan" %>' />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
+					<portlet:param name="backURL" value="<%= currentURL %>" />
 					<portlet:param name="batchPlannerPlanId" value="<%= String.valueOf(batchPlannerPlan.getBatchPlannerPlanId()) %>" />
+					<portlet:param name="editable" value="true" />
 				</portlet:renderURL>
 
 				<liferay-ui:search-container-column-text
@@ -102,5 +103,5 @@ BatchPlannerPlanManagementToolbarDisplayContext batchPlannerPlanManagementToolba
 				markupView="lexicon"
 			/>
 		</liferay-ui:search-container>
-	<form>
+	</aui:form>
 </clay:container-fluid>

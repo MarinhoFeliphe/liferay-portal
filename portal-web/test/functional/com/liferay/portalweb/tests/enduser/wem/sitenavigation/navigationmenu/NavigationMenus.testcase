@@ -51,7 +51,7 @@ definition {
 		}
 
 		task ("Add a Display Page Content fragment to the first display page template") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Web Content DPT");
 
@@ -74,7 +74,7 @@ definition {
 		}
 
 		task ("Add a Display Page Content fragment to the second display page template") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Blogs Entry DPT");
 
@@ -98,7 +98,7 @@ definition {
 		}
 
 		task ("Add a Display Page Content fragment to the third display page template") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Document DPT");
 
@@ -121,7 +121,7 @@ definition {
 		}
 
 		task ("Add a Display Page Content fragment to the fourth display page template") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Category DPT");
 
@@ -178,7 +178,7 @@ definition {
 		}
 
 		task ("Add the Display Page type items in navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 		}
@@ -296,7 +296,7 @@ definition {
 		}
 
 		task ("Navigate to the navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 		}
@@ -350,7 +350,7 @@ definition {
 				groupName = "Test Site Name",
 				siteNavigationMenuName = "Navigation Menu Name");
 
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 		}
@@ -414,7 +414,7 @@ definition {
 				groupName = "Test Site Name",
 				siteNavigationMenuName = "Navigation Menu Name");
 
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 		}
@@ -460,7 +460,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Assert no Add New Pages column in Global navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "global");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "global");
 
 			AssertElementNotPresent(
 				key_addNewPages = "Yes",
@@ -469,7 +469,7 @@ definition {
 		}
 
 		task ("Assert no checkbox for Add Page to Global navigation menu when creating a page in normal site") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "Test Site Name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "Test Site Name");
 
 			LexiconEntry.gotoAddMenuItem(menuItem = "Public Page");
 
@@ -489,7 +489,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Navigate to the Global navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "global");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "global");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Global Navigation Menu Name");
 		}
@@ -513,7 +513,7 @@ definition {
 		}
 
 		task ("Navigate to Navigation Menus admin in Global site") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "global");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "global");
 		}
 	}
 
@@ -547,7 +547,7 @@ definition {
 		}
 
 		task ("Navigate to Navigation Menus admin") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Mark the first navigation menu as Primary Navigation") {
@@ -569,7 +569,7 @@ definition {
 		}
 
 		task ("Create a Page Template") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteUrlKey = "test-site-name");
+			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
 			PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
 
@@ -605,6 +605,66 @@ definition {
 		}
 	}
 
+	@description = "This is a test case for LPS-141462. The user could change same type asset with selected one in an existing item."
+	@priority = "4"
+	test ChangeSameAssetTypeItem {
+		property osgi.module.configuration.file.names = "com.liferay.asset.categories.item.selector.web.internal.configuration.FFAssetCategoriesItemSelectorConfiguration.config:com.liferay.site.navigation.admin.web.internal.configuration.FFSiteNavigationAdminConfiguration.config:com.liferay.site.navigation.menu.item.display.page.internal.configuration.FFDisplayPageSiteNavigationMenuItemConfiguration.config";
+		property osgi.module.configurations = "categoriesMultipleSelectionEnabled=&quot;true&quot;:categoriesMultipleSelectionEnabled=&quot;true&quot;:multipleSelectionEnabled=B&quot;true&quot;";
+
+		task ("Add two Categories with different asset types") {
+			Category.openCategoriesAdmin(siteURLKey = "test-site-name");
+
+			Vocabulary.addWithAssociatedAssetTypeCP(
+				assetType = "Document",
+				vocabularyName = "Vocabulary Name 1");
+
+			JSONCategory.addCategory(
+				groupName = "Test Site Name",
+				title = "Document Category Name",
+				vocabularyName = "Vocabulary Name 1");
+
+			Category.openCategoriesAdmin(siteURLKey = "test-site-name");
+
+			Vocabulary.addWithAssociatedAssetTypeCP(
+				assetType = "Web Content Article",
+				vocabularyName = "Vocabulary Name 2");
+
+			JSONCategory.addCategory(
+				groupName = "Test Site Name",
+				title = "Web Content Article Category Name",
+				vocabularyName = "Vocabulary Name 2");
+		}
+
+		task ("Add a navigation menu") {
+			JSONSitenavigation.addSiteNavigationMenu(
+				groupName = "Test Site Name",
+				siteNavigationMenuName = "Navigation Menu Name");
+		}
+
+		task ("Navigate to the navigation menu") {
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
+
+			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
+		}
+
+		task ("Adding a category item type and view the iframe is Select Categories") {
+			NavigationMenusAdmin.addCategoryItem(assetTitleList = "Document Category Name");
+		}
+
+		task ("Assert the first category is shown after selecting in Navigation Menu") {
+			NavigationMenusAdmin.viewItem(itemName = "Document Category Name");
+		}
+
+		task ("View second category is shown after changing item") {
+			NavigationMenusAdmin.editItem(
+				assetTitle = "Web Content Article Category Name",
+				item = "Category",
+				itemName = "Document Category Name");
+
+			NavigationMenusAdmin.viewItem(itemName = "Web Content Article Category Name");
+		}
+	}
+
 	@description = "LPS-78049 - Multiple Navigation Menus can be deleted Filter by All."
 	@priority = "3"
 	test DeleteMultipleNavigationMenus {
@@ -621,7 +681,7 @@ definition {
 		}
 
 		task ("Delete all navigation menus") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			ManagementBar.setFilterAndOrder(filterBy = "All");
 
@@ -660,7 +720,7 @@ definition {
 		}
 
 		task ("Delete the navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			LexiconEntry.delete(
 				menuItem = "Delete",
@@ -684,7 +744,7 @@ definition {
 		}
 
 		task ("Navigate to Navigation Menus admin") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Mark the first navigation menu as Primary Navigation") {
@@ -725,7 +785,7 @@ definition {
 		}
 
 		task ("Navigate to Navigation Menus admin") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Mark the first navigation menu as Secondary Navigation") {
@@ -753,7 +813,7 @@ definition {
 		}
 
 		task ("Navigate to Navigation Menus admin") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Mark the second navigation menu as Social Navigation") {
@@ -781,7 +841,7 @@ definition {
 		}
 
 		task ("Rename the navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			LexiconEntry.gotoEntryMenuItem(
 				menuItem = "Rename",
@@ -828,7 +888,7 @@ definition {
 		}
 
 		task ("Navigate to the Navigation Menus admin") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Mark the navigation menu as Primary Navigation") {
@@ -871,9 +931,9 @@ definition {
 				pageName = "Test Page Name 3",
 				siteName = "Test Site Name");
 
-			var portalUrl = PropsUtil.get("portal.url");
+			var portalURL = PropsUtil.get("portal.url");
 
-			AssertLocation(value1 = "${portalUrl}/web/test-site-name/test-page-name-2");
+			AssertLocation(value1 = "${portalURL}/web/test-site-name/test-page-name-2");
 		}
 	}
 
@@ -891,7 +951,7 @@ definition {
 		}
 
 		task ("Navigate to pages admin") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Add a page and automatically add it to both navigation menus") {
@@ -907,7 +967,7 @@ definition {
 		}
 
 		task ("Navigate to the first navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name 1");
 		}
@@ -919,7 +979,7 @@ definition {
 		}
 
 		task ("Navigate to the second navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name 2");
 		}
@@ -931,7 +991,7 @@ definition {
 		}
 
 		task ("Disable the option to offer new pages for the first navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name 1");
 
@@ -939,7 +999,7 @@ definition {
 		}
 
 		task ("Add a third page and assert that while adding the new page, the checkbox to add a new page to the first navigation menu is not present") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PagesAdmin.addPublicPage(
 				assertCheckboxMissing = "true",
@@ -948,7 +1008,7 @@ definition {
 		}
 
 		task ("Assert the third page was not added to the first navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name 1");
 
@@ -992,7 +1052,7 @@ definition {
 		}
 
 		task ("Add first and third category into Navigation Menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 
@@ -1064,7 +1124,7 @@ definition {
 		}
 
 		task ("Navigate to the navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 
@@ -1146,7 +1206,7 @@ definition {
 		}
 
 		task ("Add all categories into Navigation Menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			NavigationMenusAdmin.editMenu(navigationMenuName = "Navigation Menu Name");
 
@@ -1199,7 +1259,7 @@ definition {
 		}
 
 		task ("View no navigation menus are automatically created after adding pages") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",

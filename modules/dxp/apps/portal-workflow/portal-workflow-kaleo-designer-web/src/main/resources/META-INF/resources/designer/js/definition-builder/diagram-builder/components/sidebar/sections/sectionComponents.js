@@ -12,13 +12,19 @@
 import EdgeInformation from './EdgeInformation';
 import NodeInformation from './NodeInformation';
 import Assignments from './assignments/Assignments';
-import SelectAssignment from './assignments/SelectAssignment';
+import AssignmentsSummary from './assignments/AssignmentsSummary';
+import SourceCode from './assignments/SourceCode';
+import Notifications from './notifications/Notifications';
+import NotificationsSummary from './notifications/NotificationsSummary';
 
 const sectionComponents = {
 	assignments: Assignments,
+	assignmentsSummary: AssignmentsSummary,
 	edgeInformation: EdgeInformation,
 	nodeInformation: NodeInformation,
-	selectAssignment: SelectAssignment,
+	notifications: Notifications,
+	notificationsSummary: NotificationsSummary,
+	sourceCode: SourceCode,
 };
 
 export default sectionComponents;

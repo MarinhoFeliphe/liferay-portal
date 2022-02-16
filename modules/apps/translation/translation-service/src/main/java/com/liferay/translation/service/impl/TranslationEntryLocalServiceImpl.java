@@ -316,6 +316,11 @@ public class TranslationEntryLocalServiceImpl
 
 			Object object = infoItemObjectProvider.getInfoItem(classPK);
 
+			if (object == null) {
+				throw new XLIFFFileException.MustHaveValidModel(
+					"Unable to get info item for class PK " + classPK);
+			}
+
 			if (object instanceof GroupedModel) {
 				GroupedModel groupedModel = (GroupedModel)object;
 

@@ -15,6 +15,7 @@
 // Utils
 
 export {default as compose} from './utils/compose.es';
+export {getDDMFormFieldSettingsContext} from './utils/dataConverter';
 export * as DRAG_TYPES from './utils/dragTypes';
 export {convertToFormData, makeFetch} from './utils/fetch.es';
 export {getFields, normalizeFieldName} from './utils/fields.es';
@@ -36,6 +37,8 @@ export * as RulesSupport from './utils/rulesSupport';
 export {default as setDataRecord} from './utils/setDataRecord.es';
 export * as SettingsContext from './utils/settingsContext';
 export * as StringUtils from './utils/strings';
+export {Token} from './utils/Token';
+export {Tokenizer} from './utils/Tokenizer';
 export {PagesVisitor} from './utils/visitors.es';
 
 // Form/Data Engine Core

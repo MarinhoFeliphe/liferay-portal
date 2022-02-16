@@ -75,6 +75,13 @@ public interface WorkflowTaskManager {
 	public WorkflowTask fetchWorkflowTask(long companyId, long workflowTaskId)
 		throws WorkflowException;
 
+	public default List<User> getUsersThatCanSee(
+		long companyId, long workflowTaskId)
+		throws WorkflowException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public default List<User> getAssignableUsers(
 			long companyId, long workflowTaskId)
 		throws WorkflowException {

@@ -48,6 +48,12 @@ definition {
 		AssertChecked.assertCheckedNotVisible(locator1 = "//input[@type='checkbox']");
 	}
 
+	macro assertEntryDetailsLabelNotPresent {
+		AssertNotVisible(
+			key_entryLabel = "${entryLabel}",
+			locator1 = "ObjectPortlet#VIEW_ENTRY_DETAILS_LABEL");
+	}
+
 	macro assertEntryDetailsLabelPresent {
 		AssertElementPresent(
 			key_entryLabel = "${entryLabel}",
@@ -110,6 +116,13 @@ definition {
 
 	macro assertFieldLabelName {
 		AssertTextEquals(
+			key_fieldLabelName = "${fieldLabelName}",
+			locator1 = "ObjectPortlet#FIELD_LABEL_NAME",
+			value1 = "${key_fieldLabelName}");
+	}
+
+	macro assertFieldLabelNameNotPresent {
+		AssertTextNotEquals(
 			key_fieldLabelName = "${fieldLabelName}",
 			locator1 = "ObjectPortlet#FIELD_LABEL_NAME",
 			value1 = "${key_fieldLabelName}");
@@ -331,6 +344,21 @@ definition {
 		WaitForSPARefresh();
 	}
 
+	macro viewClobEntryDetails {
+		var key_entry = "${clobEntry}";
+
+		if (IsElementPresent(locator1 = "ObjectPortlet#ENTRY_CLOB_KEBAB_MENU")) {
+			Click(locator1 = "ObjectPortlet#ENTRY_CLOB_KEBAB_MENU");
+
+			Click(locator1 = "ObjectPortlet#VIEW_ENTRY_BUTTON");
+		}
+		else {
+			Click(locator1 = "ObjectPortlet#VIEW_ENTRY_EYE_BUTTON");
+		}
+
+		WaitForPageLoad();
+	}
+
 	macro viewEntry {
 		AssertElementPresent(
 			key_entry = "${entry}",
@@ -350,6 +378,16 @@ definition {
 		}
 
 		WaitForPageLoad();
+	}
+
+	macro viewWarningMessage {
+		AssertElementPresent(
+			locator1 = "Message#ERROR_3_ALT",
+			value1 = "${warningMessage}");
+	}
+
+	macro viewWidgetButton {
+		AssertElementPresent(locator1 = "ObjectPortlet#VIEW_WIDGET_BUTTON");
 	}
 
 }

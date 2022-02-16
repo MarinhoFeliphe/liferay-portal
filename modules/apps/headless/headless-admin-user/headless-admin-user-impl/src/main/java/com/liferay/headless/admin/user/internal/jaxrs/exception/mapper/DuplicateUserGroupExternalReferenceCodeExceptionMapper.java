@@ -45,7 +45,7 @@ public class DuplicateUserGroupExternalReferenceCodeExceptionMapper
 
 		return new Problem(
 			Response.Status.BAD_REQUEST,
-			"The external reference code belongs to another user group");
+			duplicateUserGroupExternalReferenceCodeException.getMessage());
 	}
 
 }

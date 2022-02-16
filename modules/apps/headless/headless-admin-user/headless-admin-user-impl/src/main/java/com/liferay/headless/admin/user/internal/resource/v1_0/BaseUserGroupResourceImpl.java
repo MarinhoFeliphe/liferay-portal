@@ -43,6 +43,7 @@ import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -66,6 +67,54 @@ import javax.ws.rs.core.UriInfo;
 public abstract class BaseUserGroupResourceImpl
 	implements EntityModelResource, UserGroupResource,
 			   VulcanBatchEngineTaskItemDelegate<UserGroup> {
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-user/v1.0/user-groups'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "search"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "filter"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "page"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "pageSize"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "sort"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "UserGroup")}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/user-groups")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public Page<UserGroup> getUserGroupsPage(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.ws.rs.QueryParam("search")
+			String search,
+			@javax.ws.rs.core.Context Filter filter,
+			@javax.ws.rs.core.Context Pagination pagination,
+			@javax.ws.rs.core.Context Sort[] sorts)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
 
 	/**
 	 * Invoke this method with the command line:
@@ -185,6 +234,40 @@ public abstract class BaseUserGroupResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("externalReferenceCode")
 			String externalReferenceCode)
+		throws Exception {
+
+		return new UserGroup();
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-user/v1.0/user-groups/by-external-reference-code/{externalReferenceCode}' -d $'{"description": ___, "externalReferenceCode": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "externalReferenceCode"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "UserGroup")}
+	)
+	@javax.ws.rs.Consumes({"application/json", "application/xml"})
+	@javax.ws.rs.Path(
+		"/user-groups/by-external-reference-code/{externalReferenceCode}"
+	)
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@javax.ws.rs.PUT
+	@Override
+	public UserGroup putUserGroupByExternalReferenceCode(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("externalReferenceCode")
+			String externalReferenceCode,
+			UserGroup userGroup)
 		throws Exception {
 
 		return new UserGroup();
@@ -532,7 +615,7 @@ public abstract class BaseUserGroupResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		return null;
+		return getUserGroupsPage(search, filter, pagination, sorts);
 	}
 
 	@Override

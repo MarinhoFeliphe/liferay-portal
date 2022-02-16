@@ -56,6 +56,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CATEGORY_CONTENT_TITLE</td>
+	<td>//div[contains(@class,'portlet-content-editable')]//*[contains(@class,'category-title')] | //div[contains(@class,'category-content')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CHANGE_TAX_CATEGORY</td>
 	<td>//label[text()='Shipping Tax Category']/..//input[@type='text']</td>
 	<td></td>
@@ -68,11 +73,6 @@
 <tr>
 	<td>CHECK_WAREHOUSE_COLLAPSE_OPEN</td>
 	<td>//a[contains(.,'${key_specifiedCollapse}')]/../../..//div[contains(@class,'show')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DEFAULT_PRODUCT_DISPLAY_PAGE</td>
-	<td>//span[contains (@id,'displayPageNameInput') and contains(.,'${key_displayPage}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -93,6 +93,11 @@
 <tr>
 	<td>DISPLAY_DATE_TIME_FIELD</td>
 	<td>//span/input[contains(@id,'displayDateTime') and (@placeholder='h:mm am/pm')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISPLAY_PAGE_ANY</td>
+	<td>//span[contains (@id,'displayPageNameInput')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -228,6 +233,11 @@
 <tr>
 	<td>OPTIONS_SELECT_LIST</td>
 	<td>//div[contains(@class,'dropdown-menu')]//button[contains(.,'${key_selectValue}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OVERRIDE_DEFAULT_DISPLAY_PAGE_LAYOUT</td>
+	<td>//div[contains(@class,'table')]//div[contains(text(),'${key_layout}')]</td>
 	<td></td>
 </tr>
 <tr>

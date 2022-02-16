@@ -50,6 +50,10 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 				"apiURL", objectDefinitionsRelationshipsDisplayContext.getAPIURL()
 			).put(
 				"ffOneToOneRelationshipConfigurationEnabled", objectDefinitionsRelationshipsDisplayContext.isFFOneToOneRelationshipConfigurationEnabled()
+			).put(
+				"objectDefinitionId", objectDefinition.getObjectDefinitionId()
+			).put(
+				"system", objectDefinition.isSystem()
 			).build()
 		%>'
 	/>

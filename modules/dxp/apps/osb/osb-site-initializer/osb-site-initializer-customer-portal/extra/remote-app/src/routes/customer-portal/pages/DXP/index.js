@@ -8,11 +8,14 @@
  * permissions and limitations under the License, including but not limited to
  * distribution rights of the Software.
  */
-import DeveloperKeysLayouts from '../../components/DeveloperKeysLayout';
+import DXPActivationKeysTable from '../../containers/DXPActivationKeysTable';
+import DeveloperKeysLayouts from '../../layouts/DeveloperKeysLayout';
 
 const DXP = ({project, sessionId}) => {
 	return (
 		<div className="mr-4">
+			<DXPActivationKeysTable project={project} sessionId={sessionId} />
+
 			<DeveloperKeysLayouts>
 				<DeveloperKeysLayouts.Inputs
 					accountKey={project.accountKey}

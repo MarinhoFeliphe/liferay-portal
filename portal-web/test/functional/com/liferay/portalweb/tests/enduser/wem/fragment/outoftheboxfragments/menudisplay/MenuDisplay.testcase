@@ -82,14 +82,14 @@ definition {
 		}
 
 		task ("Add a Menu Display fragment as header in custom master page") {
-			MastersPageTemplatesAdmin.openMastersAdmin(siteUrlKey = "test-site-name");
+			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "test-site-name");
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
 			PageEditor.addFragment(
 				collectionName = "Menu Display",
 				dropTarget = "Header",
-				fragmentName = "Menu Display Fragment",
+				fragmentName = "Menu Display",
 				scope = "Master");
 		}
 
@@ -128,7 +128,7 @@ definition {
 		}
 
 		task ("Assert the All is shown in Sublevels field") {
-			PageEditor.clickConfigurableField(fragmentName = "Menu Display Fragment");
+			PageEditor.clickConfigurableField(fragmentName = "Menu Display");
 
 			Pause(locator1 = "3000");
 
@@ -222,14 +222,14 @@ definition {
 		}
 
 		task ("Add a Menu Display fragment as header in custom master page") {
-			MastersPageTemplatesAdmin.openMastersAdmin(siteUrlKey = "test-site-name");
+			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "test-site-name");
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
 			PageEditor.addFragment(
 				collectionName = "Menu Display",
 				dropTarget = "Header",
-				fragmentName = "Menu Display Fragment",
+				fragmentName = "Menu Display",
 				scope = "Master");
 		}
 
@@ -260,7 +260,7 @@ definition {
 		}
 
 		task ("Assert the Horizontal is shown in Display Style field") {
-			PageEditor.clickConfigurableField(fragmentName = "Menu Display Fragment");
+			PageEditor.clickConfigurableField(fragmentName = "Menu Display");
 
 			Pause(locator1 = "3000");
 
@@ -309,14 +309,14 @@ definition {
 		}
 
 		task ("Add a Menu Display fragment as header in custom master page") {
-			MastersPageTemplatesAdmin.openMastersAdmin(siteUrlKey = "test-site-name");
+			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "test-site-name");
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
 			PageEditor.addFragment(
 				collectionName = "Menu Display",
 				dropTarget = "Header",
-				fragmentName = "Menu Display Fragment",
+				fragmentName = "Menu Display",
 				scope = "Master");
 		}
 
@@ -346,7 +346,7 @@ definition {
 		}
 
 		task ("Add a page based on custom master page") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",
@@ -419,7 +419,7 @@ definition {
 		}
 
 		task ("Add an URL type item to navigation menu") {
-			NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "test-site-name");
+			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			LexiconEntry.gotoEntry(rowEntry = "Navigation Menu Name");
 
@@ -440,14 +440,14 @@ definition {
 		}
 
 		task ("Add a Menu Display fragment as header in custom master page") {
-			MastersPageTemplatesAdmin.openMastersAdmin(siteUrlKey = "test-site-name");
+			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "test-site-name");
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "Custom Masters Page Template");
 
 			PageEditor.addFragment(
 				collectionName = "Menu Display",
 				dropTarget = "Header",
-				fragmentName = "Menu Display Fragment",
+				fragmentName = "Menu Display",
 				scope = "Master");
 		}
 
@@ -458,7 +458,7 @@ definition {
 		}
 
 		task ("Assert the Public Pages Hierarchy is shown in Source field") {
-			PageEditor.clickConfigurableField(fragmentName = "Menu Display Fragment");
+			PageEditor.clickConfigurableField(fragmentName = "Menu Display");
 
 			AssertTextEquals(
 				key_fieldLabel = "Source",

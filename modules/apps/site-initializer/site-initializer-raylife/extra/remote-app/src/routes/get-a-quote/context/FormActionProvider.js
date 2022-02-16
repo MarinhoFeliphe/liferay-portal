@@ -14,7 +14,6 @@
 
 import {createContext, useContext, useState} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {DEVICES} from '../../../common/utils/constants';
 import ProgressSavedModal from '../components/containers/Forms/Modal/ProgressSaved';
 import useFormActions from '../hooks/useFormActions';
 import {AppContext} from './AppContextProvider';
@@ -34,7 +33,10 @@ const FormActionProvider = ({children, form}) => {
 
 	const {
 		state: {
-			dimensions: {deviceSize},
+			activeMobileSubSection,
+			dimensions: {
+				device: {isMobile},
+			},
 			selectedStep: {index: currentStepIndex = 0},
 			steps,
 		},
@@ -43,7 +45,6 @@ const FormActionProvider = ({children, form}) => {
 	const emailHasError = !!errors?.basics?.businessInformation?.business
 		?.email;
 
-	const isMobileDevice = deviceSize === DEVICES.PHONE;
 	const email = getValues('basics.businessInformation.business.email');
 	const productQuote = getValues('basics.productQuoteName');
 
@@ -63,6 +64,14 @@ const FormActionProvider = ({children, form}) => {
 			.finally(() => setLoading(false));
 	};
 
+	const isContinueButtonVisible = () => {
+		if (!isMobile) {
+			return true;
+		}
+
+		return activeMobileSubSection?.hideContinueButton ? false : true;
+	};
+
 	return (
 		<FormActionContext.Provider
 			value={{
@@ -72,10 +81,11 @@ const FormActionProvider = ({children, form}) => {
 					onPrevious,
 					onSave,
 					onSaveDisabled: !email || emailHasError || loading,
+					showContinueButton: isContinueButtonVisible(),
 					showSaveAndExit: onNext && currentStepIndex >= 2,
 				},
 				errorModal,
-				isMobileDevice,
+				isMobileDevice: isMobile,
 				isValid,
 				setShowProgressModal,
 			}}
@@ -84,7 +94,7 @@ const FormActionProvider = ({children, form}) => {
 
 			<ProgressSavedModal
 				email={email}
-				isMobileDevice={isMobileDevice}
+				isMobileDevice={isMobile}
 				onClose={() => {
 					setShowProgressModal(false);
 

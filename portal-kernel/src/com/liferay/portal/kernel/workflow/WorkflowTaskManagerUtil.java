@@ -86,6 +86,13 @@ public class WorkflowTaskManagerUtil {
 			companyId, workflowTaskId);
 	}
 
+	public static List<User> getUsersThatCanSee(long companyId, long workflowTaskId)
+		throws WorkflowException {
+
+		return _workflowTaskManager.getUsersThatCanSee(
+			companyId, workflowTaskId);
+	}
+
 	public static List<User> getAssignableUsers(
 			long companyId, long workflowTaskId)
 		throws WorkflowException {

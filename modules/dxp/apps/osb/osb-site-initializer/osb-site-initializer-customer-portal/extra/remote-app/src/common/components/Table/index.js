@@ -10,26 +10,82 @@
  */
 
 import ClayTable from '@clayui/table';
-import React from 'react';
+import classNames from 'classnames';
+
+import {useState} from 'react';
 import TablePagination from './Pagination';
 import TableSkeleton from './Skeleton';
 
 const Table = ({
-	activePage = 1,
 	columns,
+	hasCheckbox,
 	hasPagination,
 	isLoading = false,
-	itemsPerPage = 5,
+	paginationConfig,
 	rows,
-	setActivePage,
-	totalCount,
 	...props
 }) => {
+	const [isAllCheckboxsSelected, setIsAllCheckboxsSelected] = useState(false);
+	const [checkboxesChecked, setCheckboxesChecked] = useState([]);
+	const {
+		activePage,
+		itemsPerPage,
+		labels,
+		listItemsPerPage,
+		setActivePage,
+		setItemsPerPage,
+		showDeltasDropDown,
+		totalCount,
+	} = paginationConfig;
+
+	const handleCheckboxClick = (event, id) => {
+		const {checked} = event.target;
+
+		if (checked) {
+			return setCheckboxesChecked((previousCheckboxesChecked) => [
+				...previousCheckboxesChecked,
+				id,
+			]);
+		}
+
+		setCheckboxesChecked((previousCheckboxesChecked) =>
+			previousCheckboxesChecked.filter(
+				(CheckboxChecked) => CheckboxChecked !== id
+			)
+		);
+	};
+
+	const handleToggleAllCheckboxsSelected = () => {
+		setIsAllCheckboxsSelected(
+			(previousIsAllCheckboxsSelected) => !previousIsAllCheckboxsSelected
+		);
+
+		if (isAllCheckboxsSelected) {
+			setCheckboxesChecked([]);
+
+			return;
+		}
+
+		setCheckboxesChecked(
+			new Array(rows.length).fill().map((_, index) => index)
+		);
+	};
+
 	return (
 		<>
 			<ClayTable {...props}>
 				<ClayTable.Head>
 					<ClayTable.Row>
+						{hasCheckbox && (
+							<ClayTable.Cell className="text-center">
+								<input
+									checked={isAllCheckboxsSelected}
+									onChange={handleToggleAllCheckboxsSelected}
+									type="checkbox"
+								/>
+							</ClayTable.Cell>
+						)}
+
 						{columns.map((column) => (
 							<ClayTable.Cell
 								align={column.align}
@@ -37,11 +93,23 @@ const Table = ({
 									column.header.styles ||
 									'bg-neutral-1 font-weight-bold text-neutral-8'
 								}
-								expanded={column.expanded}
 								headingCell
 								key={column.accessor}
+								noWrap={column.header.noWrap}
 							>
-								{column.header.name}
+								{column.header.description ? (
+									<div>
+										<p className="font-weight-bold m-0 text-neutral-10">
+											{column.header.name}
+										</p>
+
+										<p className="font-weight-normal m-0 text-neutral-7 text-paragraph-sm">
+											{column.header.description}
+										</p>
+									</div>
+								) : (
+									column.header.name
+								)}
 							</ClayTable.Cell>
 						))}
 					</ClayTable.Row>
@@ -50,13 +118,44 @@ const Table = ({
 				{!isLoading ? (
 					<ClayTable.Body>
 						{rows.map((row, rowIndex) => (
-							<ClayTable.Row key={rowIndex}>
+							<ClayTable.Row
+								className={classNames({
+									'cp-common-table-active-row': checkboxesChecked.find(
+										(checkboxChecked) =>
+											checkboxChecked === rowIndex
+									),
+								})}
+								key={rowIndex}
+							>
+								{hasCheckbox && (
+									<ClayTable.Cell
+										align="center"
+										className="border-0"
+										key={`checkbox-${rowIndex}`}
+									>
+										<input
+											checked={checkboxesChecked.includes(
+												rowIndex
+											)}
+											onChange={(event) =>
+												handleCheckboxClick(
+													event,
+													rowIndex
+												)
+											}
+											type="checkbox"
+										/>
+									</ClayTable.Cell>
+								)}
+
 								{columns.map((column, columnIndex) => (
 									<ClayTable.Cell
 										align={column.align}
 										className={column.bodyClass}
-										headingTitle={column.headingTitle}
+										columnTextAlignment={column.align}
+										expanded={column.expanded}
 										key={`${rowIndex}-${columnIndex}`}
+										noWrap={column.noWrap}
 									>
 										{row[column.accessor]}
 									</ClayTable.Cell>
@@ -66,22 +165,40 @@ const Table = ({
 					</ClayTable.Body>
 				) : (
 					<TableSkeleton
+						hasCheckbox={hasCheckbox}
 						totalColumns={columns.length}
 						totalItems={itemsPerPage}
 					/>
 				)}
 			</ClayTable>
 
-			{hasPagination && (
+			{!!hasPagination && !!totalCount && (
 				<TablePagination
-					activePage={activePage}
-					itemsPerPage={itemsPerPage}
+					activePage={activePage || 1}
+					itemsPerPage={itemsPerPage || 5}
+					labels={labels}
+					listItemsPerPage={listItemsPerPage}
 					setActivePage={setActivePage}
+					setItemsPerPage={setItemsPerPage}
+					showDeltasDropDown={showDeltasDropDown}
 					totalItems={totalCount}
 				/>
 			)}
 		</>
 	);
+};
+
+Table.defaultProps = {
+	paginationConfig: {
+		activePage: 1,
+		itemsPerPage: 5,
+		labels: '',
+		listItemsPerPage: [],
+		setActivePage: () => {},
+		setItemsPerPage: () => {},
+		showDeltasDropDown: false,
+		totalCount: 1,
+	},
 };
 
 export default Table;

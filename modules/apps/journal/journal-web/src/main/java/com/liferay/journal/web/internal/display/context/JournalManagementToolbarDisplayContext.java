@@ -26,10 +26,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.web.internal.configuration.FFBulkTranslationConfiguration;
 import com.liferay.journal.web.internal.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
+import com.liferay.journal.web.internal.util.JournalUtil;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -387,7 +386,7 @@ public class JournalManagementToolbarDisplayContext
 						ddmStructureName);
 			}
 		).add(
-			() -> status != _journalDisplayContext.getDefaultStatus(),
+			() -> status != WorkflowConstants.STATUS_ANY,
 			labelItem -> {
 				labelItem.putData(
 					"removeLabelURL",
@@ -395,7 +394,7 @@ public class JournalManagementToolbarDisplayContext
 						PortletURLUtil.clone(
 							currentURLObj, liferayPortletResponse)
 					).setParameter(
-						"status", (String)null
+						"status", WorkflowConstants.STATUS_ANY
 					).buildString());
 
 				labelItem.setCloseable(true);
@@ -639,14 +638,7 @@ public class JournalManagementToolbarDisplayContext
 		statuses.add(WorkflowConstants.STATUS_ANY);
 		statuses.add(WorkflowConstants.STATUS_DRAFT);
 
-		int workflowDefinitionLinksCount =
-			WorkflowDefinitionLinkLocalServiceUtil.
-				getWorkflowDefinitionLinksCount(
-					_themeDisplay.getCompanyId(),
-					_themeDisplay.getScopeGroupId(),
-					JournalFolder.class.getName());
-
-		if (workflowDefinitionLinksCount > 0) {
+		if (JournalUtil.hasWorkflowDefinitionsLinks(_themeDisplay)) {
 			statuses.add(WorkflowConstants.STATUS_PENDING);
 			statuses.add(WorkflowConstants.STATUS_DENIED);
 		}

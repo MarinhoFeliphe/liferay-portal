@@ -30,12 +30,44 @@ import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.tools.GitException;
 import com.liferay.portal.tools.GitUtil;
 import com.liferay.portal.tools.ToolsUtil;
-import com.liferay.source.formatter.checks.configuration.ConfigurationLoader;
-import com.liferay.source.formatter.checks.configuration.SourceCheckConfiguration;
-import com.liferay.source.formatter.checks.configuration.SourceFormatterConfiguration;
-import com.liferay.source.formatter.checks.configuration.SourceFormatterSuppressions;
-import com.liferay.source.formatter.checks.configuration.SuppressionsLoader;
-import com.liferay.source.formatter.checks.util.SourceUtil;
+import com.liferay.source.formatter.check.configuration.ConfigurationLoader;
+import com.liferay.source.formatter.check.configuration.SourceCheckConfiguration;
+import com.liferay.source.formatter.check.configuration.SourceFormatterConfiguration;
+import com.liferay.source.formatter.check.configuration.SourceFormatterSuppressions;
+import com.liferay.source.formatter.check.configuration.SuppressionsLoader;
+import com.liferay.source.formatter.check.util.SourceUtil;
+import com.liferay.source.formatter.processor.BNDRunSourceProcessor;
+import com.liferay.source.formatter.processor.BNDSourceProcessor;
+import com.liferay.source.formatter.processor.CQLSourceProcessor;
+import com.liferay.source.formatter.processor.CSSSourceProcessor;
+import com.liferay.source.formatter.processor.CodeownersSourceProcessor;
+import com.liferay.source.formatter.processor.ConfigSourceProcessor;
+import com.liferay.source.formatter.processor.DTDSourceProcessor;
+import com.liferay.source.formatter.processor.DockerfileSourceProcessor;
+import com.liferay.source.formatter.processor.FTLSourceProcessor;
+import com.liferay.source.formatter.processor.GradleSourceProcessor;
+import com.liferay.source.formatter.processor.GroovySourceProcessor;
+import com.liferay.source.formatter.processor.HTMLSourceProcessor;
+import com.liferay.source.formatter.processor.JSONSourceProcessor;
+import com.liferay.source.formatter.processor.JSPSourceProcessor;
+import com.liferay.source.formatter.processor.JSSourceProcessor;
+import com.liferay.source.formatter.processor.JavaSourceProcessor;
+import com.liferay.source.formatter.processor.LFRBuildSourceProcessor;
+import com.liferay.source.formatter.processor.MarkdownSourceProcessor;
+import com.liferay.source.formatter.processor.PackageinfoSourceProcessor;
+import com.liferay.source.formatter.processor.PoshiSourceProcessor;
+import com.liferay.source.formatter.processor.PropertiesSourceProcessor;
+import com.liferay.source.formatter.processor.PythonSourceProcessor;
+import com.liferay.source.formatter.processor.SHSourceProcessor;
+import com.liferay.source.formatter.processor.SQLSourceProcessor;
+import com.liferay.source.formatter.processor.SourceProcessor;
+import com.liferay.source.formatter.processor.SoySourceProcessor;
+import com.liferay.source.formatter.processor.TLDSourceProcessor;
+import com.liferay.source.formatter.processor.TSSourceProcessor;
+import com.liferay.source.formatter.processor.TXTSourceProcessor;
+import com.liferay.source.formatter.processor.UpgradeSourceProcessor;
+import com.liferay.source.formatter.processor.XMLSourceProcessor;
+import com.liferay.source.formatter.processor.YMLSourceProcessor;
 import com.liferay.source.formatter.util.CheckType;
 import com.liferay.source.formatter.util.DebugUtil;
 import com.liferay.source.formatter.util.FileUtil;
@@ -946,6 +978,9 @@ public class SourceFormatter {
 				new ExcludeSyntaxPattern(ExcludeSyntax.GLOB, "**/tmp/**"),
 				new ExcludeSyntaxPattern(
 					ExcludeSyntax.GLOB, "**/node_modules_cache/**"),
+				new ExcludeSyntaxPattern(
+					ExcludeSyntax.REGEX,
+					".*/tests?/.*/dependencies/.+\\.(jar|lar|war|zip)/.+"),
 				new ExcludeSyntaxPattern(
 					ExcludeSyntax.REGEX,
 					"^((?!/frontend-js-node-shims/src/).)*/node_modules/.*")));

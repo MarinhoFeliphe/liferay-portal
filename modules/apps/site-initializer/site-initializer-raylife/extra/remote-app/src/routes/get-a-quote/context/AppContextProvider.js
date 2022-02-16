@@ -20,7 +20,9 @@ import {getTaxonomyVocabularies} from '../services/TaxonomyVolucabularies';
 import {AVAILABLE_STEPS, STEP_ORDERED} from '../utils/constants';
 
 const initialState = {
-	dimensions: {},
+	dimensions: {
+		device: {},
+	},
 	percentage: {
 		[AVAILABLE_STEPS.BASICS_BUSINESS_INFORMATION.section]: 0,
 		[AVAILABLE_STEPS.BUSINESS.section]: 0,
@@ -37,6 +39,7 @@ const initialState = {
 export const ActionTypes = {
 	SET_DIMENSIONS: 'SET_DIMENSIONS',
 	SET_MOBILE_SUBSECTION_ACTIVE: 'SET_MOBILE_SUBSECTION_ACTIVE',
+	SET_MOBILE_SUBSECTION_DISABLE: 'SET_MOBILE_SUBSECTION_DISABLE',
 	SET_PERCENTAGE: 'SET_PERCENTAGE',
 	SET_SELECTED_PRODUCT: 'SET_SELECTED_PRODUCT',
 	SET_SELECTED_TRIGGER: 'SET_SELECTED_TRIGGER',
@@ -100,6 +103,33 @@ function AppContextReducer(state, action) {
 				}),
 			};
 
+		case ActionTypes.SET_MOBILE_SUBSECTION_DISABLE:
+			const disableSections = action.payload;
+
+			return {
+				...state,
+				steps: state.steps.map((step) => {
+					const mobileSubSections = step.mobileSubSections;
+
+					if (Array.isArray(mobileSubSections)) {
+						return {
+							...step,
+							mobileSubSections: mobileSubSections.filter(
+								(mobileSubSection) =>
+									!(Array.isArray(disableSections)
+										? disableSections.includes(
+												mobileSubSection.title
+										  )
+										: disableSections ===
+										  mobileSubSection.title)
+							),
+						};
+					}
+
+					return step;
+				}),
+			};
+
 		case ActionTypes.SET_STEP_ACTIVE:
 			return {
 				...state,
@@ -127,6 +157,8 @@ export const AppContext = createContext({});
 export function AppContextProvider({children}) {
 	const dimensions = useWindowDimensions();
 	const [state, dispatch] = useReducer(AppContextReducer, initialState);
+
+	const selectedStep = state.steps.find(({active}) => active);
 
 	useEffect(() => {
 		const onDismiss = () =>
@@ -164,7 +196,10 @@ export function AppContextProvider({children}) {
 				dispatch,
 				state: {
 					...state,
-					selectedStep: state.steps.find(({active}) => active),
+					activeMobileSubSection: selectedStep.mobileSubSections?.find(
+						({active, blocked = false}) => active && !blocked
+					),
+					selectedStep,
 				},
 			}}
 		>

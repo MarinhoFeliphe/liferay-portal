@@ -14,10 +14,8 @@
 
 import React, {useContext, useEffect} from 'react';
 import {useWatch} from 'react-hook-form';
-import {DEVICES} from '../../../common/utils/constants';
 
 import {createExitAlert} from '../../../common/utils/exitAlert';
-import {getWebDavUrl} from '../../../common/utils/webdav';
 import Providers from '../Providers';
 import {FormLayout} from '../components/containers/Forms';
 import {Steps} from '../components/containers/Steps';
@@ -33,27 +31,18 @@ import {AVAILABLE_STEPS} from '../utils/constants';
  * @param {Boolean} isMobileDevice
  */
 
-const adaptRaylifeLayout = (isMobileDevice) => {
-	if (isMobileDevice) {
+const adaptRaylifeLayout = (isMobile) => {
+	if (isMobile) {
 		document
 			.querySelector('section#content')
 			?.setAttribute('class', 'raylife-mobile');
 	}
 
 	document
-		.querySelector('.quote-site-navbar .container img.navbar-logo')
-		?.setAttribute(
-			'src',
-			`${getWebDavUrl()}${
-				isMobileDevice ? 'raylife_logo_mobile.svg' : 'raylife_logo.svg'
-			}`
-		);
-
-	document
 		.querySelector('.get-a-quote-structure .step-list')
 		?.setAttribute(
 			'style',
-			isMobileDevice
+			isMobile
 				? 'overflow-x: auto; overflow-y: hidden; height: 39px;'
 				: 'justify-content-center'
 		);
@@ -64,10 +53,12 @@ const QuoteApp = () => {
 	const {selectedStep} = useStepWizard();
 	const {updateState} = useTriggerContext();
 	const {
-		state: {dimensions},
+		state: {
+			dimensions: {
+				device: {isMobile},
+			},
+		},
 	} = useContext(AppContext);
-
-	const isMobileDevice = dimensions.deviceSize === DEVICES.PHONE;
 
 	useEffect(() => {
 		createExitAlert();
@@ -79,12 +70,12 @@ const QuoteApp = () => {
 	}, [selectedStep.section, selectedStep.subsection]);
 
 	useEffect(() => {
-		adaptRaylifeLayout(isMobileDevice);
-	}, [isMobileDevice]);
+		adaptRaylifeLayout(isMobile);
+	}, [isMobile]);
 
 	return (
 		<div className="d-flex get-a-quote-structure justify-content-between">
-			<Steps isMobileDevice={isMobileDevice} />
+			<Steps />
 
 			<main className="d-flex flex-wrap justify-content-lg-start justify-content-md-center">
 				<h2 className="display-4 mb-6 mx-6 step-title">

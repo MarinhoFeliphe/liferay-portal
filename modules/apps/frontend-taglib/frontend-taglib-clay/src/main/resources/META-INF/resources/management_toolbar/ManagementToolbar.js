@@ -31,6 +31,8 @@ import SelectionControls from './SelectionControls';
 
 import './ManagementToolbar.scss';
 
+const noop = () => {};
+
 function ManagementToolbar({
 	clearResultsURL,
 	clearSelectionURL,
@@ -44,15 +46,17 @@ function ManagementToolbar({
 	initialCheckboxStatus,
 	initialSelectAllButtonVisible,
 	initialSelectedItems,
-	onActionButtonClick = () => {},
-	onCheckboxChange = () => {},
-	onClearSelectionButtonClick = () => {},
-	onCreateButtonClick = () => {},
-	onCreationMenuItemClick = () => {},
-	onInfoButtonClick = () => {},
-	onFilterDropdownItemClick = () => {},
-	onSelectAllButtonClick = () => {},
+	onActionButtonClick = noop,
+	onCheckboxChange = noop,
+	onClearSelectionButtonClick = noop,
+	onCreateButtonClick = noop,
+	onCreationMenuItemClick = noop,
+	onInfoButtonClick = noop,
+	onFilterDropdownItemClick = noop,
+	onOrderDropdownItemClick = noop,
+	onSelectAllButtonClick = noop,
 	onShowMoreButtonClick,
+	orderDropdownItems,
 	searchActionURL,
 	searchContainerId,
 	searchData,
@@ -125,6 +129,8 @@ function ManagementToolbar({
 							onFilterDropdownItemClick={
 								onFilterDropdownItemClick
 							}
+							onOrderDropdownItemClick={onOrderDropdownItemClick}
+							orderDropdownItems={orderDropdownItems}
 							sortingOrder={sortingOrder}
 							sortingURL={sortingURL}
 						/>
@@ -293,6 +299,7 @@ ManagementToolbar.propTypes = {
 	onCreateButtonClick: PropTypes.func,
 	onInfoButtonClick: PropTypes.func,
 	onViewTypeSelect: PropTypes.func,
+	orderDropdownItems: PropTypes.array,
 	searchActionURL: PropTypes.string,
 	searchContainerId: PropTypes.string,
 	searchData: PropTypes.object,

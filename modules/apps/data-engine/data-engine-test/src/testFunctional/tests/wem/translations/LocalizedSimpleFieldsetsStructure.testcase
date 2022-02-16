@@ -12,7 +12,7 @@ definition {
 
 		JSONGroup.addGroup(groupName = "Test Site Name");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
 		NavItem.gotoStructures();
 	}
@@ -63,7 +63,7 @@ definition {
 	@description = "This test ensures default title is carried to a new locale on the fieldsets modal."
 	@priority = "4"
 	test DefaultTitleIsDisplayedUponLocaleChange {
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -127,9 +127,7 @@ definition {
 			key_fieldFieldLabel = "Text",
 			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
 
-		Translations.addLanguageManageTranslations(key_language = "pt-BR");
-
-		PortletEntry.changeLocale(
+		DataEngine.changeLocale(
 			locale = "pt-BR",
 			modal = "true");
 
@@ -160,6 +158,8 @@ definition {
 		Alert.viewSuccessMessage();
 
 		DataEngine.addFieldsetToBuilder(fieldsetName = "New Fieldset en-US");
+
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
 
 		DataEngine.viewFieldsetTranslation(
 			fieldNameList = "Text",
@@ -237,8 +237,6 @@ definition {
 			fieldName = "Rich Text",
 			targetFieldLabel = "Text");
 
-		Translations.addLanguageManageTranslations(key_language = "pt-BR");
-
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
 			modal = "true");
@@ -262,8 +260,6 @@ definition {
 			fieldFieldLabelEdit = "Rico Texto",
 			fieldsetModal = "true");
 
-		Translations.addLanguageManageTranslations(key_language = "es-ES");
-
 		PortletEntry.changeLocale(
 			locale = "es-ES",
 			modal = "true");
@@ -286,8 +282,6 @@ definition {
 			fieldFieldLabel = "Rich Text",
 			fieldFieldLabelEdit = "Rica Texto",
 			fieldsetModal = "true");
-
-		Translations.addLanguageManageTranslations(key_language = "ja-JP");
 
 		PortletEntry.changeLocale(
 			locale = "ja-JP",
@@ -341,6 +335,8 @@ definition {
 				locator1 = "DataEngineBuilder#FORM_FIELD_NESTED");
 		}
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		PortletEntry.changeLocale(locale = "pt-BR");
 
 		AssertTextEquals(
@@ -362,6 +358,8 @@ definition {
 				locator1 = "DataEngineBuilder#FORM_FIELD_NESTED");
 		}
 
+		Translations.addLanguageManageTranslations(key_language = "es-ES");
+
 		PortletEntry.changeLocale(locale = "es-ES");
 
 		AssertTextEquals(
@@ -382,6 +380,8 @@ definition {
 				key_fieldsGroupLabel = "Grupo de campos",
 				locator1 = "DataEngineBuilder#FORM_FIELD_NESTED");
 		}
+
+		Translations.addLanguageManageTranslations(key_language = "ja-JP");
 
 		PortletEntry.changeLocale(locale = "ja-JP");
 
@@ -746,7 +746,7 @@ definition {
 	test TranslateStructureWithFieldsetAndNested {
 		property portal.acceptance = "true";
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
 		NavItem.gotoStructures();
 
@@ -788,8 +788,6 @@ definition {
 				fieldsGroupLabel = "Fields Group",
 				fieldsGroupLabelEdit = "${prefix} Fields Group");
 		}
-
-		Translations.addLanguageManageTranslations(key_language = "pt-BR");
 
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
@@ -834,8 +832,6 @@ definition {
 			fieldFieldLabelEdit = "Quarto Texto",
 			fieldsetModal = "true");
 
-		Translations.addLanguageManageTranslations(key_language = "es-ES");
-
 		PortletEntry.changeLocale(
 			locale = "es-ES",
 			modal = "true");
@@ -878,8 +874,6 @@ definition {
 			fieldFieldLabel = "Fourth Text",
 			fieldFieldLabelEdit = "Cuarto Texto",
 			fieldsetModal = "true");
-
-		Translations.addLanguageManageTranslations(key_language = "de-DE");
 
 		PortletEntry.changeLocale(
 			locale = "de-DE",
@@ -965,6 +959,8 @@ definition {
 				locator1 = "DataEngineBuilder#FORM_FIELD_NESTED");
 		}
 
+		Translations.addLanguageManageTranslations(key_language = "pt-BR");
+
 		PortletEntry.changeLocale(locale = "pt-BR");
 
 		AssertTextEquals(
@@ -1004,6 +1000,8 @@ definition {
 				locator1 = "DataEngineBuilder#FORM_FIELD_NESTED");
 		}
 
+		Translations.addLanguageManageTranslations(key_language = "es-ES");
+
 		PortletEntry.changeLocale(locale = "es-ES");
 
 		AssertTextEquals(
@@ -1042,6 +1040,8 @@ definition {
 				key_fieldsGroupLabel = "Grupo de campos de tercer nivel",
 				locator1 = "DataEngineBuilder#FORM_FIELD_NESTED");
 		}
+
+		Translations.addLanguageManageTranslations(key_language = "de-DE");
 
 		PortletEntry.changeLocale(locale = "de-DE");
 
@@ -1086,7 +1086,7 @@ definition {
 	@description = "This test ensures that the default language is the first show on the fieldset modal."
 	@priority = "5"
 	test VerifyDefaultLanguageIsFirstShown {
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
 		NavItem.gotoStructures();
 

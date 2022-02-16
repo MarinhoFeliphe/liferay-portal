@@ -166,13 +166,13 @@
 
 			tableToolbar.hide();
 
-			requestAnimationFrame(() => {
+			setTimeout(() => {
 				const range = editor.createRange();
 
 				range.selectNodeContents(tableElement);
 
 				range.select();
-			});
+			}, 0);
 		},
 
 		_focusedEditorName: null,
@@ -255,7 +255,7 @@
 			};
 
 			const onFocusLoss = () => {
-				requestAnimationFrame(() => {
+				setTimeout(() => {
 					if (this._focusedEditorName !== editor.name) {
 						hide();
 					}
@@ -288,17 +288,6 @@
 				}),
 
 				editor.on('change', hide),
-
-				CKEDITOR.document.getWindow().on('click', (event) => {
-					const target = event.data.getTarget();
-
-					if (
-						!target.$.closest('.lfr-balloon-editor') &&
-						!target.equals(button)
-					) {
-						hide();
-					}
-				}),
 
 				editor.on('contentDom', () => {
 					const body = editor.document.getBody();

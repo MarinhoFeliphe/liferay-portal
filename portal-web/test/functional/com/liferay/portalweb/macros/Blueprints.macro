@@ -1,7 +1,7 @@
 definition {
 
 	macro addElement {
-		AssertElementPresent.assertVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
+		AssertVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
 
 		if (IsElementPresent(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_SEARCH_CLEAR")) {
 			Click.clickNoMouseOver(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_SEARCH_CLEAR");
@@ -20,18 +20,10 @@ definition {
 			locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_ELEMENT_ADD_BUTTON");
 	}
 
-	macro applyBlueprintViaLLSO {
-		SearchPortlets.addWidgets(searchPortletList = "Low Level Search Options");
-
-		var blueprintId = Blueprints.getBlueprintID(title = "${blueprintTitle}");
-
-		SearchPortlets.configureLowLevelSearchOptions(
-			attributesKey = "search.experiences.blueprint.id",
-			attributesValue = "${blueprintId}");
-	}
-
 	macro applyBlueprintViaOptionsWidget {
-		SearchPortlets.addWidgets(searchPortletList = "Blueprints Options");
+		if (!(IsElementPresent(key_portletName = "Blueprints Options", locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON"))) {
+			SearchPortlets.addWidgets(searchPortletList = "Blueprints Options");
+		}
 
 		Portlet.gotoPortletOptions(
 			portletName = "Blueprints Options",
@@ -101,10 +93,6 @@ definition {
 		PortletEntry.save();
 	}
 
-	macro deleteElement {
-		Blueprints.deleteEntry(title = "${element}");
-	}
-
 	macro deleteEntry {
 		Blueprints.gotoEntryMenuItem(
 			menuItem = "Delete",
@@ -142,10 +130,10 @@ definition {
 			groupName = "Global",
 			site = "true");
 
-		var portalUrl = JSONCompany.getPortalURL();
+		var portalURL = JSONCompany.getPortalURL();
 
 		var curl = '''
-				${portalUrl}/o/search-experiences-rest/v1.0/sxp-blueprints \
+				${portalURL}/o/search-experiences-rest/v1.0/sxp-blueprints \
 				-H 'accept: application/json' \
 				-u test@liferay.com:test
 		''';
@@ -157,17 +145,19 @@ definition {
 	}
 
 	macro gotoEntryMenuItem {
-		Blueprints.openEntryMenu(title = "${title}");
+		if (IsElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_OPEN_DROPDOWN_MENU")) {
+			Blueprints.openEntryMenu(title = "${title}");
+		}
 
 		MenuItem.clickNoError(menuItem = "${menuItem}");
 	}
 
 	macro openBlueprintsAdmin {
-		if (!(isSet(siteUrlKey))) {
-			var siteUrlKey = "guest";
+		if (!(isSet(siteURLKey))) {
+			var siteURLKey = "guest";
 		}
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteUrlKey}/~/control_panel/manage?p_p_id=com_liferay_search_experiences_web_internal_blueprint_admin_portlet_SXPBlueprintAdminPortlet");
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_search_experiences_web_internal_blueprint_admin_portlet_SXPBlueprintAdminPortlet");
 	}
 
 	macro openEntryMenu {
@@ -179,6 +169,23 @@ definition {
 	macro searchBlueprintsPreview {
 		if (IsNotVisible(locator1 = "Blueprints#BLUEPRINTS_PREVIEW_SEARCH_BAR")) {
 			Click(locator1 = "Button#PREVIEW");
+		}
+
+		if (isSet(attributesKey)) {
+			Click.javaScriptClick(
+				key_title = "Attributes",
+				locator1 = "Button#ANY_TITLE");
+
+			Type(
+				locator1 = "TextInput#KEY",
+				value1 = "${attributesKey}");
+
+			Type(
+				key_fieldLabel = "Value",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "${attributesValue}");
+
+			Button.clickDone();
 		}
 
 		Type(
@@ -210,7 +217,7 @@ definition {
 	macro viewCopiedContent {
 		WebContentNavigator.openToAddBasicArticle(
 			groupName = "Guest",
-			siteUrlKey = "guest");
+			siteURLKey = "guest");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME_2");
 

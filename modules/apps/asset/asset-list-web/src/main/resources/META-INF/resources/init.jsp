@@ -23,7 +23,6 @@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
@@ -53,6 +52,7 @@ page import="com.liferay.asset.list.web.internal.display.context.AssetListManage
 page import="com.liferay.asset.list.web.internal.display.context.EditAssetListDisplayContext" %><%@
 page import="com.liferay.asset.list.web.internal.display.context.InfoCollectionProviderDisplayContext" %><%@
 page import="com.liferay.asset.list.web.internal.display.context.InfoCollectionProviderItemsDisplayContext" %><%@
+page import="com.liferay.asset.list.web.internal.display.context.SelectStructureFieldDisplayContext" %><%@
 page import="com.liferay.asset.list.web.internal.security.permission.resource.AssetListEntryPermission" %><%@
 page import="com.liferay.asset.list.web.internal.servlet.taglib.util.AssetEntryListActionDropdownItems" %><%@
 page import="com.liferay.asset.list.web.internal.servlet.taglib.util.InfoCollectionProviderActionDropdownItems" %><%@
@@ -69,7 +69,6 @@ page import="com.liferay.petra.portlet.url.builder.PortletURLBuilder" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchModelException" %><%@
-page import="com.liferay.portal.kernel.json.JSONUtil" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.model.ClassName" %><%@
 page import="com.liferay.portal.kernel.model.Group" %><%@

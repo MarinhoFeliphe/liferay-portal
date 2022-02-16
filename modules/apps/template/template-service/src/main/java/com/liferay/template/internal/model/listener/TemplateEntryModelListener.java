@@ -17,25 +17,24 @@ package com.liferay.template.internal.model.listener;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.template.internal.info.item.renderer.TemplateEntryInfoItemRenderer;
+import com.liferay.template.internal.transformer.TemplateNodeFactory;
 import com.liferay.template.model.TemplateEntry;
 import com.liferay.template.service.TemplateEntryLocalService;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
@@ -69,7 +68,8 @@ public class TemplateEntryModelListener
 			_bundleContext.registerService(
 				InfoItemRenderer.class,
 				new TemplateEntryInfoItemRenderer<>(
-					_infoItemServiceTracker, templateEntry),
+					_infoItemServiceTracker, templateEntry,
+					_templateNodeFactory),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"item.class.name", templateEntry.getInfoItemClassName()
 				).build()));
@@ -93,28 +93,29 @@ public class TemplateEntryModelListener
 	}
 
 	@Override
-	public void portalInstanceRegistered(Company company) {
+	public void portalInstanceRegistered(Company company)
+		throws PortalException {
+
 		Map<Long, ServiceRegistration<?>> serviceRegistrations =
 			new HashMap<>();
 
-		List<Group> companyGroups = _groupLocalService.getCompanyGroups(
-			company.getCompanyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		ActionableDynamicQuery actionableDynamicQuery =
+			_templateEntryLocalService.getActionableDynamicQuery();
 
-		List<TemplateEntry> templateEntries =
-			_templateEntryLocalService.getTemplateEntries(
-				ListUtil.toLongArray(companyGroups, Group::getGroupId));
-
-		for (TemplateEntry templateEntry : templateEntries) {
-			serviceRegistrations.put(
+		actionableDynamicQuery.setCompanyId(company.getCompanyId());
+		actionableDynamicQuery.setPerformActionMethod(
+			(TemplateEntry templateEntry) -> serviceRegistrations.put(
 				templateEntry.getTemplateEntryId(),
 				_bundleContext.registerService(
 					InfoItemRenderer.class,
 					new TemplateEntryInfoItemRenderer<>(
-						_infoItemServiceTracker, templateEntry),
+						_infoItemServiceTracker, templateEntry,
+						_templateNodeFactory),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"item.class.name", templateEntry.getInfoItemClassName()
-					).build()));
-		}
+					).build())));
+
+		actionableDynamicQuery.performActions();
 
 		if (MapUtil.isNotEmpty(serviceRegistrations)) {
 			_serviceRegistrations.put(
@@ -174,5 +175,8 @@ public class TemplateEntryModelListener
 
 	@Reference
 	private TemplateEntryLocalService _templateEntryLocalService;
+
+	@Reference
+	private TemplateNodeFactory _templateNodeFactory;
 
 }

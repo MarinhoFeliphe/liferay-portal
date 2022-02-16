@@ -5260,7 +5260,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.jenkins.results.parser.jar</file-name>
-				<version>1.0.981</version>
+				<version>1.0.987</version>
 				<project-name>Liferay Jenkins Results Parser</project-name>
 				<licenses>
 					<license>
@@ -5271,7 +5271,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.poshi.core.jar</file-name>
-				<version>1.0.45</version>
+				<version>1.0.47</version>
 				<project-name>Liferay Poshi Core</project-name>
 				<licenses>
 					<license>
@@ -6655,30 +6655,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/jai_codec.jar</file-name>
-				<version>1.1.3</version>
-				<project-name>Java Advanced Imaging</project-name>
-				<project-url>http://java.sun.com/javase/technologies/desktop/media/jai</project-url>
-				<licenses>
-					<license>
-						<license-name>BSD Style License</license-name>
-						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jai_core.jar</file-name>
-				<version>1.1.3</version>
-				<project-name>Java Advanced Imaging</project-name>
-				<project-url>http://java.sun.com/javase/technologies/desktop/media/jai</project-url>
-				<licenses>
-					<license>
-						<license-name>BSD Style License</license-name>
-						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/java-libpst.jar</file-name>
 				<version>0.8.1</version>
 				<project-name>java-libpst</project-name>
@@ -6960,18 +6936,6 @@
 				<comments>See the Ant target "build-json-java-jar" in portal-impl/build.xml.</comments>
 			</library>
 			<library>
-				<file-name>lib/portal/jsr107cache.jar</file-name>
-				<version>1.0</version>
-				<project-name>JSR 107</project-name>
-				<project-url>http://sourceforge.net/projects/jsr107cache</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/juniversalchardet.jar</file-name>
 				<version>1.0.3</version>
 				<project-name>Universal Character Detection</project-name>
@@ -7155,78 +7119,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/netty-buffer.jar</file-name>
-				<version>4.1.72.Final</version>
-				<project-name>Netty</project-name>
-				<project-url>http://netty.io</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/netty-codec.jar</file-name>
-				<version>4.1.72.Final</version>
-				<project-name>Netty</project-name>
-				<project-url>http://netty.io</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/netty-common.jar</file-name>
-				<version>4.1.72.Final</version>
-				<project-name>Netty</project-name>
-				<project-url>http://netty.io</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/netty-handler.jar</file-name>
-				<version>4.1.72.Final</version>
-				<project-name>Netty</project-name>
-				<project-url>http://netty.io</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/netty-resolver.jar</file-name>
-				<version>4.1.72.Final</version>
-				<project-name>Netty</project-name>
-				<project-url>http://netty.io</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/netty-transport.jar</file-name>
-				<version>4.1.72.Final</version>
-				<project-name>Netty</project-name>
-				<project-url>http://netty.io</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/odmg.jar</file-name>
 				<version>3.0</version>
 				<project-name>ODMG - Object Data Management Group Java Bindings</project-name>
@@ -7335,18 +7227,6 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/rhino.jar</file-name>
-				<version>1.7R4</version>
-				<project-name>Mozilla Rhino</project-name>
-				<project-url>https://developer.mozilla.org/en/Rhino</project-url>
-				<licenses>
-					<license>
-						<license-name>MPL 2.0</license-name>
-						<license-url>https://www.mozilla.org/en-US/MPL/2.0</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -7713,18 +7593,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/stringtemplate.jar</file-name>
-				<version>3.0</version>
-				<project-name>StringTemplate</project-name>
-				<project-url>http://www.stringtemplate.org</project-url>
-				<licenses>
-					<license>
-						<license-name>BSD Style License</license-name>
-						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/tagsoup.jar</file-name>
 				<version>1.2.1</version>
 				<project-name>TagSoup</project-name>
@@ -7815,19 +7683,6 @@
 					<license>
 						<license-name>BSD Style License</license-name>
 						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/wsdl4j.jar</file-name>
-				<version>1.6.3</version>
-				<project-name>WSDL4J</project-name>
-				<project-url>http://sourceforge.net/projects/wsdl4j</project-url>
-				<licenses>
-					<license>
-						<license-name>Common Public License 1.0</license-name>
-						<license-url>http://opensource.org/licenses/cpl1.0.php</license-url>
-						<copyright-notice>Copyright (c) IBM Corp 2001, 2005</copyright-notice>
 					</license>
 				</licenses>
 			</library>

@@ -187,7 +187,7 @@ definition {
 		}
 
 		task ("Add a Grid to content page template") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteUrlKey = "test-site-name");
+			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
@@ -219,7 +219,7 @@ definition {
 		}
 
 		task ("Add a Grid to display page template") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
@@ -259,13 +259,10 @@ definition {
 		task ("Configure the Grid") {
 			PageEditor.editLayoutGrid(
 				columnCount = "2",
-				panel = "General",
-				spaceBetweenColumns = "false");
-
-			PageEditor.editLayoutGrid(
 				inverseOrder = "true",
 				layout = "1 Module per Row",
-				panel = "Styles",
+				panelList = "General",
+				spaceBetweenColumns = "false",
 				verticalAlignment = "Bottom");
 		}
 
@@ -345,6 +342,7 @@ definition {
 
 			DragAndDrop.javaScriptDragAndDropToObject(
 				key_columnNumber = "1",
+				key_indexItem = "1",
 				key_portletName = "Web Content Display",
 				key_position = "1",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_WIDGET",
@@ -489,13 +487,13 @@ definition {
 		task ("Configure the Button's style") {
 			PageEditor.gotoConfiguration(fragmentName = "Button");
 
-			PageEditor.configureFragment(type = "Link");
+			PageEditor.configureFragment(
+				size = "Large",
+				type = "Link");
 
 			PageEditor.gotoStyle(fragmentName = "Button");
 
-			PageEditor.configureFragment(
-				alignment = "Center",
-				size = "Large");
+			PageEditor.configureFragment(alignment = "Center");
 		}
 
 		task ("View the Button's style") {

@@ -15,6 +15,7 @@
 package com.liferay.headless.admin.user.resource.v1_0;
 
 import com.liferay.headless.admin.user.dto.v1_0.UserGroup;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,6 +24,8 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +58,10 @@ public interface UserGroupResource {
 		return FactoryHolder.factory.create();
 	}
 
+	public Page<UserGroup> getUserGroupsPage(
+			String search, Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public UserGroup postUserGroup(UserGroup userGroup) throws Exception;
 
 	public Response postUserGroupBatch(String callbackURL, Object object)
@@ -66,6 +73,10 @@ public interface UserGroupResource {
 
 	public UserGroup getUserGroupByExternalReferenceCode(
 			String externalReferenceCode)
+		throws Exception;
+
+	public UserGroup putUserGroupByExternalReferenceCode(
+			String externalReferenceCode, UserGroup userGroup)
 		throws Exception;
 
 	public void deleteUserGroup(Long userGroupId) throws Exception;

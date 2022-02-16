@@ -11,7 +11,7 @@ definition {
 
 		Select(
 			locator1 = "ServerAdministrationLogLevels#ADD_CATEGORY_PRIORITY_SELECT",
-			value1 = "${categoryPriority}");
+			value1 = "${categoryLevel}");
 
 		PortletEntry.save();
 	}
@@ -137,7 +137,7 @@ definition {
 
 	macro openServerAdmin {
 		Navigator.openWithAppendToBaseURL(
-			baseUrl = "${baseUrl}",
+			baseURL = "${baseURL}",
 			urlAppend = "group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet");
 	}
 
@@ -209,6 +209,21 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#SUCCESS",
 			value1 = "Your request completed successfully.");
+	}
+
+	macro viewCategoryLogLevels {
+		Navigator.gotoNavItem(navItem = "Log Levels");
+
+		Search.searchCP(searchTerm = "${categoryName}");
+
+		AssertElementPresent(
+			key_categoryName = "${categoryName}",
+			locator1 = "ServerAdministrationLogLevels#CATEGORY_NAME");
+
+		AssertSelectedLabel(
+			key_categoryName = "${categoryName}",
+			locator1 = "ServerAdministrationLogLevels#CATEGORY_LEVEL_SELECT",
+			value1 = "DEBUG");
 	}
 
 	macro viewForbiddenErrorMessageAlert {

@@ -29,13 +29,15 @@ definition {
 	@description = "Verify that the user can Approve a Translation"
 	@priority = "5"
 	test CanApproveTranslation {
+		property portal.upstream = "quarantine";
+
 		Workflow.openWorkflowProcessBuilderConfiguration();
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Translation");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		Workflow.webContentGoToAddCP();
 
@@ -91,7 +93,7 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Translation");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		Workflow.webContentGoToAddCP();
 
@@ -139,7 +141,7 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Translation");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		Workflow.webContentGoToAddCP();
 
@@ -191,7 +193,7 @@ definition {
 			workflowAssetType = "Translation",
 			workflowTask = "Review");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
@@ -214,7 +216,7 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Translation");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		Workflow.webContentGoToAddCP();
 
@@ -259,7 +261,7 @@ definition {
 			workflowAssetType = "Translation",
 			workflowTask = "Review");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
@@ -282,7 +284,7 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Translation");
 
-		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		Workflow.webContentGoToAddCP();
 

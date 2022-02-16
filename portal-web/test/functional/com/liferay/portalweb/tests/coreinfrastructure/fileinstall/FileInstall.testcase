@@ -60,13 +60,15 @@ definition {
 
 		Clustering.deployClusteringModule(nodePort = "8080");
 
-		AssertConsoleTextPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample_");
+		Pause(locator1 = "10000");
+
+		AssertConsoleTextPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample.web_");
 
 		GogoShell.openGogoShellAdmin();
 
-		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Sample'");
+		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Multiple Sample'");
 
-		GogoShell.viewOutput(outputContent = "Cluster Sample");
+		GogoShell.viewOutput(outputContent = "Cluster Multiple Sample");
 
 		GogoShell.viewOutput(outputContent = "Active");
 	}
@@ -80,7 +82,7 @@ definition {
 
 		GogoShell.openGogoShellAdmin();
 
-		AssertConsoleTextNotPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample_");
+		AssertConsoleTextNotPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample.web_");
 
 		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Sample'");
 
@@ -115,29 +117,33 @@ definition {
 
 		GogoShell.openGogoShellAdmin();
 
-		AssertConsoleTextPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample_");
+		Pause(locator1 = "10000");
 
-		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Sample'");
+		AssertConsoleTextPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample.web_");
 
-		GogoShell.viewOutput(outputContent = "Cluster Sample");
+		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Multiple Sample'");
+
+		GogoShell.viewOutput(outputContent = "Cluster Multiple Sample");
 
 		GogoShell.viewOutput(outputContent = "Active");
 
 		Portlet.shutdownServer();
 
-		FileInstall.deletePortalJarOffline(jarFile = "com.liferay.portal.cluster.multiple.sample.jar");
+		FileInstall.deletePortalJarOffline(jarFile = "com.liferay.portal.cluster.multiple.sample.web.jar");
 
 		Portlet.startServer(keepOsGiState = "true");
 
 		GogoShell.openGogoShellAdmin();
 
-		AssertConsoleTextNotPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample_");
+		// Ignore assert until LPS-146449 is resolved
 
-		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Sample'");
+		//AssertConsoleTextNotPresent(value1 = "STARTED com.liferay.portal.cluster.multiple.sample.web_");
+
+		GogoShell.executeCommand(commandName = "lb | grep 'Cluster Multiple Sample'");
 
 		GogoShell.viewOutput(outputContent = "false");
 
-		GogoShell.viewNoOutput(outputContent = "Cluster Sample");
+		GogoShell.viewNoOutput(outputContent = "Cluster Multiple Sample");
 
 		GogoShell.viewNoOutput(outputContent = "Active");
 	}

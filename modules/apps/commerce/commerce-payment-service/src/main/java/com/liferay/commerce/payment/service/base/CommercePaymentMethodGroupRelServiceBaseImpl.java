@@ -18,6 +18,7 @@ import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelServiceUtil;
 import com.liferay.commerce.payment.service.persistence.CommercePaymentMethodGroupRelPersistence;
+import com.liferay.commerce.payment.service.persistence.CommercePaymentMethodGroupRelQualifierPersistence;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -128,6 +129,82 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 
 		this.commercePaymentMethodGroupRelPersistence =
 			commercePaymentMethodGroupRelPersistence;
+	}
+
+	/**
+	 * Returns the commerce payment method group rel qualifier local service.
+	 *
+	 * @return the commerce payment method group rel qualifier local service
+	 */
+	public com.liferay.commerce.payment.service.
+		CommercePaymentMethodGroupRelQualifierLocalService
+			getCommercePaymentMethodGroupRelQualifierLocalService() {
+
+		return commercePaymentMethodGroupRelQualifierLocalService;
+	}
+
+	/**
+	 * Sets the commerce payment method group rel qualifier local service.
+	 *
+	 * @param commercePaymentMethodGroupRelQualifierLocalService the commerce payment method group rel qualifier local service
+	 */
+	public void setCommercePaymentMethodGroupRelQualifierLocalService(
+		com.liferay.commerce.payment.service.
+			CommercePaymentMethodGroupRelQualifierLocalService
+				commercePaymentMethodGroupRelQualifierLocalService) {
+
+		this.commercePaymentMethodGroupRelQualifierLocalService =
+			commercePaymentMethodGroupRelQualifierLocalService;
+	}
+
+	/**
+	 * Returns the commerce payment method group rel qualifier remote service.
+	 *
+	 * @return the commerce payment method group rel qualifier remote service
+	 */
+	public com.liferay.commerce.payment.service.
+		CommercePaymentMethodGroupRelQualifierService
+			getCommercePaymentMethodGroupRelQualifierService() {
+
+		return commercePaymentMethodGroupRelQualifierService;
+	}
+
+	/**
+	 * Sets the commerce payment method group rel qualifier remote service.
+	 *
+	 * @param commercePaymentMethodGroupRelQualifierService the commerce payment method group rel qualifier remote service
+	 */
+	public void setCommercePaymentMethodGroupRelQualifierService(
+		com.liferay.commerce.payment.service.
+			CommercePaymentMethodGroupRelQualifierService
+				commercePaymentMethodGroupRelQualifierService) {
+
+		this.commercePaymentMethodGroupRelQualifierService =
+			commercePaymentMethodGroupRelQualifierService;
+	}
+
+	/**
+	 * Returns the commerce payment method group rel qualifier persistence.
+	 *
+	 * @return the commerce payment method group rel qualifier persistence
+	 */
+	public CommercePaymentMethodGroupRelQualifierPersistence
+		getCommercePaymentMethodGroupRelQualifierPersistence() {
+
+		return commercePaymentMethodGroupRelQualifierPersistence;
+	}
+
+	/**
+	 * Sets the commerce payment method group rel qualifier persistence.
+	 *
+	 * @param commercePaymentMethodGroupRelQualifierPersistence the commerce payment method group rel qualifier persistence
+	 */
+	public void setCommercePaymentMethodGroupRelQualifierPersistence(
+		CommercePaymentMethodGroupRelQualifierPersistence
+			commercePaymentMethodGroupRelQualifierPersistence) {
+
+		this.commercePaymentMethodGroupRelQualifierPersistence =
+			commercePaymentMethodGroupRelQualifierPersistence;
 	}
 
 	/**
@@ -384,6 +461,26 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 	@BeanReference(type = CommercePaymentMethodGroupRelPersistence.class)
 	protected CommercePaymentMethodGroupRelPersistence
 		commercePaymentMethodGroupRelPersistence;
+
+	@BeanReference(
+		type = com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelQualifierLocalService.class
+	)
+	protected com.liferay.commerce.payment.service.
+		CommercePaymentMethodGroupRelQualifierLocalService
+			commercePaymentMethodGroupRelQualifierLocalService;
+
+	@BeanReference(
+		type = com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelQualifierService.class
+	)
+	protected com.liferay.commerce.payment.service.
+		CommercePaymentMethodGroupRelQualifierService
+			commercePaymentMethodGroupRelQualifierService;
+
+	@BeanReference(
+		type = CommercePaymentMethodGroupRelQualifierPersistence.class
+	)
+	protected CommercePaymentMethodGroupRelQualifierPersistence
+		commercePaymentMethodGroupRelQualifierPersistence;
 
 	@ServiceReference(
 		type = com.liferay.counter.kernel.service.CounterLocalService.class

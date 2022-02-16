@@ -111,8 +111,11 @@
 											}
 										},
 										"text": {
-											"value_i18n": {
-												"en_US": "Category"
+											"mapping": {
+												"fieldKey": "masterclass",
+												"itemReference": {
+													"contextSource": "DisplayPageItem"
+												}
 											}
 										}
 									}
@@ -628,6 +631,25 @@
 											"id": "link",
 											"value": {
 												"fragmentLink": {
+													"value": {
+														"href": {
+															"mapping": {
+																"itemReference": {
+																	"className": "com.liferay.portal.kernel.model.Layout",
+																	"fields": [
+																		{
+																			"fieldName": "friendlyURL",
+																			"fieldValue": "/blog"
+																		},
+																		{
+																			"fieldName": "privatePage",
+																			"fieldValue": "false"
+																		}
+																	]
+																}
+															}
+														}
+													},
 													"value_i18n": {
 													}
 												},
@@ -729,8 +751,11 @@
 															}
 														},
 														"text": {
-															"value_i18n": {
-																"en_US": "Category"
+															"mapping": {
+																"fieldKey": "masterclass",
+																"itemReference": {
+																	"contextSource": "CollectionItem"
+																}
 															}
 														}
 													}

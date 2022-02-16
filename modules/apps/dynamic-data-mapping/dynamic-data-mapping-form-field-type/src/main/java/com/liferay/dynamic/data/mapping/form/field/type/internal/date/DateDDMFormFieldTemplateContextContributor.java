@@ -72,6 +72,11 @@ public class DateDDMFormFieldTemplateContextContributor
 				ddmFormField, ddmFormFieldRenderingContext.getLocale(),
 				"predefinedValue")
 		).put(
+			"tooltip",
+			DDMFormFieldTypeUtil.getPropertyValue(
+				ddmFormField, ddmFormFieldRenderingContext.getLocale(),
+				"tooltip")
+		).put(
 			"weekdaysShort",
 			Stream.of(
 				CalendarUtil.DAYS_ABBREVIATION

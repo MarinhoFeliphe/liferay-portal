@@ -537,10 +537,35 @@ definition {
 		Click(locator1 = "Button#BACK");
 	}
 
-	macro assertDefaultProductDisplayPage {
+	macro assertCategoryDisplayPageOverride {
 		AssertElementPresent(
-			key_displayPage = "${pageName}",
-			locator1 = "CommerceEntry#DEFAULT_PRODUCT_DISPLAY_PAGE");
+			key_entryName = "${category}",
+			key_table = "Override Default Category Display Page",
+			locator1 = "CommerceEntry#TABLE_ENTRY_NAME");
+
+		AssertElementPresent(
+			key_layout = "${layout}",
+			locator1 = "CommerceEntry#OVERRIDE_DEFAULT_DISPLAY_PAGE_LAYOUT");
+	}
+
+	macro assertDefaultDisplayPage {
+		if (!(isSet(pageType))) {
+			AssertTextEquals(
+				locator1 = "CommerceEntry#DISPLAY_PAGE_ANY",
+				value1 = "${pageName}");
+		}
+
+		if ("${pageType}" == "Public") {
+			AssertTextEquals(
+				locator1 = "CommerceEntry#DISPLAY_PAGE_ANY",
+				value1 = "Public Pages > ${pageName}");
+		}
+
+		if ("${pageType}" == "Private") {
+			AssertTextEquals(
+				locator1 = "CommerceEntry#DISPLAY_PAGE_ANY",
+				value1 = "Private Pages > ${pageName}");
+		}
 	}
 
 	macro changePinColor {

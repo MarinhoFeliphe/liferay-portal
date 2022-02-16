@@ -19,6 +19,7 @@ import com.liferay.batch.planner.exception.BatchPlannerPlanExternalTypeException
 import com.liferay.batch.planner.exception.BatchPlannerPlanInternalClassNameException;
 import com.liferay.batch.planner.exception.BatchPlannerPlanNameException;
 import com.liferay.batch.planner.exception.DuplicateBatchPlannerPlanException;
+import com.liferay.batch.planner.exception.RequiredBatchPlannerPlanException;
 import com.liferay.batch.planner.model.BatchPlannerLog;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.batch.planner.service.base.BatchPlannerPlanLocalServiceBaseImpl;
@@ -131,16 +132,24 @@ public class BatchPlannerPlanLocalServiceImpl
 
 	@Override
 	public BatchPlannerPlan updateBatchPlannerPlan(
-			long userId, long batchPlannerPlanId, String name)
+			long userId, long batchPlannerPlanId, String externalType,
+			String internalClassName, String name)
 		throws PortalException {
 
 		BatchPlannerPlan batchPlannerPlan =
 			batchPlannerPlanPersistence.findByPrimaryKey(batchPlannerPlanId);
 
+		if (!batchPlannerPlan.isTemplate()) {
+			throw new RequiredBatchPlannerPlanException(
+				"Batch planner plan is not a template");
+		}
+
 		User user = userLocalService.getUser(userId);
 
 		_validateName(batchPlannerPlanId, user.getCompanyId(), name);
 
+		batchPlannerPlan.setExternalType(externalType);
+		batchPlannerPlan.setInternalClassName(internalClassName);
 		batchPlannerPlan.setName(name);
 
 		return batchPlannerPlanPersistence.update(batchPlannerPlan);

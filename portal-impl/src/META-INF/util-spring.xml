@@ -90,11 +90,6 @@
 			<bean class="com.liferay.portal.image.ImageToolImpl" factory-method="getInstance" />
 		</property>
 	</bean>
-	<bean class="com.liferay.portal.kernel.image.SpriteProcessorUtil" id="com.liferay.portal.kernel.image.SpriteProcessorUtil">
-		<property name="spriteProcessor">
-			<bean class="com.liferay.portal.image.SpriteProcessorImpl" />
-		</property>
-	</bean>
 	<bean class="com.liferay.portal.json.JSONFactoryImpl" id="com.liferay.portal.kernel.json.JSONFactory" />
 	<bean class="com.liferay.portal.kernel.json.JSONFactoryUtil" id="com.liferay.portal.kernel.json.JSONFactoryUtil">
 		<property name="JSONFactory" ref="com.liferay.portal.kernel.json.JSONFactory" />
@@ -124,15 +119,7 @@
 	<bean class="com.liferay.portal.kernel.license.util.LicenseManagerUtil" id="com.liferay.portal.kernel.license.util.LicenseManagerUtil">
 		<property name="licenseManager" ref="com.liferay.portal.kernel.license.util.LicenseManager" />
 	</bean>
-	<bean class="com.liferay.portal.metadata.TikaRawMetadataProcessor" id="com.liferay.portal.kernel.metadata.RawMetadataProcessor">
-		<property name="parser">
-			<bean class="org.apache.tika.parser.AutoDetectParser">
-				<constructor-arg>
-					<bean class="org.apache.tika.config.TikaConfig" />
-				</constructor-arg>
-			</bean>
-		</property>
-	</bean>
+	<bean class="com.liferay.portal.metadata.TikaRawMetadataProcessor" id="com.liferay.portal.kernel.metadata.RawMetadataProcessor" />
 	<bean class="com.liferay.portal.kernel.metadata.RawMetadataProcessorUtil" id="com.liferay.portal.kernel.metadata.RawMetadataProcessorUtil">
 		<property name="rawMetadataProcessor" ref="com.liferay.portal.kernel.metadata.RawMetadataProcessor" />
 	</bean>

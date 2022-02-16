@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>CustomerPortalSite</title>
+</head>
+
+<body>
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><td rowspan="1" colspan="3">CustomerPortalSite</td></tr>
+</thead>
+
+<tbody>
+<tr>
+	<td>ACCOUNTS_TABLE</td>
+	<td>//tr[(@data-qa-id='row') and contains(., '${value}') and contains(., 'Active')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OBJECTS_TABLE</td>
+	<td>//div[(@class='dnd-tbody') and contains(., '${value}') and contains(., 'Approved')]</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

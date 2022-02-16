@@ -50,6 +50,8 @@ public class CommerceTermEntryKeywordQueryContributor
 		_queryHelper.addSearchTerm(
 			booleanQuery, searchContext, Field.NAME, false);
 		_queryHelper.addSearchTerm(
+			booleanQuery, searchContext, Field.PRIORITY, false);
+		_queryHelper.addSearchTerm(
 			booleanQuery, searchContext, Field.USER_NAME, false);
 		_queryHelper.addSearchTerm(booleanQuery, searchContext, "label", false);
 		_queryHelper.addSearchLocalizedTerm(

@@ -23,8 +23,8 @@ import com.liferay.content.dashboard.web.internal.item.ContentDashboardItem;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
 import com.liferay.content.dashboard.web.internal.item.FileEntryContentDashboardItem;
 import com.liferay.content.dashboard.web.internal.item.JournalArticleContentDashboardItem;
-import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtype;
 import com.liferay.content.dashboard.web.internal.searcher.ContentDashboardSearchRequestBuilderFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -48,6 +47,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.portlet.ResourceRequest;
@@ -147,12 +147,14 @@ public class GetContentDashboardItemsXlsMVCResourceCommand
 			).cell(
 				contentDashboardItem.getTypeLabel(locale)
 			).cell(
-				() -> {
-					ContentDashboardItemSubtype contentDashboardItemSubtype =
-						contentDashboardItem.getContentDashboardItemSubtype();
-
-					return contentDashboardItemSubtype.getLabel(locale);
-				}
+				Optional.ofNullable(
+					contentDashboardItem.getContentDashboardItemSubtype()
+				).map(
+					contentDashboardItemSubtype ->
+						contentDashboardItemSubtype.getLabel(locale)
+				).orElse(
+					StringPool.BLANK
+				)
 			).cell(
 				contentDashboardItem.getScopeName(locale)
 			).cell(
@@ -183,9 +185,7 @@ public class GetContentDashboardItemsXlsMVCResourceCommand
 			if (contentDashboardItem instanceof FileEntryContentDashboardItem) {
 				JSONObject jsonObject =
 					contentDashboardItem.getSpecificInformationJSONObject(
-						ParamUtil.getString(resourceRequest, "backURL"),
-						_portal.getLiferayPortletResponse(resourceResponse),
-						locale, themeDisplay);
+						locale);
 
 				if (jsonObject != null) {
 					workbookBuilder.cell(
@@ -205,9 +205,7 @@ public class GetContentDashboardItemsXlsMVCResourceCommand
 
 				JSONObject jsonObject =
 					contentDashboardItem.getSpecificInformationJSONObject(
-						ParamUtil.getString(resourceRequest, "backURL"),
-						_portal.getLiferayPortletResponse(resourceResponse),
-						locale, themeDisplay);
+						locale);
 
 				if (jsonObject != null) {
 					workbookBuilder.cellIndexIncrement(

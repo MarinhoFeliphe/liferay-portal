@@ -30,7 +30,7 @@ definition {
 		}
 
 		task ("Navigate to fragments admin") {
-			FragmentsAdminNavigator.openFragmentsAdmin(siteUrlKey = "test-site-name");
+			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 		}
 	}
 
@@ -124,7 +124,7 @@ NO CSS
 		}
 
 		task ("Edit the imported fragment") {
-			FragmentsAdminNavigator.openFragmentsAdmin(siteUrlKey = "test-site-name");
+			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
@@ -194,6 +194,7 @@ NO CSS
 				value1 = "Asset Publisher");
 
 			DragAndDrop.javaScriptDragAndDropObjectBelowTallNestedObject(
+				key_indexItem = "1",
 				key_portletName = "Asset Publisher",
 				key_position = "1",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_WIDGET",

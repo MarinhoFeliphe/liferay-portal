@@ -467,8 +467,6 @@ definition {
 	test SelectOptionValueAndAddProductToCart {
 		property portal.acceptance = "false";
 
-		// TODO Review
-
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
 
 		ApplicationsMenu.gotoSite(site = "Minium");
@@ -482,22 +480,19 @@ definition {
 		CommerceAcceleratorsInitializer.changeProductsSorting(sortingType = "Name Ascending");
 
 		Click(
-			key_productName = "brake-fluid",
+			key_productName = "Brake Fluid",
 			locator1 = "CommerceAccelerators#PRODUCT_CARD_VIEW_ALL_VARIANTS");
 
-		Click(locator1 = "CommerceFrontStore#PRODUCT_DETAILS_PACKAGE_QUANTITY");
-
-		Click(
-			key_selectValue = "48",
-			locator1 = "CommerceEntry#OPTIONS_SELECT_LIST");
-
-		Click(locator1 = "CommerceAccelerators#ADD_TO_CART_BUTTON_PRODUCT_DETAILS_PAGE");
+		FrontStore.addToCartFromProductDetails(
+			optionNamesAndValues = "Package Quantity:48",
+			productName = "Brake Fluid",
+			productSku = "MIN93016B");
 
 		CommerceNavigator.gotoMiniCart();
 
 		AssertElementPresent(
 			key_cartItemSku = "MIN93016B",
-			locator1 = "CommerceAccelerators#MINI_CART_ITEM_NAME_USING_SKU");
+			locator1 = "CommerceAccelerators#MINI_CART_ITEM_SKU");
 	}
 
 	@description = "COMMERCE-6658. As a buyer, I want to be able to select an option value(Bundled Product) and I want to see product details updating(Price, SKU and Availability)"
@@ -723,9 +718,9 @@ definition {
 			locator1 = "Dropdown#SELECTED_VALUE",
 			value1 = "Black");
 
-		AssertTextEquals(
-			locator1 = "CommerceFrontStore#FS_PRODUCT_SKU",
-			value1 = "BLACKSKU");
+		AssertElementPresent(
+			key_productSku = "BLACKSKU",
+			locator1 = "CommerceFrontStore#FS_PRODUCT_SKU");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "CommerceAccelerators#PRODUCT_DETAILS_LIST_PRICE",
@@ -747,9 +742,9 @@ definition {
 			locator1 = "Dropdown#SELECTED_VALUE",
 			value1 = "Blue");
 
-		AssertTextEquals(
-			locator1 = "CommerceFrontStore#FS_PRODUCT_SKU",
-			value1 = "BLUESKU");
+		AssertElementPresent(
+			key_productSku = "BLUESKU",
+			locator1 = "CommerceFrontStore#FS_PRODUCT_SKU");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "CommerceAccelerators#PRODUCT_DETAILS_LIST_PRICE",

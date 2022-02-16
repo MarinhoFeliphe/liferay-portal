@@ -23,36 +23,146 @@ definition {
 	}
 
 	@description = "LPS-135390 - Verify it is possible to view and access the Picklist portlet with the Access in Control Panel permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanAccessPicklistWithAccessPermission {
+		JSONRole.addRegularRole(roleTitle = "Regular Role");
 
-		// TODO LPS-145753 CanAccessPicklistWithAccessPermission pending implementation
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
 
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		ObjectPortlet.assertHeader(objectLabel = "Picklists");
+
+		ObjectAdmin.assertNoItemsWereFound();
 	}
 
 	@description = "LPS-135390 - Verify it is possible to add a Picklist with the Add permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanAddPicklistWithAddPermission {
+		JSONRole.addRegularRole(roleTitle = "Regular Role");
 
-		// TODO LPS-145755 CanAddPicklistWithAddPermission pending implementation
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
 
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+			roleTitle = "Regular Role");
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ADD_LIST_TYPE_DEFINITION",
+			resourceName = "com.liferay.list.type",
+			roleTitle = "Regular Role");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		Picklist.addPicklistViaUI(picklistName = "Picklist Test");
+
+		Picklist.assertPicklist(picklistName = "Picklist Test");
 	}
 
 	@description = "LPS-135390 - Verify it is possible to delete a Picklist with the Delete permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanDeletePicklistWithDeletePermission {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145757 CanDeletePicklistWithDeletePermission pending implementation
+		JSONRole.addRegularRole(
+			roleKey = "Regular Role",
+			roleTitle = "Regular Role");
 
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
+
+		for (var resourceAction : list "DELETE,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+				roleTitle = "Regular Role");
+		}
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "Delete");
+
+		Picklist.assertPicklistNotPresent(picklistName = "Picklist Test");
 	}
 
 	@description = "LPS-135390 - Verify it is possible to edit its own Object entry with only the Add Object Entry permission"
 	@priority = "5"
 	test CanEditItsOwnEntryWithOnlyAddPermission {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
@@ -162,48 +272,259 @@ definition {
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to delete a Picklist without the Delete permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotDeletePicklistWithoutDeletePermission {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145756 CannotDeletePicklistWithoutDeletePermission pending implementation
+		JSONRole.addRegularRole(
+			roleKey = "Regular Role",
+			roleTitle = "Regular Role");
 
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+			roleTitle = "Regular Role");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		MenuItem.viewNotPresent(menuItem = "Delete");
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to update a Picklist without the Update permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotUpdatePicklistWithoutUpdatePermission {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145758 CannotUpdatePicklistWithoutUpdatePermission pending implementation
+		Picklist.addPicklistItemViaAPI(
+			itemKey = "ItemTest",
+			itemName = "Picklist Item",
+			picklistName = "Picklist Test");
 
+		JSONRole.addRegularRole(
+			roleKey = "Regular Role",
+			roleTitle = "Regular Role");
+
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+			roleTitle = "Regular Role");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		CreateObject.viewObject(labelName = "Picklist Test");
+
+		Picklist.assertDisabledPicklistName();
+
+		Picklist.assertDisabledSaveButton();
+
+		CreateObject.viewObject(labelName = "Picklist Item");
+
+		Picklist.assertDisabledPicklistItem();
+
+		Picklist.assertDisabledSaveButton();
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to view a Picklist without the View permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotViewPicklistWithoutViewPermission {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145760 CannotViewPicklistWithoutViewPermission pending implementation
+		JSONRole.addRegularRole(roleTitle = "Regular Role");
 
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		Picklist.assertPicklistNotPresent(picklistName = "Picklist Test");
 	}
 
 	@description = "LPS-135390 - Verify it is possible to update a Picklist with the Update permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanUpdatePicklistWithUpdatePermission {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145759 CanUpdatePicklistWithUpdatePermission pending implementation
+		JSONRole.addRegularRole(
+			roleKey = "Regular Role",
+			roleTitle = "Regular Role");
 
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
+
+		for (var resourceAction : list "UPDATE,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+				roleTitle = "Regular Role");
+		}
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		CreateObject.viewObject(labelName = "Picklist Test");
+
+		Picklist.updatePicklistName(picklistName = "Update Picklist");
+
+		Button.clickSave();
+
+		Refresh();
+
+		Picklist.assertPicklist(picklistName = "Update Picklist");
 	}
 
 	@description = "LPS-140342 - Verify it is possible view and edit its own Picklist with only the Add Picklist permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewAndEditPicklistWithAddPicklistPermission {
+		JSONRole.addRegularRole(roleTitle = "Regular Role");
 
-		// TODO LPS-145762 CanViewAndEditPicklistWithAddPicklistPermission pending implementation
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
 
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+			roleTitle = "Regular Role");
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ADD_LIST_TYPE_DEFINITION",
+			resourceName = "com.liferay.list.type",
+			roleTitle = "Regular Role");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		Picklist.addPicklistViaUI(picklistName = "Picklist Test");
+
+		Picklist.assertPicklist(picklistName = "Picklist Test");
+
+		CreateObject.viewObject(labelName = "Picklist Test");
+
+		Picklist.updatePicklistName(picklistName = "Update Picklist");
+
+		Button.clickSave();
+
+		Refresh();
+
+		Picklist.assertPicklist(picklistName = "Update Picklist");
 	}
 
 	@description = "LPS-135390 - Verify it is possible to view its own Object entry with only the Add Object Entry permission"
@@ -273,12 +594,46 @@ definition {
 	}
 
 	@description = "LPS-135390 - Verify it is possible to view a Picklist with the View permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewPicklistWithViewPermission {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145761 CanViewPicklistWithViewPermission pending implementation
+		JSONRole.addRegularRole(roleTitle = "Regular Role");
 
+		for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceAction}",
+				resourceName = "com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet",
+				roleTitle = "Regular Role");
+		}
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.list.type.model.ListTypeDefinition",
+			roleTitle = "Regular Role");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Picklist.gotoPicklists();
+
+		Picklist.assertPicklist(picklistName = "Picklist Test");
 	}
 
 }

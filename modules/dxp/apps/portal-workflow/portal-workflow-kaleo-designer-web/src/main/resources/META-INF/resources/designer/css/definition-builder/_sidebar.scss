@@ -36,6 +36,54 @@
 			width: 100%;
 		}
 
+		.recipient-type-form-group {
+			margin-bottom: 0.5rem;
+		}
+
+		.section-buttons-area {
+			align-items: center;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+
+			.delete-button {
+				align-items: flex-end;
+
+				& svg {
+					fill: #6b6c7e;
+				}
+			}
+		}
+
+		.current-assignments-area {
+			background-color: #fff;
+			border-color: #e7e7ed;
+			border-radius: 0.25rem;
+			border-style: solid;
+			border-width: 0.0625rem;
+			padding-bottom: 3px;
+			padding-left: 30px;
+			padding-right: 15px;
+			padding-top: 3px;
+
+			.current-assignments-row {
+				align-items: center;
+
+				.truncate-container {
+					max-width: 332px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				.delete-button {
+					& svg {
+						fill: #6b6c7e;
+					}
+				}
+			}
+		}
+
 		span .lexicon-icon-exclamation-full:hover {
 			color: #da1414 !important;
 		}
@@ -51,37 +99,6 @@
 		display: flex;
 		height: 75px;
 
-		.spaced-items {
-			align-items: center;
-			display: flex;
-			justify-content: space-between;
-			width: 100%;
-
-			.trash-button {
-				height: 32px;
-				width: 32px;
-
-				svg {
-					height: 16px;
-					width: 16px;
-				}
-
-				&:hover {
-					background: #feefef;
-					border-radius: 4px;
-					height: 32px;
-					padding: 8px;
-					width: 32px;
-
-					svg {
-						fill: #da1414;
-						height: 16px;
-						width: 16px;
-					}
-				}
-			}
-		}
-
 		.title {
 			color: #272833;
 			font-size: 20px;
@@ -89,6 +106,46 @@
 
 			&:first-letter {
 				text-transform: capitalize;
+			}
+		}
+	}
+
+	.spaced-items {
+		align-items: center;
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+
+		.auto-create {
+			align-items: center;
+			display: flex;
+
+			.custom-control {
+				margin-bottom: 0;
+			}
+		}
+
+		.trash-button {
+			height: 32px;
+			width: 32px;
+
+			svg {
+				height: 16px;
+				width: 16px;
+			}
+
+			&:hover {
+				background: #feefef;
+				border-radius: 4px;
+				height: 32px;
+				padding: 8px;
+				width: 32px;
+
+				svg {
+					fill: #da1414;
+					height: 16px;
+					width: 16px;
+				}
 			}
 		}
 	}

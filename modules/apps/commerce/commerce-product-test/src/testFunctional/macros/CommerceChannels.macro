@@ -64,30 +64,6 @@ definition {
 		Button.clickSave();
 	}
 
-	macro addProductDisplayPage {
-		Button.click(button = "Choose");
-
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
-
-		if ("${pageType}" == "Private") {
-			CommerceEntry.gotoMenuTab(menuTab = "Private Pages");
-		}
-
-		CommerceNavigator.searchEntry(entryName = "${pageName}");
-
-		LexiconCard.clickCard(card = "${pageName}");
-
-		SelectFrame.selectFrameTop();
-
-		Button.clickDone();
-
-		Button.clickSave();
-
-		AssertElementPresent(locator1 = "Message#SUCCESS");
-
-		CommerceEntry.assertDefaultProductDisplayPage(pageName = "${pageName}");
-	}
-
 	macro assertMercanetConfigurationEnvironment {
 		CommerceEntry.clickTableEntryEditButton(
 			entryName = "${paymentMethod}",
@@ -114,6 +90,58 @@ definition {
 			locator1 = "CommerceEntry#SELECT_ASSERT_SELECTED_VALUE");
 
 		Click(locator1 = "Icon#CLOSE");
+	}
+
+	macro chooseDefaultDisplayPage {
+		Button.click(button = "Choose");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		if ("${pageType}" == "Private") {
+			CommerceEntry.gotoMenuTab(menuTab = "Private Pages");
+		}
+
+		CommerceNavigator.searchEntry(entryName = "${pageName}");
+
+		LexiconCard.clickCard(card = "${pageName}");
+
+		SelectFrame.selectFrameTop();
+
+		if (IsElementPresent(locator1 = "Button#DONE")) {
+			Button.clickDone();
+		}
+
+		Button.clickSave();
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+	}
+
+	macro chooseDisplayPageFromSidePanel {
+		SelectFrame.selectFrameTop();
+
+		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
+
+		Button.click(button = "Choose");
+
+		if (IsElementNotPresent(locator1 = "IFrame#MODAL_BODY")) {
+			SelectFrame.selectFrameTop();
+		}
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		if ("${pageType}" == "Private") {
+			CommerceEntry.gotoMenuTab(menuTab = "Private Pages");
+		}
+
+		CommerceNavigator.searchEntry(entryName = "${pageName}");
+
+		LexiconCard.clickCard(card = "${pageName}");
+
+		SelectFrame.selectFrameTop();
+
+		if (IsElementPresent(locator1 = "Button#DONE")) {
+			Button.clickDone();
+		}
 	}
 
 	macro configurationPaypal {
@@ -193,11 +221,29 @@ definition {
 
 	macro openChannelsAdmin {
 		Navigator.openWithAppendToBaseURL(
-			baseUrl = "${baseUrl}",
+			baseURL = "${baseURL}",
 			urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_commerce_channel_web_internal_portlet_CommerceChannelsPortlet");
 	}
 
-	macro removeProductDisplayPage {
+	macro overrideCategoryDisplayPage {
+		CommerceChannels.addCategory(key_card = "${category}");
+
+		CommerceChannels.chooseDisplayPageFromSidePanel(
+			pageName = "${pageName}",
+			pageType = "${pageType}");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
+
+		Button.clickSave();
+
+		Alert.viewSuccessMessage();
+
+		Click(locator1 = "CommerceEntry#MODAL_BUTTON_CLOSE");
+
+		SelectFrame.selectFrameTop();
+	}
+
+	macro removeDefaultDisplayPage {
 		Click(locator1 = "CommerceEntry#DISPLAY_PAGE_ITEM_REMOVE");
 
 		Button.clickSave();

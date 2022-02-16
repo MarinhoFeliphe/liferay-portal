@@ -5,6 +5,7 @@ definition {
 	property portal.suite.search.engine = "elasticsearch7";
 	property portal.upstream = "true";
 	property test.run.environment = "EE";
+	property testray.component.names = "Frontend Dataset";
 	property testray.main.component.name = "Search Experiences";
 
 	setUp {
@@ -35,7 +36,7 @@ definition {
 		PortletEntry.save();
 
 		AssertTextEquals(
-			blueprintTitle = "Test Blueprint",
+			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_DESCRIPTION",
 			value1 = "Test Description");
 	}
@@ -68,15 +69,10 @@ definition {
 
 		Blueprints.addElement(element = "Paste Any Elasticsearch Query");
 
-		var elasticsearchQueryJson = '''
-{
-	"match_none":
-	{}
-}
-		''';
+		var elasticsearchQueryJson = '''{"match_none":{}}''';
 
 		Type.typeCodeMirrorEditorNoError(
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_ELASTICSEARCH_QUERY_EDITOR",
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
 			value1 = "${elasticsearchQueryJson}");
 
 		PortletEntry.save();
@@ -94,7 +90,13 @@ definition {
 			searchAssetTitle = "apple",
 			searchAssetType = "Web Content Article");
 
-		Blueprints.applyBlueprintViaLLSO(blueprintTitle = "Test Blueprint");
+		SearchPortlets.addWidgets(searchPortletList = "Low Level Search Options");
+
+		var blueprintId = Blueprints.getBlueprintID(title = "Test Blueprint");
+
+		SearchPortlets.configureLowLevelSearchOptions(
+			attributesKey = "search.experiences.blueprint.id",
+			attributesValue = "${blueprintId}");
 
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
@@ -121,6 +123,134 @@ definition {
 		AssertTextNotEquals.assertNotPartialText(
 			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
 			value1 = "hits");
+	}
+
+	test ApplyBlueprintToContentPageViaBlueprintsOptions {
+		JSONBlog.addEntry(
+			entryContent = "",
+			entryTitle = "apple apple apple");
+
+		JSONWebcontent.addWebContent(
+			content = "apple",
+			groupName = "Guest",
+			title = "WC Title");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Boost Asset Type");
+
+		Blueprints.configureElementDropdown(
+			dropdownName = "Asset Type",
+			option = "Web Content Article");
+
+		Type(
+			elementName = "Boost Asset Type",
+			fieldLabel = "Boost",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
+			value1 = "1000");
+
+		PortletEntry.save();
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Content Search Page",
+			type = "content");
+
+		ContentPagesNavigator.openEditContentPage(
+			pageName = "Content Search Page",
+			siteName = "Guest");
+
+		PageEditor.addWidget(portletName = "Search Bar");
+
+		PageEditor.addWidget(
+			collectionName = "Search",
+			portletName = "Search Results",
+			targetFragmentName = "Search Bar");
+
+		PageEditor.addWidget(
+			portletName = "Blueprints Options",
+			targetFragmentName = "Search Bar");
+
+		Blueprints.applyBlueprintViaOptionsWidget(blueprintTitle = "Test Blueprint");
+
+		PageEditor.clickPublish();
+
+		ContentPagesNavigator.openViewContentPage(
+			pageName = "Content Search Page",
+			siteName = "Guest");
+
+		SearchPortlets.searchWidget(searchTerm = "apple");
+
+		SearchResultPortlet.viewSearchResultsSpecificOrder(resultsList = "WC Title,apple apple apple");
+	}
+
+	test ApplyBlueprintToContentPageViaLLSO {
+		property test.name.skip.portal.instance = "Blueprints#ApplyBlueprintToContentPageViaLLSO";
+
+		JSONBlog.addEntry(
+			entryContent = "",
+			entryTitle = "apple apple apple");
+
+		JSONWebcontent.addWebContent(
+			content = "apple",
+			groupName = "Guest",
+			title = "WC Title");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Boost Asset Type");
+
+		Blueprints.configureElementDropdown(
+			dropdownName = "Asset Type",
+			option = "Web Content Article");
+
+		Type(
+			elementName = "Boost Asset Type",
+			fieldLabel = "Boost",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
+			value1 = "1000");
+
+		PortletEntry.save();
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Content Search Page",
+			type = "content");
+
+		ContentPagesNavigator.openEditContentPage(
+			pageName = "Content Search Page",
+			siteName = "Guest");
+
+		PageEditor.addWidget(portletName = "Search Bar");
+
+		PageEditor.addWidget(
+			collectionName = "Search",
+			portletName = "Search Results",
+			targetFragmentName = "Search Bar");
+
+		PageEditor.addWidget(
+			portletName = "Low Level Search Options",
+			targetFragmentName = "Search Bar");
+
+		var blueprintId = Blueprints.getBlueprintID(title = "Test Blueprint");
+
+		SearchPortlets.configureLowLevelSearchOptions(
+			attributesKey = "search.experiences.blueprint.id",
+			attributesValue = "${blueprintId}");
+
+		PageEditor.clickPublish();
+
+		ContentPagesNavigator.openViewContentPage(
+			pageName = "Content Search Page",
+			siteName = "Guest");
+
+		SearchPortlets.searchWidget(searchTerm = "apple");
+
+		SearchResultPortlet.viewSearchResultsSpecificOrder(resultsList = "WC Title,apple apple apple");
 	}
 
 	test ApplyBlueprintWithDefaultElement {
@@ -164,18 +294,6 @@ definition {
 		SearchResultPortlet.viewSearchResultsSpecificOrder(resultsList = "Liferay Web Content,Liferay Blogs Entry");
 	}
 
-	test AssertBlueprintsPreviewFormValidation {
-		Blueprints.openBlueprintsAdmin();
-
-		Blueprints.createBlueprint(title = "Test Blueprint");
-
-		Blueprints.addElement(element = "Boost Asset Type");
-
-		Blueprints.searchBlueprintsPreview(searchTerm = "test");
-
-		Alert.viewErrorMessage(errorMessage = "The configuration has missing or invalid values.");
-	}
-
 	test AssertLocalizedFieldsAddLocaleDropdown {
 		Blueprints.openBlueprintsAdmin();
 
@@ -192,6 +310,25 @@ definition {
 			optionName = "localized_title");
 
 		AssertElementPresent(locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_MAPPING_LOCALE_DROPDOWN");
+	}
+
+	@description = "This is a use case for LPS-LPS-144359."
+	test AssertNoBlueprintsPreviewResultsDueToEmptyRequiredFields {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Boost Asset Type");
+
+		Blueprints.searchBlueprintsPreview(searchTerm = "test");
+
+		Alert.viewErrorMessage(errorMessage = "The configuration has missing or invalid values.");
+
+		AssertElementNotPresent(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_TITLE",
+			resultTitle = "");
+
+		Alert.viewRequiredField();
 	}
 
 	test BoostCustomLiferayObjectType {
@@ -278,6 +415,13 @@ definition {
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "1000");
 
+		Blueprints.searchBlueprintsPreview(searchTerm = "red apple");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_SPECIFIC_RANKING",
+			resultRanking = "1",
+			value1 = "reddish apple");
+
 		PortletEntry.save();
 
 		Search.openSearchPage();
@@ -319,7 +463,7 @@ definition {
 		''';
 
 		Type.typeCodeMirrorEditorNoError(
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_ELASTICSEARCH_QUERY_EDITOR",
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
 			value1 = "${elasticsearchQueryJson}");
 
 		Blueprints.configureElementDropdown(
@@ -368,7 +512,7 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Configuration");
 
-		var aggregationConfigurationJson = '''{"cardinality-test":{}}''';
+		var aggregationConfigurationJson = '''{"aggs":{}}''';
 
 		Type.typeCodeMirrorEditorNoError(
 			configurationField = "Aggregation Configuration",
@@ -393,7 +537,7 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Configuration");
 
-		AssertTextNotPresent(value1 = "cardinality-test");
+		AssertTextNotPresent(value1 = "aggs");
 	}
 
 	test CancelChangesToQuerySettings {
@@ -417,10 +561,6 @@ definition {
 	}
 
 	test CopyElementJSONViaBlueprintsQueryBuilder {
-		property test.name.skip.portal.instance = "Blueprints#CopyElementJSONViaBlueprintsQueryBuilder";
-
-		// Not running the test on a virtual instance is a workaround for LPS-140041
-
 		Blueprints.openBlueprintsAdmin();
 
 		Blueprints.createBlueprint(title = "Test Blueprint");
@@ -439,10 +579,6 @@ definition {
 	}
 
 	test CopyScoreExplanationViaBlueprintsQueryBuilder {
-		property test.name.skip.portal.instance = "Blueprints#CopyScoreExplanationViaBlueprintsQueryBuilder";
-
-		// Not running the test on a virtual instance is a workaround for LPS-140041
-
 		Blueprints.openBlueprintsAdmin();
 
 		Blueprints.createBlueprint(title = "Test Blueprint");
@@ -476,6 +612,31 @@ definition {
 		Blueprints.createElement(title = "Test Element");
 
 		Blueprints.viewEntryTitle(title = "Test Element");
+	}
+
+	test CreateElementWithDescription {
+		Blueprints.openBlueprintsAdmin();
+
+		Navigator.gotoNavItem(navItem = "Elements");
+
+		Click(locator1 = "Button#PLUS");
+
+		PortletEntry.inputTitle(title = "Test Element");
+
+		PortletEntry.inputDescription(description = "Test Element Description");
+
+		Button.click(button = "Create");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
+			value1 = "Test Element Description");
+
+		PortletEntry.save();
+
+		AssertTextEquals(
+			entryTitle = "Test Element",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_DESCRIPTION",
+			value1 = "Test Element Description");
 	}
 
 	test DefineBlueprintsRolePermissions {
@@ -543,7 +704,7 @@ definition {
 
 		Click(locator1 = "Icon#EDIT_PENCIL");
 
-		PortletEntry.inputName(name = "Edited Blueprint");
+		PortletEntry.inputTitle(title = "Edited Blueprint");
 
 		Button.clickDone();
 
@@ -633,7 +794,7 @@ definition {
 
 		PortletEntry.save();
 
-		Blueprints.deleteElement(element = "Edited Element");
+		Blueprints.deleteEntry(title = "Edited Element");
 
 		Blueprints.viewNoEntry(element = "Edited Element");
 	}
@@ -655,7 +816,7 @@ definition {
 
 		Blueprints.createElement(title = "Test Element");
 
-		Blueprints.deleteElement(element = "Test Element");
+		Blueprints.deleteEntry(title = "Test Element");
 
 		Blueprints.viewNoEntry(title = "Test Element");
 	}
@@ -678,6 +839,30 @@ definition {
 		Blueprints.viewDownloadedContent(
 			fileName = "sxpElement.json",
 			text = "clauses");
+	}
+
+	test DownloadElementJSONViaElementsEditPreview {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.editElement(
+			element = "Text Match Over Multiple Fields",
+			searchForElement = "true");
+
+		Click(locator1 = "Button#PREVIEW");
+
+		Click(
+			key_text = "Dropdown",
+			locator1 = "Icon#ANY_VERTICAL_ELLIPSIS");
+
+		MenuItem.clickNoError(menuItem = "View Element JSON");
+
+		SelectFrameTop();
+
+		Click(locator1 = "Link#DOWNLOAD");
+
+		Blueprints.viewDownloadedContent(
+			fileName = "sxpElement.json",
+			text = "queryConfiguration");
 	}
 
 	test DownloadScoreExplanationViaBlueprintsQueryBuilder {
@@ -718,7 +903,7 @@ definition {
 		PortletEntry.save();
 
 		AssertTextEquals(
-			blueprintTitle = "Test Blueprint",
+			entryTitle = "Test Blueprint",
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_DESCRIPTION",
 			value1 = "Edited Description");
 	}
@@ -730,7 +915,7 @@ definition {
 
 		Click(locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_HEADER_TITLE");
 
-		PortletEntry.inputName(name = "Edited Blueprint");
+		PortletEntry.inputTitle(title = "Edited Blueprint");
 
 		Button.clickDone();
 
@@ -743,6 +928,162 @@ definition {
 		Blueprints.viewEntryTitle(title = "Edited Blueprint");
 
 		Blueprints.viewNoEntry(title = "Test Blueprint");
+	}
+
+	test ExportImportBlueprint {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Boost Tags Match");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		Check.checkNotVisible(
+			locator1 = "Radio#ANY",
+			radioLabel = "Selected Types");
+
+		Button.click(button = "Select Asset Types");
+
+		Check.checkNotVisible(
+			assetType = "Blogs Entry",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+
+		Button.clickDone();
+
+		Uncheck.uncheckToggleSwitch(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
+
+		Check.checkNotVisible(
+			locator1 = "Radio#ANY",
+			radioLabel = "Customize");
+
+		Button.click(button = "Customize Contributors");
+
+		Uncheck.uncheckToggleSwitch(
+			contributorClass = "AccountEntryKeywordQueryContributor",
+			locator1 = "Blueprints#BLUEPRINTS_CLAUSE_CONTRIBUTOR_ON_OFF_TOGGLE");
+
+		Navigator.gotoNavTab(navTab = "Configuration");
+
+		var aggregationConfigurationJson = '''{"aggs":{}}''';
+
+		Type.typeCodeMirrorEditorNoError(
+			configurationField = "Aggregation Configuration",
+			locator1 = "Blueprints#BLUEPRINTS_CONFIGURATION_EDITOR",
+			value1 = "${aggregationConfigurationJson}");
+
+		PortletEntry.save();
+
+		Blueprints.gotoEntryMenuItem(
+			menuItem = "Export",
+			title = "Test Blueprint");
+
+		Blueprints.deleteEntry(title = "Test Blueprint");
+
+		Click(locator1 = "Portlet#OPTIONS_ICON");
+
+		MenuItem.click(menuItem = "Import");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		UploadTempFile.uploadTempFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
+			value1 = "Test Blueprint.json");
+
+		Click(
+			key_text = "Import",
+			locator1 = "Button#ANY");
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		AssertElementPresent(
+			element = "Boost Tags Match",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		AssertElementPresent(
+			assetType = "Blogs Entry",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+
+		AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
+
+		Button.click(button = "Customize Contributors");
+
+		AssertNotChecked.assertNotCheckedNotVisible(
+			contributorClass = "AccountEntryKeywordQueryContributor",
+			locator1 = "Blueprints#BLUEPRINTS_CLAUSE_CONTRIBUTOR_ON_OFF_TOGGLE");
+
+		Navigator.gotoNavTab(navTab = "Configuration");
+
+		AssertTextPresent(value1 = "aggs");
+	}
+
+	test ExportImportElement {
+		Blueprints.openBlueprintsAdmin();
+
+		var elementSourceJson = '''
+{
+	"description_i18n": {
+		"en_US": "Import Element"
+	},
+	"elementDefinition": {
+		"configuration": {},
+		"uiConfiguration": {}
+	},
+	"title_i18n": {
+		"en_US": "Test Element"
+	}
+}
+			''';
+
+		Blueprints.createElement(
+			elementSourceJson = "${elementSourceJson}",
+			title = "Test Element");
+
+		Blueprints.gotoEntryMenuItem(
+			menuItem = "Export",
+			title = "Test Element");
+
+		Blueprints.deleteEntry(title = "Test Element");
+
+		Click(locator1 = "Portlet#OPTIONS_ICON");
+
+		MenuItem.click(menuItem = "Import");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		UploadTempFile.uploadTempFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
+			value1 = "Test Element.json");
+
+		Click(
+			key_text = "Import",
+			locator1 = "Button#ANY");
+
+		Blueprints.editElement(element = "Test Element");
+
+		AssertTextPresent(value1 = "Import Element");
+	}
+
+	test HideAndShowAddElementsSidebar {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		AssertVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
+
+		Click(
+			ariaLabel = "Add Query Element",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		AssertNotVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
+
+		Click(
+			ariaLabel = "Add Query Element",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		AssertVisible(locator1 = "Blueprints#BLUEPRINTS_ADD_ELEMENTS_SIDEBAR_HEADER");
 	}
 
 	test HideWebContentViaCustomElement {
@@ -842,6 +1183,36 @@ definition {
 		SearchResultPortlet.viewSearchResultNotPresent(
 			searchAssetTitle = "Hide This Content",
 			searchAssetType = "Web Content Article");
+	}
+
+	test ModifyIndexerClausesToggle {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
+
+		Uncheck.uncheckToggleSwitch(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
+
+		PortletEntry.save();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
+
+		Check.checkToggleSwitch(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
+
+		PortletEntry.save();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCH_FRAMEWORK_INDEXER_CLAUSES_ON_OFF_TOGGLE");
 	}
 
 	test NavigateToEditPageViaMenu {
@@ -1066,6 +1437,99 @@ definition {
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
 	}
 
+	@description = "This is a use case for LPS-143567."
+	test SaveAndEditCustomJSONElement {
+		JSONWebcontent.addWebContent(
+			content = "",
+			groupName = "Guest",
+			title = "apple apple apple");
+
+		var webContentserviceContext = '''{"assetTagNames": ["apple"]}''';
+
+		JSONWebcontent.addWebContent(
+			content = "",
+			groupName = "Guest",
+			serviceContext = "${webContentserviceContext}",
+			title = "gala");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Custom JSON Element");
+
+		var customJson = '''
+{
+	"elementDefinition": {
+		"configuration": {
+			"queryConfiguration": {
+				"queryEntries": [
+					{
+						"clauses": [
+							{
+								"context": "query",
+								"occur": "should",
+								"query": {
+									"term": {
+										"assetTagNames.raw": {
+											"value": "${keywords}",
+											"boost": "2000"
+										}
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		}
+	},
+	"title_i18n": {
+		"en_US": "Boost Tags Match Custom JSON"
+	}
+}
+		''';
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
+			value1 = "${customJson}");
+
+		PortletEntry.save();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		AssertElementPresent(
+			element = "Boost Tags Match Custom JSON",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		Blueprints.searchBlueprintsPreview(searchTerm = "apple");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_SPECIFIC_RANKING",
+			resultRanking = "1",
+			value1 = "gala");
+
+		var customJsonEdited = '''
+{
+	"title_i18n": {
+		"en_US": "Custom JSON Element Edited"
+	}
+}
+		''';
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
+			value1 = "${customJsonEdited}");
+
+		PortletEntry.save();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		AssertElementPresent(
+			element = "Custom JSON Element Edited",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+	}
+
 	test SearchBlueprintsAdminTable {
 		Blueprints.openBlueprintsAdmin();
 
@@ -1111,55 +1575,71 @@ definition {
 	}
 
 	test SearchViaBlueprintsPreviewWithAttributes {
+		JSONCategory.addVocabulary(
+			groupName = "Guest",
+			title = "Test Vocabulary");
+
+		var categoryId = JSONCategory.addCategory(
+			groupName = "Guest",
+			title = "Test Category",
+			vocabularyName = "Test Vocabulary");
+
+		var webContentserviceContext = '''{"assetCategoryIds": ["${categoryId}"]}''';
+
+		JSONWebcontent.addWebContent(
+			content = "apple",
+			groupName = "Guest",
+			serviceContext = "${webContentserviceContext}",
+			title = "gala");
+
 		JSONWebcontent.addWebContent(
 			content = "",
 			groupName = "Guest",
 			title = "apple apple apple");
 
-		var webContentserviceContext = '''{"assetTagNames": ["apple"]}''';
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		JSONWebcontent.addWebContent(
-			content = "",
+		JSONSegmentsentry.addSegment(
+			fieldName = "First Name",
 			groupName = "Guest",
-			serviceContext = "${webContentserviceContext}",
-			title = "gala");
+			operator = "equals",
+			segmentName = "Test Segment",
+			text = "test");
 
 		Blueprints.openBlueprintsAdmin();
 
-		Blueprints.createBlueprint(title = "Boost Tags Match Blueprint");
+		Blueprints.createBlueprint(title = "Test Blueprint");
 
-		Blueprints.addElement(element = "Boost Tags Match");
+		Blueprints.addElement(element = "Boost Contents in a Category for a User Segment");
 
 		Type(
-			elementName = "Boost Tags Match",
+			elementName = "Boost Contents in a Category for a User Segment",
+			fieldLabel = "Asset Category ID",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
+			value1 = "${categoryId}");
+
+		var segmentId = JSONSegmentsentry.getSegmentId(segmentName = "Test Segment");
+
+		Type(
+			elementName = "Boost Contents in a Category for a User Segment",
+			fieldLabel = "User Segment IDs",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
+			value1 = "${segmentId}");
+
+		Type(
+			elementName = "Boost Contents in a Category for a User Segment",
 			fieldLabel = "Boost",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "2000");
 
-		PortletEntry.save();
+		var groupId = JSONGroupAPI._getGroupIdByName(
+			groupName = "Guest",
+			site = "true");
 
-		Blueprints.createBlueprint(title = "Test Blueprint");
-
-		Click(locator1 = "Button#PREVIEW");
-
-		Click.javaScriptClick(
-			key_title = "Attributes",
-			locator1 = "Button#ANY_TITLE");
-
-		var blueprintId = Blueprints.getBlueprintID(title = "Boost Tags Match Blueprint");
-
-		Type(
-			locator1 = "TextInput#KEY",
-			value1 = "search.experiences.blueprint.id");
-
-		Type(
-			key_fieldLabel = "Value",
-			locator1 = "TextInput#GENERIC_TEXT_INPUT",
-			value1 = "${blueprintId}");
-
-		Button.clickDone();
-
-		Blueprints.searchBlueprintsPreview(searchTerm = "apple");
+		Blueprints.searchBlueprintsPreview(
+			attributesKey = "search.experiences.scope.group.id",
+			attributesValue = "${groupId}",
+			searchTerm = "apple");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_SPECIFIC_RANKING",
@@ -1175,6 +1655,55 @@ definition {
 		Blueprints.searchBlueprintsPreview(searchTerm = "empty");
 
 		AssertElementPresent(locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_EMPTY");
+	}
+
+	test SearchWithSelectedAssetType {
+		JSONWebcontent.addWebContent(
+			content = "",
+			groupName = "Guest",
+			title = "red apple");
+
+		JSONBlog.addEntry(
+			entryContent = "",
+			entryTitle = "green apple");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		Check.checkNotVisible(
+			locator1 = "Radio#ANY",
+			radioLabel = "Selected Types");
+
+		Button.click(button = "Select Asset Types");
+
+		Check.checkNotVisible(
+			assetType = "Web Content Article",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+
+		Button.clickDone();
+
+		PortletEntry.save();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		AssertElementPresent(
+			assetType = "Web Content Article",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+
+		Blueprints.searchBlueprintsPreview(searchTerm = "apple");
+
+		AssertElementPresent(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_TITLE",
+			resultTitle = "red apple");
+
+		AssertElementNotPresent(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_TITLE",
+			resultTitle = "green apple");
 	}
 
 	@description = "This is a use case for LPS-145977."
@@ -1205,6 +1734,74 @@ definition {
 		AssertTextEquals(
 			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_HEADER_TITLE",
 			value1 = "Test Blueprint");
+	}
+
+	test ViewBlueprintsPreviewLocalizedResults {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		JSONWebcontent.addBasicWebContentLocalized(
+			contentMap = "pt_BR:contente",
+			groupName = "Guest",
+			titleMap = "en_US:Title,pt_BR:Título");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Language Selector Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Guest",
+			layoutName = "Language Selector Page",
+			widgetName = "Language Selector");
+
+		Navigator.openSitePage(
+			pageName = "Language Selector Page",
+			siteName = "Guest");
+
+		LanguagePortlet.selectLanguagePG(
+			locale = "pt_BR",
+			textIcon = "português-Brasil");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		Click(locator1 = "Blueprints#BLUEPRINTS_PREVIEW_BUTTON_PORTUGUESE");
+
+		Type(
+			locator1 = "Blueprints#BLUEPRINTS_PREVIEW_SEARCH_BAR_PORTUGUESE",
+			value1 = "content");
+
+		KeyPress(
+			locator1 = "Blueprints#BLUEPRINTS_PREVIEW_SEARCH_BAR_PORTUGUESE",
+			value1 = "\RETURN");
+
+		AssertElementPresent(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_TITLE",
+			resultTitle = "Título");
+	}
+
+	test ViewBlueprintsPreviewValidationForInvalidJSONProperty {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Custom JSON Element");
+
+		var customJson = '''{"elementDefinitionnnnnnn": {}}''';
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
+			value1 = "${customJson}");
+
+		Blueprints.searchBlueprintsPreview(searchTerm = "test");
+
+		Alert.viewErrorMessage(errorMessage = "The property &quot;elementDefinitionnnnnnn&quot; is not defined in SXPElement.");
+
+		AssertElementNotPresent(
+			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_TITLE",
+			resultTitle = "");
 	}
 
 	test ViewClauseContributorsUI {
@@ -1279,12 +1876,82 @@ definition {
 			locator1 = "Blueprints#BLUEPRINTS_CLAUSE_CONTRIBUTOR_ON_OFF_TOGGLE");
 	}
 
+	test ViewCollapsibleAddedElements {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Boost Proximity");
+
+		Click(
+			ariaLabel = "Collapse",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		AssertElementNotPresent(
+			elementName = "Boost Proximity",
+			fieldName = "Field",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		Click(
+			ariaLabel = "Expand",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		AssertElementPresent(
+			elementName = "Boost Proximity",
+			fieldName = "Field",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		Blueprints.addElement(element = "Boost Asset Type");
+
+		Blueprints.addElement(element = "Boost Freshness");
+
+		Click(
+			key_text = "Collapse All",
+			locator1 = "Button#ANY");
+
+		AssertElementNotPresent(
+			elementName = "",
+			fieldName = "Boost",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		AssertElementNotPresent(
+			ariaLabel = "Collapse",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+
+		Click(
+			key_text = "Expand All",
+			locator1 = "Button#ANY");
+
+		AssertElementPresent(
+			elementName = "",
+			fieldName = "Boost",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		AssertElementNotPresent(
+			ariaLabel = "Expand",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+	}
+
 	test ViewDefaultElement {
 		Blueprints.openBlueprintsAdmin();
 
-		Blueprints.editElement(
-			element = "Boost All Keywords Match",
-			searchForElement = "true");
+		Navigator.gotoNavItem(navItem = "Elements");
+
+		Search.searchCP(searchTerm = "Boost All Keywords Match");
+
+		Blueprints.openEntryMenu(title = "Boost All Keywords Match");
+
+		AssertElementPresent(
+			key_menuItem = "Export",
+			locator1 = "MenuItem#ANY_MENU_ITEM");
+
+		AssertElementNotPresent(
+			key_menuItem = "Delete",
+			locator1 = "MenuItem#ANY_MENU_ITEM");
+
+		Blueprints.gotoEntryMenuItem(
+			menuItem = "View",
+			title = "Boost All Keywords Match");
 
 		AssertElementPresent(locator1 = "Blueprints#ELEMENTS_EDIT_PAGE_READ_ONLY_INDICATOR");
 
@@ -1299,10 +1966,6 @@ definition {
 		Click(
 			key_text = "Close",
 			locator1 = "Link#ANY");
-
-		AssertElementNotPresent(
-			key_text = "Save",
-			locator1 = "Button#ANY");
 
 		AssertTextEquals(
 			locator1 = "ControlMenu#HEADING",
@@ -1533,6 +2196,84 @@ definition {
 		AssertVisible(
 			key_searchExplanation = "PerFieldSimilarity",
 			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_PREVIEW_SEARCH_RESULT_SCORE_EXPLANATION");
+	}
+
+	test ViewSelectedAssetTypesUI {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		Check.checkNotVisible(
+			locator1 = "Radio#ANY",
+			radioLabel = "Selected Types");
+
+		Button.click(button = "Select Asset Types");
+
+		Check.checkNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(
+			assetType = "Blogs Entry",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+
+		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_UNCHECKED");
+
+		Uncheck.uncheckNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+
+		AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+
+		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_CHECKED");
+
+		Check.checkNotVisible(
+			assetType = "Web Content Article",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+
+		Click(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_REMAINING");
+
+		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_UNCHECKED");
+
+		Button.clickDone();
+
+		AssertElementPresent(
+			assetType = "Web Content Article",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+
+		Click(
+			assetType = "Wiki Page",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_REMOVE_SELECTED");
+
+		AssertElementNotPresent(
+			assetType = "Wiki Page",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+
+		PortletEntry.save();
+
+		Blueprints.editBlueprint(title = "Test Blueprint");
+
+		Navigator.gotoNavNested(navNested = "Query Settings");
+
+		AssertElementPresent(
+			assetType = "Web Content Article",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+
+		AssertElementNotPresent(
+			assetType = "Wiki Page",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+
+		Button.click(button = "Select Asset Types");
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(
+			assetType = "Web Content Article",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+
+		AssertNotChecked.assertNotCheckedNotVisible(
+			assetType = "Wiki Page",
+			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
 	}
 
 }

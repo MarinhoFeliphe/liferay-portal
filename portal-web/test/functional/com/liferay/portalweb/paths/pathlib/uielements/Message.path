@@ -52,7 +52,7 @@
 </tr>
 <tr>
 	<td>EMPTY_DEPOT_ROLE</td>
-	<td>//div[contains(@id,'depotRoles')]/p[contains(@class,'text-muted')]</td>
+	<td>//div[contains(@id,'depotRoles')]/p[contains(@class,'text-secondary')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -72,12 +72,12 @@
 </tr>
 <tr>
 	<td>EMPTY_INFO_DEPOT</td>
-	<td>//p[contains(@class,'text-muted')]</td>
+	<td>//p[contains(@class,'text-secondary')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EMPTY_INFO_DEPOT_HIDE</td>
-	<td>//div[not(contains(@class,'hide'))]//p[contains(@class,'text-muted')]</td>
+	<td>//div[not(contains(@class,'hide'))]//p[contains(@class,'text-secondary')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -218,6 +218,11 @@
 <tr>
 	<td>ERROR_IMPORT_TRANSLATIONS_ITEM</td>
 	<td>//div[contains(@class,'text-danger')]/preceding-sibling::div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_IMPORT_TRANSLATIONS_ITEM_N</td>
+	<td>xpath=(//div[contains(@class,'text-danger')]/preceding-sibling::div[contains(@class,'title')])[${key_indexNumber}]</td>
 	<td></td>
 </tr>
 <tr>

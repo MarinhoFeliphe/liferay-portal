@@ -28,6 +28,7 @@ definition {
 	@priority = "5"
 	test AntiSamyConfigXMLShouldBeConfigurableInPortal {
 		property antisamy.enabled = "true";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AntiSamy#AntiSamyConfigXMLShouldBeConfigurableInPortal";
 
 		task ("Verify that AntiSamy module has been started") {
@@ -62,6 +63,7 @@ definition {
 	@priority = "5"
 	test ModelSpecificAntiSamyRulesShouldWorkForModel {
 		property antisamy.enabled = "true";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AntiSamy#ModelSpecificAntiSamyRulesShouldWorkForModel";
 
 		task ("Verify that AntiSamy module has been started") {
@@ -69,14 +71,14 @@ definition {
 		}
 
 		task ("Add KB article with dynamic attribute and view it as guest") {
-			KBAdmin.openKBAdmin(siteUrlKey = "guest");
+			KBAdmin.openKBAdmin(siteURLKey = "guest");
 
 			KBArticle.addCP(
 				kbArticleAddViaSource = "true",
 				kbArticleContentSource = '''<p data-test="test">Hello Liferay</p>''',
 				kbArticleTitle = "Test AntiSamy");
 
-			KBAdmin.openKBAdmin(siteUrlKey = "guest");
+			KBAdmin.openKBAdmin(siteURLKey = "guest");
 
 			KBArticle.viewCP(
 				kbArticleContent = "Hello Liferay",
@@ -84,7 +86,7 @@ definition {
 		}
 
 		task ("Save KB article as Draft") {
-			KBAdmin.openKBAdmin(siteUrlKey = "guest");
+			KBAdmin.openKBAdmin(siteURLKey = "guest");
 
 			KBArticle.editCP(
 				kbArticleTitle = "Test AntiSamy",
@@ -128,8 +130,8 @@ definition {
 
 		task ("Assert that script is sanitized so page content remains unchanged") {
 			WebContentDisplayPortlet.viewContent(
-				webContentContent = "PASS",
-				webContentTitle = "Web Content Title");
+				webContentContent = "p id='demo'>FAIL</p>",
+				webContentTitle = "WC WebContent Title");
 		}
 	}
 

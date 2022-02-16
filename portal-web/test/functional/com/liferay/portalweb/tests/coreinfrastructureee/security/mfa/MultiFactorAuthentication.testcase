@@ -82,7 +82,7 @@ definition {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#AssertEditedEmailTemplate";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Enable OTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings();
@@ -120,16 +120,17 @@ definition {
 
 		task ("View OTP mail") {
 			MockMock.viewMailForOTP(
-				asset = "${portalUrl}: Your One-Time Password for test",
+				asset = "${portalURL}: Your One-Time Password for test",
 				content = "One-Time Password for test is:",
 				sender = "Joe Bloggs <test@liferay.com>",
-				subject = "${portalUrl}: Your One-Time Password for test");
+				subject = "${portalURL}: Your One-Time Password for test");
 		}
 	}
 
 	@description = "This is a use case for LPS-101717. Assert portal will not show any other MFA after IP Address Configuration is Enabled and assert portal will goes in other MFA verifier if IP verifier is failed."
 	@priority = "5"
 	test AssertLoginGoesInOtherMFAVerifierWhenIPVerifierFailed {
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#AssertLoginGoesInOtherMFAVerifierWhenIPVerifierFailed";
 
 		task ("Add CP able.com") {
@@ -142,12 +143,12 @@ definition {
 		task ("Login at able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Enable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
@@ -160,7 +161,7 @@ definition {
 
 		task ("Enable IP address") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "IP Address");
 
 			MultiFactorAuthentication.configureIPAddress(enableIp = "true");
@@ -168,7 +169,7 @@ definition {
 
 		task ("Enable OTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "Time-Based OTP");
 
 			MultiFactorAuthentication.configureTOTP(enableTotp = "true");
@@ -179,13 +180,13 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Configure IP address allowed 192.168.132.153/255.0.0.0") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "IP Address");
 
 			MultiFactorAuthentication.configureIPAddress(
@@ -198,7 +199,7 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080/",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "test@www.able.com");
 		}
 
@@ -208,9 +209,9 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "http://www.able.com:8080",
+				portalURL = "http://www.able.com:8080",
 				recipient = "test test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userPassword = "test");
 		}
@@ -231,10 +232,10 @@ definition {
 		task ("Login at able.com and enable OTP") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
@@ -245,7 +246,7 @@ definition {
 
 		task ("Go to able.com and enable OTP In time-base OTP password configuration") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "Time-Based OTP");
 
 			MultiFactorAuthentication.configureTOTP(enableTotp = "true");
@@ -270,7 +271,7 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080/",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "test@www.able.com");
 
 			MultiFactorAuthentication.viewEmailOTPVerifyField();
@@ -285,9 +286,10 @@ definition {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property osgi.module.configuration.file.names = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration.config";
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#AssertUserIsBlockedAfterReachAllowedFailedAttempts";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Enable OTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings();
@@ -342,17 +344,17 @@ definition {
 		task ("Login at able.com and enable OTP") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
 
 		task ("Disable Auto Login Basic Authentication Header") {
 			APIAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "Auto Login");
 
 			FormFields.disableCheckbox(fieldName = "enabled");
@@ -362,7 +364,7 @@ definition {
 
 		task ("Disable Basic Authentication Protocol Support") {
 			APIAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "Protocol Support");
 
 			FormFields.disableCheckbox(fieldName = "enabled");
@@ -394,12 +396,12 @@ definition {
 		task ("Login at able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Configure OTP Email sender") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTPEmailSender(
 				emailAddress = "test@www.able.com",
@@ -411,7 +413,7 @@ definition {
 		}
 
 		task ("Enable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
@@ -423,7 +425,7 @@ definition {
 		task ("Login at able.com and send OTP email") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080/",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "test@www.able.com");
 
 			MultiFactorAuthentication.sendOTPEmailPG();
@@ -431,9 +433,9 @@ definition {
 
 		task ("Login with test test") {
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "http://www.able.com:8080",
+				portalURL = "http://www.able.com:8080",
 				recipient = "test test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userPassword = "test");
 		}
@@ -453,7 +455,7 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 	}
@@ -473,12 +475,12 @@ definition {
 		task ("Login at able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Configure OTP email sender") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTPEmailSender(
 				emailAddress = "test@www.able.com",
@@ -486,14 +488,14 @@ definition {
 		}
 
 		task ("Enable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
 
 		task ("Enable TOTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "Time-Based OTP");
 
 			MultiFactorAuthentication.configureTOTP(enableTotp = "true");
@@ -523,6 +525,7 @@ definition {
 	@priority = "5"
 	test EnableOTPForInstanceAsInstanceAdminUser {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#EnableOTPForInstanceAsInstanceAdminUser";
 
 		task ("Assert MFA is not disabled on system level") {
@@ -539,12 +542,12 @@ definition {
 		task ("Login into able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Enable OTP email sender") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTPEmailSender(
 				emailAddress = "test@www.able.com",
@@ -556,7 +559,7 @@ definition {
 		}
 
 		task ("Enable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
@@ -568,7 +571,7 @@ definition {
 		task ("Login into able.com and send OTP email") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080/",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "test@www.able.com");
 
 			MultiFactorAuthentication.sendOTPEmailPG();
@@ -576,25 +579,25 @@ definition {
 
 		task ("Check OTP informations") {
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "http://www.able.com:8080",
+				portalURL = "http://www.able.com:8080",
 				recipient = "test test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userPassword = "test");
 		}
 
 		task ("Disable OTP at able.com") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "false");
 		}
 
 		task ("Log out and login at able.com") {
-			User.logoutPG(specificUrl = "http://www.able.com:8080/");
+			User.logoutPG(specificURL = "http://www.able.com:8080/");
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 	}
@@ -606,7 +609,7 @@ definition {
 		property osgi.module.configuration.file.names = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration.config";
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Add user with password") {
 			JSONUser.addUser(
@@ -646,7 +649,7 @@ definition {
 		}
 
 		task ("Assert user doesn't have permissions to configure Instance Settings") {
-			Navigator.openSpecificURL(url = "${portalUrl}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_InstanceSettingsPortlet");
+			Navigator.openSpecificURL(url = "${portalURL}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_InstanceSettingsPortlet");
 
 			AssertTextEquals(
 				locator1 = "Message#ERROR",
@@ -661,7 +664,7 @@ definition {
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginSuccessfulAfterResetPasswordAsEndUser";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Add user") {
 			JSONUser.addUser(
@@ -685,9 +688,9 @@ definition {
 
 		task ("Reset password by link") {
 			MockMock.openBodyLink(
-				asset = "${portalUrl}: Reset Your Password",
-				content = "You can reset your password for ${portalUrl}",
-				subject = "${portalUrl}: Reset Your Password");
+				asset = "${portalURL}: Reset Your Password",
+				content = "You can reset your password for ${portalURL}",
+				subject = "${portalURL}: Reset Your Password");
 
 			User.setPasswordByResetLink(
 				newPassword1 = "test",
@@ -706,7 +709,7 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "userfn userln",
 				userEmailAddress = "userea@liferay.com",
 				userPassword = "test");
@@ -721,7 +724,7 @@ definition {
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginSuccessfulAfterRetryTimeout";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Enable OTP and set failed attempts maximum number and retry time out") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings();
@@ -755,7 +758,7 @@ definition {
 			Pause(locator1 = "5000");
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "Test Test",
 				userEmailAddress = "test@liferay.com",
 				userPassword = "test");
@@ -767,9 +770,10 @@ definition {
 	test LoginWithIPBasedVerifierEnabled {
 		property osgi.module.configuration.file.names = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration.config";
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithIPBasedVerifierEnabled";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Enable OTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings();
@@ -833,7 +837,7 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "Test Test",
 				userEmailAddress = "test@liferay.com",
 				userPassword = "test");
@@ -867,9 +871,10 @@ definition {
 		property environment.acceptance = "true";
 		property osgi.module.configuration.file.names = "com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration.config";
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithOTPEnabled";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Add user and set password") {
 			JSONUser.addUser(
@@ -902,7 +907,7 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "userfn userln",
 				userEmailAddress = "userea@liferay.com",
 				userPassword = "test");
@@ -913,9 +918,10 @@ definition {
 	@priority = "5"
 	test LoginWithTOTPEnabledAsEndUser {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithTOTPEnabledAsEndUser";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Add user and set password") {
 			JSONUser.addUser(
@@ -954,7 +960,7 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "userfn userln",
 				userEmailAddress = "userea@liferay.com",
 				userPassword = "test");
@@ -1022,7 +1028,7 @@ definition {
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#RemoveTOTPVerificationOfCurrentUserNotAffectOtherEndUser";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Add user and set password") {
 			JSONUser.addUser(
@@ -1069,7 +1075,7 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "userfn userln",
 				userEmailAddress = "userea@liferay.com",
 				userPassword = "test");
@@ -1174,12 +1180,12 @@ definition {
 		task ("Login at able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Configure MFA and Email OTP and enable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
@@ -1223,7 +1229,7 @@ definition {
 		}
 
 		task ("Go to able.com and disable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "false");
 		}
@@ -1268,12 +1274,12 @@ definition {
 		task ("Login at able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Assert order field is present") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.viewOTPOrderFieldAvailable();
 
@@ -1290,7 +1296,7 @@ definition {
 		property osgi.module.configurations = "emailFromAddress=&quot;test@liferay.com&quot;${line.separator}emailFromName=&quot;Joe\ Bloggs&quot;";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#ViewResourceActionsOfOTPVerificationFailure";
 
-		var portalUrl = PropsUtil.get("portal.url");
+		var portalURL = PropsUtil.get("portal.url");
 
 		task ("Enable OTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings();
@@ -1310,14 +1316,14 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "test test",
 				userEmailAddress = "test@liferay.com",
 				userPassword = "test",
 				validOtp = "false");
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "${portalUrl}",
+				portalURL = "${portalURL}",
 				recipient = "Test Test",
 				userEmailAddress = "test@liferay.com",
 				userPassword = "test");
@@ -1356,12 +1362,12 @@ definition {
 		task ("Login at able.com") {
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Configure OTP email sender") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTPEmailSender(
 				emailAddress = "test@www.able.com",
@@ -1369,14 +1375,14 @@ definition {
 		}
 
 		task ("Enable OTP") {
-			MultiFactorAuthentication.openToConfigInInstanceSettings(baseUrl = "http://www.able.com:8080");
+			MultiFactorAuthentication.openToConfigInInstanceSettings(baseURL = "http://www.able.com:8080");
 
 			MultiFactorAuthentication.configureOTP(enableOtp = "true");
 		}
 
 		task ("Enable TOTP") {
 			MultiFactorAuthentication.openToConfigInInstanceSettings(
-				baseUrl = "http://www.able.com:8080",
+				baseURL = "http://www.able.com:8080",
 				portlet = "Time-Based OTP");
 
 			MultiFactorAuthentication.configureTOTP(enableTotp = "true");
@@ -1387,7 +1393,7 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080/",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "test@www.able.com");
 		}
 
@@ -1395,9 +1401,9 @@ definition {
 			MultiFactorAuthentication.sendOTPEmailPG();
 
 			MultiFactorAuthentication.verifyOTP(
-				portalUrl = "http://www.able.com:8080",
+				portalURL = "http://www.able.com:8080",
 				recipient = "test test",
-				specificUrl = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userPassword = "test");
 		}
@@ -1417,7 +1423,7 @@ definition {
 
 			User.firstLoginUI(
 				password = "test",
-				specificUrl = "http://www.able.com:8080/",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "test@www.able.com");
 		}
 
@@ -1430,7 +1436,7 @@ definition {
 		}
 
 		task ("Search for Test Test TOTP success verification on browser setup MFA checker") {
-			Audit.openAuditAdmin(baseUrl = "http://www.able.com:8080");
+			Audit.openAuditAdmin(baseURL = "http://www.able.com:8080");
 
 			Audit.searchViaKeywords(
 				resourceName = "TimeBasedOTPBrowserSetupMFAChecker",

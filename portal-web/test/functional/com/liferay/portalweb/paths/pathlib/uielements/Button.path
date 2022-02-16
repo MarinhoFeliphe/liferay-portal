@@ -11,6 +11,16 @@
 
 <tbody>
 <tr>
+	<td>ADD</td>
+	<td>//button[contains(@id, 'addButton')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_DISABLED</td>
+	<td>//button[contains(@id, 'addButton') and @disabled]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ADD_ADDRESS</td>
 	<td>//a[contains(@class,'add-address')]</td>
 	<td></td>
@@ -383,11 +393,6 @@
 <tr>
 	<td>EXPORT_MODAL_DISABLED</td>
 	<td>//div[contains(@class,'btn-group-item')]/button[@disabled and contains(.,'Export')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>FIELD_FILTER_APPLY</td>
-	<td>//tr[contains(.,'${key_fieldName}')]//button[contains(.,'Apply')]</td>
 	<td></td>
 </tr>
 <tr>

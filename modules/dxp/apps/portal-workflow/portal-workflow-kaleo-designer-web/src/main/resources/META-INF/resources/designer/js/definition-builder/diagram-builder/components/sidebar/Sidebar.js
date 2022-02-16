@@ -20,43 +20,70 @@ import sectionComponents from './sections/sectionComponents';
 const contents = {
 	'assignments': {
 		backButton: (setContentName) => () => setContentName('task'),
-		sections: ['selectAssignment'],
+		sections: ['assignments'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('assignments'),
 	},
 	'condition': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('condition-node'),
 	},
 	'end': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('end'),
 	},
 	'fork': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('fork-node'),
 	},
 	'join': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('join-node'),
 	},
 	'join-xor': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('join-xor-node'),
 	},
+	'notifications': {
+		backButton: (setContentName, selectedItemType) => () =>
+			setContentName(selectedItemType),
+		sections: ['notifications'],
+		showDeleteButton: true,
+		title: Liferay.Language.get('notifications'),
+	},
+	'scripted-assignment': {
+		backButton: (setContentName) => () => setContentName('assignments'),
+		sections: ['sourceCode'],
+		showDeleteButton: false,
+		title: Liferay.Language.get('scripted-assignment'),
+	},
 	'start': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('start'),
 	},
 	'state': {
-		sections: ['nodeInformation'],
+		sections: ['nodeInformation', 'notificationsSummary'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('state'),
 	},
 	'task': {
-		sections: ['nodeInformation', 'assignments'],
+		sections: [
+			'nodeInformation',
+			'assignmentsSummary',
+			'notificationsSummary',
+		],
+		showDeleteButton: true,
 		title: Liferay.Language.get('task'),
 	},
 	'transition': {
 		sections: ['edgeInformation'],
+		showDeleteButton: true,
 		title: Liferay.Language.get('transition'),
 	},
 };
@@ -107,9 +134,11 @@ export default function Sidebar() {
 		<div className="sidebar">
 			<SidebarHeader
 				backButtonFunction={
-					content?.backButton?.(setContentName) || defaultBackButton
+					content?.backButton?.(setContentName, selectedItem?.type) ||
+					defaultBackButton
 				}
-				showHeaderButtons={!!content}
+				showBackButton={!!content}
+				showDeleteButton={content?.showDeleteButton}
 				title={title}
 			/>
 

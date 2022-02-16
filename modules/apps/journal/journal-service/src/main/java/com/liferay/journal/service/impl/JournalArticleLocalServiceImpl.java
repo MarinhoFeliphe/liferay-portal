@@ -625,6 +625,7 @@ public class JournalArticleLocalServiceImpl
 		}
 
 		article.setStatusByUserId(userId);
+		article.setStatusByUserName(user.getFullName());
 		article.setStatusDate(serviceContext.getModifiedDate(date));
 		article.setExpandoBridgeAttributes(serviceContext);
 
@@ -6471,6 +6472,18 @@ public class JournalArticleLocalServiceImpl
 			article.setSmallImageURL(oldArticle.getSmallImageURL());
 
 			article.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+			User statusUser = _userLocalService.fetchUser(
+				serviceContext.getUserId());
+
+			if (statusUser == null) {
+				statusUser = _userLocalService.getDefaultUser(
+					oldArticle.getCompanyId());
+			}
+
+			article.setStatusByUserId(statusUser.getUserId());
+			article.setStatusByUserName(statusUser.getFullName());
+
 			article.setStatusDate(new Date());
 
 			ExpandoBridgeUtil.copyExpandoBridgeAttributes(

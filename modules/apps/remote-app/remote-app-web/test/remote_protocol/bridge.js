@@ -27,6 +27,7 @@ describe('remote-app-web', () => {
 	let reply;
 
 	beforeEach(() => {
+		jest.clearAllMocks();
 		jest.resetModules();
 
 		init = require('../../src/main/resources/META-INF/resources/remote_protocol/bridge')

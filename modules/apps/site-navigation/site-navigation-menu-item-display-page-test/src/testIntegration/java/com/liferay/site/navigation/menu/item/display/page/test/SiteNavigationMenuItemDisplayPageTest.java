@@ -349,6 +349,21 @@ public class SiteNavigationMenuItemDisplayPageTest {
 			friendlyURL,
 			siteNavigationMenuItemType.getRegularURL(
 				mockHttpServletRequest, siteNavigationMenuItem));
+
+		SiteNavigationMenuItemType defaultSiteNavigationMenuItemType =
+			new SiteNavigationMenuItemType() {
+
+				@Override
+				public String getLabel(Locale locale) {
+					return null;
+				}
+
+			};
+
+		Assert.assertEquals(
+			defaultSiteNavigationMenuItemType.getStatusIcon(
+				siteNavigationMenuItem),
+			siteNavigationMenuItemType.getStatusIcon(siteNavigationMenuItem));
 	}
 
 	@Test
@@ -598,6 +613,10 @@ public class SiteNavigationMenuItemDisplayPageTest {
 			themeDisplay.getURLCurrent() + StringPool.POUND,
 			siteNavigationMenuItemType.getRegularURL(
 				mockHttpServletRequest, siteNavigationMenuItem));
+
+		Assert.assertEquals(
+			"warning-full",
+			siteNavigationMenuItemType.getStatusIcon(siteNavigationMenuItem));
 	}
 
 	private SiteNavigationMenuItem _createSiteNavigationMenuItem(

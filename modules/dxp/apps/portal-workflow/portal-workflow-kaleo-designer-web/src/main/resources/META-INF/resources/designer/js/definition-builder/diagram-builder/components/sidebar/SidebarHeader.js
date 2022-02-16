@@ -21,7 +21,8 @@ import {getModalInfo} from './utils';
 
 export default function SidebarHeader({
 	backButtonFunction = () => {},
-	showHeaderButtons,
+	showBackButton,
+	showDeleteButton,
 	title,
 }) {
 	const {setElements} = useContext(DefinitionBuilderContext);
@@ -40,10 +41,25 @@ export default function SidebarHeader({
 
 	const deleteItem = () => {
 		setElements((elements) =>
-			elements.filter((element) => element.id !== selectedItem.id)
+			elements.filter(
+				(element) =>
+					element.id !== selectedItem.id &&
+					element.source !== selectedItem.id &&
+					element.target !== selectedItem.id
+			)
 		);
 		setShowDeleteConfirmationModal(false);
 		backButtonFunction();
+	};
+
+	const handleKeyDown = (event) => {
+		if (
+			(event.key === 'Backspace' || event.key === 'Delete') &&
+			document.querySelectorAll('.form-control:focus').length === 0 &&
+			document.querySelectorAll('.CodeMirror-focused').length === 0
+		) {
+			setShowDeleteConfirmationModal(true);
+		}
 	};
 
 	useEffect(() => {
@@ -53,16 +69,6 @@ export default function SidebarHeader({
 					isNode(selectedItem) ? selectedItem.type : 'transition'
 				)
 			);
-
-			const handleKeyDown = (event) => {
-				if (
-					(event.key === 'Backspace' || event.key === 'Delete') &&
-					document.querySelectorAll('.form-control:focus').length ===
-						0
-				) {
-					setShowDeleteConfirmationModal(true);
-				}
-			};
 
 			window.addEventListener('keydown', handleKeyDown);
 
@@ -74,7 +80,7 @@ export default function SidebarHeader({
 
 	return (
 		<div className="sidebar-header">
-			{showHeaderButtons && (
+			{showBackButton && (
 				<ClayButtonWithIcon
 					className="text-secondary"
 					displayType="unstyled"
@@ -86,7 +92,7 @@ export default function SidebarHeader({
 			<div className="spaced-items">
 				<span className="title">{title}</span>
 
-				{showHeaderButtons && (
+				{showDeleteButton && (
 					<ClayButtonWithIcon
 						className="text-secondary trash-button"
 						displayType="unstyled"
@@ -136,6 +142,7 @@ export default function SidebarHeader({
 
 SidebarHeader.propTypes = {
 	backButtonFunction: PropTypes.func,
-	showHeaderButtons: PropTypes.bool,
+	showBackButton: PropTypes.bool,
+	showDeleteButton: PropTypes.bool,
 	title: PropTypes.string.isRequired,
 };

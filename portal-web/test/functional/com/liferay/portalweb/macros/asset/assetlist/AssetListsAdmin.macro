@@ -198,9 +198,10 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Check(
-			key_fieldName = "${fieldName}",
-			locator1 = "APConfigurationFilterbyfield#FIELD_FILTER_RADIO_BUTTON");
+		Select(
+			key_fieldLabel = "Select",
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = "${fieldName}");
 	}
 
 	macro configureItemTypeInDynamicCollection {
@@ -358,7 +359,7 @@ definition {
 	}
 
 	macro openAssetListsAdmin {
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteUrlKey}/~/control_panel/manage?p_p_id=com_liferay_asset_list_web_portlet_AssetListPortlet");
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_asset_list_web_portlet_AssetListPortlet");
 	}
 
 	macro openPersonalizedVariation {

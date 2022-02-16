@@ -1,6 +1,4 @@
-<#assign blogsEntryModels = dataFactory.newBlogsEntryModels(groupId) />
-
-<#list blogsEntryModels as blogsEntryModel>
+<#list dataFactory.newBlogsEntryModels(groupId) as blogsEntryModel>
 	${dataFactory.toInsertSQL(blogsEntryModel)}
 
 	<#assign friendlyURLEntryModel = dataFactory.newFriendlyURLEntryModel(blogsEntryModel.groupId, dataFactory.blogsEntryClassNameId, blogsEntryModel.entryId) />
@@ -31,5 +29,5 @@
 
 	${dataFactory.toInsertSQL(dataFactory.newSocialActivityModel(blogsEntryModel))}
 
-	${csvFileWriter.write("blog", blogsEntryModel.entryId + "," + blogsEntryModel.urlTitle + "," + mbRootMessageId + "\n")}
+	${csvFileWriter.write("blog", virtualHostModel.hostname + "," + blogsEntryModel.entryId + "," + blogsEntryModel.urlTitle + "," + mbRootMessageId + "\n")}
 </#list>

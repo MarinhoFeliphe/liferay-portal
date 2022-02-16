@@ -14,6 +14,11 @@
 
 package com.liferay.asset.list.web.internal.portlet.action;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.model.ClassType;
+import com.liferay.asset.kernel.model.ClassTypeField;
+import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
@@ -67,24 +72,41 @@ public class GetFieldValueMVCResourceCommand extends BaseMVCResourceCommand {
 			WebKeys.THEME_DISPLAY);
 
 		try {
+			String className = ParamUtil.getString(
+				resourceRequest, "className");
+
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(className);
+
+			ClassTypeReader classTypeReader =
+				assetRendererFactory.getClassTypeReader();
+
+			long classTypeId = ParamUtil.getLong(
+				resourceRequest, "classTypeId");
+
+			ClassType classType = classTypeReader.getClassType(
+				classTypeId, themeDisplay.getLocale());
+
+			String fieldName = ParamUtil.getString(resourceRequest, "name");
+
+			ClassTypeField classTypeField = classType.getClassTypeField(
+				fieldName);
+
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				resourceRequest);
 
-			long structureId = ParamUtil.getLong(
-				resourceRequest, "structureId");
-
 			Fields fields = (Fields)serviceContext.getAttribute(
-				Fields.class.getName() + structureId);
+				Fields.class.getName() + classTypeField.getClassTypeId());
 
 			if (fields == null) {
 				String fieldsNamespace = ParamUtil.getString(
 					resourceRequest, "fieldsNamespace");
 
 				fields = DDMUtil.getFields(
-					structureId, fieldsNamespace, serviceContext);
+					classTypeField.getClassTypeId(), fieldsNamespace,
+					serviceContext);
 			}
-
-			String fieldName = ParamUtil.getString(resourceRequest, "name");
 
 			Field field = fields.get(fieldName);
 

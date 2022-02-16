@@ -47,7 +47,7 @@ definition {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		task ("Enable customizable to page then select the first column") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PageCustomizations.enableSectionCustomizableCP(
 				columnId = "1",
@@ -123,7 +123,7 @@ definition {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		task ("Enable customizable to page then select the first column") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PageCustomizations.enableSectionCustomizableCP(
 				columnId = "1",
@@ -168,7 +168,7 @@ definition {
 			JSONLayout.addWidgetToPublicLayout(
 				groupName = "Test Site Name",
 				layoutName = "Test Page Name",
-				widgetName = "Menu Display Widget");
+				widgetName = "Menu Display");
 		}
 
 		task ("View Navigation Menu widget is shown") {
@@ -176,7 +176,7 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			Portlet.viewSpecificPG(portletName = "Menu Display Widget");
+			Portlet.viewSpecificPG(portletName = "Menu Display");
 		}
 	}
 
@@ -186,7 +186,7 @@ definition {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		task ("Enable customizable to page then select the first column") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PageCustomizations.enableSectionCustomizableCP(
 				columnId = "1",
@@ -278,7 +278,7 @@ definition {
 		}
 
 		task ("Enable customizable to page then select the first column") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PageCustomizations.enableSectionCustomizableCP(
 				columnId = "1",

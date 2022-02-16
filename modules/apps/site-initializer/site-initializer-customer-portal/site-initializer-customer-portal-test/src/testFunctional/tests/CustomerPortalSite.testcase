@@ -1,0 +1,116 @@
+@component-name = "portal-solutions"
+definition {
+
+	property portal.release = "false";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Customer Portal";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginUI();
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			CustomerPortal.customerPortalTearDown();
+
+			User.logoutPG();
+		}
+	}
+
+	@description = "LPS-146217 - Verify if when Customer Portal is created, Accounts Users will be created for it as well"
+	@priority = "4"
+	test AccountUsersAreCreatedForCP20 {
+		CustomerPortal.createCPSite(siteName = "Customer Portal");
+
+		AccountUsers.openAccountUsersAdmin();
+
+		AssertElementPresent(
+			locator1 = "CustomerPortalSite#ACCOUNTS_TABLE",
+			value = "Test Test");
+	}
+
+	@description = "LPS-146215 - Verify if Customer Portal can be created"
+	@priority = "5"
+	test CanCP20BeCreated {
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		LexiconEntry.gotoAdd();
+
+		LexiconCard.clickCard(card = "Customer Portal");
+
+		SelectFrame(
+			key_title = "Add Site",
+			locator1 = "IFrame#MODAL_ANY");
+
+		PortletEntry.inputName(name = "Customer Portal");
+
+		Click(locator1 = "Button#ADD");
+
+		AssertElementPresent(locator1 = "Button#ADD_DISABLED");
+
+		while (IsElementPresent(locator1 = "Button#ADD_DISABLED")) {
+			Pause(locator1 = "1500");
+		}
+
+		Refresh();
+
+		WaitForElementPresent(
+			key_itemName = "Site Configuration",
+			locator1 = "ListGroupItem#ITEM_TEXT");
+
+		Click(
+			key_itemName = "Site Configuration",
+			locator1 = "ListGroupItem#ITEM_TEXT");
+
+		AssertTextEquals(
+			locator1 = "SitesEditSite#DETAILS_NAME",
+			value1 = "Customer Portal");
+	}
+
+	@description = "LPS-146220 - Verify if when Customer Portal is created, Objects will be created for it as well"
+	@priority = "4"
+	test ObjectsAreCreatedForCP20 {
+		CustomerPortal.createCPSite(siteName = "Customer Portal");
+
+		ObjectAdmin.openObjectAdmin();
+
+		AssertElementPresent(
+			locator1 = "CustomerPortalSite#OBJECTS_TABLE",
+			value = "Koroneiki Account");
+	}
+
+	@description = "LPS-146219 - Verify if when Customer Portal is created, Remote Apps will be created for it as well"
+	@priority = "4"
+	test RemoteAppsAreCreatedForCP20 {
+		CustomerPortal.createCPSite(siteName = "Customer Portal");
+
+		RemoteApps.goToRemoteAppsPortlet();
+
+		AssertElementPresent(
+			locator1 = "CustomerPortalSite#OBJECTS_TABLE",
+			value = "Customer Portal");
+	}
+
+	@description = "LPS-146216 - Verify if when Customer Portal is created, Tests Accounts will be created for it as well"
+	@priority = "4"
+	test TestsAccountsAreCreatedForCP20 {
+		CustomerPortal.createCPSite(siteName = "Customer Portal");
+
+		Accounts.openAccountsAdmin();
+
+		AssertElementPresent(
+			locator1 = "CustomerPortalSite#ACCOUNTS_TABLE",
+			value = "Test Account 01");
+	}
+
+}

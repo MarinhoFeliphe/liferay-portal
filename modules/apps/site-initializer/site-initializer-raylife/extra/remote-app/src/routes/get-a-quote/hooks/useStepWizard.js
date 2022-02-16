@@ -66,9 +66,10 @@ export function useStepWizard() {
 	}, [loadInitialData]);
 
 	const calculateAllSteps = () => {
-		const stepName = Object.keys(form)[
-			Object.keys(form).length - 1
-		]?.toLowerCase();
+		const formKeys = Object.keys(form).filter(
+			(section) => section !== 'raylife-form-input'
+		);
+		const stepName = formKeys[formKeys.length - 1]?.toLowerCase();
 
 		switch (stepName) {
 			case AVAILABLE_STEPS.BUSINESS.section:

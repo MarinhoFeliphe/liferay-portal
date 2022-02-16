@@ -150,6 +150,11 @@ public class JenkinsResultsParserUtil {
 		URL_CACHE + "/liferay-jenkins-ee/git-working-directories.json"
 	};
 
+	public static final String[] URLS_JENKINS_BUILD_PROPERTIES_DEFAULT = {
+		URL_CACHE + "/liferay-jenkins-ee/build.properties",
+		URL_CACHE + "/liferay-jenkins-ee/commands/build.properties"
+	};
+
 	public static final String[] URLS_JENKINS_PROPERTIES_DEFAULT = {
 		URL_CACHE + "/liferay-jenkins-ee/jenkins.properties"
 	};
@@ -1870,6 +1875,32 @@ public class JenkinsResultsParserUtil {
 		return gitDirectoryJSONObject.getString("branch");
 	}
 
+	public static File getGitWorkingDir(File file) {
+		if (file == null) {
+			return null;
+		}
+
+		File canonicalFile = getCanonicalFile(file);
+
+		File parentFile = canonicalFile.getParentFile();
+
+		if ((parentFile == null) || !parentFile.exists()) {
+			return file;
+		}
+
+		if (!canonicalFile.isDirectory()) {
+			return getGitWorkingDir(parentFile);
+		}
+
+		File gitDir = new File(canonicalFile, ".git");
+
+		if (!gitDir.exists()) {
+			return getGitWorkingDir(parentFile);
+		}
+
+		return canonicalFile;
+	}
+
 	public static String[] getGlobsFromProperty(String globProperty) {
 		List<String> curlyBraceExpansionList = new ArrayList<>();
 
@@ -2064,6 +2095,44 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return Float.parseFloat(matcher.group(1));
+	}
+
+	public static Properties getJenkinsBuildProperties() {
+		Properties properties = new Properties();
+
+		synchronized (_jenkinsBuildProperties) {
+			if (!_jenkinsBuildProperties.isEmpty()) {
+				properties.putAll(_jenkinsBuildProperties);
+
+				return properties;
+			}
+
+			for (String url : URLS_JENKINS_BUILD_PROPERTIES_DEFAULT) {
+				if (url.startsWith("file://")) {
+					properties.putAll(
+						getProperties(new File(url.replace("file://", ""))));
+
+					continue;
+				}
+
+				try {
+					properties.load(
+						new StringReader(
+							toString(
+								getLocalURL(url), false, 0, null, null, 0,
+								_MILLIS_TIMEOUT_DEFAULT, null, true)));
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
+			}
+
+			_jenkinsBuildProperties.clear();
+
+			_jenkinsBuildProperties.putAll(properties);
+		}
+
+		return properties;
 	}
 
 	public static String getJenkinsMasterName(String jenkinsSlaveName) {
@@ -5583,6 +5652,7 @@ public class JenkinsResultsParserUtil {
 	private static JSONArray _gitWorkingDirectoriesJSONArray;
 	private static final Pattern _javaVersionPattern = Pattern.compile(
 		"(\\d+\\.\\d+)");
+	private static final Properties _jenkinsBuildProperties = new Properties();
 	private static final Pattern _jenkinsMasterPattern = Pattern.compile(
 		"(?<cohortName>test-\\d+)-\\d+");
 	private static Hashtable<?, ?> _jenkinsProperties;

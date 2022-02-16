@@ -1,15 +1,43 @@
 [
 	{
+		"actionId": "ADD_OBJECT_ENTRY",
+		"primKey": "0",
+		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminDXPCloud$]",
+		"roleName": "Customer Portal Member",
+		"scope": "2"
+	},
+	{
+		"actionId": "ADD_OBJECT_ENTRY",
+		"primKey": "0",
+		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:DXPCloudEnvironment$]",
+		"roleName": "Customer Portal Member",
+		"scope": "2"
+	},
+	{
+		"actionId": "ADD_OBJECT_ENTRY",
+		"primKey": "0",
+		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TeamMembersInvitation$]",
+		"roleName": "Customer Portal Member",
+		"scope": "2"
+	},
+	{
 		"actionId": "VIEW",
 		"primKey": "0",
-		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:AccountSubscription$]",
+		"resourceName": "com.liferay.journal.model.JournalFolder",
+		"roleName": "Customer Portal Member",
+		"scope": "2"
+	},
+	{
+		"actionId": "VIEW",
+		"primKey": "0",
+		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:AccountFlag$]",
 		"roleName": "Customer Portal Member",
 		"scope": "1"
 	},
 	{
 		"actionId": "VIEW",
 		"primKey": "0",
-		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:AccountFlag$]",
+		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:AccountSubscription$]",
 		"roleName": "Customer Portal Member",
 		"scope": "1"
 	},
@@ -37,21 +65,7 @@
 	{
 		"actionId": "VIEW",
 		"primKey": "0",
-		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:DXPCDataCenterRegion$]",
-		"roleName": "Customer Portal Member",
-		"scope": "1"
-	},
-	{
-		"actionId": "VIEW",
-		"primKey": "0",
 		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:KoroneikiAccount$]",
-		"roleName": "Customer Portal Member",
-		"scope": "1"
-	},
-	{
-		"actionId": "VIEW",
-		"primKey": "0",
-		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:DXPCloudEnvironment$]",
 		"roleName": "Customer Portal Member",
 		"scope": "1"
 	},
@@ -60,6 +74,6 @@
 		"primKey": "0",
 		"resourceName": "com.liferay.object.model.ObjectDefinition#[$OBJECT_DEFINITION_ID:TeamMembersInvitation$]",
 		"roleName": "Customer Portal Member",
-		"scope": "1"
+		"scope": "2"
 	}
 ]

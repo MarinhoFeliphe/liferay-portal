@@ -31,6 +31,7 @@ const Modal = ({
 		className: 'cadmin',
 	},
 	customEvents,
+	disableAutoClose,
 	footerCssClass,
 	headerCssClass,
 	headerHTML,
@@ -177,6 +178,7 @@ const Modal = ({
 				<ClayModal
 					className="liferay-modal"
 					containerProps={{...containerProps}}
+					disableAutoClose={disableAutoClose}
 					id={id}
 					observer={observer}
 					size={url && !size ? 'full-screen' : size}
@@ -356,6 +358,7 @@ const openSelectionModal = ({
 	onSelect,
 	selectEventName,
 	selectedData,
+	selectedDataCheckboxesDisabled = false,
 	size,
 	title,
 	url,
@@ -471,6 +474,31 @@ const openSelectionModal = ({
 						itemElement.classList.remove('disabled');
 					}
 				});
+
+				if (multiple) {
+					for (const row of iframeBody.querySelectorAll(
+						'.searchcontainer tr'
+					)) {
+						const itemId =
+							row.dataset.entityid || row.dataset.entityname;
+
+						if (selectedDataSet.has(itemId)) {
+							const checkbox = row.querySelector(
+								'input[type="checkbox"]'
+							);
+
+							if (!checkbox) {
+								continue;
+							}
+
+							checkbox.checked = true;
+
+							if (selectedDataCheckboxesDisabled) {
+								checkbox.disabled = true;
+							}
+						}
+					}
+				}
 			}
 
 			if (selectEventName) {

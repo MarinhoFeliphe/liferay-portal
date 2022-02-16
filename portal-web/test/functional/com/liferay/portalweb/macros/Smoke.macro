@@ -34,7 +34,7 @@ definition {
 
 		var pageName = "Test Page1";
 		var portletBody = "Test Page1";
-		var portletName = "Menu Display Widget";
+		var portletName = "Menu Display";
 		var siteName = "Site Name";
 
 		task ("Add a '${portletName}' portlet to the page named '${pageName}'") {
@@ -70,7 +70,7 @@ definition {
 
 		task ("Add a '${fragmentName}' fragment to the content page named '${contentPageName}'") {
 			task ("Create a Content Page") {
-				PagesAdmin.openPagesAdmin(siteUrlKey = "${siteName}");
+				PagesAdmin.openPagesAdmin(siteURLKey = "${siteName}");
 
 				ContentPages.addPage(pageName = "${contentPageName}");
 			}

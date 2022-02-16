@@ -28,10 +28,12 @@ import com.liferay.commerce.notification.service.CommerceNotificationTemplateLoc
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionOptionRel;
+import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
+import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CPOptionLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
@@ -66,11 +68,14 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -90,10 +95,14 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.security.service.access.policy.model.SAPEntry;
+import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.remote.app.model.RemoteAppEntry;
+import com.liferay.remote.app.service.RemoteAppEntryLocalService;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
@@ -105,6 +114,8 @@ import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryLocalService;
 
 import java.io.InputStream;
+
+import java.math.BigDecimal;
 
 import java.util.List;
 
@@ -165,6 +176,7 @@ public class BundleSiteInitializerTest {
 			_assertCommerceChannel(group);
 			_assertCommerceInventoryWarehouse(group);
 			_assertCPDefinition(group);
+			_assertCPInstanceProperties(group);
 			_assertDDMStructure(group);
 			_assertDDMTemplate(group);
 			_assertDLFileEntry(group);
@@ -176,8 +188,12 @@ public class BundleSiteInitializerTest {
 			_assertListTypeDefinitions(serviceContext);
 			_assertObjectDefinitions(group, serviceContext);
 			_assertPermissions(group);
+			_assertRemoteApp(group);
+			_assertSAPEntries(group);
+			_assertSiteConfiguration(group.getGroupId());
 			_assertSiteNavigationMenu(group);
 			_assertStyleBookEntry(group);
+			_assertUserRoles(group);
 		}
 		finally {
 			ServiceContextThreadLocal.popServiceContext();
@@ -450,31 +466,72 @@ public class BundleSiteInitializerTest {
 			"test_commerce_product.png", fileEntry.getFileName());
 	}
 
+	private void _assertCPInstanceProperties(Group group) throws Exception {
+		CPDefinition cpDefinition =
+			_cpDefinitionLocalService.
+				fetchCPDefinitionByCProductExternalReferenceCode(
+					"TEST001", group.getCompanyId());
+
+		CPInstance cpInstance1 = _cpInstanceLocalService.getCPInstance(
+			cpDefinition.getCPDefinitionId(), "Test Value 1");
+
+		Assert.assertNotNull(cpInstance1);
+
+		BigDecimal actualPrice = cpInstance1.getPrice();
+
+		Assert.assertEquals(60.0, actualPrice.doubleValue(), 0.0001);
+
+		BigDecimal actualPromoPrice = cpInstance1.getPromoPrice();
+
+		Assert.assertEquals(25.0, actualPromoPrice.doubleValue(), 0.0001);
+
+		CPInstance cpInstance2 = _cpInstanceLocalService.getCPInstance(
+			cpDefinition.getCPDefinitionId(), "Test Value 2");
+
+		Assert.assertNotNull(cpInstance2);
+		Assert.assertTrue(cpInstance2.isSubscriptionEnabled());
+	}
+
 	private void _assertCPOption(Group group) throws Exception {
-		CPOption cpOption = _cpOptionLocalService.fetchCPOption(
+		CPOption cpOption1 = _cpOptionLocalService.fetchCPOption(
 			group.getCompanyId(), "test-option-1");
 
-		Assert.assertNotNull(cpOption);
-		Assert.assertEquals("test-option-1", cpOption.getKey());
+		Assert.assertNotNull(cpOption1);
+		Assert.assertEquals("test-option-1", cpOption1.getKey());
+
+		CPOption cpOption2 = _cpOptionLocalService.fetchCPOption(
+			group.getCompanyId(), "test-option-2");
+
+		Assert.assertNotNull(cpOption2);
+		Assert.assertEquals("test-option-2", cpOption2.getKey());
 
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
 					"TEST001", group.getCompanyId());
 
+		Assert.assertNotNull(cpDefinition);
+
 		List<CPDefinitionOptionRel> cpDefinitionOptionRels =
 			cpDefinition.getCPDefinitionOptionRels();
 
 		Assert.assertEquals(
-			cpDefinitionOptionRels.toString(), 1,
+			cpDefinitionOptionRels.toString(), 2,
 			cpDefinitionOptionRels.size());
 
-		CPDefinitionOptionRel cpDefinitionOptionRel =
+		CPDefinitionOptionRel cpDefinitionOptionRel1 =
 			cpDefinitionOptionRels.get(0);
 
-		cpOption = cpDefinitionOptionRel.getCPOption();
+		cpOption1 = cpDefinitionOptionRel1.getCPOption();
 
-		Assert.assertEquals("test-option-1", cpOption.getKey());
+		Assert.assertEquals("test-option-1", cpOption1.getKey());
+
+		CPDefinitionOptionRel cpDefinitionOptionRel2 =
+			cpDefinitionOptionRels.get(1);
+
+		cpOption2 = cpDefinitionOptionRel2.getCPOption();
+
+		Assert.assertEquals("test-option-2", cpOption2.getKey());
 	}
 
 	private void _assertDDMStructure(Group group) {
@@ -795,14 +852,37 @@ public class BundleSiteInitializerTest {
 		_assertResourcePermission(group);
 	}
 
+	private void _assertRemoteApp(Group group) throws Exception {
+		RemoteAppEntry remoteAppEntry =
+			_remoteAppEntryLocalService.
+				fetchRemoteAppEntryByExternalReferenceCode(
+					group.getCompanyId(), "ERC001");
+
+		Assert.assertNotNull(remoteAppEntry);
+		Assert.assertEquals(
+			"category.remote-apps", remoteAppEntry.getPortletCategoryName());
+		Assert.assertEquals(
+			"liferay-test-remote-app",
+			remoteAppEntry.getCustomElementHTMLElementName());
+	}
+
 	private void _assertResourcePermission(Group group) throws Exception {
 		Role role = _roleLocalService.fetchRole(
 			group.getCompanyId(), "Test Role 1");
 
 		ResourcePermission resourcePermission =
 			_resourcePermissionLocalService.fetchResourcePermission(
-				group.getCompanyId(), "com.liferay.commerce.product", 3, "0",
-				role.getRoleId());
+				group.getCompanyId(), "com.liferay.commerce.product", 1,
+				String.valueOf(group.getCompanyId()), role.getRoleId());
+
+		Assert.assertNotNull(resourcePermission);
+
+		role = _roleLocalService.fetchRole(group.getCompanyId(), "Test Role 2");
+
+		resourcePermission =
+			_resourcePermissionLocalService.fetchResourcePermission(
+				group.getCompanyId(), "com.liferay.commerce.product", 2,
+				String.valueOf(group.getGroupId()), role.getRoleId());
 
 		Assert.assertNotNull(resourcePermission);
 	}
@@ -831,6 +911,46 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(role4);
 		Assert.assertEquals(2, role4.getType());
+	}
+
+	private void _assertSAPEntries(Group group) {
+		SAPEntry sapEntry1 = _sapEntryLocalService.fetchSAPEntry(
+			group.getCompanyId(), "TEST_SAP_ENTRY_1");
+
+		Assert.assertNotNull(sapEntry1);
+		Assert.assertTrue(sapEntry1.isDefaultSAPEntry());
+		Assert.assertTrue(sapEntry1.isEnabled());
+
+		List<String> allowedServiceSignaturesList1 =
+			sapEntry1.getAllowedServiceSignaturesList();
+
+		Assert.assertEquals(
+			allowedServiceSignaturesList1.toString(), 3,
+			allowedServiceSignaturesList1.size());
+
+		SAPEntry sapEntry2 = _sapEntryLocalService.fetchSAPEntry(
+			group.getCompanyId(), "TEST_SAP_ENTRY_2");
+
+		Assert.assertNotNull(sapEntry2);
+		Assert.assertFalse(sapEntry2.isDefaultSAPEntry());
+		Assert.assertTrue(sapEntry2.isEnabled());
+
+		List<String> allowedServiceSignaturesList2 =
+			sapEntry2.getAllowedServiceSignaturesList();
+
+		Assert.assertEquals(
+			allowedServiceSignaturesList2.toString(), 5,
+			allowedServiceSignaturesList2.size());
+	}
+
+	private void _assertSiteConfiguration(Long groupId) {
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		Assert.assertEquals(
+			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
+			group.getMembershipRestriction());
+		Assert.assertEquals(GroupConstants.TYPE_SITE_OPEN, group.getType());
+		Assert.assertTrue(group.isManualMembership());
 	}
 
 	private void _assertSiteNavigationMenu(Group group) {
@@ -923,6 +1043,42 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(totalCount, page.getTotalCount());
 	}
 
+	private void _assertUserRoles(Group group) throws Exception {
+		User user = _userLocalService.fetchUserByEmailAddress(
+			group.getCompanyId(), "test.user1@liferay.com");
+
+		List<Role> roles = user.getRoles();
+
+		Assert.assertEquals(roles.toString(), 3, roles.size());
+
+		Role role = roles.get(0);
+
+		Assert.assertEquals(RoleConstants.USER, role.getName());
+
+		role = roles.get(1);
+
+		Assert.assertEquals("Test Role 1", role.getName());
+
+		role = roles.get(2);
+
+		Assert.assertEquals("Test Role 2", role.getName());
+
+		user = _userLocalService.fetchUserByEmailAddress(
+			group.getCompanyId(), "test.user2@liferay.com");
+
+		roles = user.getRoles();
+
+		Assert.assertEquals(roles.toString(), 2, roles.size());
+
+		role = roles.get(0);
+
+		Assert.assertEquals(RoleConstants.USER, role.getName());
+
+		role = roles.get(1);
+
+		Assert.assertEquals("Test Role 3", role.getName());
+	}
+
 	private Bundle _installBundle(BundleContext bundleContext, String location)
 		throws Exception {
 
@@ -961,6 +1117,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private CPDefinitionLocalService _cpDefinitionLocalService;
+
+	@Inject
+	private CPInstanceLocalService _cpInstanceLocalService;
 
 	@Inject
 	private CPOptionLocalService _cpOptionLocalService;
@@ -1014,10 +1173,16 @@ public class BundleSiteInitializerTest {
 	private Portal _portal;
 
 	@Inject
+	private RemoteAppEntryLocalService _remoteAppEntryLocalService;
+
+	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	@Inject
 	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private SAPEntryLocalService _sapEntryLocalService;
 
 	@Inject
 	private ServletContext _servletContext;

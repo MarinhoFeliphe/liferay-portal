@@ -23,21 +23,65 @@ definition {
 	}
 
 	@description = "LPS-139008 - Verify it is possible to cancel the creation of an Action"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanCancelAction {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145715 CanCancelAction pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		LexiconEntry.gotoAdd();
+
+		Button.clickCancel();
+
+		AssertElementNotPresent(locator1 = "Portlet#MODAL_TITLE");
+
+		ObjectAdmin.assertNoItemsWereFound();
 	}
 
 	@description = "LPS-139008 - Verify it is possible to cancel the update of an Action"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanCancelActionUpdate {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145719 CanCancelActionUpdate pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		ObjectAdmin.goToActionDetails(viewEntry = "Action Name");
+
+		ObjectAdmin.viewFieldDetails();
+
+		Type(
+			locator1 = "ObjectAdmin#VIEW_ACTION_NAME_ON_SIDE_PANEL",
+			value1 = "Update Action Name");
+
+		Button.clickCancel();
+
+		AssertElementNotPresent(locator1 = "ObjectAdmin#FIELDS_DETAILS_IFRAME");
+
+		Refresh();
+
+		ObjectAdmin.assertObjectActions(
+			actionActive = "Yes",
+			actionName = "Action Name");
 	}
 
 	@description = "LPS-139008 - Verify it is possible to create an Action"
@@ -110,39 +154,91 @@ definition {
 	}
 
 	@description = "LPS-139008 - Verify it is not possible to leave the Action Name field blank"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CannotLeaveActionNameBlank {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145711 CannotLeaveActionNameBlank pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		ObjectAdmin.viewRequiredAlert(requiredAlert = "Required");
 	}
 
 	@description = "LPS-139008 - Verify it is not possible to leave the Action Then field blank"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CannotLeaveActionThenBlank {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145713 CannotLeaveActionThenBlank pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			whenAction = "On After Add");
+
+		ObjectAdmin.viewRequiredAlert(requiredAlert = "Required");
 	}
 
 	@description = "LPS-139008 - Verify it is not possible to leave the Action When field blank"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CannotLeaveActionWhenBlank {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145712 CannotLeaveActionWhenBlank pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080");
+
+		ObjectAdmin.viewRequiredAlert(requiredAlert = "Required");
 	}
 
 	@description = "LPS-139008 - Verify it is not possible to leave the URL field blank when Webhook is selected"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CannotLeaveURLBlank {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145714 CannotLeaveURLBlank pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			whenAction = "On After Add");
+
+		ObjectAdmin.viewRequiredAlert(requiredAlert = "Required");
 	}
 
 	@description = "LPS-139008 - Verify that Actions will work again after reactivated"
@@ -188,12 +284,36 @@ definition {
 	}
 
 	@description = "LPS-139008 - Verify it is possible to update an Action"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanUpdateAction {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145717 CanUpdateAction pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		ObjectAdmin.assertObjectActions(
+			actionActive = "Yes",
+			actionName = "Action Name");
+
+		ObjectAdmin.editObjectAction(
+			newActionName = "Update Action Name",
+			viewEntry = "Action Name");
+
+		ObjectAdmin.assertObjectActions(
+			actionActive = "Yes",
+			actionName = "Update Action Name");
 	}
 
 	@description = "LPS-139008 - Verify that Webhook action works with On After Add"

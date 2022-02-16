@@ -8,9 +8,9 @@ definition {
 
 	setUp {
 		task ("Open Analytics Cloud") {
-			var analyticsCloudUrl = PropsUtil.get("analytics.cloud.url");
+			var analyticsCloudURL = PropsUtil.get("analytics.cloud.url");
 
-			Navigator.openURL(baseUrl = "${analyticsCloudUrl}");
+			Navigator.openURL(baseURL = "${analyticsCloudURL}");
 		}
 
 		task ("Take token from Analytics Cloud") {
@@ -63,63 +63,244 @@ definition {
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a blog's display page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInBlogDisplayPage {
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-128194 AuthorNotShowInBlogDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a content page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInContentPage {
+		task ("Create and go to content page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Content Page 2",
+				type = "content");
 
-		// TODO LPS-128194 AuthorNotShowInContentPage pending implementation
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/content-page-2");
+		}
 
+		task ("Open Content Performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a document's display page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInDocumentDisplayPage {
+		task ("Create a Document") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-128194 AuthorNotShowInDocumentDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a widget page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInWidgetPage {
+		task ("Create and go to Widget Page") {
+			PagesAdmin.addPublicPage(
+				pageName = "Widget Page Name",
+				sitePageType = "Widget Page");
 
-		// TODO LPS-128194 AuthorNotShowInWidgetPage pending implementation
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/3");
+		}
 
+		task ("Open Content Performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-126044: When the user changes the language using the flag selector in the panel and so the URL, the metrics corresponding the canonical URL that corresponds to the language selected are shown"
-	@ignore = "true"
 	@priority = "3"
 	test ChangeLanguageInBlogDisplayPage {
+		property test.name.skip.portal.instance = "ContentPerformance#ChangeLanguageInBlogDisplayPage";
 
-		// TODO LPS-144030 ChangeLanguageInBlogDisplayPage pending implementation
+		task ("Set portal to use Localized URL") {
+			SystemSettings.openSystemSettingsAdmin();
 
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Pages",
+				configurationName = "SEO",
+				configurationScope = "Virtual Instance Scope");
+
+			SystemSettings.selectOptionSetting(
+				fieldName = "Canonical URL",
+				selectOption = "Use Localized URL");
+
+			SystemSettings.saveConfiguration();
+		}
+
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Change language") {
+			ContentPerformance.changeLocale(locale = "Portuguese");
+		}
+
+		task ("Assert the URL shown is the one set before") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "pt/web/test-site-name/test-widget-page-name");
+		}
 	}
 
 	@description = "LPS-126044: When the user changes the language using the flag selector in the panel and so the URL, the metrics corresponding the canonical URL that corresponds to the language selected are shown"
-	@ignore = "true"
 	@priority = "3"
 	test ChangeLanguageInDocumentDisplayPage {
+		property test.name.skip.portal.instance = "ContentPerformance#ChangeLanguageInDocumentDisplayPage";
 
-		// TODO LPS-144030 ChangeLanguageInDocumentDisplayPage pending implementation
+		task ("Set portal to use Localized URL") {
+			SystemSettings.openSystemSettingsAdmin();
 
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Pages",
+				configurationName = "SEO",
+				configurationScope = "Virtual Instance Scope");
+
+			SystemSettings.selectOptionSetting(
+				fieldName = "Canonical URL",
+				selectOption = "Use Localized URL");
+
+			SystemSettings.saveConfiguration();
+		}
+
+		task ("Create a Document") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Change language") {
+			ContentPerformance.changeLocale(locale = "Portuguese");
+		}
+
+		task ("Check that the URL and date is from that translated page") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "pt/web/test-site-name/test-widget-page-name");
+
+			AssertTextEquals(
+				locator1 = "ContentPerformance#TOTAL_VIEWS_NUMBER",
+				value1 = "0");
+		}
 	}
 
 	@description = "LPS-126047: When the user changes the language using the flag selector in the panel and so the URL, the metrics corresponding the canonical URL that corresponds to the language selected are shown"
 	@priority = "3"
 	test ChangeLanguageInWidgetPage {
-		property test.name.skip.portal.instance = "ContentPerformance#LanguageSelector";
+		property test.name.skip.portal.instance = "ContentPerformance#ChangeLanguageInWidgetPage";
 
 		task ("Set portal to use Localized URL") {
 			SystemSettings.openSystemSettingsAdmin();
@@ -234,15 +415,6 @@ definition {
 		}
 	}
 
-	@description = "LPS-108856: When user opens Content Performance panel and AC is not connected, a Dont show me this again button is displayed"
-	@ignore = "true"
-	@priority = "3"
-	test DontShowButton {
-
-		// TODO LPS-139239 DontShowButton pending implementation
-
-	}
-
 	@description = "LPS-105216: Validate that Free trial and dismiss buttons ARE NOT displayed when AC is enabled"
 	@priority = "3"
 	test FreeTrialButtonNotPresent {
@@ -263,42 +435,54 @@ definition {
 		}
 	}
 
-	@description = "LPS-105216: Validate that Free trial and dismiss buttons are displayed when AC is disabled"
-	@ignore = "true"
-	@priority = "5"
-	test FreeTrialButtonPresent {
-
-		// TODO LPS-139217 FreeTrialButtonPresent pending implementation
-
-	}
-
 	@description = "LPS-108068: When there is no views nor reads in the selected range or in the default view, the line of the graphic will be at 0"
 	@priority = "3"
 	test GraphicLineNoViewsReads {
+		task ("Open Content Performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
 		task ("Assert line equal 0") {
 			AssertElementPresent(
-				key_number = "2",
 				locator1 = "ContentPerformance#NUMBER_VIEWS",
 				value1 = "0");
 		}
 	}
 
-	@description = "LPS-108856: When user clicks on Dont show me this again button, the Content Performance panel disappears"
-	@ignore = "true"
-	@priority = "5"
-	test HideContentPerformancePanel {
-
-		// TODO LPS-139239 HideContentPerformancePanel pending implementation
-
-	}
-
 	@description = "LPS-126044: When the user accesses to the content performance panel of a blog display page, the date interval selector is shown in the content performance panel, with 7 days selected as default"
-	@ignore = "true"
 	@priority = "3"
 	test IntervalSelectorInBlogDisplayPage {
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 IntervalSelectorInBlogDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert if the time range is 7 days") {
+			AssertSelectedLabel(
+				locator1 = "ContentPerformance#SELECT_DATE_RANGE",
+				value1 = "Last 7 Days");
+		}
 	}
 
 	@description = "LPS-127220: When the user opens the flag selector dropdown in the panel, the languages are alphabetically ordered"
@@ -316,46 +500,56 @@ definition {
 	@description = "LPS-110920: When the user selects a language in the switcher, the title, the URL and the metrics change accordingly"
 	@priority = "5"
 	test LanguageSelector {
+		property test.name.skip.portal.instance = "ContentPerformance#LanguageSelector";
+
+		task ("Set portal to use Localized URL") {
+			SystemSettings.openSystemSettingsAdmin();
+
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Pages",
+				configurationName = "SEO",
+				configurationScope = "Virtual Instance Scope");
+
+			SystemSettings.selectOptionSetting(
+				fieldName = "Canonical URL",
+				selectOption = "Use Localized URL");
+
+			SystemSettings.saveConfiguration();
+		}
+
 		task ("Add a translation for that page") {
-			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
 			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
 				pageName = "Content Page");
 
 			PagesAdmin.addLocalizedFriendlyURL(
-				friendlyUrlLocalizedList = "pt-BR",
-				localizedFriendlyUrlList = "",
+				friendlyURLLocalizedList = "pt-BR",
+				localizedFriendlyURLList = "",
 				localizedNameList = "Pagina principal");
-		}
-
-		task ("Set a custom page as canonical URL and go to Content Performance") {
-			PageAudit.setSEOcanonicalURL(url = "https://liferay.com.br");
 		}
 
 		task ("Open Content Performance and Assert if element is not present") {
 			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/content-page");
 
-			if (IsVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_PANEL")) {
-				Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
-			}
-
-			Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+			ContentPerformance.openContentPerformance();
 		}
 
-		task ("Change language and assert") {
-			PageAudit.changeLocale(locale = "Portuguese");
+		task ("Change language") {
+			ContentPerformance.changeLocale(locale = "Portuguese");
+		}
 
+		task ("Check if date is from respective language") {
 			AssertTextPresent(
 				locator1 = "PageAudit#PANEL_PAGE_TITLE",
 				value1 = "Pagina principal");
 
-			AssertTextPresent(
-				locator1 = "PageAudit#PANEL_PAGE_URL",
-				value1 = "https://liferay.com.br");
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "/pt/web/test-site-name");
 
 			AssertElementPresent(
-				key_number = "2",
 				locator1 = "ContentPerformance#NUMBER_VIEWS",
 				value1 = "0");
 		}
@@ -364,30 +558,49 @@ definition {
 	@description = "LPS-110920: When the user selects a language in the switcher, it doesn't affect the user's language"
 	@priority = "3"
 	test LanguageSelectorUserLanguage {
-		task ("Set a custom page as canonical URL to have data already loaded") {
-			PageAudit.setSEOcanonicalURL(url = "https://liferay.com.br");
-		}
-
-		task ("Open Content Performance and Assert if element is not present") {
+		task ("Go to Edit page") {
 			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/content-page");
 
-			if (IsVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_PANEL")) {
-				Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
-			}
+			ContentPages.gotoPageEditor();
+		}
 
-			Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+		task ("Add a heading fragment to page") {
+			PageEditor.addFragment(
+				collectionName = "Basic Components",
+				fragmentName = "Heading");
+
+			PageEditor.editFragmentText(
+				fragmentName = "Heading",
+				id = "element-text",
+				text = "Text in English");
+		}
+
+		task ("Change locale to es-ES") {
+			PageEditor.changeLocale(
+				currentLocale = "en-US",
+				locale = "es-ES");
+		}
+
+		task ("Edit the localized inline text of Heading") {
+			PageEditor.editFragmentText(
+				fragmentName = "Heading",
+				id = "element-text",
+				text = "Texto en Español");
+
+			PageEditor.clickPublish();
+		}
+
+		task ("Open Content Performance") {
+			ContentPerformance.openContentPerformance();
 		}
 
 		task ("Change language and assert") {
-			PageAudit.changeLocale(locale = "Portuguese");
+			ContentPerformance.changeLocale(locale = "Spanish");
 
-			AssertTextPresent(
-				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE_PANEL",
-				value1 = "Content Performance");
-
-			AssertTextPresent(
-				locator1 = "PageAudit#PANEL_PAGE_URL",
-				value1 = "https://liferay.com.br");
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				text = "Text in English");
 		}
 	}
 
@@ -418,12 +631,43 @@ definition {
 	}
 
 	@description = "LPS-126044: When DXP is connected and synced to AC and the user clicks on the metrics icon in a blog display page, the content performance panel displays with the metrics of the content page"
-	@ignore = "true"
 	@priority = "4"
 	test MetricsIconVisibleInBlogDisplayPage {
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 MetricsIconVisibleInBlogDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if infomation if from that page") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Test Widget Page Name");
+
+			AssertTextEquals(
+				locator1 = "ContentPerformance#TOTAL_VIEWS_NUMBER",
+				value1 = "0");
+		}
 	}
 
 	@description = "LPS-127220: When DXP is connected and synced to AC and the user clicks on the metrics icon in a content page, the content performance panel displays with the metrics of the content page"
@@ -445,12 +689,43 @@ definition {
 	}
 
 	@description = "LPS-126044: When DXP is connected and synced to AC and the user clicks on the metrics icon in a document display page, the content performance panel displays with the metrics of the content page"
-	@ignore = "true"
 	@priority = "4"
 	test MetricsIconVisibleInDocumentDisplayPage {
+		task ("Create a Document") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 MetricsIconVisibleInDocumentDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if infomation if from that page") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Test Widget Page Name");
+
+			AssertTextEquals(
+				locator1 = "ContentPerformance#TOTAL_VIEWS_NUMBER",
+				value1 = "0");
+		}
 	}
 
 	@description = "LPS-126047: When DXP is connected and synced to AC and the user clicks on the metrics icon in a widget page, the content performance panel displays with the metrics of the content page"
@@ -481,24 +756,6 @@ definition {
 		}
 	}
 
-	@description = "LPS-118006: When the DXP is not connected to AC, if the user clicks on the Metrics button, the sidebar panel shows up and displays a button titled Dont show me this again and a message informing the user that the panel will show up again if AC is connected"
-	@ignore = "true"
-	@priority = "4"
-	test MetricsInContentDashboardACDisabled {
-
-		// TODO LPS-139257 MetricsInContentDashboardACDisabled pending implementation
-
-	}
-
-	@description = "LPS-118006: When the DXP is connected to AC after the user has clicked the Don't show me this again button, the Metrics option is shown again, and the sidebar panel with instructions to sync, and without the Dont show me this again button shows up when the user clicks on it"
-	@ignore = "true"
-	@priority = "4"
-	test MetricsInContentDashboardACEnabled {
-
-		// TODO LPS-139257 MetricsInContentDashboardACEnabled pending implementation
-
-	}
-
 	@description = "LPS-113910: When the user selects the info option while the Content performance panel is open, the side panel shows the Info panel"
 	@priority = "3"
 	test MetricsToInfoPanel {
@@ -516,7 +773,7 @@ definition {
 				groupName = "Test Site Name",
 				subType = "Basic Web Content");
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
@@ -599,7 +856,7 @@ definition {
 		}
 
 		task ("Create a default Display Page Template") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.addDisplayPage(
 				contentType = "Web Content Article",
@@ -711,7 +968,7 @@ definition {
 		}
 
 		task ("Create a DPT and set as Default") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.addDisplayPage(
 				contentType = "Web Content Article",
@@ -803,7 +1060,7 @@ definition {
 		}
 
 		task ("Create a DPT and set as Default") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.addDisplayPage(
 				contentType = "Web Content Article",
@@ -889,7 +1146,7 @@ definition {
 				groupName = "Test Site Name",
 				subType = "Basic Web Content");
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
@@ -973,7 +1230,7 @@ definition {
 		}
 
 		task ("Create a DPT and set as Default") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.addDisplayPage(
 				contentType = "Web Content Article",
@@ -1032,22 +1289,46 @@ definition {
 		}
 	}
 
-	@description = "LPS-108856: When user opens Content Performance panel and AC is connected but not synced, the Content Performance panel displays instructions to sync to AC (Dont show me this again button and the message is not displayed)"
-	@ignore = "true"
-	@priority = "3"
-	test NotSyncedPanel {
-
-		// TODO LPS-139239 NotSyncedPanel pending implementation
-
-	}
-
 	@description = "LPS-126044: When the user accesses to the content performance panel of a blog display page, the name, the URL of the page and the language selector are shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test PanelInformationInBlogDisplayPage {
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 PanelInformationInBlogDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if the name, the URL of the page and the language selector exists") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Test Widget Page Name");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "web/test-site-name/test-widget-page-name");
+
+			AssertVisible(locator1 = "ContentPerformance#LANGUAGE_DROPDOWN_BUTTON");
+		}
 	}
 
 	@description = "LPS-127220: When the user accesses to the content performance panel of a content page, the name, the URL of the page and the language selector are shown in the content performance panel"
@@ -1057,7 +1338,7 @@ definition {
 			ContentPerformance.openContentPerformance();
 		}
 
-		task ("Check if the name, the URL and the language selector are shown") {
+		task ("Check if the name, the URL of the page and the language selector are present") {
 			AssertVisible(
 				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
 				pageName = "Content Page");
@@ -1071,12 +1352,45 @@ definition {
 	}
 
 	@description = "LPS-126044: When the user accesses to the content performance panel of a document display page, the name, the URL of the page and the language selector are shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test PanelInformationInDocumentDisplayPage {
+		task ("Create a Document") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 PanelInformationInDocumentDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if infomation if the name, URL and language selector are present") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Test Widget Page Name");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "web/test-site-name/test-widget-page-name");
+
+			AssertVisible(locator1 = "ContentPerformance#LANGUAGE_DROPDOWN_BUTTON");
+		}
 	}
 
 	@description = "LPS-126047: When the user accesses to the content performance panel of a widget page, the name, the URL of the page and the language selector are shown in the content performance panel"
@@ -1119,21 +1433,71 @@ definition {
 	}
 
 	@description = "LPS-126044: When the user accesses to the content performance panel of a blog display page, the views graph is shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test ViewsGraphInBlogDisplayPage {
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 ViewsGraphInBlogDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if the graph exist") {
+			AssertVisible(locator1 = "ContentPerformance#GRAPH_ENGAGEMENT");
+		}
 	}
 
 	@description = "LPS-126044: When the user accesses to the content performance panel of a document display page, the views graph is shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test ViewsGraphInDocumentDisplayPage {
+		task ("Create a Document") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-144030 ViewsGraphInDocumentDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if the graph exist") {
+			AssertVisible(locator1 = "ContentPerformance#GRAPH_ENGAGEMENT");
+		}
 	}
 
 }

@@ -43,8 +43,17 @@ function getDeviceSize(currentWidth) {
 function getWindowDimensions(dimensions = {}) {
 	const {innerHeight: height, innerWidth: width} = window;
 
+	const deviceSize = getDeviceSize(width, dimensions);
+
+	const phoneBreakpoint = 767.98;
+
 	return {
-		deviceSize: getDeviceSize(width, dimensions),
+		device: {
+			isDesktop: deviceSize === DEVICES.DESKTOP,
+			isMobile: deviceSize === DEVICES.PHONE && width <= phoneBreakpoint,
+			isTablet: deviceSize === DEVICES.TABLET,
+		},
+		deviceSize,
 		height,
 		width,
 	};

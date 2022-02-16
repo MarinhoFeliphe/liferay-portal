@@ -71,6 +71,89 @@ export function deleteField({
 	});
 }
 
+function isParameterRelatedToField(parameter, fieldName) {
+
+	/* TODO: enforce parameter type consistency and remove this normalization */
+	const json =
+		typeof parameter === 'string' ? parameter : JSON.stringify(parameter);
+
+	return json.includes(fieldName);
+}
+
+/* TODO: enforce parameter type consistency and remove this function */
+function normalizeParameter(parameter, defaultLanguageId) {
+	let normalizedParameter = parameter;
+
+	if (typeof normalizedParameter === 'string') {
+		normalizedParameter = JSON.parse(parameter);
+	}
+
+	if (normalizedParameter[defaultLanguageId]) {
+		normalizedParameter = normalizedParameter[defaultLanguageId];
+	}
+
+	return normalizedParameter;
+}
+
+function updateFieldAffectedByActivatingRepeatable({
+	defaultLanguageId,
+	editingLanguageId,
+	field,
+	fieldNameGenerator,
+	generateFieldNameUsingFieldLabel,
+	repeatableFieldName,
+}) {
+	if (
+		field.type === 'date' &&
+		isParameterRelatedToField(
+			field.validation.parameter,
+			repeatableFieldName
+		)
+	) {
+		const {endsOn, startsFrom} = normalizeParameter(
+			field.validation.parameter,
+			defaultLanguageId
+		);
+
+		const removeDateField = (validation) => {
+			if (repeatableFieldName !== validation.dateFieldName) {
+				return;
+			}
+
+			if (validation.type === 'dateField') {
+				validation.type = 'responseDate';
+			}
+			delete validation.dateFieldName;
+		};
+		removeDateField(endsOn);
+		removeDateField(startsFrom);
+
+		const validation = {
+			...field.validation,
+
+			/* TODO: define a proper parameter type and apply it here */
+			parameter: JSON.stringify({
+				endsOn,
+				startsFrom,
+			}),
+		};
+
+		return updateField(
+			{
+				defaultLanguageId,
+				editingLanguageId,
+				fieldNameGenerator,
+				generateFieldNameUsingFieldLabel,
+			},
+			field,
+			'validation',
+			validation
+		);
+	}
+
+	return field;
+}
+
 const updateFieldProperty = ({
 	defaultLanguageId,
 	editingLanguageId,
@@ -298,6 +381,16 @@ export default function fieldEditableReducer(state, action, config) {
 					(field) => {
 						if (field.fieldName === newFocusedField.fieldName) {
 							return newFocusedField;
+						}
+						if (propertyValue && propertyName === 'repeatable') {
+							return updateFieldAffectedByActivatingRepeatable({
+								defaultLanguageId,
+								editingLanguageId,
+								field,
+								fieldNameGenerator,
+								generateFieldNameUsingFieldLabel,
+								repeatableFieldName: newFocusedField.fieldName,
+							});
 						}
 
 						return field;

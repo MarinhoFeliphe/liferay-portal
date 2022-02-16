@@ -9,11 +9,10 @@
  * distribution rights of the Software.
  */
 
-import {Button, DropDown} from '@clayui/core';
+import {Button as ClayButton, DropDown} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
-import classNames from 'classnames';
 import React, {useEffect, useRef, useState} from 'react';
-import BaseButton from '../../../../common/components/BaseButton';
+import RoundedGroupButtons from '../../../../common/components/RoundedGroupButtons';
 import {useCustomerPortal} from '../../context';
 
 const SubscriptionDropDownMenu = ({
@@ -24,7 +23,7 @@ const SubscriptionDropDownMenu = ({
 	const [active, setActive] = useState(false);
 
 	return (
-		<div className="align-items-center d-flex mt-4 pb-3 subscription-navbar-dropdown">
+		<div className="align-items-center d-flex mt-4 pb-3">
 			<h6>Type:</h6>
 
 			<DropDown
@@ -35,14 +34,14 @@ const SubscriptionDropDownMenu = ({
 				}}
 				onActiveChange={setActive}
 				trigger={
-					<Button
+					<ClayButton
 						className="font-weight-semi-bold ml-2 pb-2 shadow-none text-brand-primary"
 						displayType="unstyled"
 					>
 						{selectedSubscriptionGroup}
 
 						<ClayIcon symbol="caret-bottom" />
-					</Button>
+					</ClayButton>
 				}
 			>
 				{subscriptionGroups.map((subscriptionGroup) => (
@@ -52,6 +51,11 @@ const SubscriptionDropDownMenu = ({
 							setSelectedSubscriptionGroup(event.target.value);
 							setActive(false);
 						}}
+						symbolRight={
+							subscriptionGroup.name === selectedSubscriptionGroup
+								? 'check'
+								: ''
+						}
 						value={subscriptionGroup.name}
 					>
 						{subscriptionGroup.name}
@@ -67,9 +71,6 @@ const SubscriptionsNavbar = ({
 	setSelectedSubscriptionGroup,
 	subscriptionGroups,
 }) => {
-	const [selectedButton, setSelectedButton] = useState(
-		subscriptionGroups[0]?.name
-	);
 	const [showDropDown, setShowDropDown] = useState(false);
 	const [{isQuickLinksExpanded}] = useCustomerPortal();
 
@@ -77,7 +78,6 @@ const SubscriptionsNavbar = ({
 
 	useEffect(() => {
 		setSelectedSubscriptionGroup(subscriptionGroups[0]?.name);
-		setSelectedButton(subscriptionGroups[0]?.name);
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [subscriptionGroups]);
@@ -85,13 +85,16 @@ const SubscriptionsNavbar = ({
 	useEffect(() => {
 		const updateShowDropDown = () => {
 			setShowDropDown(
-				subscriptionNavbarRef.current.offsetWidth <
-					(isQuickLinksExpanded ? 500 : 570)
+				subscriptionNavbarRef?.current &&
+					subscriptionNavbarRef.current.offsetWidth <
+						(isQuickLinksExpanded ? 500 : 570)
 			);
 		};
 
 		updateShowDropDown();
 		window.addEventListener('resize', updateShowDropDown);
+
+		return () => window.removeEventListener('resize', updateShowDropDown);
 	}, [isQuickLinksExpanded]);
 
 	return (
@@ -123,41 +126,18 @@ const SubscriptionsNavbar = ({
 							)}
 
 							{!showDropDown && (
-								<div
-									className="bg-neutral-1 border border-light btn-group rounded-pill"
-									id="subscription-navbar"
-									role="group"
-								>
-									{subscriptionGroups.map(
-										(subscriptionGroup) => (
-											<BaseButton
-												className={classNames(
-													'btn px-4 py-1 rounded-pill',
-													{
-														'bg-transparent text-neutral-4':
-															selectedButton !==
-															subscriptionGroup.name,
-														'bg-white border border-primary label-primary text-brand-primary':
-															selectedButton ===
-															subscriptionGroup.name,
-													}
-												)}
-												key={subscriptionGroup.name}
-												onClick={(event) => {
-													setSelectedSubscriptionGroup(
-														event.target.value
-													);
-													setSelectedButton(
-														event.target.value
-													);
-												}}
-												value={subscriptionGroup.name}
-											>
-												{subscriptionGroup.name}
-											</BaseButton>
-										)
+								<RoundedGroupButtons
+									groupButtons={subscriptionGroups.map(
+										(subscriptionGroup) => ({
+											label: subscriptionGroup.name,
+											value: subscriptionGroup.name,
+										})
 									)}
-								</div>
+									handleOnChange={(value) => {
+										setSelectedSubscriptionGroup(value);
+									}}
+									id="subscription-navbar"
+								/>
 							)}
 						</>
 					)}

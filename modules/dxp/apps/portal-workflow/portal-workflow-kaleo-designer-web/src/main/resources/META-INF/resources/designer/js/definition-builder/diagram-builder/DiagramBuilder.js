@@ -36,6 +36,7 @@ import {isIdDuplicated} from './components/sidebar/utils';
 import edgeTypes from './components/transitions/Edge';
 import FloatingConnectionLine from './components/transitions/FloatingConnectionLine';
 import getCollidingElements from './util/collisionDetection';
+import populateAssignmentsData from './util/populateAssignmentData';
 
 let id = 2;
 const getId = () => `item_${id++}`;
@@ -65,6 +66,17 @@ export default function DiagramBuilder({version}) {
 	const [selectedItemNewId, setSelectedItemNewId] = useState(null);
 
 	const onConnect = (params) => {
+		if (
+			elements.filter(
+				(element) =>
+					isEdge(element) &&
+					element.source === params.source &&
+					element.target === params.target
+			).length
+		) {
+			return;
+		}
+
 		const defaultEdge = !elements.filter(
 			(element) =>
 				isEdge(element) &&
@@ -167,6 +179,45 @@ export default function DiagramBuilder({version}) {
 		setReactFlowInstance(reactFlowInstance);
 	};
 
+	const onNodeDragStart = (event) => {
+		const elementRectangle = event.currentTarget.getBoundingClientRect();
+
+		setElementRectangle({
+			mouseXInRectangle: event.clientX - elementRectangle.left,
+			mouseYInRectangle: event.clientY - elementRectangle.top,
+			rectangleHeight: elementRectangle.height,
+			rectangleWidth: elementRectangle.width,
+		});
+	};
+
+	const onNodeDragStop = (event, node) => {
+		const reactFlowBounds = reactFlowWrapperRef.current.getBoundingClientRect();
+
+		const position = reactFlowInstance.project({
+			x:
+				event.clientX -
+				reactFlowBounds.left -
+				elementRectangle.mouseXInRectangle,
+			y:
+				event.clientY -
+				reactFlowBounds.top -
+				elementRectangle.mouseYInRectangle,
+		});
+
+		setElements((elements) =>
+			elements.map((element) => {
+				if (element.id === node.id) {
+					element = {
+						...element,
+						position,
+					};
+				}
+
+				return element;
+			})
+		);
+	};
+
 	useEffect(() => {
 		if (
 			selectedItem &&
@@ -247,18 +298,12 @@ export default function DiagramBuilder({version}) {
 
 			setElements(elements);
 
+			populateAssignmentsData(elements, setElements);
+
 			setDeserialize(false);
 		}
-	}, [
-		currentEditor,
-		definitionTitle,
-		deserialize,
-		setDefinitionDescription,
-		setDefinitionTitle,
-		setDeserialize,
-		setElements,
-		version,
-	]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentEditor, definitionTitle, deserialize, version]);
 
 	useEffect(() => {
 		if (version !== '0' && !deserialize) {
@@ -274,6 +319,8 @@ export default function DiagramBuilder({version}) {
 					const elements = deserializeUtil.getElements();
 
 					setElements(elements);
+
+					populateAssignmentsData(elements, setElements);
 				});
 		}
 
@@ -307,6 +354,8 @@ export default function DiagramBuilder({version}) {
 						onDragOver={onDragOver}
 						onDrop={onDrop}
 						onLoad={onLoad}
+						onNodeDragStart={onNodeDragStart}
+						onNodeDragStop={onNodeDragStop}
 					/>
 
 					<Controls showInteractive={false} />

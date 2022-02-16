@@ -35,6 +35,6 @@
 <liferay-editor:editor
 	contents="<%= sampleEditorContents %>"
 	editorName="ballooneditor"
-	name="sampleBalloonEditor"
+	name="contentEditor"
 	placeholder="content"
 />
