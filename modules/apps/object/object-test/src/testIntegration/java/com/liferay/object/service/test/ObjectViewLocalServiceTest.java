@@ -71,10 +71,8 @@ public class ObjectViewLocalServiceTest {
 
 	@Test
 	public void testAddObjectView() throws Exception {
-		ObjectView objectView = null;
-
 		try {
-			objectView = _objectViewLocalService.addObjectView(
+			_objectViewLocalService.addObjectView(
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId(), true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -105,29 +103,20 @@ public class ObjectViewLocalServiceTest {
 
 		_deleteObjectFields();
 
-		_objectViewLocalService.deleteObjectView(objectView.getObjectViewId());
-
-		objectView = _addObjectView();
-
-		_assertObjectView(objectView);
+		_assertObjectView(_addObjectView());
 
 		_deleteObjectFields();
-
-		_objectViewLocalService.deleteObjectView(objectView.getObjectViewId());
 	}
 
 	@Test
 	public void testGetObjectView() throws Exception {
 		ObjectView objectView = _addObjectView();
 
-		objectView = _objectViewLocalService.getObjectView(
-			objectView.getObjectViewId());
-
-		_assertObjectView(objectView);
+		_assertObjectView(
+			_objectViewLocalService.getObjectView(
+				objectView.getObjectViewId()));
 
 		_deleteObjectFields();
-
-		_objectViewLocalService.deleteObjectView(objectView.getObjectViewId());
 	}
 
 	@Test
@@ -153,8 +142,6 @@ public class ObjectViewLocalServiceTest {
 			objectViewSortColumns.toString(), 1, objectViewSortColumns.size());
 
 		_deleteObjectFields();
-
-		_objectViewLocalService.deleteObjectView(objectView.getObjectViewId());
 	}
 
 	private String _addObjectField() throws Exception {
