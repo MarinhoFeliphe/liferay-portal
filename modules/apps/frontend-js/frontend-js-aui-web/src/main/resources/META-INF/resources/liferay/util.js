@@ -253,6 +253,9 @@
 			return totalOn;
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		checkTab(box) {
 			if (document.all && Number(window.event.keyCode) === 9) {
 				box.selection = document.selection.createRange();
@@ -374,6 +377,9 @@
 			}
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		getAttributes(element, attributeGetter) {
 			var result = null;
 
@@ -420,6 +426,9 @@
 			return result;
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		getColumnId(str) {
 			var columnId = str.replace(/layout-column_/, '');
 
@@ -683,6 +692,9 @@
 			topUtil._openWindowProvider(config, callback);
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		processTab(id) {
 			document.all[id].selection.text = String.fromCharCode(9);
 			document.all[id].focus();

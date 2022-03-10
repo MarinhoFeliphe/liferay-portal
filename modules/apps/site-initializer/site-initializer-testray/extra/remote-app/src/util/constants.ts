@@ -40,7 +40,7 @@ export enum TEST_STATUS {
 	'Untested' = 0,
 }
 
-export const TEST_STATUS_LABEL = {
+export const TEST_STATUS_LABEL: any = {
 	0: 'Untested',
 	1: 'In Progress',
 	2: 'Passed',
@@ -50,85 +50,21 @@ export const TEST_STATUS_LABEL = {
 	7: 'Test Fix',
 };
 
-export const MANAGE_DROPDOWN = [
-	{
-		items: [
-			{icon: 'plus', label: 'New Project', path: '/'},
-			{icon: 'cog', label: 'Case Types', path: '/'},
-		],
-		title: 'System',
-	},
-	{
-		items: [
-			{
-				icon: 'cog',
-				label: 'Categories',
-				path: '/',
-			},
-			{
-				icon: 'cog',
-				label: 'Options',
-				path: '/',
-			},
-		],
-		title: 'Enviroment Factors',
-	},
-	{
-		items: [
-			{
-				icon: 'pencil',
-				label: 'Manage User',
-				path: '/',
-			},
-			{
-				icon: 'pencil',
-				label: 'Manager User Groups',
-				path: '/',
-			},
-			{
-				icon: 'pencil',
-				label: 'Manage Roles',
-				path: '/',
-			},
-		],
-		title: '',
-	},
-	{
-		items: [
-			{
-				icon: 'filter',
-				label: 'Manage Indexers',
-				path: '/',
-			},
-			{
-				icon: 'pencil',
-				label: 'Manage Server',
-				path: '/',
-			},
-		],
-		title: '',
-	},
-];
-
-export const USER_DROPDOWN = [
-	{
-		items: [
-			{
-				icon: 'user',
-				label: 'Manage Accounts',
-				path: '/manage/user',
-			},
-			{
-				icon: 'logout',
-				label: 'Sign Out',
-				path: `${window.location.origin}/c/portal/logout`,
-			},
-		],
-		title: '',
-	},
-];
-
 const getStatusLabel = (status: number): string =>
 	(TEST_STATUS_LABEL as any)[status];
+
+export enum SUB_TASK_STATUS {
+	'OPEN' = 0,
+	'IN_ANALYSIS' = 1,
+	'COMPLETE' = 2,
+	'MERGED' = 3,
+}
+
+export const SUBTASK_STATUS: any = {
+	0: {color: 'label-inverse-light', label: 'OPEN'},
+	1: {color: 'label-inverse-warning', label: 'IN ANALYSIS'},
+	2: {color: 'label-inverse-primary', label: 'COMPLETE'},
+	3: {color: 'label-inverse-light', label: 'MERGED'},
+};
 
 export {getStatusLabel};

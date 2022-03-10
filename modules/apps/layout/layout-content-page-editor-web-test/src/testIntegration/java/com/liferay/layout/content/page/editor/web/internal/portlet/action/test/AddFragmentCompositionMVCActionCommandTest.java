@@ -128,7 +128,7 @@ public class AddFragmentCompositionMVCActionCommandTest {
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
 				fetchLayoutPageTemplateStructure(
-					_group.getGroupId(), _layout.getPlid(), true);
+					_group.getGroupId(), _layout.getPlid());
 
 		LayoutStructure layoutStructure = LayoutStructure.of(
 			layoutPageTemplateStructure.getData(
@@ -175,7 +175,7 @@ public class AddFragmentCompositionMVCActionCommandTest {
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
 				fetchLayoutPageTemplateStructure(
-					_group.getGroupId(), _layout.getPlid(), true);
+					_group.getGroupId(), _layout.getPlid());
 
 		LayoutStructure layoutStructure = LayoutStructure.of(
 			layoutPageTemplateStructure.getData(
@@ -323,9 +323,11 @@ public class AddFragmentCompositionMVCActionCommandTest {
 			fragmentEntryLink.getFragmentEntryLinkId(),
 			containerStyledLayoutStructureItem.getItemId(), 0);
 
-		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
-			TestPropsValues.getUserId(), _group.getGroupId(), _layout.getPlid(),
-			layoutStructure.toString(), _serviceContext);
+		_layoutPageTemplateStructureLocalService.
+			updateLayoutPageTemplateStructureData(
+				_group.getGroupId(), _layout.getPlid(),
+				SegmentsExperienceConstants.ID_DEFAULT,
+				layoutStructure.toString());
 
 		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
 			_getMockLiferayPortletActionRequest();
@@ -404,7 +406,7 @@ public class AddFragmentCompositionMVCActionCommandTest {
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
 				fetchLayoutPageTemplateStructure(
-					_group.getGroupId(), _layout.getPlid(), true);
+					_group.getGroupId(), _layout.getPlid());
 
 		LayoutStructure layoutStructure = LayoutStructure.of(
 			layoutPageTemplateStructure.getData(

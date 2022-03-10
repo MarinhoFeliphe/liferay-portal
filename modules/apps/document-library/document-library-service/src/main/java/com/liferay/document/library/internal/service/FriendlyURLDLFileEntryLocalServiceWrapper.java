@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
 import java.io.InputStream;
@@ -57,20 +58,21 @@ public class FriendlyURLDLFileEntryLocalServiceWrapper
 	public DLFileEntry addFileEntry(
 			String externalReferenceCode, long userId, long groupId,
 			long repositoryId, long folderId, String sourceFileName,
-			String mimeType, String title, String description, String changeLog,
-			long fileEntryTypeId, Map<String, DDMFormValues> ddmFormValuesMap,
-			File file, InputStream inputStream, long size, Date expirationDate,
+			String mimeType, String title, String urlTitle, String description,
+			String changeLog, long fileEntryTypeId,
+			Map<String, DDMFormValues> ddmFormValuesMap, File file,
+			InputStream inputStream, long size, Date expirationDate,
 			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		DLFileEntry dlFileEntry = super.addFileEntry(
 			externalReferenceCode, userId, groupId, repositoryId, folderId,
-			sourceFileName, mimeType, title, description, changeLog,
+			sourceFileName, mimeType, title, urlTitle, description, changeLog,
 			fileEntryTypeId, ddmFormValuesMap, file, inputStream, size,
 			expirationDate, reviewDate, serviceContext);
 
 		if (_ffFriendlyURLEntryFileEntryConfiguration.enabled()) {
-			_addFriendlyURLEntry(dlFileEntry, title);
+			_addFriendlyURLEntry(dlFileEntry, _getUrlTitle(title, urlTitle));
 		}
 
 		return dlFileEntry;
@@ -95,21 +97,21 @@ public class FriendlyURLDLFileEntryLocalServiceWrapper
 	@Override
 	public DLFileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String description, String changeLog,
-			DLVersionNumberIncrease dlVersionNumberIncrease,
+			String mimeType, String title, String urlTitle, String description,
+			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
 			long fileEntryTypeId, Map<String, DDMFormValues> ddmFormValuesMap,
 			File file, InputStream inputStream, long size, Date expirationDate,
 			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		DLFileEntry dlFileEntry = super.updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, description,
-			changeLog, dlVersionNumberIncrease, fileEntryTypeId,
+			userId, fileEntryId, sourceFileName, mimeType, title, urlTitle,
+			description, changeLog, dlVersionNumberIncrease, fileEntryTypeId,
 			ddmFormValuesMap, file, inputStream, size, expirationDate,
 			reviewDate, serviceContext);
 
 		if (_ffFriendlyURLEntryFileEntryConfiguration.enabled()) {
-			_updateFriendlyURL(dlFileEntry, title);
+			_updateFriendlyURL(dlFileEntry, title, urlTitle);
 		}
 
 		return dlFileEntry;
@@ -139,7 +141,16 @@ public class FriendlyURLDLFileEntryLocalServiceWrapper
 			ServiceContextThreadLocal.getServiceContext());
 	}
 
-	private void _updateFriendlyURL(DLFileEntry dlFileEntry, String urlTitle)
+	private String _getUrlTitle(String title, String urlTitle) {
+		if (!Validator.isBlank(urlTitle)) {
+			return urlTitle;
+		}
+
+		return title;
+	}
+
+	private void _updateFriendlyURL(
+			DLFileEntry dlFileEntry, String title, String urlTitle)
 		throws PortalException {
 
 		FriendlyURLEntry friendlyURLEntry =
@@ -148,12 +159,14 @@ public class FriendlyURLDLFileEntryLocalServiceWrapper
 				dlFileEntry.getFileEntryId());
 
 		if (friendlyURLEntry == null) {
-			_addFriendlyURLEntry(dlFileEntry, urlTitle);
+			_addFriendlyURLEntry(dlFileEntry, _getUrlTitle(title, urlTitle));
 
 			return;
 		}
 
-		if (!Objects.equals(friendlyURLEntry.getUrlTitle(), urlTitle)) {
+		if (!Validator.isBlank(urlTitle) &&
+			!Objects.equals(friendlyURLEntry.getUrlTitle(), urlTitle)) {
+
 			String uniqueUrlTitle =
 				_friendlyURLEntryLocalService.getUniqueUrlTitle(
 					dlFileEntry.getGroupId(),

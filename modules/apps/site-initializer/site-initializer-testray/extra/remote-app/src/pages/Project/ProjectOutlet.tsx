@@ -25,6 +25,7 @@ import {
 	getTestrayProjects,
 } from '../../graphql/queries/testrayProject';
 import useHeader from '../../hooks/useHeader';
+import i18n from '../../i18n';
 
 const ProjectOutlet = () => {
 	const {projectId, ...otherParams} = useParams();
@@ -70,7 +71,7 @@ const ProjectOutlet = () => {
 						items: [
 							{
 								divider: true,
-								label: 'Project Directory',
+								label: i18n.translate('project-directory'),
 								path: '/',
 							},
 							...testrayProjects.map((testrayProject) => ({
@@ -86,8 +87,14 @@ const ProjectOutlet = () => {
 	}, [dispatch, testrayProjects]);
 
 	useEffect(() => {
-		if (testrayProject && !hasOtherParams) {
-			setHeading([{category: 'PROJECT', title: testrayProject.name}]);
+		if (testrayProject) {
+			setHeading([
+				{
+					category: i18n.translate('project').toUpperCase(),
+					path: `/project/${testrayProject.testrayProjectId}/routines`,
+					title: testrayProject.name,
+				},
+			]);
 		}
 	}, [setHeading, testrayProject, hasOtherParams]);
 
@@ -97,23 +104,23 @@ const ProjectOutlet = () => {
 				setTabs([
 					{
 						...getPath('overview'),
-						title: 'Overview',
+						title: i18n.translate('overview'),
 					},
 					{
 						...getPath('routines'),
-						title: 'Routines',
+						title: i18n.translate('routines'),
 					},
 					{
 						...getPath('suites'),
-						title: 'Suites',
+						title: i18n.translate('suites'),
 					},
 					{
 						...getPath('cases'),
-						title: 'Cases',
+						title: i18n.translate('cases'),
 					},
 					{
 						...getPath('requirements'),
-						title: 'Requirements',
+						title: i18n.translate('requirements'),
 					},
 				]);
 			}, 0);

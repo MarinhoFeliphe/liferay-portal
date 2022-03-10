@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -76,9 +79,7 @@ public class DiscountCategoryResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (DiscountCategoryResource)ProxyUtil.newProxyInstance(
-					DiscountCategoryResource.class.getClassLoader(),
-					new Class<?>[] {DiscountCategoryResource.class},
+				return _discountCategoryResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -147,6 +148,34 @@ public class DiscountCategoryResourceFactoryImpl
 		DiscountCategoryResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, DiscountCategoryResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DiscountCategoryResource.class.getClassLoader(),
+			DiscountCategoryResource.class);
+
+		try {
+			Constructor<DiscountCategoryResource> constructor =
+				(Constructor<DiscountCategoryResource>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -208,6 +237,10 @@ public class DiscountCategoryResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, DiscountCategoryResource>
+		_discountCategoryResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

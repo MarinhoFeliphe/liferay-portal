@@ -184,7 +184,7 @@ public class StructuredContentResourceTest
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"title"};
+		return new String[] {"priority", "title"};
 	}
 
 	@Override
@@ -241,7 +241,7 @@ public class StructuredContentResourceTest
 				StructuredContent structuredContent)
 		throws Exception {
 
-		return _postSiteStructuredContent(
+		return structuredContentResource.postSiteStructuredContentDraft(
 			testGroup.getGroupId(), structuredContent);
 	}
 
@@ -334,6 +334,7 @@ public class StructuredContentResourceTest
 				setDateCreated(structuredContent.getDateCreated());
 				setDateModified(structuredContent.getDateModified());
 				setId(structuredContent.getId());
+				setPriority(structuredContent.getPriority());
 				setSiteId(structuredContent.getSiteId());
 				setTitle(structuredContent.getTitle());
 			}

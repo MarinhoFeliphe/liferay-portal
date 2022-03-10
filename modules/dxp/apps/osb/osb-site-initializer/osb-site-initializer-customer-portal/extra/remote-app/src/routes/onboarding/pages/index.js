@@ -20,14 +20,20 @@ import Welcome from './Welcome';
 
 const Pages = () => {
 	const [
-		{project, sessionId, step, subscriptionGroups},
+		{
+			dxpCloudActivationSubmittedStatus,
+			project,
+			sessionId,
+			step,
+			subscriptionGroups,
+		},
 		dispatch,
 	] = useOnboarding();
 
 	const invitesPageHandle = () => {
 		const hasSubscriptionsDXPCloud = !!subscriptionGroups?.length;
 
-		if (hasSubscriptionsDXPCloud) {
+		if (hasSubscriptionsDXPCloud && !dxpCloudActivationSubmittedStatus) {
 			dispatch({
 				payload: ONBOARDING_STEP_TYPES.dxpCloud,
 				type: actionTypes.CHANGE_STEP,

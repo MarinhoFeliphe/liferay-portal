@@ -14,9 +14,13 @@
 
 package com.liferay.commerce.checkout.web.internal.helper;
 
+import com.liferay.account.model.AccountEntry;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.checkout.helper.CommerceCheckoutStepHttpHelper;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
+import com.liferay.commerce.constants.CommerceOrderActionKeys;
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceMoney;
@@ -44,6 +48,7 @@ import com.liferay.commerce.util.CommerceShippingEngineRegistry;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -51,6 +56,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 
@@ -126,10 +132,6 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			_commerceShippingMethodLocalService.getCommerceShippingMethod(
 				commerceOrder.getCommerceShippingMethodId());
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		CommerceShippingEngine commerceShippingEngine =
 			_commerceShippingEngineRegistry.getCommerceShippingEngine(
 				commerceShippingMethod.getEngineKey());
@@ -137,6 +139,10 @@ public class DefaultCommerceCheckoutStepHttpHelper
 		CommerceContext commerceContext =
 			(CommerceContext)httpServletRequest.getAttribute(
 				CommerceWebKeys.COMMERCE_CONTEXT);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		List<CommerceShippingOption> commerceShippingOptions =
 			commerceShippingEngine.getCommerceShippingOptions(
@@ -177,8 +183,8 @@ public class DefaultCommerceCheckoutStepHttpHelper
 				deliveryCommerceTermEntries.get(0);
 
 			_commerceOrderService.updateTermsAndConditions(
-				commerceOrder.getCommerceOrderId(), 0,
-				commerceTermEntry.getCommerceTermEntryId(), languageId);
+				commerceOrder.getCommerceOrderId(),
+				commerceTermEntry.getCommerceTermEntryId(), 0, languageId);
 
 			return false;
 		}
@@ -190,6 +196,13 @@ public class DefaultCommerceCheckoutStepHttpHelper
 	public boolean isActivePaymentMethodCommerceCheckoutStep(
 			HttpServletRequest httpServletRequest, CommerceOrder commerceOrder)
 		throws PortalException {
+
+		if (!_hasCommerceOrderPermission(
+				CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_METHODS,
+				commerceOrder, httpServletRequest)) {
+
+			return false;
+		}
 
 		long commercePaymentMethodGroupRelsCount =
 			_commercePaymentEngine.getCommercePaymentMethodGroupRelsCount(
@@ -233,6 +246,38 @@ public class DefaultCommerceCheckoutStepHttpHelper
 				commercePaymentMethod.getKey());
 
 			return false;
+		}
+
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
+
+		if (commerceAccount != null) {
+			AccountEntry accountEntry =
+				_accountEntryLocalService.fetchAccountEntry(
+					commerceAccount.getCommerceAccountId());
+
+			if ((accountEntry != null) &&
+				(accountEntry.getDefaultCPaymentMethodKey() != null)) {
+
+				Stream<CommercePaymentMethod> commercePaymentMethodsStream =
+					commercePaymentMethods.stream();
+
+				CommercePaymentMethod commercePaymentMethod =
+					commercePaymentMethodsStream.filter(
+						cpm -> cpm.getKey(
+						).equals(
+							accountEntry.getDefaultCPaymentMethodKey()
+						)
+					).findFirst(
+					).orElse(
+						commercePaymentMethods.get(0)
+					);
+
+				_updateCommerceOrder(
+					httpServletRequest, commerceOrder,
+					commercePaymentMethod.getKey());
+
+				return false;
+			}
 		}
 
 		return true;
@@ -289,7 +334,10 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			(CommerceOrder)httpServletRequest.getAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_ORDER);
 
-		if (!_commerceShippingHelper.isShippable(commerceOrder) ||
+		if (!_hasCommerceOrderPermission(
+				CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_SHIPPING_OPTIONS,
+				commerceOrder, httpServletRequest) ||
+			!_commerceShippingHelper.isShippable(commerceOrder) ||
 			_commerceShippingHelper.isFreeShipping(commerceOrder)) {
 
 			return false;
@@ -345,6 +393,28 @@ public class DefaultCommerceCheckoutStepHttpHelper
 		return false;
 	}
 
+	private boolean _hasCommerceOrderPermission(
+			String actionId, CommerceOrder commerceOrder,
+			HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (!commerceOrder.isGuestOrder() &&
+			!commerceAccount.isPersonalAccount() &&
+			!_commerceOrderPortletResourcePermission.contains(
+				themeDisplay.getPermissionChecker(),
+				commerceAccount.getCommerceAccountGroupId(), actionId)) {
+
+			return false;
+		}
+
+		return true;
+	}
+
 	private void _updateCommerceOrder(
 			CommerceContext commerceContext, CommerceOrder commerceOrder,
 			long commerceShippingMethodId,
@@ -397,10 +467,18 @@ public class DefaultCommerceCheckoutStepHttpHelper
 	}
 
 	@Reference
+	private AccountEntryLocalService _accountEntryLocalService;
+
+	@Reference
 	private CommerceAddressService _commerceAddressService;
 
 	@Reference
 	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
+
+	@Reference(
+		target = "(resource.name=" + CommerceOrderConstants.RESOURCE_NAME + ")"
+	)
+	private PortletResourcePermission _commerceOrderPortletResourcePermission;
 
 	@Reference
 	private CommerceOrderPriceCalculation _commerceOrderPriceCalculation;

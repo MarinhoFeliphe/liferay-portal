@@ -141,9 +141,6 @@ public class PropsValues {
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.ASSET_BROWSER_SEARCH_WITH_DATABASE));
 
-	public static final String[] ASSET_CATEGORIES_PROPERTIES_DEFAULT =
-		PropsUtil.getArray(PropsKeys.ASSET_CATEGORIES_PROPERTIES_DEFAULT);
-
 	public static final boolean ASSET_CATEGORIES_SEARCH_HIERARCHICAL =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.ASSET_CATEGORIES_SEARCH_HIERARCHICAL));
@@ -301,9 +298,6 @@ public class PropsValues {
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.BROWSER_CACHE_SIGNED_IN_DISABLED));
 
-	public static final String BROWSER_COMPATIBILITY_IE_VERSIONS =
-		PropsUtil.get(PropsKeys.BROWSER_COMPATIBILITY_IE_VERSIONS);
-
 	public static final String BROWSER_LAUNCHER_URL = PropsUtil.get(
 		PropsKeys.BROWSER_LAUNCHER_URL);
 
@@ -346,10 +340,6 @@ public class PropsValues {
 	public static final boolean CALENDAR_EVENT_RATINGS_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.CALENDAR_EVENT_RATINGS_ENABLED));
-
-	public static final boolean CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT));
 
 	public static final boolean CDN_DYNAMIC_RESOURCES_ENABLED =
 		GetterUtil.getBoolean(
@@ -1163,9 +1153,6 @@ public class PropsValues {
 	public static final String LAYOUT_CLONE_IMPL = PropsUtil.get(
 		PropsKeys.LAYOUT_CLONE_IMPL);
 
-	public static final boolean LAYOUT_COMMENTS_ENABLED = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.LAYOUT_COMMENTS_ENABLED));
-
 	public static final boolean LAYOUT_DEFAULT_P_L_RESET =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.LAYOUT_DEFAULT_P_L_RESET));
@@ -1635,9 +1622,6 @@ public class PropsValues {
 
 	public static final String[] MY_SITES_DIRECTORY_SITE_EXCLUDES =
 		PropsUtil.getArray(PropsKeys.MY_SITES_DIRECTORY_SITE_EXCLUDES);
-
-	public static final String MY_SITES_DISPLAY_STYLE = PropsUtil.get(
-		PropsKeys.MY_SITES_DISPLAY_STYLE);
 
 	public static final int MY_SITES_MAX_ELEMENTS = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.MY_SITES_MAX_ELEMENTS));
@@ -2201,26 +2185,12 @@ public class PropsValues {
 	public static boolean RSS_FEEDS_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.RSS_FEEDS_ENABLED));
 
-	public static final boolean RSS_PUBLISH_TO_LIVE_BY_DEFAULT =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.RSS_PUBLISH_TO_LIVE_BY_DEFAULT));
-
-	public static String[] RTL_CSS_EXCLUDED_PATHS_REGEXP = PropsUtil.getArray(
-		PropsKeys.RTL_CSS_EXCLUDED_PATHS_REGEXP);
-
 	public static final boolean SCHEDULER_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.SCHEDULER_ENABLED));
 
 	public static boolean SCHEMA_MODULE_BUILD_AUTO_UPGRADE =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.SCHEMA_MODULE_BUILD_AUTO_UPGRADE));
-
-	public static final String SCRIPTING_JRUBY_COMPILE_MODE = PropsUtil.get(
-		PropsKeys.SCRIPTING_JRUBY_COMPILE_MODE);
-
-	public static final int SCRIPTING_JRUBY_COMPILE_THRESHOLD =
-		GetterUtil.getInteger(
-			PropsUtil.get(PropsKeys.SCRIPTING_JRUBY_COMPILE_THRESHOLD), 50);
 
 	public static final int SEARCH_CONTAINER_PAGE_DEFAULT_DELTA =
 		GetterUtil.getInteger(
@@ -2661,9 +2631,6 @@ public class PropsValues {
 	public static final String[] USERS_EXPORT_CSV_FIELDS = PropsUtil.getArray(
 		PropsKeys.USERS_EXPORT_CSV_FIELDS);
 
-	public static final String[] USERS_LIST_VIEWS = PropsUtil.getArray(
-		PropsKeys.USERS_LIST_VIEWS);
-
 	public static final String USERS_PROFILE_FRIENDLY_URL = PropsUtil.get(
 		PropsKeys.USERS_PROFILE_FRIENDLY_URL);
 
@@ -2832,9 +2799,6 @@ public class PropsValues {
 	public static final int YUI_COMPRESSOR_CSS_LINE_BREAK =
 		GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.YUI_COMPRESSOR_CSS_LINE_BREAK));
-
-	public static final String ZIP_FILE_NAME_ENCODING = GetterUtil.getString(
-		PropsUtil.get(PropsKeys.ZIP_FILE_NAME_ENCODING));
 
 	public static final long ZIP_FILE_WRITER_EXPORT_BUFFER_SIZE =
 		GetterUtil.getLong(

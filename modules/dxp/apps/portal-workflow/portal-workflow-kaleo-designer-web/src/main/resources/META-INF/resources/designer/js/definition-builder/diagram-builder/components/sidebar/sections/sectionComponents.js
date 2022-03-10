@@ -18,6 +18,7 @@ import AssignmentsSummary from './assignments/AssignmentsSummary';
 import SourceCode from './assignments/SourceCode';
 import Notifications from './notifications/Notifications';
 import NotificationsSummary from './notifications/NotificationsSummary';
+import TimerSourceCode from './timers/TimerSourceCode';
 import Timers from './timers/Timers';
 import TimersSummary from './timers/TimersSummary';
 
@@ -32,6 +33,7 @@ const sectionComponents = {
 	notificationsSummary: NotificationsSummary,
 	sourceCode: SourceCode,
 	timers: Timers,
+	timersSourceCode: TimerSourceCode,
 	timersSummary: TimersSummary,
 };
 

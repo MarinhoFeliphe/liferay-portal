@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.search.experiences.rest.resource.v1_0.SXPParameterContributorDefinitionResource;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -76,13 +79,8 @@ public class SXPParameterContributorDefinitionResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (SXPParameterContributorDefinitionResource)
-					ProxyUtil.newProxyInstance(
-						SXPParameterContributorDefinitionResource.class.
-							getClassLoader(),
-						new Class<?>[] {
-							SXPParameterContributorDefinitionResource.class
-						},
+				return _sxpParameterContributorDefinitionResourceProxyProviderFunction.
+					apply(
 						(proxy, method, arguments) -> _invoke(
 							method, arguments, _checkPermissions,
 							_httpServletRequest, _httpServletResponse,
@@ -153,6 +151,35 @@ public class SXPParameterContributorDefinitionResourceFactoryImpl
 		SXPParameterContributorDefinitionResource.FactoryHolder.factory = null;
 	}
 
+	private static Function
+		<InvocationHandler, SXPParameterContributorDefinitionResource>
+			_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SXPParameterContributorDefinitionResource.class.getClassLoader(),
+			SXPParameterContributorDefinitionResource.class);
+
+		try {
+			Constructor<SXPParameterContributorDefinitionResource> constructor =
+				(Constructor<SXPParameterContributorDefinitionResource>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -221,6 +248,11 @@ public class SXPParameterContributorDefinitionResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function
+		<InvocationHandler, SXPParameterContributorDefinitionResource>
+			_sxpParameterContributorDefinitionResourceProxyProviderFunction =
+				_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

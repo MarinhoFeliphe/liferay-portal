@@ -21,10 +21,12 @@ import com.liferay.account.manager.CurrentAccountEntryManager;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.settings.AccountEntryGroupSettings;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -33,12 +35,10 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
-import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 
@@ -57,25 +57,43 @@ public class CurrentAccountEntryManagerImpl
 	public AccountEntry getCurrentAccountEntry(long groupId, long userId)
 		throws PortalException {
 
+		AccountEntry guestAccountEntry =
+			_accountEntryLocalService.getGuestAccountEntry(
+				CompanyThreadLocal.getCompanyId());
+
+		if (userId <= UserConstants.USER_ID_DEFAULT) {
+			return guestAccountEntry;
+		}
+
+		User user = _userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			return guestAccountEntry;
+		}
+
+		List<AccountEntry> userAccountEntries =
+			_accountEntryLocalService.getUserAccountEntries(
+				userId, AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
+				_getAllowedTypes(groupId), WorkflowConstants.STATUS_APPROVED,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
 		AccountEntry accountEntry = _getAccountEntryFromHttpSession(groupId);
 
-		String[] allowedTypes = _getAllowedTypes(groupId);
-
-		if (_isValid(accountEntry, allowedTypes)) {
+		if (_isValid(accountEntry, userAccountEntries)) {
 			return accountEntry;
 		}
 
 		accountEntry = _getAccountEntryFromPortalPreferences(groupId, userId);
 
-		if (_isValid(accountEntry, allowedTypes)) {
+		if (_isValid(accountEntry, userAccountEntries)) {
 			_saveInHttpSession(accountEntry.getAccountEntryId(), groupId);
 
 			return accountEntry;
 		}
 
-		accountEntry = _getDefaultAccountEntry(allowedTypes, userId);
+		if (!userAccountEntries.isEmpty()) {
+			accountEntry = userAccountEntries.get(0);
 
-		if (_isValid(accountEntry, allowedTypes)) {
 			setCurrentAccountEntry(
 				accountEntry.getAccountEntryId(), groupId, userId);
 
@@ -150,30 +168,6 @@ public class CurrentAccountEntryManagerImpl
 		return _accountEntryGroupSettings.getAllowedTypes(groupId);
 	}
 
-	private AccountEntry _getDefaultAccountEntry(
-			String[] allowedTypes, long userId)
-		throws PortalException {
-
-		User user = _userLocalService.fetchUser(userId);
-
-		if ((user == null) || user.isDefaultUser()) {
-			return _accountEntryLocalService.getGuestAccountEntry(
-				CompanyThreadLocal.getCompanyId());
-		}
-
-		List<AccountEntry> accountEntries =
-			_accountEntryLocalService.getUserAccountEntries(
-				user.getUserId(),
-				AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
-				allowedTypes, 0, 1);
-
-		if (accountEntries.size() == 1) {
-			return accountEntries.get(0);
-		}
-
-		return null;
-	}
-
 	private String _getKey(long groupId) {
 		return AccountWebKeys.CURRENT_ACCOUNT_ENTRY_ID + groupId;
 	}
@@ -182,13 +176,13 @@ public class CurrentAccountEntryManagerImpl
 		return _portletPreferencesFactory.getPortalPreferences(userId, true);
 	}
 
-	private boolean _isValid(AccountEntry accountEntry, String[] allowedTypes) {
+	private boolean _isValid(
+		AccountEntry accountEntry, List<AccountEntry> userAccountEntries) {
+
 		if ((accountEntry != null) &&
-			Objects.equals(
-				WorkflowConstants.STATUS_APPROVED, accountEntry.getStatus()) &&
 			((accountEntry.getAccountEntryId() ==
 				AccountConstants.ACCOUNT_ENTRY_ID_GUEST) ||
-			 ArrayUtil.contains(allowedTypes, accountEntry.getType()))) {
+			 userAccountEntries.contains(accountEntry))) {
 
 			return true;
 		}
@@ -237,9 +231,6 @@ public class CurrentAccountEntryManagerImpl
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference
-	private Portal _portal;
 
 	@Reference
 	private PortalPreferencesLocalService _portalPreferencesLocalService;

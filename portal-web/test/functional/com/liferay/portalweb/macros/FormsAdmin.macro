@@ -300,7 +300,7 @@ definition {
 	macro viewForm {
 		var key_formName = "${formName}";
 
-		AssertTextEquals(
+		WaitForElementPresent(
 			locator1 = "FormsAdmin#FORMS_TABLE_NAME",
 			value1 = "${formName}");
 

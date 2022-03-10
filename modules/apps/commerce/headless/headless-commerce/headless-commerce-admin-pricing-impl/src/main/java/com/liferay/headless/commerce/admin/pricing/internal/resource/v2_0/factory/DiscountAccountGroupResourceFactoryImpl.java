@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -76,9 +79,7 @@ public class DiscountAccountGroupResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (DiscountAccountGroupResource)ProxyUtil.newProxyInstance(
-					DiscountAccountGroupResource.class.getClassLoader(),
-					new Class<?>[] {DiscountAccountGroupResource.class},
+				return _discountAccountGroupResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -147,6 +148,34 @@ public class DiscountAccountGroupResourceFactoryImpl
 		DiscountAccountGroupResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, DiscountAccountGroupResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DiscountAccountGroupResource.class.getClassLoader(),
+			DiscountAccountGroupResource.class);
+
+		try {
+			Constructor<DiscountAccountGroupResource> constructor =
+				(Constructor<DiscountAccountGroupResource>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -209,6 +238,11 @@ public class DiscountAccountGroupResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function
+		<InvocationHandler, DiscountAccountGroupResource>
+			_discountAccountGroupResourceProxyProviderFunction =
+				_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

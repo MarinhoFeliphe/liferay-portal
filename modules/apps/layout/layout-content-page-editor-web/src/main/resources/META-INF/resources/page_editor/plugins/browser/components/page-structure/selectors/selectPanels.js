@@ -29,6 +29,7 @@ import {CollectionGeneralPanel} from '../components/item-configuration-panels/Co
 import ContainerGeneralPanel from '../components/item-configuration-panels/ContainerGeneralPanel';
 import {ContainerStylesPanel} from '../components/item-configuration-panels/ContainerStylesPanel';
 import EditableLinkPanel from '../components/item-configuration-panels/EditableLinkPanel';
+import {FragmentAdvancedPanel} from '../components/item-configuration-panels/FragmentAdvancedPanel';
 import {FragmentGeneralPanel} from '../components/item-configuration-panels/FragmentGeneralPanel';
 import {FragmentStylesPanel} from '../components/item-configuration-panels/FragmentStylesPanel';
 import ImageSourcePanel from '../components/item-configuration-panels/ImageSourcePanel';
@@ -45,6 +46,7 @@ export const PANEL_IDS = {
 	containerStyles: 'containerStyles',
 	editableLink: 'editableLink',
 	editableMapping: 'editableMapping',
+	fragmentAdvanced: 'fragmentAdvanced',
 	fragmentGeneral: 'fragmentGeneral',
 	fragmentStyles: 'fragmentStyles',
 	imageSource: 'imageSource',
@@ -90,15 +92,20 @@ export const PANELS = {
 		label: Liferay.Language.get('mapping'),
 		priority: 1,
 	},
+	[PANEL_IDS.fragmentAdvanced]: {
+		component: FragmentAdvancedPanel,
+		label: Liferay.Language.get('advanced'),
+		priority: 0,
+	},
 	[PANEL_IDS.fragmentGeneral]: {
 		component: FragmentGeneralPanel,
 		label: Liferay.Language.get('general'),
-		priority: 1,
+		priority: 2,
 	},
 	[PANEL_IDS.fragmentStyles]: {
 		component: FragmentStylesPanel,
 		label: Liferay.Language.get('styles'),
-		priority: 0,
+		priority: 1,
 	},
 	[PANEL_IDS.imageSource]: {
 		component: ImageSourcePanel,
@@ -169,17 +176,19 @@ export function selectPanels(activeItemId, activeItemType, state) {
 				activeItem.type !== EDITABLE_TYPES.backgroundImage,
 		};
 	}
+	else if (!canUpdateItemConfiguration) {
+		return {activeItem, panelsIds};
+	}
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.collection) {
 		panelsIds = {
 			[PANEL_IDS.collectionGeneral]:
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemConfiguration,
+				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
 		};
 	}
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.container) {
 		panelsIds = {
-			[PANEL_IDS.containerGeneral]: canUpdateItemConfiguration,
-			[PANEL_IDS.containerStyles]: canUpdateItemConfiguration,
+			[PANEL_IDS.containerGeneral]: true,
+			[PANEL_IDS.containerStyles]: true,
 		};
 	}
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.fragment) {
@@ -190,30 +199,36 @@ export function selectPanels(activeItemId, activeItemType, state) {
 		const fieldSets = fragmentEntryLink?.configuration?.fieldSets ?? [];
 
 		panelsIds = {
-			[PANEL_IDS.fragmentStyles]: canUpdateItemConfiguration,
-			[PANEL_IDS.fragmentGeneral]:
-				fragmentEntryKey !== COLLECTION_FILTER_FRAGMENT_ENTRY_KEY &&
-				canUpdateItemConfiguration &&
+			[PANEL_IDS.fragmentAdvanced]:
+				config.fragmentAdvancedOptionsEnabled &&
+				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
 				fieldSets.some(
 					(fieldSet) =>
-						fieldSet.configurationRole !==
-						FRAGMENT_CONFIGURATION_ROLES.style
+						fieldSet.configurationRole ===
+						FRAGMENT_CONFIGURATION_ROLES.advanced
+				),
+			[PANEL_IDS.fragmentStyles]: true,
+			[PANEL_IDS.fragmentGeneral]:
+				fragmentEntryKey !== COLLECTION_FILTER_FRAGMENT_ENTRY_KEY &&
+				fieldSets.some((fieldSet) =>
+					config.fragmentAdvancedOptionsEnabled
+						? !fieldSet.configurationRole
+						: fieldSet.configurationRole !==
+						  FRAGMENT_CONFIGURATION_ROLES.style
 				),
 			[PANEL_IDS.collectionAppliedFiltersGeneral]:
 				fragmentEntryKey ===
 					COLLECTION_APPLIED_FILTERS_FRAGMENT_ENTRY_KEY &&
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemConfiguration,
+				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
 			[PANEL_IDS.collectionFilterGeneral]:
 				fragmentEntryKey === COLLECTION_FILTER_FRAGMENT_ENTRY_KEY &&
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemConfiguration,
+				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
 		};
 	}
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.row) {
 		panelsIds = {
-			[PANEL_IDS.rowStyles]: canUpdateItemConfiguration,
-			[PANEL_IDS.rowGeneral]: canUpdateItemConfiguration,
+			[PANEL_IDS.rowStyles]: true,
+			[PANEL_IDS.rowGeneral]: true,
 		};
 	}
 

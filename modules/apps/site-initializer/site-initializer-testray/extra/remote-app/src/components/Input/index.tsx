@@ -23,7 +23,7 @@ type InputProps = {
 	label: string;
 	name: string;
 	required?: boolean;
-};
+} & React.HTMLAttributes<HTMLInputElement>;
 
 const Input: React.FC<InputProps> = ({
 	error,

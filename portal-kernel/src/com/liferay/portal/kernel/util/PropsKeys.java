@@ -151,9 +151,6 @@ public interface PropsKeys {
 	public static final String ASSET_BROWSER_SEARCH_WITH_DATABASE =
 		"asset.browser.search.with.database";
 
-	public static final String ASSET_CATEGORIES_PROPERTIES_DEFAULT =
-		"asset.categories.properties.default";
-
 	public static final String ASSET_CATEGORIES_SEARCH_HIERARCHICAL =
 		"asset.categories.search.hierarchical";
 
@@ -355,9 +352,6 @@ public interface PropsKeys {
 	public static final String BROWSER_CACHE_SIGNED_IN_DISABLED =
 		"browser.cache.signed.in.disabled";
 
-	public static final String BROWSER_COMPATIBILITY_IE_VERSIONS =
-		"browser.compatibility.ie.versions";
-
 	public static final String BROWSER_LAUNCHER_URL = "browser.launcher.url";
 
 	/**
@@ -422,9 +416,6 @@ public interface PropsKeys {
 
 	public static final String CALENDAR_EVENT_TYPES = "calendar.event.types";
 
-	public static final String CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT =
-		"calendar.publish.to.live.by.default";
-
 	public static final String CDN_DYNAMIC_RESOURCES_ENABLED =
 		"cdn.dynamic.resources.enabled";
 
@@ -457,9 +448,6 @@ public interface PropsKeys {
 		"cluster.link.channel.system.properties";
 
 	public static final String CLUSTER_LINK_ENABLED = "cluster.link.enabled";
-
-	public static final String CLUSTER_LINK_NODE_BOOTUP_RESPONSE_TIMEOUT =
-		"cluster.link.node.bootup.response.timeout";
 
 	public static final String CLUSTERABLE_ADVICE_CALL_MASTER_TIMEOUT =
 		"clusterable.advice.call.master.timeout";
@@ -1479,9 +1467,6 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_CLONE_IMPL = "layout.clone.impl";
 
-	public static final String LAYOUT_COMMENTS_ENABLED =
-		"layout.comments.enabled";
-
 	public static final String LAYOUT_CONFIGURATION_ACTION_DELETE =
 		"layout.configuration.action.delete";
 
@@ -2082,9 +2067,6 @@ public interface PropsKeys {
 	public static final String MY_SITES_DIRECTORY_SITE_EXCLUDES =
 		"my.sites.directory.site.excludes";
 
-	public static final String MY_SITES_DISPLAY_STYLE =
-		"my.sites.display.style";
-
 	public static final String MY_SITES_MAX_ELEMENTS = "my.sites.max.elements";
 
 	public static final String MY_SITES_SHOW_PRIVATE_SITES_WITH_NO_LAYOUTS =
@@ -2614,12 +2596,6 @@ public interface PropsKeys {
 
 	public static final String RSS_FEEDS_ENABLED = "rss.feeds.enabled";
 
-	public static final String RSS_PUBLISH_TO_LIVE_BY_DEFAULT =
-		"rss.publish.to.live.by.default";
-
-	public static final String RTL_CSS_EXCLUDED_PATHS_REGEXP =
-		"rtl.css.excluded.paths.regexp";
-
 	public static final String SANITIZER_IMPL = "sanitizer.impl";
 
 	public static final String SCHEDULER_DESCRIPTION_MAX_LENGTH =
@@ -2640,12 +2616,6 @@ public interface PropsKeys {
 		"schema.module.build.auto.upgrade";
 
 	public static final String SCHEMA_RUN_ENABLED = "schema.run.enabled";
-
-	public static final String SCRIPTING_JRUBY_COMPILE_MODE =
-		"scripting.jruby.compile.mode";
-
-	public static final String SCRIPTING_JRUBY_COMPILE_THRESHOLD =
-		"scripting.jruby.compile.threshold";
 
 	public static final String SEARCH_CONTAINER_PAGE_DEFAULT_DELTA =
 		"search.container.page.default.delta";
@@ -3201,8 +3171,6 @@ public interface PropsKeys {
 	public static final String USERS_FULL_NAME_VALIDATOR =
 		"users.full.name.validator";
 
-	public static final String USERS_LIST_VIEWS = "users.list.views";
-
 	public static final String USERS_PROFILE_FRIENDLY_URL =
 		"users.profile.friendly.url";
 
@@ -3407,9 +3375,6 @@ public interface PropsKeys {
 
 	public static final String YUI_COMPRESSOR_CSS_LINE_BREAK =
 		"yui.compressor.css.line.break";
-
-	public static final String ZIP_FILE_NAME_ENCODING =
-		"zip.file.name.encoding";
 
 	public static final String ZIP_FILE_WRITER_EXPORT_BUFFER_SIZE =
 		"zip.file.writer.export.buffer.size";

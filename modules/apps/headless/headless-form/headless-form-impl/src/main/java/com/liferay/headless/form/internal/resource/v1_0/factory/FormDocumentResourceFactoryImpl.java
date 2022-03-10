@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -73,9 +76,7 @@ public class FormDocumentResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (FormDocumentResource)ProxyUtil.newProxyInstance(
-					FormDocumentResource.class.getClassLoader(),
-					new Class<?>[] {FormDocumentResource.class},
+				return _formDocumentResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -144,6 +145,34 @@ public class FormDocumentResourceFactoryImpl
 		FormDocumentResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, FormDocumentResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FormDocumentResource.class.getClassLoader(),
+			FormDocumentResource.class);
+
+		try {
+			Constructor<FormDocumentResource> constructor =
+				(Constructor<FormDocumentResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -203,6 +232,10 @@ public class FormDocumentResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, FormDocumentResource>
+		_formDocumentResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

@@ -88,7 +88,6 @@
 /development/websocket-api.jar
 /development/xmlresolver.jar
 /portal/activation.jar
-/portal/ant.jar
 /portal/asm-analysis.jar
 /portal/asm-commons.jar
 /portal/asm-tree.jar
@@ -158,17 +157,11 @@
 /portal/log4j-core.jar
 /portal/mchange-commons-java.jar
 /portal/metadata-extractor.jar
-/portal/mime4j-core.jar
-/portal/mime4j-dom.jar
 /portal/mimepull.jar
 /portal/mp4parser.jar
 /portal/netcdf.jar
 /portal/pdfbox.jar
 /portal/persistence.jar
-/portal/poi-ooxml-schemas.jar
-/portal/poi-ooxml.jar
-/portal/poi-scratchpad.jar
-/portal/poi.jar
 /portal/portlet.jar
 /portal/portletmvc4spring-framework.jar
 /portal/rmi-api.jar
@@ -199,7 +192,6 @@
 /portal/stax-ex.jar
 /portal/stax.jar
 /portal/streambuffer.jar
-/portal/tagsoup.jar
 /portal/tomcat-jdbc.jar
 /portal/tomcat-juli.jar
 /portal/transaction.jar

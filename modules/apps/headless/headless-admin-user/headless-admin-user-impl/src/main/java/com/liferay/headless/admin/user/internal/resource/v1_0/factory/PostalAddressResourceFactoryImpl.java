@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -73,9 +76,7 @@ public class PostalAddressResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (PostalAddressResource)ProxyUtil.newProxyInstance(
-					PostalAddressResource.class.getClassLoader(),
-					new Class<?>[] {PostalAddressResource.class},
+				return _postalAddressResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -144,6 +145,34 @@ public class PostalAddressResourceFactoryImpl
 		PostalAddressResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, PostalAddressResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PostalAddressResource.class.getClassLoader(),
+			PostalAddressResource.class);
+
+		try {
+			Constructor<PostalAddressResource> constructor =
+				(Constructor<PostalAddressResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -204,6 +233,10 @@ public class PostalAddressResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, PostalAddressResource>
+		_postalAddressResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

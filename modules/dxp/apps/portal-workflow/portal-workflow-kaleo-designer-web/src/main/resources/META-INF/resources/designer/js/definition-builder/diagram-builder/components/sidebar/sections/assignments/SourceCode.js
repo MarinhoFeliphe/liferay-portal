@@ -9,16 +9,16 @@
  * distribution rights of the Software.
  */
 
-import {Editor} from 'frontend-editor-ckeditor-web';
-import React, {useContext, useRef} from 'react';
+import React, {useContext} from 'react';
 
-import {editorConfig} from '../../../../../constants';
 import {DEFAULT_LANGUAGE} from '../../../../../source-builder/constants';
 import {DiagramBuilderContext} from '../../../../DiagramBuilderContext';
+import BaseSourceCode from '../shared-components/BaseSourceCode';
 
 const SourceCode = () => {
-	const editorRef = useRef();
 	const {selectedItem, setSelectedItem} = useContext(DiagramBuilderContext);
+
+	const scriptSourceCode = selectedItem.data?.assignments?.script;
 
 	const updateSelectedItem = (editor) => {
 		if (editor.getData().trim() !== '') {
@@ -37,31 +37,9 @@ const SourceCode = () => {
 	};
 
 	return (
-		<Editor
-			config={editorConfig}
-			onInstanceReady={({editor}) => {
-				editor.setMode('source');
-
-				if (selectedItem.data?.assignments?.script) {
-					editor.setData(selectedItem.data.assignments.script[0]);
-				}
-
-				document
-					.querySelector('div.sidebar-body')
-					.addEventListener('keyup', () => {
-						updateSelectedItem(editor);
-					});
-
-				return () => {
-					document
-						.querySelector('div.sidebar-body')
-						.removeEventListener(
-							'keyup',
-							updateSelectedItem(editor)
-						);
-				};
-			}}
-			ref={editorRef}
+		<BaseSourceCode
+			scriptSourceCode={scriptSourceCode}
+			updateSelectedItem={updateSelectedItem}
 		/>
 	);
 };

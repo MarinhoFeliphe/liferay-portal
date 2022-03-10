@@ -422,10 +422,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		// Draft layout
 
-		if (!system &&
-			(Objects.equals(type, LayoutConstants.TYPE_COLLECTION) ||
-			 Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
-			 layout.isTypeAssetDisplay())) {
+		if (!layout.isDraftLayout() &&
+			(layout.isTypeAssetDisplay() || layout.isTypeContent())) {
 
 			serviceContext.setModifiedDate(date);
 

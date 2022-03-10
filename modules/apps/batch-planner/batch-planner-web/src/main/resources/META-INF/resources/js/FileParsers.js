@@ -53,25 +53,43 @@ export function parseCSV(content, separator) {
 	return arrData;
 }
 
+export function getItemDetails(itemData, headers) {
+	return itemData.reduce(
+		(data, value, index) => ({
+			...data,
+			[headers[index]]: value,
+		}),
+		{}
+	);
+}
+
 export function extractFieldsFromCSV(
 	content,
 	{csvContainsHeaders, csvSeparator}
 ) {
-	if (content.indexOf('\n') > -1) {
-		const splitLines = content.split('\n');
+	const splitLines = content.split('\n');
+	const newLineFound = content.indexOf('\n') > -1;
 
-		const firstNoEmptyLine = splitLines.find((line) => line.length > 0);
+	if (csvContainsHeaders && splitLines.length > 2) {
+		const [schema, firstItemData] = parseCSV(content, csvSeparator);
 
-		const firstLineColumns = parseCSV(firstNoEmptyLine, csvSeparator)[0];
+		return {
+			firstItemDetails: getItemDetails(firstItemData, schema),
+			schema,
+		};
+	}
 
-		if (csvContainsHeaders) {
-			return firstLineColumns;
-		}
-		else {
-			return new Array(firstLineColumns.length)
-				.fill()
-				.map((_, index) => index);
-		}
+	if (!csvContainsHeaders && newLineFound) {
+		const [firstItemData] = parseCSV(splitLines[0], csvSeparator);
+
+		const schema = new Array(firstItemData.length)
+			.fill()
+			.map((_, index) => index);
+
+		return {
+			firstItemDetails: getItemDetails(firstItemData, schema),
+			schema,
+		};
 	}
 }
 
@@ -90,7 +108,12 @@ export function extractFieldsFromJSONL(content) {
 	try {
 		const data = JSON.parse(contentToParse);
 
-		return Object.keys(data);
+		const schema = Object.keys(data);
+
+		return {
+			firstItemDetails: getItemDetails(Object.values(data), schema),
+			schema,
+		};
 	}
 	catch (error) {
 		console.error(error);
@@ -112,7 +135,15 @@ export function extractFieldsFromJSON(content) {
 			try {
 				parsedJSON = JSON.parse(partialJson);
 
-				return Object.keys(parsedJSON);
+				const schema = Object.keys(parsedJSON);
+
+				return {
+					firstItemDetails: getItemDetails(
+						Object.values(parsedJSON),
+						schema
+					),
+					schema,
+				};
 			}
 			catch (error) {
 				console.error(error);
@@ -149,10 +180,14 @@ function parseInChunk({
 
 		offset += event.target.result.length;
 
-		const schema = chunkParser(event.target.result, options);
+		const parsedData = chunkParser(event.target.result, options);
 
-		if (schema) {
-			return onComplete({extension, schema});
+		if (parsedData) {
+			return onComplete({
+				extension,
+				firstItemDetails: parsedData.firstItemDetails,
+				schema: parsedData.schema,
+			});
 		}
 		else if (offset >= fileSize) {
 			return onError();

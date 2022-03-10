@@ -1,0 +1,100 @@
+@component-name = "portal-frontend-infrastructure"
+definition {
+
+	property osgi.module.configuration.file.names = "com.liferay.document.library.web.internal.configuration.FFManagementToolbarConfiguration.config:com.liferay.frontend.taglib.clay.internal.configuration.FFManagementToolbarConfiguration.config";
+	property osgi.module.configurations = "enableDesignImprovements=&quot;true&quot;:showDesignImprovements=&quot;true&quot;";
+	property portal.acceptance = "true";
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.component.names = "Management Toolbar";
+	property testray.main.component.name = "User Interface";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+	}
+
+	@description = "LPS-147844. Assert the tooltip message is displayed when hovered over the view button"
+	@priority = "3"
+	test ViewButtonCanDisplayTooltip {
+		task ("Add Clay Sample Portlet") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "Clay Sample Test Page");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Guest",
+				layoutName = "Clay Sample Test Page",
+				widgetName = "Clay Sample");
+
+			JSONLayout.updateLayoutTemplateOfPublicLayout(
+				groupName = "Guest",
+				layoutName = "Clay Sample Test Page",
+				layoutTemplate = "1 Column");
+
+			Navigator.gotoPage(pageName = "Clay Sample Test Page");
+		}
+
+		task ("Navigate to Management Toolbars tab") {
+			Navigator.gotoNavTab(navTab = "Management Toolbars");
+		}
+
+		task ("Hover over the view button") {
+			MouseOver(
+				key_text = "caret-double",
+				locator1 = "ManagementBar#VIEW_BUTTON");
+		}
+
+		task ("Assert tooltip message is displayed") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#TOOLTIP",
+				value1 = "Show View Options");
+		}
+	}
+
+	@description = "LPS-147839. Assert the view button displays a double caret icon"
+	@priority = "5"
+	test ViewButtonCanRenderDoubleCaret {
+		task ("Add Clay Sample Portlet") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "Clay Sample Test Page");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Guest",
+				layoutName = "Clay Sample Test Page",
+				widgetName = "Clay Sample");
+
+			JSONLayout.updateLayoutTemplateOfPublicLayout(
+				groupName = "Guest",
+				layoutName = "Clay Sample Test Page",
+				layoutTemplate = "1 Column");
+
+			Navigator.gotoPage(pageName = "Clay Sample Test Page");
+		}
+
+		task ("Navigate to Management Toolbars tab") {
+			Navigator.gotoNavTab(navTab = "Management Toolbars");
+		}
+
+		task ("Assert the view button also has a double caret icon") {
+			AssertElementPresent(
+				key_text = "cards",
+				locator1 = "ManagementBar#VIEW_BUTTON");
+
+			AssertElementPresent(
+				key_text = "caret-double",
+				locator1 = "ManagementBar#VIEW_BUTTON");
+		}
+	}
+
+}

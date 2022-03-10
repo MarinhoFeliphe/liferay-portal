@@ -1,8 +1,10 @@
 Bundle-Name: Liferay Batch Engine Service
 Bundle-SymbolicName: com.liferay.batch.engine.service
-Bundle-Version: 4.0.26
+Bundle-Version: 4.0.28
 Import-Package:\
 	!com.graphbuilder.*,\
+	\
+	!org.apache.tools.ant.*,\
 	\
 	com.github.*;resolution:=optional,\
 	\

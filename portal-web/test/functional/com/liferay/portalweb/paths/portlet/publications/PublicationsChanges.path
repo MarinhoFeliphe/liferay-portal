@@ -16,6 +16,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CHANGE_TITLE</td>
+	<td>//h2[contains(.,'${key_changeTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>COMMENT_ACTIONS</td>
 	<td>//div[contains(@class,'autofit-row') and contains(.,'${key_commentValue}')]/preceding-sibling::div//button[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
@@ -71,13 +76,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DISCARDED_CHANGES_TITLE</td>
-	<td>//h2[contains(.,'Discarded Changes')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>PUBLICATIONS_CHANGE_DROPDOWN</td>
-	<td>//li[contains(.,'${key_changeTitle}') and contains(.,'Edit in')]//button[contains(@class,'dropdown-toggle')]</td>
+	<td>//li[contains(.,'${key_changeTitle}') and contains(.,'${key_changeCategory}')]//button[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>

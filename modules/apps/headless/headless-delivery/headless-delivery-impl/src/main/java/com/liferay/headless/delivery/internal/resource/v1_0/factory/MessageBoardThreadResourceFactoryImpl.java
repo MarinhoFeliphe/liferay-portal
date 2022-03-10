@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -73,9 +76,7 @@ public class MessageBoardThreadResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (MessageBoardThreadResource)ProxyUtil.newProxyInstance(
-					MessageBoardThreadResource.class.getClassLoader(),
-					new Class<?>[] {MessageBoardThreadResource.class},
+				return _messageBoardThreadResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -144,6 +145,34 @@ public class MessageBoardThreadResourceFactoryImpl
 		MessageBoardThreadResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, MessageBoardThreadResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MessageBoardThreadResource.class.getClassLoader(),
+			MessageBoardThreadResource.class);
+
+		try {
+			Constructor<MessageBoardThreadResource> constructor =
+				(Constructor<MessageBoardThreadResource>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -206,6 +235,10 @@ public class MessageBoardThreadResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, MessageBoardThreadResource>
+		_messageBoardThreadResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

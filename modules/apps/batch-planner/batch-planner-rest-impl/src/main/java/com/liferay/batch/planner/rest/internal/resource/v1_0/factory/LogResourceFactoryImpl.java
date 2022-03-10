@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -72,9 +75,7 @@ public class LogResourceFactoryImpl implements LogResource.Factory {
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (LogResource)ProxyUtil.newProxyInstance(
-					LogResource.class.getClassLoader(),
-					new Class<?>[] {LogResource.class},
+				return _logResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -141,6 +142,33 @@ public class LogResourceFactoryImpl implements LogResource.Factory {
 		LogResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, LogResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LogResource.class.getClassLoader(), LogResource.class);
+
+		try {
+			Constructor<LogResource> constructor =
+				(Constructor<LogResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -198,6 +226,9 @@ public class LogResourceFactoryImpl implements LogResource.Factory {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, LogResource>
+		_logResourceProxyProviderFunction = _getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

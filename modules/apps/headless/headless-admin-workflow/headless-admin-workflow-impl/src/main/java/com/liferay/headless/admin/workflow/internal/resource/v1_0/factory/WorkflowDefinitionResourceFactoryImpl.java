@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -73,9 +76,7 @@ public class WorkflowDefinitionResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (WorkflowDefinitionResource)ProxyUtil.newProxyInstance(
-					WorkflowDefinitionResource.class.getClassLoader(),
-					new Class<?>[] {WorkflowDefinitionResource.class},
+				return _workflowDefinitionResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -144,6 +145,34 @@ public class WorkflowDefinitionResourceFactoryImpl
 		WorkflowDefinitionResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, WorkflowDefinitionResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			WorkflowDefinitionResource.class.getClassLoader(),
+			WorkflowDefinitionResource.class);
+
+		try {
+			Constructor<WorkflowDefinitionResource> constructor =
+				(Constructor<WorkflowDefinitionResource>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -206,6 +235,10 @@ public class WorkflowDefinitionResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, WorkflowDefinitionResource>
+		_workflowDefinitionResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

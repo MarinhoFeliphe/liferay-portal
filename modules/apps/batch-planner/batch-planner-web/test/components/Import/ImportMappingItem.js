@@ -22,11 +22,11 @@ const BASE_PROPS = {
 	dbField: {
 		label: 'nameLabel',
 		name: 'name',
-		required: true,
 	},
 	fileFields: ['first name', 'last name', 'address'],
 	formEvaluated: false,
 	portletNamespace: 'test',
+	required: true,
 	selectedFileField: 'first name',
 	updateFieldMapping: () => {},
 };
@@ -78,9 +78,9 @@ describe('ImportMappingItem', () => {
 				dbField={{
 					label: 'nameLabel',
 					name: 'name',
-					required: false,
 				}}
 				formEvaluated={true}
+				required={false}
 				selectedFileField=""
 			/>
 		);

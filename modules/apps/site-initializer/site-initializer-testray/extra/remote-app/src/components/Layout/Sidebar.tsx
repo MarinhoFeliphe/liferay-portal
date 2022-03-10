@@ -12,32 +12,28 @@
  * details.
  */
 
-import {Align} from '@clayui/drop-down';
-import ClayIcon from '@clayui/icon';
 import {useLocation} from 'react-router-dom';
 
+import i18n from '../../i18n';
 import TestrayLogo from '../../images/testray-logo';
-import {Liferay} from '../../services/liferay/liferay';
-import {MANAGE_DROPDOWN, USER_DROPDOWN} from '../../util/constants';
-import {Avatar} from '../Avatar';
-import DropDown from '../DropDown';
+import SidebarFooter from './SidebarFooter';
 import SidebarItem from './SidebarItem';
 
 const sidebarItems = [
 	{
 		icon: 'polls',
-		label: 'Results',
+		label: i18n.translate('results'),
 		path: '/',
 	},
 	{
 		icon: 'merge',
-		label: 'TestFlow',
+		label: i18n.translate('testflow'),
 		path: '/testflow',
 	},
 	{
 		className: 'mt-3',
 		icon: 'drop',
-		label: 'Compare Runs',
+		label: i18n.translate('compare-runs'),
 		path: '/compare-runs',
 	},
 ];
@@ -79,37 +75,7 @@ const Sidebar = () => {
 				})}
 			</div>
 
-			<div className="testray-sidebar-footer">
-				<div className="divider divider-full" />
-
-				<DropDown
-					items={MANAGE_DROPDOWN}
-					position={Align.RightBottom}
-					trigger={
-						<div className="align-items-center d-flex testray-sidebar-item">
-							<ClayIcon fontSize={16} symbol="cog" />
-
-							<span className="ml-1 testray-sidebar-text">
-								Manage
-							</span>
-						</div>
-					}
-				/>
-
-				<DropDown
-					items={USER_DROPDOWN}
-					position={Align.RightBottom}
-					trigger={
-						<div className="testray-sidebar-item">
-							<Avatar
-								displayName
-								name={Liferay.ThemeDisplay.getUserName()}
-								url="https://clayui.com/images/long_user_image.png"
-							/>
-						</div>
-					}
-				/>
-			</div>
+			<SidebarFooter />
 		</div>
 	);
 };

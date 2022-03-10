@@ -117,3 +117,8 @@ a24a6bed4b5efb4f994d8a8d7ae7c3a1de426aaf^..025ad7d3220a4d03f9f952f56843e965a9640
 # Bundle Version 4.0.22
 #
 f07d7175a65bcbf15b93ed4094e49c1adb7c813e^..b27daf2df9cc4f21ca8a23e4db6be20cc7931a62=COMMERCE-8024
+
+#
+# Bundle Version 4.0.23
+#
+b27daf2df9cc4f21ca8a23e4db6be20cc7931a62^..37ff7ce5a9b731aa94fd19e4962e3bfbe1a30d4f=COMMERCE-8388 COMMERCE-8570

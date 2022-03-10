@@ -1,8 +1,6 @@
 @component-name = "portal-lima"
 definition {
 
-	property osgi.module.configuration.file.names = "com.liferay.translation.web.internal.configuration.FFLayoutExperienceSelectorConfiguration.config";
-	property osgi.module.configurations = "enabled=B&quot;true&quot;";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Translations Management";
@@ -37,6 +35,7 @@ definition {
 	@priority = "5"
 	test CannotTranslateToChineseWithoutPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
+		property portal.acceptance = "true";
 
 		ContentPagesNavigator.openEditContentPage(
 			pageName = "Test Content Page Name",

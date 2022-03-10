@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -73,9 +76,7 @@ public class ObjectRelationshipResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (ObjectRelationshipResource)ProxyUtil.newProxyInstance(
-					ObjectRelationshipResource.class.getClassLoader(),
-					new Class<?>[] {ObjectRelationshipResource.class},
+				return _objectRelationshipResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -144,6 +145,34 @@ public class ObjectRelationshipResourceFactoryImpl
 		ObjectRelationshipResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, ObjectRelationshipResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ObjectRelationshipResource.class.getClassLoader(),
+			ObjectRelationshipResource.class);
+
+		try {
+			Constructor<ObjectRelationshipResource> constructor =
+				(Constructor<ObjectRelationshipResource>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -206,6 +235,10 @@ public class ObjectRelationshipResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, ObjectRelationshipResource>
+		_objectRelationshipResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

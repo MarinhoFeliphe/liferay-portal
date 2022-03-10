@@ -13,7 +13,7 @@
  */
 
 import ClayForm, {ClaySelect} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
+import ClayTable from '@clayui/table';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -23,89 +23,97 @@ const ImportMappingItem = ({
 	fileFields,
 	formEvaluated,
 	portletNamespace,
+	previewValue,
+	required,
 	selectedFileField,
 	updateFieldMapping,
 }) => {
 	const inputId = `input-field-${dbField.name}`;
-	const hasError = formEvaluated && dbField.required && !selectedFileField;
+	const hasError = formEvaluated && required && !selectedFileField;
 
 	const hasSuccess = formEvaluated && !hasError;
 
 	return (
-		<ClayForm.Group
-			className={classNames({
-				'has-error': hasError,
-				'has-success': hasSuccess,
-			})}
-		>
-			<label htmlFor={inputId}>
-				{dbField.label}
+		<ClayTable.Row>
+			<ClayTable.Cell>
+				<label htmlFor={inputId}>{dbField.label}</label>
 
-				{dbField.required && (
-					<>
-						<span className="inline-item-after reference-mark text-warning">
-							<ClayIcon symbol="asterisk" />
-						</span>
-
-						<span className="hide-accessible">
-							{Liferay.Language.get('required')}
-						</span>
-					</>
+				{dbField.description && (
+					<p className="mb-0">{dbField.description}</p>
 				)}
-			</label>
+			</ClayTable.Cell>
 
-			{selectedFileField && (
-				<input
-					hidden
-					name={`${portletNamespace}internalFieldName_${dbField.name}`}
-					readOnly
-					value={dbField.name}
-				/>
-			)}
-
-			<ClaySelect
-				aria-required={dbField.required}
-				id={inputId}
-				name={
-					selectedFileField &&
-					`${portletNamespace}externalFieldName_${dbField.name}`
-				}
-				onChange={(event) => updateFieldMapping(event.target.value)}
-				value={selectedFileField}
-			>
-				<ClaySelect.Option label="" value="" />
-
-				{fileFields.map((fileField) => {
-					const columnHasNoName = typeof fileField === 'number';
-
-					const label = columnHasNoName
-						? `${Liferay.Language.get('column')} ${fileField + 1}`
-						: fileField;
-
-					return (
-						<ClaySelect.Option
-							key={fileField}
-							label={label}
-							value={String(fileField)}
+			<ClayTable.Cell>
+				<ClayForm.Group
+					className={classNames({
+						'has-error': hasError,
+						'has-success': hasSuccess,
+						'mb-0': true,
+					})}
+				>
+					{selectedFileField && (
+						<input
+							hidden
+							name={`${portletNamespace}internalFieldName_${dbField.name}`}
+							readOnly
+							value={dbField.name}
 						/>
-					);
-				})}
-			</ClaySelect>
-		</ClayForm.Group>
+					)}
+
+					<ClaySelect
+						aria-required={required}
+						id={inputId}
+						name={
+							selectedFileField &&
+							`${portletNamespace}externalFieldName_${dbField.name}`
+						}
+						onChange={(event) =>
+							updateFieldMapping(event.target.value)
+						}
+						value={selectedFileField}
+					>
+						<ClaySelect.Option label="" value="" />
+
+						{fileFields.map((fileField) => {
+							const columnHasNoName =
+								typeof fileField === 'number';
+
+							const label = columnHasNoName
+								? `${Liferay.Language.get('column')} ${
+										fileField + 1
+								  }`
+								: fileField;
+
+							return (
+								<ClaySelect.Option
+									key={fileField}
+									label={label}
+									value={String(fileField)}
+								/>
+							);
+						})}
+					</ClaySelect>
+				</ClayForm.Group>
+			</ClayTable.Cell>
+
+			<ClayTable.Cell>{previewValue}</ClayTable.Cell>
+		</ClayTable.Row>
 	);
 };
 
 ImportMappingItem.propTypes = {
 	dbField: PropTypes.shape({
+		description: PropTypes.string,
 		label: PropTypes.string.isRequired,
 		name: PropTypes.string.isRequired,
-		required: PropTypes.bool,
 	}).isRequired,
 	fileFields: PropTypes.arrayOf(
 		PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 	).isRequired,
 	formEvaluated: PropTypes.bool.isRequired,
 	portletNamespace: PropTypes.string.isRequired,
+	previewValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+	required: PropTypes.bool.isRequired,
 	selectedFileField: PropTypes.string.isRequired,
 	updateFieldMapping: PropTypes.func.isRequired,
 };

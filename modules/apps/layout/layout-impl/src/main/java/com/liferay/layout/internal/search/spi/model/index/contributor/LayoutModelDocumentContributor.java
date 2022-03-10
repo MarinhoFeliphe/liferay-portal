@@ -90,6 +90,15 @@ public class LayoutModelDocumentContributor
 			return;
 		}
 
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		if ((draftLayout == null) ||
+			!GetterUtil.getBoolean(
+				draftLayout.getTypeSettingsProperty("published"))) {
+
+			return;
+		}
+
 		Set<Locale> locales = LanguageUtil.getAvailableLocales(
 			layout.getGroupId());
 

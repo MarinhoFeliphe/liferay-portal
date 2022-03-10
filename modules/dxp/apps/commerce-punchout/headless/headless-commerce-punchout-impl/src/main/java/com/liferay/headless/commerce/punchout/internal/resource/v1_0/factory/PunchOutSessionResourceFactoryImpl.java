@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -76,9 +79,7 @@ public class PunchOutSessionResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (PunchOutSessionResource)ProxyUtil.newProxyInstance(
-					PunchOutSessionResource.class.getClassLoader(),
-					new Class<?>[] {PunchOutSessionResource.class},
+				return _punchOutSessionResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -147,6 +148,34 @@ public class PunchOutSessionResourceFactoryImpl
 		PunchOutSessionResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, PunchOutSessionResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PunchOutSessionResource.class.getClassLoader(),
+			PunchOutSessionResource.class);
+
+		try {
+			Constructor<PunchOutSessionResource> constructor =
+				(Constructor<PunchOutSessionResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -208,6 +237,10 @@ public class PunchOutSessionResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, PunchOutSessionResource>
+		_punchOutSessionResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

@@ -15,6 +15,7 @@
 import {Outlet, useLocation} from 'react-router-dom';
 
 import useHeader from '../../hooks/useHeader';
+import i18n from '../../i18n';
 
 const TestflowOutlet = () => {
 	const {pathname} = useLocation();
@@ -24,17 +25,23 @@ const TestflowOutlet = () => {
 
 	const {setHeading, setTabs} = useHeader({
 		shouldUpdate: currentPathIsActive || archivedPathIsActive,
-		useHeading: [{category: 'TASK', title: 'Testflow'}],
+		useDropdown: [],
+		useHeading: [
+			{
+				category: i18n.translate('task').toUpperCase(),
+				title: i18n.translate('testflow'),
+			},
+		],
 		useTabs: [
 			{
 				active: currentPathIsActive,
 				path: '/testflow',
-				title: 'Current',
+				title: i18n.translate('current'),
 			},
 			{
 				active: archivedPathIsActive,
 				path: '/testflow/archived',
-				title: 'Archived',
+				title: i18n.translate('archived'),
 			},
 		],
 	});

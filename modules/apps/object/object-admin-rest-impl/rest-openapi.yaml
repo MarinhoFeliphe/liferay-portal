@@ -335,6 +335,10 @@ components:
                     items:
                         $ref: "#/components/schemas/ObjectViewColumn"
                     type: array
+                objectViewSortColumns:
+                    items:
+                        $ref: "#/components/schemas/ObjectViewSortColumn"
+                    type: array
         ObjectViewColumn:
             properties:
                 id:
@@ -346,6 +350,20 @@ components:
                 priority:
                     format: int32
                     type: integer
+        ObjectViewSortColumn:
+            properties:
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                objectFieldName:
+                    type: string
+                priority:
+                    format: int32
+                    type: integer
+                sortOrder:
+                    enum: [asc, desc]
+                    type: string
         Status:
             properties:
                 code:
@@ -360,7 +378,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.object.admin.rest.client', and version '1.0.14'."
+        'com.liferay.object.admin.rest.client', and version '1.0.15'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

@@ -13,7 +13,10 @@
  */
 
 const getFieldsFromSchema = (schema) => {
-	const dbFields = [];
+	const dbFields = {
+		optional: [],
+		required: [],
+	};
 
 	for (const [label, property] of Object.entries(schema)) {
 		if (property.writeOnly || property.readOnly || label.startsWith('x-')) {
@@ -26,9 +29,13 @@ const getFieldsFromSchema = (schema) => {
 			name = property.extensions['x-parent-map'] + '_' + label;
 		}
 
-		const field = {label, name, required: property.required};
+		const field = {
+			description: property.description,
+			label,
+			name,
+		};
 
-		dbFields.push(field);
+		dbFields[property.required ? 'required' : 'optional'].push(field);
 	}
 
 	return dbFields;

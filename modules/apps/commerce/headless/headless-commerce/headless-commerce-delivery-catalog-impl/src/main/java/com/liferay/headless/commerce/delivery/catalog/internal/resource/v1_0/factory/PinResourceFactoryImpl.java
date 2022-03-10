@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -74,9 +77,7 @@ public class PinResourceFactoryImpl implements PinResource.Factory {
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (PinResource)ProxyUtil.newProxyInstance(
-					PinResource.class.getClassLoader(),
-					new Class<?>[] {PinResource.class},
+				return _pinResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -143,6 +144,33 @@ public class PinResourceFactoryImpl implements PinResource.Factory {
 		PinResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, PinResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PinResource.class.getClassLoader(), PinResource.class);
+
+		try {
+			Constructor<PinResource> constructor =
+				(Constructor<PinResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -200,6 +228,9 @@ public class PinResourceFactoryImpl implements PinResource.Factory {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, PinResource>
+		_pinResourceProxyProviderFunction = _getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

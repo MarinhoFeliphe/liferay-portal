@@ -260,6 +260,41 @@ public class SiteNavigationMenuDisplayContext {
 		return _getDefaultSelectSiteNavigationMenuType();
 	}
 
+	public String getSelectSiteNavigationMenuTypeLabel() {
+		String typeKey = "select";
+
+		int type = getSelectSiteNavigationMenuType();
+
+		if (type == SiteNavigationConstants.TYPE_PRIMARY) {
+			typeKey = "primary-navigation";
+		}
+		else if (type == SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY) {
+			typeKey = "private-pages-hierarchy";
+		}
+		else if (type == SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			Group group = themeDisplay.getScopeGroup();
+
+			if (group.isPrivateLayoutsEnabled()) {
+				typeKey = "public-pages-hierarchy";
+			}
+			else {
+				typeKey = "pages-hierarchy";
+			}
+		}
+		else if (type == SiteNavigationConstants.TYPE_SECONDARY) {
+			typeKey = "secondary-navigation";
+		}
+		else if (type == SiteNavigationConstants.TYPE_SOCIAL) {
+			typeKey = "social-navigation";
+		}
+
+		return LanguageUtil.get(_httpServletRequest, typeKey);
+	}
+
 	public SiteNavigationMenu getSiteNavigationMenu() {
 		if (_siteNavigationMenu != null) {
 			return _siteNavigationMenu;
@@ -393,41 +428,6 @@ public class SiteNavigationMenuDisplayContext {
 		return _navigationMenuType;
 	}
 
-	public String getSiteNavigationMenuTypeLabel() {
-		int type = getSiteNavigationMenuType();
-
-		String typeKey = "select";
-
-		if (type == SiteNavigationConstants.TYPE_PRIMARY) {
-			typeKey = "primary-navigation";
-		}
-		else if (type == SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY) {
-			typeKey = "private-pages-hierarchy";
-		}
-		else if (type == SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)_httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			Group group = themeDisplay.getScopeGroup();
-
-			if (group.isPrivateLayoutsEnabled()) {
-				typeKey = "public-pages-hierarchy";
-			}
-			else {
-				typeKey = "pages-hierarchy";
-			}
-		}
-		else if (type == SiteNavigationConstants.TYPE_SECONDARY) {
-			typeKey = "secondary-navigation";
-		}
-		else if (type == SiteNavigationConstants.TYPE_SOCIAL) {
-			typeKey = "social-navigation";
-		}
-
-		return LanguageUtil.get(_httpServletRequest, typeKey);
-	}
-
 	public boolean isPreview() {
 		if (_preview != null) {
 			return _preview;
@@ -467,12 +467,19 @@ public class SiteNavigationMenuDisplayContext {
 				WebKeys.THEME_DISPLAY);
 
 		Layout layout = themeDisplay.getLayout();
+		Group scopeGroup = themeDisplay.getScopeGroup();
 
-		if (layout.isPrivateLayout()) {
+		if (layout.isPrivateLayout() && scopeGroup.hasPrivateLayouts() &&
+			scopeGroup.isPrivateLayoutsEnabled()) {
+
 			return SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY;
 		}
 
-		return SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY;
+		if (layout.isPublicLayout() && scopeGroup.hasPublicLayouts()) {
+			return SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY;
+		}
+
+		return SiteNavigationConstants.TYPE_PRIMARY;
 	}
 
 	private String _getSiteNavigationMenuName() {

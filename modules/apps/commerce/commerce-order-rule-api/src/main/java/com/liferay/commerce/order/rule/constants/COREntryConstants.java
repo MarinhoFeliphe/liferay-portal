@@ -28,6 +28,17 @@ public class COREntryConstants {
 	public static final String TYPE_MINIMUM_ORDER_AMOUNT_FIELD_AMOUNT =
 		"minimum-order-amount-field-amount";
 
+	public static final String TYPE_MINIMUM_ORDER_AMOUNT_FIELD_APPLY_TO =
+		"minimum-order-amount-field-apply-to";
+
+	public static final String
+		TYPE_MINIMUM_ORDER_AMOUNT_FIELD_APPLY_TO_ORDER_SUBTOTAL =
+			"minimum-order-amount-field-apply-to-order-subtotal";
+
+	public static final String
+		TYPE_MINIMUM_ORDER_AMOUNT_FIELD_APPLY_TO_ORDER_TOTAL =
+			"minimum-order-amount-field-apply-to-order-total";
+
 	public static final String TYPE_MINIMUM_ORDER_AMOUNT_FIELD_CURRENCY_CODE =
 		"minimum-order-amount-field-currency-code";
 

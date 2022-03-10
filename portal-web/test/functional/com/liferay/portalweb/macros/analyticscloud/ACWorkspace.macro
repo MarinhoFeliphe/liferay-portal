@@ -51,6 +51,28 @@ definition {
 		}
 	}
 
+	macro createWorkspace {
+		ACUtils.clickAnyButton(button = "Start Free Trial");
+
+		Type(
+			locator1 = "ACUtils#NAME_FIELD",
+			value1 = "${workspaceName}");
+
+		for (var email : list "${emailList}") {
+			Type(
+				locator1 = "ACWorkspace#INVITE_USERS_INPUT",
+				value1 = "${email}");
+
+			KeyPress(
+				locator1 = "ACWorkspace#INVITE_USERS_INPUT",
+				value1 = "\ENTER");
+		}
+
+		Click.clickAtNotVisible(locator1 = "ACDXPSettings#AC_GENERIC_CHECKBOX");
+
+		Button.clickSubmitButton();
+	}
+
 	macro openWorkspace {
 		if (isSet(workspaceName)) {
 			var key_workspaceName = "${workspaceName}";

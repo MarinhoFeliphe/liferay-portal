@@ -94,6 +94,12 @@ const contents = {
 		showDeleteButton: false,
 		title: Liferay.Language.get('scripted-assignment'),
 	},
+	'scripted-reassignment': {
+		backButton: (setContentName) => () => setContentName('timers'),
+		sections: ['timersSourceCode'],
+		showDeleteButton: false,
+		title: Liferay.Language.get('scripted-reassignment'),
+	},
 	'start': {
 		sections: ['nodeInformation', 'notificationsSummary', 'actionsSummary'],
 		showDeleteButton: true,

@@ -1554,6 +1554,7 @@ public class VerifyProperties extends VerifyProcess {
 	private static final String[] _OBSOLETE_PORTAL_KEYS = {
 		"aim.login", "aim.login", "amazon.access.key.id",
 		"amazon.associate.tag", "amazon.secret.access.key",
+		"asset.categories.properties.default",
 		"asset.entry.increment.view.counter.enabled", "asset.entry.validator",
 		"asset.publisher.asset.entry.query.processors",
 		"asset.publisher.filter.unlistable.entries",
@@ -1577,9 +1578,11 @@ public class VerifyProperties extends VerifyProcess {
 		"axis.servlet.enabled", "axis.servlet.hosts.allowed",
 		"axis.servlet.https.required", "axis.servlet.mapping",
 		"blogs.image.small.max.size", "breadcrumb.display.style.options",
+		"browser.compatibility.ie.versions",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size",
-		"cache.clear.on.context.initialization", "captcha.max.challenges",
+		"cache.clear.on.context.initialization",
+		"calendar.publish.to.live.by.default", "captcha.max.challenges",
 		"captcha.check.portal.create_account",
 		"captcha.check.portal.send_password",
 		"captcha.check.portlet.message_boards.edit_category",
@@ -1597,6 +1600,7 @@ public class VerifyProperties extends VerifyProcess {
 		"captcha.engine.simplecaptcha.text.producers",
 		"captcha.engine.simplecaptcha.word.renderers", "cas.validate.url",
 		"cluster.executor.heartbeat.interval",
+		"cluster.link.node.bootup.response.timeout",
 		"com.liferay.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.audit.AuditFilter",
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
@@ -1742,7 +1746,7 @@ public class VerifyProperties extends VerifyProcess {
 		"jpa.provider", "jpa.provider.property.eclipselink.allow-zero-id",
 		"jpa.provider.property.eclipselink.logging.level",
 		"jpa.provider.property.eclipselink.logging.timestamp",
-		"language.display.style.options",
+		"language.display.style.options", "layout.comments.enabled",
 		"layout.configuration.action.update[embedded]",
 		"layout.configuration.action.update[link_to_layout]",
 		"layout.configuration.action.update[url]",
@@ -1808,7 +1812,7 @@ public class VerifyProperties extends VerifyProcess {
 		"module.framework.properties.lpkg.index.validator.enabled",
 		"module.framework.register.liferay.services", "msn.login",
 		"msn.password", "multicast.group.address[\"hibernate\"]",
-		"multicast.group.port[\"hibernate\"]",
+		"multicast.group.port[\"hibernate\"]", "my.sites.display.style",
 		"multi.value.map.com.liferay.portal.convert." +
 			"ConvertPermissionAlgorithm.convertResourcePermission",
 		"multi.value.map.com.liferay.portal.convert." +
@@ -1854,12 +1858,15 @@ public class VerifyProperties extends VerifyProcess {
 		"plugin.types", "pop.server.notifications.interval",
 		"ratings.max.score", "ratings.min.score",
 		"redirect.url.domains.allowed", "redirect.url.ips.allowed",
-		"redirect.url.security.mode", "sandbox.deploy.dir",
+		"redirect.url.security.mode", "rss.publish.to.live.by.default",
+		"rtl.css.excluded.paths.regexp", "sandbox.deploy.dir",
 		"sandbox.deploy.enabled", "sandbox.deploy.interval",
 		"sandbox.deploy.listeners", "sc.image.max.size",
 		"sc.image.thumbnail.max.height", "sc.image.thumbnail.max.width",
 		"sc.product.comments.enabled", "scheduler.classes",
-		"schema.run.minimal", "search.container.page.iterator.page.values",
+		"schema.run.minimal", "scripting.jruby.compile.mode",
+		"scripting.jruby.compile.threshold",
+		"search.container.page.iterator.page.values",
 		"service.builder.service.read.only.prefixes", "session.disabled",
 		"setup.database.types", "shard.available.names", "shard.default.name",
 		"shard.selector", "siteminder.auth.enabled",
@@ -1889,7 +1896,7 @@ public class VerifyProperties extends VerifyProcess {
 		"users.form.update.identification", "users.form.update.main",
 		"users.form.update.miscellaneous", "users.image.check.token",
 		"users.image.default.use.initials", "users.image.max.height",
-		"users.image.max.size", "users.image.max.width",
+		"users.image.max.size", "users.image.max.width", "users.list.views",
 		"vaadin.resources.path", "vaadin.theme", "vaadin.widgetset",
 		"value.object.entity.blocking.cache",
 		"value.object.finder.blocking.cache", "verify.database.transactions",
@@ -1908,7 +1915,7 @@ public class VerifyProperties extends VerifyProcess {
 		"xuggler.f.ffpreset.qmin", "xuggler.f.ffpreset.qmax",
 		"xuggler.f.ffpreset.sc_threshold", "xuggler.f.ffpreset.subq",
 		"xuggler.f.ffpreset.trellis", "xuggler.f.ffpreset.wpredp", "ym.login",
-		"ym.password"
+		"ym.password", "zip.file.name.encoding"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = {

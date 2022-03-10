@@ -18,13 +18,8 @@ import parseFile, {
 	extractFieldsFromJSONL,
 } from '../../src/main/resources/META-INF/resources/js/FileParsers';
 
-const csvFileContents = `currencyCode,type,name
-    USD,site,My Channel 0
-    USD,site,My Channel 1
-    USD,site,My Channel 2
-    USD,site,My Channel 3
-    USD,site,My Channel 4
-`;
+const csvFileContents =
+	'currencyCode,type,name\nUSD,site,My Channel 0\nUSD,site,My Channel 1\nUSD,site,My Channel 2\nUSD,site,My Channel 3\nUSD,site,My Channel 4';
 const fileSchema = ['currencyCode', 'type', 'name'];
 const jsonlFileContent = `{"currencyCode": "ciao", "type": 1, "name": "test"}`;
 const jsonFileContent = `[{"currencyCode": "ciao", "type": 1, "name": "test"}, {"currencyCode": "ciao", "type": 1, "name": "test"}, {"currencyCode": "ciao", "type": 1, "name": "test"}]`;
@@ -88,12 +83,12 @@ describe('parseFile', () => {
 		const file = new Blob([csvFileContents], {
 			type: 'text/csv',
 		});
+
 		file.name = 'test.csv';
 
 		const onProgressEvent = {
 			target: {
-				result: `currencyCode,type,name
-				USD,site,My Channel 0`,
+				result: 'currencyCode,type,name\nUSD,site,My Channel 0\n',
 			},
 		};
 
@@ -116,8 +111,14 @@ describe('parseFile', () => {
 
 		expect(onComplete).toBeCalledWith({
 			extension: 'csv',
+			firstItemDetails: {
+				currencyCode: 'USD',
+				name: 'My Channel 0',
+				type: 'site',
+			},
 			schema: fileSchema,
 		});
+
 		expect(onError).not.toBeCalled();
 	});
 });
@@ -128,23 +129,48 @@ describe('extractFieldsFromCSV', () => {
 			extractFieldsFromCSV(csvFileContents, {
 				csvContainsHeaders: true,
 				csvSeparator: ',',
-			})
+			}).schema
 		).toStrictEqual(fileSchema);
+	});
+
+	it('must correctly extract the first item details', () => {
+		expect(
+			extractFieldsFromCSV(csvFileContents, {
+				csvContainsHeaders: true,
+				csvSeparator: ',',
+			}).firstItemDetails
+		).toStrictEqual({
+			currencyCode: 'USD',
+			name: 'My Channel 0',
+			type: 'site',
+		});
 	});
 });
 
 describe('extractFieldsFromJSONL', () => {
 	it('must correctly find file schema', () => {
-		expect(extractFieldsFromJSONL(jsonlFileContent)).toStrictEqual(
+		expect(extractFieldsFromJSONL(jsonlFileContent).schema).toStrictEqual(
 			fileSchema
 		);
+	});
+
+	it('must correctly extract the first item details', () => {
+		expect(
+			extractFieldsFromJSONL(jsonlFileContent).firstItemDetails
+		).toStrictEqual({currencyCode: 'ciao', name: 'test', type: 1});
 	});
 });
 
 describe('extractFieldsFromJSON', () => {
 	it('must correctly find file schema', () => {
-		expect(extractFieldsFromJSON(jsonFileContent)).toStrictEqual(
+		expect(extractFieldsFromJSON(jsonFileContent).schema).toStrictEqual(
 			fileSchema
 		);
+	});
+
+	it('must correctly extract the first item details', () => {
+		expect(
+			extractFieldsFromJSON(jsonFileContent).firstItemDetails
+		).toStrictEqual(JSON.parse(jsonFileContent)[0]);
 	});
 });

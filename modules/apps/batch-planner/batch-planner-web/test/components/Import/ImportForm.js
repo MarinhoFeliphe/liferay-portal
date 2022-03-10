@@ -51,7 +51,12 @@ const SCHEMA = {
 	},
 };
 
-const fileSchema = ['currencyCode', 'type', 'name'];
+const FILE_SCHEMA = ['currencyCode', 'type', 'name'];
+const firstItemDetails = {
+	currencyCode: 'USD',
+	name: 'car',
+	type: 'default',
+};
 
 describe('ImportForm', () => {
 	afterEach(cleanup);
@@ -67,12 +72,14 @@ describe('ImportForm', () => {
 			Liferay.fire(SCHEMA_SELECTED_EVENT, {
 				schema: SCHEMA,
 			});
+
 			Liferay.fire(FILE_SCHEMA_EVENT, {
-				schema: fileSchema,
+				firstItemDetails,
+				schema: FILE_SCHEMA,
 			});
 		});
 
-		fileSchema.forEach((field) => getByLabelText(field));
+		FILE_SCHEMA.forEach((field) => getByLabelText(field));
 	});
 
 	it('must automatically map matching field names', () => {
@@ -84,7 +91,8 @@ describe('ImportForm', () => {
 			});
 
 			Liferay.fire(FILE_SCHEMA_EVENT, {
-				schema: fileSchema,
+				firstItemDetails,
+				schema: FILE_SCHEMA,
 			});
 		});
 
@@ -94,10 +102,10 @@ describe('ImportForm', () => {
 			}
 
 			if (dbFieldSelect.value) {
-				expect(fileSchema).toContain(dbFieldSelect.value);
+				expect(FILE_SCHEMA).toContain(dbFieldSelect.value);
 			}
 			else {
-				expect(fileSchema).not.toContain(dbFieldSelect.value);
+				expect(FILE_SCHEMA).not.toContain(dbFieldSelect.value);
 			}
 		});
 	});

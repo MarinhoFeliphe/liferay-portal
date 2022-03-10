@@ -15,9 +15,10 @@
 import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import {getTestrayCases} from '../../../graphql/queries/testrayCase';
+import i18n from '../../../i18n';
 
 const Cases = () => (
-	<Container title="Cases">
+	<Container title={i18n.translate('cases')}>
 		<ListView
 			query={getTestrayCases}
 			tableProps={{
@@ -25,29 +26,34 @@ const Cases = () => (
 					{
 						clickable: true,
 						key: 'name',
-						value: 'Case Name',
+						value: i18n.translate('case-name'),
 					},
-					{key: 'priority', value: 'Priority'},
-					{key: 'type', value: 'Case Type'},
-					{key: 'team', value: 'Team'},
-					{key: 'component', value: 'Component'},
-					{key: 'issues', value: 'Issues'},
+					{key: 'priority', value: i18n.translate('priority')},
+					{
+						key: 'testrayCaseType',
+						render: (testrayCaseType) => testrayCaseType?.name,
+						value: i18n.translate('case-type'),
+					},
+					{key: 'team', value: i18n.translate('team')},
+					{
+						key: 'testrayComponent',
+						render: (testrayComponent) => testrayComponent?.name,
+						value: i18n.translate('component'),
+					},
+					{key: 'issues', value: i18n.translate('issues')},
 
 					{
-						key: 'createdDate',
-						render: () => 'dez 13, 2021 12:00 PM',
-						value: 'Create Date',
+						key: 'dateCreated',
+						value: i18n.translate('create-date'),
 					},
 					{
-						key: 'modifiedDate',
-						render: () => 'dez 13, 2021 12:00 PM',
-						value: 'Modified Date',
+						key: 'dateModified',
+						value: i18n.translate('modified-date'),
 					},
 				],
 				navigateTo: ({testrayCaseId}) => testrayCaseId?.toString(),
 			}}
-			transformData={(data) => data?.c?.testrayCases}
-			variables={{}}
+			transformData={(data) => data?.testrayCases}
 		/>
 	</Container>
 );

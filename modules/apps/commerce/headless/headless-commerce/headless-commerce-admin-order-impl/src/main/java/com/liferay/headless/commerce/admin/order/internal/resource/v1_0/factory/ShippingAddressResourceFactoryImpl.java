@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -76,9 +79,7 @@ public class ShippingAddressResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (ShippingAddressResource)ProxyUtil.newProxyInstance(
-					ShippingAddressResource.class.getClassLoader(),
-					new Class<?>[] {ShippingAddressResource.class},
+				return _shippingAddressResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -147,6 +148,34 @@ public class ShippingAddressResourceFactoryImpl
 		ShippingAddressResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, ShippingAddressResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ShippingAddressResource.class.getClassLoader(),
+			ShippingAddressResource.class);
+
+		try {
+			Constructor<ShippingAddressResource> constructor =
+				(Constructor<ShippingAddressResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -208,6 +237,10 @@ public class ShippingAddressResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, ShippingAddressResource>
+		_shippingAddressResourceProxyProviderFunction =
+			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

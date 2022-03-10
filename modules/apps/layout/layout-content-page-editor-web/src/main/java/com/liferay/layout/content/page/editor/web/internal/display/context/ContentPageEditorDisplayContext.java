@@ -344,6 +344,10 @@ public class ContentPageEditorDisplayContext {
 				getFragmentEntryActionURL(
 					"/layout_content_page_editor/edit_fragment_entry_link")
 			).put(
+				"fragmentAdvancedOptionsEnabled",
+				_ffLayoutContentPageEditorConfiguration.
+					fragmentAdvancedOptionsEnabled()
+			).put(
 				"frontendTokens",
 				() -> {
 					LayoutSet layoutSet =
@@ -588,9 +592,6 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"themeColorsCssClasses", _getThemeColorsCssClasses()
 			).put(
-				"tokenReuseEnabled",
-				_ffLayoutContentPageEditorConfiguration.tokenReuseEnabled()
-			).put(
 				"unmarkItemForDeletionURL",
 				getFragmentEntryActionURL(
 					"/layout_content_page_editor/unmark_item_for_deletion")
@@ -681,6 +682,14 @@ public class ContentPageEditorDisplayContext {
 
 	public List<Map<String, Object>> getSidebarPanels() {
 		return getSidebarPanels(_getLayoutType());
+	}
+
+	public boolean isContentLayout() {
+		if (_getLayoutType() == -1) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isConversionDraft() {

@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class CSVBatchEngineImportTaskItemReaderImpl
 	implements BatchEngineImportTaskItemReader {
@@ -42,16 +43,18 @@ public class CSVBatchEngineImportTaskItemReaderImpl
 		_delimiter = (String)parameters.getOrDefault("delimiter", delimiter);
 		_inputStream = inputStream;
 
-		_enclosingCharacter = (String)parameters.getOrDefault(
-			"enclosingCharacter", null);
+		_enclosingCharacter = _getEnclosingCharacter(parameters);
 
 		_delimiterRegex = _getDelimiterRegex(_enclosingCharacter);
 
 		_unsyncBufferedReader = new UnsyncBufferedReader(
 			new InputStreamReader(_inputStream));
 
-		_fieldNames = StringUtil.split(
-			_unsyncBufferedReader.readLine(), _delimiter);
+		_fieldNames = _getFieldNames(
+			Boolean.valueOf(
+				(String)parameters.getOrDefault(
+					"containsHeaders", StringPool.TRUE)),
+			_delimiter, _unsyncBufferedReader);
 	}
 
 	@Override
@@ -114,6 +117,37 @@ public class CSVBatchEngineImportTaskItemReaderImpl
 
 		return StringBundler.concat(
 			enclosingCharacter, escapedDelimiter, enclosingCharacter);
+	}
+
+	private String _getEnclosingCharacter(
+		Map<String, Serializable> parameters) {
+
+		String enclosingCharacter = (String)parameters.getOrDefault(
+			"enclosingCharacter", null);
+
+		if (Validator.isNull(enclosingCharacter)) {
+			return null;
+		}
+
+		return enclosingCharacter;
+	}
+
+	private String[] _getFieldNames(
+			boolean containsHeaders, String delimiter,
+			UnsyncBufferedReader unsyncBufferedReader)
+		throws IOException {
+
+		if (containsHeaders) {
+			return StringUtil.split(unsyncBufferedReader.readLine(), delimiter);
+		}
+
+		String[] fieldNames = new String[100];
+
+		for (int i = 0; i < fieldNames.length; i++) {
+			fieldNames[i] = String.valueOf(i);
+		}
+
+		return fieldNames;
 	}
 
 	private String _trimEnclosingCharacter(String line) {

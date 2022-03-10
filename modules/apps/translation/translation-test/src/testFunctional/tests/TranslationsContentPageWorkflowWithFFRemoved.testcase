@@ -1,8 +1,6 @@
 @component-name = "portal-lima"
 definition {
 
-	property osgi.module.configuration.file.names = "com.liferay.translation.web.internal.configuration.FFLayoutExperienceSelectorConfiguration.config";
-	property osgi.module.configurations = "enabled=B&quot;true&quot;";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Translations Management";
@@ -29,6 +27,8 @@ definition {
 	@description = "This ensures that an imported content page translation can be approved through the workflow."
 	@priority = "5"
 	test CanApproveImportedTranslation {
+		property portal.acceptance = "true";
+
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "TranslationContentPage",
@@ -459,6 +459,8 @@ definition {
 	@description = "This ensures that translation files can be uploaded and resubmitted from a zip file after workflow is enabled."
 	@priority = "4"
 	test CanResubmitImportedEntryFromZip {
+		property portal.acceptance = "true";
+
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "ContentPage",
@@ -624,6 +626,8 @@ definition {
 	@description = "This ensures that an imported translation can be resubmitted after being rejected."
 	@priority = "5"
 	test CanResubmitRejectedImportedTranslation {
+		property portal.acceptance = "true";
+
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "TranslationContentPage",

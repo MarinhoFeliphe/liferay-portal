@@ -315,23 +315,33 @@ const InviteTeamMembersPage = ({
 					))}
 				</ClayForm.Group>
 
-				{values?.invites?.length < MAXIMUM_INVITES_COUNT && (
+				<div className="mb-4 ml-3 mt-5">
 					<Button
-						borderless
-						className="mb-3 ml-3 mt-2 text-brand-primary"
-						onClick={() => {
-							setBaseButtonDisabled(false);
-							setFieldValue('invites', [
-								...values?.invites,
-								getInitialInvite(accountMemberRole),
-							]);
-						}}
-						prependIcon="plus"
+						className="mr-3 py-2 text-brandy-secondary"
+						displayType="secondary"
+						prependIcon="hr"
 						small
 					>
-						Add More Members
+						Remove this Member
 					</Button>
-				)}
+
+					{values?.invites?.length < MAXIMUM_INVITES_COUNT && (
+						<Button
+							className="btn-outline-primary cp-btn-add-members py-2 rounded-xs"
+							onClick={() => {
+								setBaseButtonDisabled(false);
+								setFieldValue('invites', [
+									...values?.invites,
+									getInitialInvite(accountMemberRole),
+								]);
+							}}
+							prependIcon="plus"
+							small
+						>
+							Add More Members
+						</Button>
+					)}
+				</div>
 			</div>
 
 			<div className="invites-helper px-3">

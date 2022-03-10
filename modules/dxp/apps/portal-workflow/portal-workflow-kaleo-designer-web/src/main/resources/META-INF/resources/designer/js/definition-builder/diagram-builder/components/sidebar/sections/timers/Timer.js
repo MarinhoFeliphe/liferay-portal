@@ -18,7 +18,13 @@ import TimerAction from './TimerAction';
 import TimerDuration from './TimerDuration';
 import TimerInfo from './TimerInfo';
 
-const Timer = ({identifier, index, sectionsLength, setSections}) => {
+const Timer = ({
+	identifier,
+	index,
+	sectionsLength,
+	setContentName,
+	setSections,
+}) => {
 	const {selectedItem, setSelectedItem} = useContext(DiagramBuilderContext);
 
 	const [subSections, setSubSections] = useState([
@@ -135,6 +141,7 @@ const Timer = ({identifier, index, sectionsLength, setSections}) => {
 					key={`section-${identifier}`}
 					sectionsLength={subSections?.length}
 					selectedItem={selectedItem}
+					setContentName={setContentName}
 					updateSelectedItem={updateSelectedItem}
 				/>
 			))}
@@ -176,6 +183,7 @@ Timer.propTypes = {
 	identifier: PropTypes.string,
 	index: PropTypes.number,
 	sectionsLength: PropTypes.number,
+	setContentName: PropTypes.func,
 	setSections: PropTypes.func,
 };
 

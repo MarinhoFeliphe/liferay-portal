@@ -35,12 +35,15 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -72,9 +75,7 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return (WikiPageResource)ProxyUtil.newProxyInstance(
-					WikiPageResource.class.getClassLoader(),
-					new Class<?>[] {WikiPageResource.class},
+				return _wikiPageResourceProxyProviderFunction.apply(
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -143,6 +144,33 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 		WikiPageResource.FactoryHolder.factory = null;
 	}
 
+	private static Function<InvocationHandler, WikiPageResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			WikiPageResource.class.getClassLoader(), WikiPageResource.class);
+
+		try {
+			Constructor<WikiPageResource> constructor =
+				(Constructor<WikiPageResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private Object _invoke(
 			Method method, Object[] arguments, boolean checkPermissions,
 			HttpServletRequest httpServletRequest,
@@ -202,6 +230,9 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	private static final Function<InvocationHandler, WikiPageResource>
+		_wikiPageResourceProxyProviderFunction = _getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
