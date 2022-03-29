@@ -148,6 +148,12 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 					ObjectDefinition.class.getName(),
 					serviceBuilderObjectView.getObjectDefinitionId())
 			).put(
+				"duplicate",
+				addAction(
+					ActionKeys.UPDATE, "postObjectViewCopy",
+					ObjectDefinition.class.getName(),
+					serviceBuilderObjectView.getObjectDefinitionId())
+			).put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getObjectView",
