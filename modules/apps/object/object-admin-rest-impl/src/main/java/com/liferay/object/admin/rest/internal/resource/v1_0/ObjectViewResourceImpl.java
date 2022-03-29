@@ -110,6 +110,18 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 	}
 
 	@Override
+	public ObjectView postObjectViewCopy(Long objectViewId) throws Exception {
+		com.liferay.object.model.ObjectView objectView =
+			_objectViewService.getObjectView(objectViewId);
+
+		return _toObjectView(
+			_objectViewService.addObjectView(
+				objectView.getObjectDefinitionId(), false,
+				objectView.getNameMap(), objectView.getObjectViewColumns(),
+				objectView.getObjectViewSortColumns()));
+	}
+
+	@Override
 	public ObjectView putObjectView(Long objectViewId, ObjectView objectView)
 		throws Exception {
 
