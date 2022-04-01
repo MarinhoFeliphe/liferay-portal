@@ -93,6 +93,11 @@ public class ObjectDefinitionsViewsDisplayContext {
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
 			new FDSActionDropdownItem(
+				"/o/object-admin/v1.0/object-views/{id}/copy", "copy", "copy",
+				LanguageUtil.get(
+					_objectRequestHelper.getRequest(), "duplicate"),
+				"post", "copy", "async"),
+			new FDSActionDropdownItem(
 				"/o/object-admin/v1.0/object-views/{id}", "trash", "delete",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"));
