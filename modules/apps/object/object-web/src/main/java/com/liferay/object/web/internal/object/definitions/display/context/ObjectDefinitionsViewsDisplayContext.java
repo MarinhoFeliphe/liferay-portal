@@ -26,8 +26,10 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletException;
@@ -78,7 +80,9 @@ public class ObjectDefinitionsViewsDisplayContext {
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
 		throws Exception {
 
-		return Arrays.asList(
+		List<FDSActionDropdownItem> fDSActionDropdownItems = new ArrayList<>();
+
+		fDSActionDropdownItems.add(
 			new FDSActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
@@ -91,16 +95,25 @@ public class ObjectDefinitionsViewsDisplayContext {
 				).buildString(),
 				"view", "view",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
-				"get", null, "sidePanel"),
-			new FDSActionDropdownItem(
-				"/o/object-admin/v1.0/object-views/{id}/copy", "copy", "copy",
-				LanguageUtil.get(
-					_objectRequestHelper.getRequest(), "duplicate"),
-				"post", "copy", "async"),
+				"get", null, "sidePanel"));
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-146028"))) {
+			fDSActionDropdownItems.add(
+				new FDSActionDropdownItem(
+					"/o/object-admin/v1.0/object-views/{id}/copy", "copy",
+					"copy",
+					LanguageUtil.get(
+						_objectRequestHelper.getRequest(), "duplicate"),
+					"post", "copy", "async"));
+		}
+
+		fDSActionDropdownItems.add(
 			new FDSActionDropdownItem(
 				"/o/object-admin/v1.0/object-views/{id}", "trash", "delete",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"));
+
+		return fDSActionDropdownItems;
 	}
 
 	public long getObjectDefinitionId() {
