@@ -18,6 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectView;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectViewColumn;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectViewSortColumn;
+import com.liferay.object.admin.rest.resource.v1_0.util.NameMapUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -29,8 +30,11 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -85,6 +89,69 @@ public class ObjectViewResourceTest extends BaseObjectViewResourceTestCase {
 	@Override
 	@Test
 	public void testGraphQLGetObjectViewNotFound() {
+	}
+
+	@Test
+	public void testPostObjectViewCopy() throws Exception {
+		ObjectView objectView = testGetObjectView_addObjectView();
+
+		objectView.setDefaultObjectView(true);
+
+		ObjectView objectViewCopy = objectViewResource.postObjectViewCopy(
+			objectView.getId());
+
+		Assert.assertTrue(
+			Objects.deepEquals(
+				objectView.getActions(), objectViewCopy.getActions()));
+		Assert.assertFalse(objectViewCopy.getDefaultObjectView());
+		Assert.assertEquals(
+			objectView.getObjectDefinitionId(),
+			objectViewCopy.getObjectDefinitionId());
+		Assert.assertTrue(
+			equals(
+				NameMapUtil.copy(objectView.getName()),
+				(Map)objectViewCopy.getName()));
+
+		ObjectViewColumn[] objectViewColumns =
+			objectView.getObjectViewColumns();
+		ObjectViewColumn[] objectViewColumnsCopy =
+			objectViewCopy.getObjectViewColumns();
+
+		for (int i = 0; i < objectViewColumns.length; i++) {
+			ObjectViewColumn objectViewColumn = objectViewColumns[i];
+			ObjectViewColumn objectViewColumnCopy = objectViewColumnsCopy[i];
+
+			Assert.assertEquals(
+				objectViewColumn.getObjectFieldName(),
+				objectViewColumnCopy.getObjectFieldName());
+			Assert.assertEquals(
+				objectViewColumn.getPriority(),
+				objectViewColumnCopy.getPriority());
+		}
+
+		ObjectViewSortColumn[] objectViewSortColumns =
+			objectView.getObjectViewSortColumns();
+		ObjectViewSortColumn[] objectViewSortColumnsCopy =
+			objectViewCopy.getObjectViewSortColumns();
+
+		for (int i = 0; i < objectViewSortColumns.length; i++) {
+			ObjectViewSortColumn objectViewSortColumn =
+				objectViewSortColumns[i];
+			ObjectViewSortColumn objectViewSortColumnCopy =
+				objectViewSortColumnsCopy[i];
+
+			Assert.assertEquals(
+				objectViewSortColumn.getObjectFieldName(),
+				objectViewSortColumnCopy.getObjectFieldName());
+			Assert.assertEquals(
+				objectViewSortColumn.getPriority(),
+				objectViewSortColumnCopy.getPriority());
+			Assert.assertEquals(
+				objectViewSortColumn.getSortOrderAsString(),
+				objectViewSortColumnCopy.getSortOrderAsString());
+		}
+
+		assertValid(objectViewCopy);
 	}
 
 	@Override
