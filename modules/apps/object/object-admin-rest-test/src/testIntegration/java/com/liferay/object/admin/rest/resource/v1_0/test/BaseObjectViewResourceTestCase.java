@@ -462,6 +462,25 @@ public abstract class BaseObjectViewResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testPostObjectViewCopy() throws Exception {
+		ObjectView randomObjectView = randomObjectView();
+
+		ObjectView postObjectView = testPostObjectViewCopy_addObjectView(
+			randomObjectView);
+
+		assertEquals(randomObjectView, postObjectView);
+		assertValid(postObjectView);
+	}
+
+	protected ObjectView testPostObjectViewCopy_addObjectView(
+			ObjectView objectView)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
 	protected ObjectView testGraphQLObjectView_addObjectView()
 		throws Exception {
 

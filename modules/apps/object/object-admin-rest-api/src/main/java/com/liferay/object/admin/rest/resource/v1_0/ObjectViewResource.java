@@ -82,6 +82,8 @@ public interface ObjectViewResource {
 	public Response putObjectViewBatch(String callbackURL, Object object)
 		throws Exception;
 
+	public ObjectView postObjectViewCopy(Long objectViewId) throws Exception;
+
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
 	}
