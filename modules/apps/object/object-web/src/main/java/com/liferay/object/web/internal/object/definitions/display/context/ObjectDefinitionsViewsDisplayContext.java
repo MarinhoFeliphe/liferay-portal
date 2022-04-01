@@ -96,7 +96,7 @@ public class ObjectDefinitionsViewsDisplayContext {
 				"/o/object-admin/v1.0/object-views/{id}/copy", "copy", "copy",
 				LanguageUtil.get(
 					_objectRequestHelper.getRequest(), "duplicate"),
-				"post", "duplicate", "async"),
+				"post", "create", "async"),
 			new FDSActionDropdownItem(
 				"/o/object-admin/v1.0/object-views/{id}", "trash", "delete",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),

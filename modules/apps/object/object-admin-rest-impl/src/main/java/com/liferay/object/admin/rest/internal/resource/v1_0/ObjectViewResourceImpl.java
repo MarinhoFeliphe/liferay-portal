@@ -23,15 +23,21 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
 import com.liferay.object.service.persistence.ObjectViewSortColumnPersistence;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -114,10 +120,21 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 		com.liferay.object.model.ObjectView objectView =
 			_objectViewService.getObjectView(objectViewId);
 
+		Map<Locale, String> copyNameMap = new HashMap<>();
+		Map<Locale, String> nameMap = objectView.getNameMap();
+
+		for (Map.Entry<Locale, String> entry : nameMap.entrySet()) {
+			copyNameMap.put(
+				entry.getKey(),
+				StringUtil.appendParentheticalSuffix(
+					entry.getValue(),
+					LanguageUtil.get(entry.getKey(), "copy")));
+		}
+
 		return _toObjectView(
 			_objectViewService.addObjectView(
-				objectView.getObjectDefinitionId(), false,
-				objectView.getNameMap(), objectView.getObjectViewColumns(),
+				objectView.getObjectDefinitionId(), false, copyNameMap,
+				objectView.getObjectViewColumns(),
 				objectView.getObjectViewSortColumns()));
 	}
 
@@ -142,15 +159,15 @@ public class ObjectViewResourceImpl extends BaseObjectViewResourceImpl {
 
 		return ObjectViewUtil.toObjectView(
 			HashMapBuilder.put(
-				"delete",
+				"create",
 				addAction(
-					ActionKeys.DELETE, "deleteObjectView",
+					ActionKeys.UPDATE, "postObjectViewCopy",
 					ObjectDefinition.class.getName(),
 					serviceBuilderObjectView.getObjectDefinitionId())
 			).put(
-				"duplicate",
+				"delete",
 				addAction(
-					ActionKeys.UPDATE, "postObjectViewCopy",
+					ActionKeys.DELETE, "deleteObjectView",
 					ObjectDefinition.class.getName(),
 					serviceBuilderObjectView.getObjectDefinitionId())
 			).put(
