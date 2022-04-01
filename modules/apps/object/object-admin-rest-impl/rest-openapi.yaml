@@ -1252,3 +1252,23 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectView"
             tags: ["ObjectView"]
+    "/object-views/{objectViewId}/copy":
+        post:
+            operationId: postObjectViewCopy
+            parameters:
+                - in: path
+                  name: objectViewId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectView"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectView"
+            tags: ["ObjectView"]
