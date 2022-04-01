@@ -661,6 +661,18 @@ public class Mutation {
 				callbackURL, object));
 	}
 
+	@GraphQLField
+	public ObjectView createObjectViewCopy(
+			@GraphQLName("objectViewId") Long objectViewId)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectViewResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectViewResource -> objectViewResource.postObjectViewCopy(
+				objectViewId));
+	}
+
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
 			_applyComponentServiceObjects(
 				ComponentServiceObjects<T> componentServiceObjects,
