@@ -86,6 +86,13 @@ public interface WorkflowTaskManager {
 			long companyId, long userId, long workflowTaskId)
 		throws WorkflowException;
 
+	public default List<User> getUsersThatCanSeeNotifications(
+			long companyId, long workflowTaskId)
+		throws WorkflowException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public WorkflowTask getWorkflowTask(long companyId, long workflowTaskId)
 		throws WorkflowException;
 
