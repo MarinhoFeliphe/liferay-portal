@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -214,7 +215,9 @@ public class ObjectValidationRuleLocalServiceImpl
 						modelAttributes.entrySet()) {
 
 					hashMapWrapper.put(
-						"original." + entry.getKey(), entry.getValue());
+						"original" +
+							StringUtil.upperCaseFirstLetter(entry.getKey()),
+						entry.getValue());
 				}
 			}
 
@@ -222,11 +225,11 @@ public class ObjectValidationRuleLocalServiceImpl
 				User user = _userLocalService.getUser(userId);
 
 				hashMapWrapper.put(
-					"user.emailAddress", user.getEmailAddress()
+					"userEmailAddress", user.getEmailAddress()
 				).put(
-					"user.firstName", user.getFirstName()
+					"userFirstName", user.getFirstName()
 				).put(
-					"user.lastName", user.getLastName()
+					"userLastName", user.getLastName()
 				).put(
 					"userId", userId
 				);
