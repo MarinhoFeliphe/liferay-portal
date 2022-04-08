@@ -15,6 +15,7 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.object.exception.ObjectValidationRuleEngineException;
+import com.liferay.object.exception.ObjectValidationRuleExecuteScriptException;
 import com.liferay.object.exception.ObjectValidationRuleNameException;
 import com.liferay.object.exception.ObjectValidationRuleScriptException;
 import com.liferay.object.model.ObjectEntry;
@@ -23,6 +24,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -31,6 +33,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -229,9 +232,19 @@ public class ObjectValidationRuleLocalServiceImpl
 				);
 			}
 
-			if (!objectValidationRuleEngine.evaluate(
-					hashMapWrapper.build(), objectValidationRule.getScript())) {
+			Map<String, Object> results = objectValidationRuleEngine.execute(
+				hashMapWrapper.build(), objectValidationRule.getScript());
 
+			if (GetterUtil.getBoolean(results.get("isScriptInvalid"))) {
+				throw new ObjectValidationRuleExecuteScriptException(
+					StringBundler.concat(
+						"The validation \"",
+						objectValidationRule.getName(
+							LocaleUtil.getMostRelevantLocale()),
+						"\" contains an invalid script"));
+			}
+
+			if (GetterUtil.getBoolean(results.get("hasInvalidFields"))) {
 				throw new ObjectValidationRuleScriptException(
 					objectValidationRule.getErrorLabel(
 						LocaleUtil.getMostRelevantLocale()));
