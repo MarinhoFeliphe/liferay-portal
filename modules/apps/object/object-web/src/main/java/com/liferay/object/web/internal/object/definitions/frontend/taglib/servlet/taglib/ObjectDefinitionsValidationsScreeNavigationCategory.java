@@ -17,12 +17,10 @@ package com.liferay.object.web.internal.object.definitions.frontend.taglib.servl
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContextFactory;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -90,21 +88,14 @@ public class ObjectDefinitionsValidationsScreeNavigationCategory
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ObjectDefinitionsValidationsDisplayContext(
-				httpServletRequest, _objectDefinitionModelResourcePermission,
-				_objectValidationRuleEngineServicesTracker));
+			_objectDefinitionsValidationsDisplayContextFactory.create(
+				httpServletRequest));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
-	)
-	private ModelResourcePermission<ObjectDefinition>
-		_objectDefinitionModelResourcePermission;
-
 	@Reference
-	private ObjectValidationRuleEngineServicesTracker
-		_objectValidationRuleEngineServicesTracker;
+	private ObjectDefinitionsValidationsDisplayContextFactory
+		_objectDefinitionsValidationsDisplayContextFactory;
 
 }

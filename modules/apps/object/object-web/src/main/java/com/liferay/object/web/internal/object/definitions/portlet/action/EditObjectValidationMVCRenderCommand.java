@@ -15,16 +15,13 @@
 package com.liferay.object.web.internal.object.definitions.portlet.action;
 
 import com.liferay.object.constants.ObjectPortletKeys;
-import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
-import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContextFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -68,10 +65,8 @@ public class EditObjectValidationMVCRenderCommand implements MVCRenderCommand {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
-				new ObjectDefinitionsValidationsDisplayContext(
-					_portal.getHttpServletRequest(renderRequest),
-					_objectDefinitionModelResourcePermission,
-					_objectValidationRuleEngineServicesTracker));
+				_objectDefinitionsValidationsDisplayContextFactory.create(
+					_portal.getHttpServletRequest(renderRequest)));
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(renderRequest, portalException.getClass());
@@ -83,15 +78,9 @@ public class EditObjectValidationMVCRenderCommand implements MVCRenderCommand {
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
-	)
-	private ModelResourcePermission<ObjectDefinition>
-		_objectDefinitionModelResourcePermission;
-
 	@Reference
-	private ObjectValidationRuleEngineServicesTracker
-		_objectValidationRuleEngineServicesTracker;
+	private ObjectDefinitionsValidationsDisplayContextFactory
+		_objectDefinitionsValidationsDisplayContextFactory;
 
 	@Reference
 	private ObjectValidationRuleLocalService _objectValidationRuleLocalService;
