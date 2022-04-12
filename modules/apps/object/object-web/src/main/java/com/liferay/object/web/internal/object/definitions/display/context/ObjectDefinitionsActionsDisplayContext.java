@@ -25,7 +25,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.dynamic.data.mapping.util.DDMFormLayoutFactory;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.action.trigger.ObjectActionTrigger;
@@ -34,7 +34,7 @@ import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -43,8 +43,6 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -60,16 +58,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javax.portlet.PortletException;
-import javax.portlet.PortletURL;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
 /**
  * @author Marco Leo
  */
-public class ObjectDefinitionsActionsDisplayContext {
+public class ObjectDefinitionsActionsDisplayContext
+	extends BaseObjectDefinitionsDisplayContext {
 
 	public ObjectDefinitionsActionsDisplayContext(
 		DDMFormRenderer ddmFormRenderer, HttpServletRequest httpServletRequest,
@@ -79,39 +75,12 @@ public class ObjectDefinitionsActionsDisplayContext {
 			objectDefinitionModelResourcePermission,
 		JSONFactory jsonFactory) {
 
+		super(httpServletRequest, objectDefinitionModelResourcePermission);
+
 		_ddmFormRenderer = ddmFormRenderer;
 		_objectActionExecutorRegistry = objectActionExecutorRegistry;
 		_objectActionTriggerRegistry = objectActionTriggerRegistry;
-		_objectDefinitionModelResourcePermission =
-			objectDefinitionModelResourcePermission;
 		_jsonFactory = jsonFactory;
-
-		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
-	}
-
-	public String getAPIURL() {
-		return "/o/object-admin/v1.0/object-definitions/" +
-			getObjectDefinitionId() + "/object-actions";
-	}
-
-	public CreationMenu getCreationMenu() throws Exception {
-		CreationMenu creationMenu = new CreationMenu();
-
-		if (!hasUpdateObjectDefinitionPermission()) {
-			return creationMenu;
-		}
-
-		creationMenu.addDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setHref("addObjectAction");
-				dropdownItem.setLabel(
-					LanguageUtil.get(
-						_objectRequestHelper.getRequest(),
-						"add-object-action"));
-				dropdownItem.setTarget("event");
-			});
-
-		return creationMenu;
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
@@ -129,17 +98,17 @@ public class ObjectDefinitionsActionsDisplayContext {
 					LiferayWindowState.POP_UP
 				).buildString(),
 				"view", "view",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
+				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
 			new FDSActionDropdownItem(
 				"/o/object-admin/v1.0/object-actions/{id}", "trash", "delete",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
+				LanguageUtil.get(objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"));
 	}
 
 	public ObjectAction getObjectAction() {
 		HttpServletRequest httpServletRequest =
-			_objectRequestHelper.getRequest();
+			objectRequestHelper.getRequest();
 
 		return (ObjectAction)httpServletRequest.getAttribute(
 			ObjectWebKeys.OBJECT_ACTION);
@@ -164,7 +133,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 				JSONUtil.put(
 					"description",
 					LanguageUtil.get(
-						_objectRequestHelper.getLocale(),
+						objectRequestHelper.getLocale(),
 						"object-action-executor-help[" +
 							objectActionExecutor.getKey() + "]")
 				).put(
@@ -172,7 +141,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 				).put(
 					"label",
 					LanguageUtil.get(
-						_objectRequestHelper.getLocale(),
+						objectRequestHelper.getLocale(),
 						"object-action-executor[" +
 							objectActionExecutor.getKey() + "]")
 				)));
@@ -195,7 +164,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 				JSONUtil.put(
 					"description",
 					LanguageUtil.get(
-						_objectRequestHelper.getLocale(),
+						objectRequestHelper.getLocale(),
 						"object-action-trigger-help[" +
 							objectActionTrigger.getKey() + "]")
 				).put(
@@ -203,7 +172,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 				).put(
 					"label",
 					LanguageUtil.get(
-						_objectRequestHelper.getLocale(),
+						objectRequestHelper.getLocale(),
 						"object-action-trigger[" +
 							objectActionTrigger.getKey() + "]")
 				)));
@@ -213,37 +182,10 @@ public class ObjectDefinitionsActionsDisplayContext {
 
 	public ObjectDefinition getObjectDefinition() {
 		HttpServletRequest httpServletRequest =
-			_objectRequestHelper.getRequest();
+			objectRequestHelper.getRequest();
 
 		return (ObjectDefinition)httpServletRequest.getAttribute(
 			ObjectWebKeys.OBJECT_DEFINITION);
-	}
-
-	public long getObjectDefinitionId() {
-		HttpServletRequest httpServletRequest =
-			_objectRequestHelper.getRequest();
-
-		ObjectDefinition objectDefinition =
-			(ObjectDefinition)httpServletRequest.getAttribute(
-				ObjectWebKeys.OBJECT_DEFINITION);
-
-		return objectDefinition.getObjectDefinitionId();
-	}
-
-	public PortletURL getPortletURL() throws PortletException {
-		return PortletURLUtil.clone(
-			PortletURLUtil.getCurrent(
-				_objectRequestHelper.getLiferayPortletRequest(),
-				_objectRequestHelper.getLiferayPortletResponse()),
-			_objectRequestHelper.getLiferayPortletResponse());
-	}
-
-	public boolean hasUpdateObjectDefinitionPermission()
-		throws PortalException {
-
-		return _objectDefinitionModelResourcePermission.contains(
-			_objectRequestHelper.getPermissionChecker(),
-			getObjectDefinitionId(), ActionKeys.UPDATE);
 	}
 
 	public String renderDDMForm(PageContext pageContext)
@@ -294,14 +236,14 @@ public class ObjectDefinitionsActionsDisplayContext {
 		}
 
 		ddmFormRenderingContext.setHttpServletRequest(
-			_objectRequestHelper.getRequest());
+			objectRequestHelper.getRequest());
 		ddmFormRenderingContext.setHttpServletResponse(
 			PipingServletResponseFactory.createPipingServletResponse(
 				pageContext));
-		ddmFormRenderingContext.setLocale(_objectRequestHelper.getLocale());
+		ddmFormRenderingContext.setLocale(objectRequestHelper.getLocale());
 
 		LiferayPortletResponse liferayPortletResponse =
-			_objectRequestHelper.getLiferayPortletResponse();
+			objectRequestHelper.getLiferayPortletResponse();
 
 		ddmFormRenderingContext.setPortletNamespace(
 			liferayPortletResponse.getNamespace());
@@ -316,6 +258,24 @@ public class ObjectDefinitionsActionsDisplayContext {
 			ddmFormRenderingContext);
 	}
 
+	@Override
+	protected String getAPIURI() {
+		return "/object-actions";
+	}
+
+	@Override
+	protected UnsafeConsumer<DropdownItem, Exception>
+		getCreationMenuDropdownItemUnsafeConsumer() {
+
+		return dropdownItem -> {
+			dropdownItem.setHref("addObjectAction");
+			dropdownItem.setLabel(
+				LanguageUtil.get(
+					objectRequestHelper.getRequest(), "add-object-action"));
+			dropdownItem.setTarget("event");
+		};
+	}
+
 	private DDMFormValues _getDDMFormValues(
 		DDMForm ddmForm, ObjectAction objectAction) {
 
@@ -328,7 +288,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
-		ddmFormValues.addAvailableLocale(_objectRequestHelper.getLocale());
+		ddmFormValues.addAvailableLocale(objectRequestHelper.getLocale());
 
 		Map<String, DDMFormField> ddmFormFieldsMap =
 			ddmForm.getDDMFormFieldsMap(false);
@@ -360,7 +320,7 @@ public class ObjectDefinitionsActionsDisplayContext {
 					return ddmFormFieldValue;
 				}));
 
-		ddmFormValues.setDefaultLocale(_objectRequestHelper.getLocale());
+		ddmFormValues.setDefaultLocale(objectRequestHelper.getLocale());
 
 		return ddmFormValues;
 	}
@@ -381,8 +341,5 @@ public class ObjectDefinitionsActionsDisplayContext {
 	private final JSONFactory _jsonFactory;
 	private final ObjectActionExecutorRegistry _objectActionExecutorRegistry;
 	private final ObjectActionTriggerRegistry _objectActionTriggerRegistry;
-	private final ModelResourcePermission<ObjectDefinition>
-		_objectDefinitionModelResourcePermission;
-	private final ObjectRequestHelper _objectRequestHelper;
 
 }

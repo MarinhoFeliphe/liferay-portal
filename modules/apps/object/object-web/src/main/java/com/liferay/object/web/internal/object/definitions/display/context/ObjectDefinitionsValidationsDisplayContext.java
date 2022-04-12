@@ -15,20 +15,17 @@
 package com.liferay.object.web.internal.object.definitions.display.context;
 
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
-import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
@@ -39,15 +36,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.portlet.PortletException;
-import javax.portlet.PortletURL;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Selton Guedes
  */
-public class ObjectDefinitionsValidationsDisplayContext {
+public class ObjectDefinitionsValidationsDisplayContext
+	extends BaseObjectDefinitionsDisplayContext {
 
 	public ObjectDefinitionsValidationsDisplayContext(
 		HttpServletRequest httpServletRequest,
@@ -56,38 +51,10 @@ public class ObjectDefinitionsValidationsDisplayContext {
 		ObjectValidationRuleEngineServicesTracker
 			objectValidationRuleEngineServicesTracker) {
 
-		_objectDefinitionModelResourcePermission =
-			objectDefinitionModelResourcePermission;
-
-		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
+		super(httpServletRequest, objectDefinitionModelResourcePermission);
 
 		_objectValidationRuleEngineServicesTracker =
 			objectValidationRuleEngineServicesTracker;
-	}
-
-	public String getAPIURL() {
-		return "/o/object-admin/v1.0/object-definitions/" +
-			getObjectDefinitionId() + "/object-validation-rules";
-	}
-
-	public CreationMenu getCreationMenu() throws PortalException {
-		CreationMenu creationMenu = new CreationMenu();
-
-		if (!hasUpdateObjectDefinitionPermission()) {
-			return creationMenu;
-		}
-
-		creationMenu.addDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setHref("addObjectValidation");
-				dropdownItem.setLabel(
-					LanguageUtil.get(
-						_objectRequestHelper.getRequest(),
-						"add-object-validation"));
-				dropdownItem.setTarget("event");
-			});
-
-		return creationMenu;
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
@@ -105,24 +72,13 @@ public class ObjectDefinitionsValidationsDisplayContext {
 					LiferayWindowState.POP_UP
 				).buildString(),
 				"view", "view",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
+				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
 			new FDSActionDropdownItem(
 				"/o/object-admin/v1.0/object-validation-rules/{id}", "trash",
 				"delete",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
+				LanguageUtil.get(objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"));
-	}
-
-	public long getObjectDefinitionId() {
-		HttpServletRequest httpServletRequest =
-			_objectRequestHelper.getRequest();
-
-		ObjectDefinition objectDefinition =
-			(ObjectDefinition)httpServletRequest.getAttribute(
-				ObjectWebKeys.OBJECT_DEFINITION);
-
-		return objectDefinition.getObjectDefinitionId();
 	}
 
 	public List<Map<String, String>> getObjectValidationRuleEngines() {
@@ -135,7 +91,7 @@ public class ObjectDefinitionsValidationsDisplayContext {
 			objectValidationRuleEngine -> HashMapBuilder.put(
 				"label",
 				LanguageUtil.get(
-					_objectRequestHelper.getLocale(),
+					objectRequestHelper.getLocale(),
 					objectValidationRuleEngine.getName())
 			).put(
 				"name", objectValidationRuleEngine.getName()
@@ -155,7 +111,7 @@ public class ObjectDefinitionsValidationsDisplayContext {
 		).put(
 			"engineLabel",
 			LanguageUtil.get(
-				_objectRequestHelper.getLocale(),
+				objectRequestHelper.getLocale(),
 				objectValidationRule.getEngine())
 		).put(
 			"errorLabel", objectValidationRule.getErrorLabel()
@@ -166,14 +122,6 @@ public class ObjectDefinitionsValidationsDisplayContext {
 		).put(
 			"script", objectValidationRule.getScript()
 		);
-	}
-
-	public PortletURL getPortletURL() throws PortletException {
-		return PortletURLUtil.clone(
-			PortletURLUtil.getCurrent(
-				_objectRequestHelper.getLiferayPortletRequest(),
-				_objectRequestHelper.getLiferayPortletResponse()),
-			_objectRequestHelper.getLiferayPortletResponse());
 	}
 
 	public HashMap<String, Object> getProps(
@@ -190,17 +138,24 @@ public class ObjectDefinitionsValidationsDisplayContext {
 		).build();
 	}
 
-	public boolean hasUpdateObjectDefinitionPermission()
-		throws PortalException {
-
-		return _objectDefinitionModelResourcePermission.contains(
-			_objectRequestHelper.getPermissionChecker(),
-			getObjectDefinitionId(), ActionKeys.UPDATE);
+	@Override
+	protected String getAPIURI() {
+		return "/object-validation-rules";
 	}
 
-	private final ModelResourcePermission<ObjectDefinition>
-		_objectDefinitionModelResourcePermission;
-	private final ObjectRequestHelper _objectRequestHelper;
+	@Override
+	protected UnsafeConsumer<DropdownItem, Exception>
+		getCreationMenuDropdownItemUnsafeConsumer() {
+
+		return dropdownItem -> {
+			dropdownItem.setHref("addObjectValidation");
+			dropdownItem.setLabel(
+				LanguageUtil.get(
+					objectRequestHelper.getRequest(), "add-object-validation"));
+			dropdownItem.setTarget("event");
+		};
+	}
+
 	private final ObjectValidationRuleEngineServicesTracker
 		_objectValidationRuleEngineServicesTracker;
 
