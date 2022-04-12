@@ -40,11 +40,12 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	property = {
 		"javax.portlet.name=" + ObjectPortletKeys.OBJECT_DEFINITIONS,
-		"mvc.command.name=/object_definitions/edit_object_validation"
+		"mvc.command.name=/object_definitions/edit_object_validation_rule"
 	},
 	service = MVCRenderCommand.class
 )
-public class EditObjectValidationMVCRenderCommand implements MVCRenderCommand {
+public class EditObjectValidationRuleMVCRenderCommand
+	implements MVCRenderCommand {
 
 	@Override
 	public String render(
