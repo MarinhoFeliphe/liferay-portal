@@ -65,7 +65,7 @@ public class ObjectDefinitionsValidationsDisplayContext
 				PortletURLBuilder.create(
 					getPortletURL()
 				).setMVCRenderCommandName(
-					"/object_definitions/edit_object_validation"
+					"/object_definitions/edit_object_validation_rule"
 				).setParameter(
 					"objectValidationRuleId", "{id}"
 				).setWindowState(
