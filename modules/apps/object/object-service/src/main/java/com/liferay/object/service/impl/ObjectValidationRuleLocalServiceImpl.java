@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -205,20 +204,6 @@ public class ObjectValidationRuleLocalServiceImpl
 
 			if ((objectEntry != null) && (values != null)) {
 				hashMapWrapper.putAll(values);
-			}
-
-			if (originalObjectEntry != null) {
-				Map<String, Object> modelAttributes =
-					originalObjectEntry.getModelAttributes();
-
-				for (Map.Entry<String, Object> entry :
-						modelAttributes.entrySet()) {
-
-					hashMapWrapper.put(
-						"original" +
-							StringUtil.upperCaseFirstLetter(entry.getKey()),
-						entry.getValue());
-				}
 			}
 
 			if (userId > 0) {
