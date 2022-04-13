@@ -22,7 +22,7 @@ ObjectValidationRule objectValidationRule = (ObjectValidationRule)request.getAtt
 %>
 
 <liferay-frontend:side-panel-content
-	title='<%= LanguageUtil.get(request, "validation") %>'
+	title="<%= objectValidationRule.getName(locale) %>"
 >
 	<react:component
 		module="js/components/EditObjectValidation"
