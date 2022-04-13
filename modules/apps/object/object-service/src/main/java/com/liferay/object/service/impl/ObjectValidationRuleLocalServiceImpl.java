@@ -14,6 +14,7 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.exception.ObjectValidationRuleEngineException;
 import com.liferay.object.exception.ObjectValidationRuleExecuteScriptException;
 import com.liferay.object.exception.ObjectValidationRuleNameException;
@@ -43,6 +44,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -220,22 +222,39 @@ public class ObjectValidationRuleLocalServiceImpl
 				);
 			}
 
-			Map<String, Object> results = objectValidationRuleEngine.execute(
-				hashMapWrapper.build(), objectValidationRule.getScript());
+			if (Objects.equals(
+					objectValidationRule.getEngine(),
+					ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY)) {
 
-			if (GetterUtil.getBoolean(results.get("isScriptInvalid"))) {
-				throw new ObjectValidationRuleExecuteScriptException(
-					StringBundler.concat(
-						"The validation \"",
-						objectValidationRule.getName(
-							LocaleUtil.getMostRelevantLocale()),
-						"\" contains an invalid script"));
+				Map<String, Object> results =
+					objectValidationRuleEngine.execute(
+						hashMapWrapper.build(),
+						objectValidationRule.getScript());
+
+				if (GetterUtil.getBoolean(results.get("isScriptInvalid"))) {
+					throw new ObjectValidationRuleExecuteScriptException(
+						StringBundler.concat(
+							"The validation \"",
+							objectValidationRule.getName(
+								LocaleUtil.getMostRelevantLocale()),
+							"\" contains an invalid script"));
+				}
+
+				if (GetterUtil.getBoolean(results.get("hasInvalidFields"))) {
+					throw new ObjectValidationRuleScriptException(
+						objectValidationRule.getErrorLabel(
+							LocaleUtil.getMostRelevantLocale()));
+				}
 			}
+			else {
+				if (!objectValidationRuleEngine.evaluate(
+						hashMapWrapper.build(),
+						objectValidationRule.getScript())) {
 
-			if (GetterUtil.getBoolean(results.get("hasInvalidFields"))) {
-				throw new ObjectValidationRuleScriptException(
-					objectValidationRule.getErrorLabel(
-						LocaleUtil.getMostRelevantLocale()));
+					throw new ObjectValidationRuleScriptException(
+						objectValidationRule.getErrorLabel(
+							LocaleUtil.getMostRelevantLocale()));
+				}
 			}
 		}
 	}
