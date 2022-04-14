@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -177,20 +178,30 @@ public class ObjectValidationRuleLocalServiceImpl
 	}
 
 	@Override
-	public void validate(
-			long userId, long objectDefinitionId,
-			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
-		throws PortalException {
+	public void validate(ObjectEntry objectEntry) throws PortalException {
+		if (objectEntry == null) {
+			return;
+		}
 
-		Map<String, Serializable> values = null;
+		Map<String, Serializable> values = _objectEntryLocalService.getValues(
+			objectEntry);
 
-		if (objectEntry != null) {
-			values = _objectEntryLocalService.getValues(objectEntry);
+		HashMapBuilder.HashMapWrapper<String, Object> hashMapWrapper =
+			HashMapBuilder.<String, Object>putAll(
+				objectEntry.getModelAttributes());
+
+		if (values != null) {
+			hashMapWrapper.putAll(values);
+		}
+
+		if (PrincipalThreadLocal.getUserId() > 0) {
+			hashMapWrapper.put(
+				"currentUserId", PrincipalThreadLocal.getUserId());
 		}
 
 		List<ObjectValidationRule> objectValidationRules =
 			objectValidationRuleLocalService.getObjectValidationRules(
-				objectDefinitionId, true);
+				objectEntry.getObjectDefinitionId(), true);
 
 		for (ObjectValidationRule objectValidationRule :
 				objectValidationRules) {
@@ -199,28 +210,6 @@ public class ObjectValidationRuleLocalServiceImpl
 				_objectValidationRuleEngineServicesTracker.
 					getObjectValidationRuleEngine(
 						objectValidationRule.getEngine());
-
-			HashMapBuilder.HashMapWrapper<String, Object> hashMapWrapper =
-				HashMapBuilder.<String, Object>putAll(
-					objectEntry.getModelAttributes());
-
-			if ((objectEntry != null) && (values != null)) {
-				hashMapWrapper.putAll(values);
-			}
-
-			if (userId > 0) {
-				User user = _userLocalService.getUser(userId);
-
-				hashMapWrapper.put(
-					"userEmailAddress", user.getEmailAddress()
-				).put(
-					"userFirstName", user.getFirstName()
-				).put(
-					"userLastName", user.getLastName()
-				).put(
-					"userId", userId
-				);
-			}
 
 			if (Objects.equals(
 					objectValidationRule.getEngine(),
