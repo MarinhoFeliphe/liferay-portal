@@ -29,6 +29,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = ObjectDefinitionsValidationsDisplayContextFactory.class)
 public class ObjectDefinitionsValidationsDisplayContextFactory {
 
+	// TODO Remove this class and simplify
+
 	public ObjectDefinitionsValidationsDisplayContext create(
 		HttpServletRequest httpServletRequest) {
 
