@@ -44,9 +44,9 @@ public class ObjectValidationsTableFDSView extends BaseTableFDSView {
 		FDSTableSchemaField labelFDSTableSchemaField =
 			fdsTableSchemaBuilder.addFDSTableSchemaField("name.LANG", "label");
 
-		fdsTableSchemaBuilder.addFDSTableSchemaField("engineLabel", "type");
-
 		labelFDSTableSchemaField.setContentRenderer("actionLink");
+
+		fdsTableSchemaBuilder.addFDSTableSchemaField("engineLabel", "type");
 
 		FDSTableSchemaField activeFDSTableSchemaField =
 			fdsTableSchemaBuilder.addFDSTableSchemaField("active", "active");
