@@ -221,7 +221,7 @@ public class ObjectValidationRuleLocalServiceImpl
 						objectValidationRule.getScript());
 
 				if (GetterUtil.getBoolean(results.get("isScriptInvalid"))) {
-					throw new ObjectValidationRuleExecuteScriptException(
+					throw new ObjectValidationRuleScriptException.InvalidExecute(
 						StringBundler.concat(
 							"The validation \"",
 							objectValidationRule.getName(
@@ -229,8 +229,11 @@ public class ObjectValidationRuleLocalServiceImpl
 							"\" contains an invalid script"));
 				}
 
+// rename hasInvalidFields and isScriptInvalid
+
+// remove default constructor for ObjectValidationRuleScriptException so we always set the class name
 				if (GetterUtil.getBoolean(results.get("hasInvalidFields"))) {
-					throw new ObjectValidationRuleScriptException(
+					throw new ObjectValidationRuleScriptException.BusinessRule????(
 						objectValidationRule.getErrorLabel(
 							LocaleUtil.getMostRelevantLocale()));
 				}
