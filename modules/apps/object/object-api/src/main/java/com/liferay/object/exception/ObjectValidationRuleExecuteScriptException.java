@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 public class ObjectValidationRuleExecuteScriptException
 	extends PortalException {
 
+	// TODO See ObjectFieldNameException and delete this class
+
 	public ObjectValidationRuleExecuteScriptException(String msg) {
 		super(msg);
 	}
