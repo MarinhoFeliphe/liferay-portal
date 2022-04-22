@@ -40,8 +40,14 @@ public class ServletContextUtil {
 		return _servletContext.getContextPath();
 	}
 
-	public static FDSFilterSerializer getFDSFilterSerializer() {
-		return _fdsFilterSerializer;
+	public static FDSFilterSerializer getFDSFilterSerializer(
+		String fdsFilterSerializerKey) {
+
+		if ("object_entries".equals(fdsFilterSerializerKey)) {
+			return _objectEntriesFDSFilterSerializer;
+		}
+
+		return _defaultFDSFilterSerializer;
 	}
 
 	public static String getFDSSettingsNamespace(
@@ -75,11 +81,14 @@ public class ServletContextUtil {
 		return _servletContext;
 	}
 
-	@Reference(unbind = "-")
-	protected void setFDSFilterSerializer(
+	@Reference(
+		target = "(frontend.data.set.filter.serializer.key=default)",
+		unbind = "-"
+	)
+	protected void setDefaultFDSFilterSerializer(
 		FDSFilterSerializer fdsFilterSerializer) {
 
-		_fdsFilterSerializer = fdsFilterSerializer;
+		_defaultFDSFilterSerializer = fdsFilterSerializer;
 	}
 
 	@Reference(unbind = "-")
@@ -87,6 +96,16 @@ public class ServletContextUtil {
 		FDSViewSerializer fdsDisplayViewSerializer) {
 
 		_fdsViewSerializer = fdsDisplayViewSerializer;
+	}
+
+	@Reference(
+		target = "(frontend.data.set.filter.serializer.key=object_entries)",
+		unbind = "-"
+	)
+	protected void setObjectEntryFDSFilterSerializer(
+		FDSFilterSerializer fdsFilterSerializer) {
+
+		_objectEntriesFDSFilterSerializer = fdsFilterSerializer;
 	}
 
 	@Reference(unbind = "-")
@@ -102,8 +121,9 @@ public class ServletContextUtil {
 		_servletContext = servletContext;
 	}
 
-	private static FDSFilterSerializer _fdsFilterSerializer;
+	private static FDSFilterSerializer _defaultFDSFilterSerializer;
 	private static FDSViewSerializer _fdsViewSerializer;
+	private static FDSFilterSerializer _objectEntriesFDSFilterSerializer;
 	private static Portal _portal;
 	private static ServletContext _servletContext;
 

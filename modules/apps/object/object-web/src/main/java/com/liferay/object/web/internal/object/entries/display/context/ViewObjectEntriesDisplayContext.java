@@ -14,6 +14,7 @@
 
 package com.liferay.object.web.internal.object.entries.display.context;
 
+import com.liferay.frontend.data.set.filter.FDSFilter;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.data.set.model.FDSSortItemBuilder;
 import com.liferay.frontend.data.set.model.FDSSortItemList;
@@ -132,6 +133,13 @@ public class ViewObjectEntriesDisplayContext {
 			});
 
 		return creationMenu;
+	}
+
+	public List<FDSFilter> getFDSFilters() {
+
+
+
+		return null;
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()

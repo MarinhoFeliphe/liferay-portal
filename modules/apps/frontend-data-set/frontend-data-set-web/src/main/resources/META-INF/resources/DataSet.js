@@ -146,6 +146,9 @@ const DataSet = ({
 	const selectable = !!(bulkActions?.length && selectedItemsKey);
 
 	const requestData = useCallback(() => {
+		console.log('DataSet.js');
+		console.log(filters);
+
 		const activeFiltersOdataStrings = filters.reduce(
 			(activeFilters, filter) =>
 				filter.active && filter.odataFilterString

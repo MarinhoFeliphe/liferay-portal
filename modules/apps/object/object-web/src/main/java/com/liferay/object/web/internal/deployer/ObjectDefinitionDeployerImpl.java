@@ -58,7 +58,9 @@ import com.liferay.object.web.internal.item.selector.ObjectEntryItemSelectorView
 import com.liferay.object.web.internal.layout.display.page.ObjectEntryLayoutDisplayPageProvider;
 import com.liferay.object.web.internal.object.entries.application.list.ObjectEntriesPanelApp;
 import com.liferay.object.web.internal.object.entries.display.context.ObjectEntryDisplayContextFactory;
+import com.liferay.object.web.internal.object.entries.frontend.data.set.filter.ObjectEntryCountryCheckBoxFDSFilter;
 import com.liferay.object.web.internal.object.entries.frontend.data.set.filter.ObjectEntryStatusCheckBoxFDSFilter;
+import com.liferay.object.web.internal.object.entries.frontend.data.set.filter.ObjectEntryUserIdCheckBoxFDSFilter;
 import com.liferay.object.web.internal.object.entries.frontend.data.set.view.table.ObjectEntriesTableFDSView;
 import com.liferay.object.web.internal.object.entries.portlet.ObjectEntriesPortlet;
 import com.liferay.object.web.internal.object.entries.portlet.action.EditObjectEntryMVCActionCommand;
@@ -126,6 +128,16 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				).build()),
 			_bundleContext.registerService(
 				FDSFilter.class, new ObjectEntryStatusCheckBoxFDSFilter(),
+				HashMapDictionaryBuilder.put(
+					"frontend.data.set.name", objectDefinition.getPortletId()
+				).build()),
+			_bundleContext.registerService(
+				FDSFilter.class, new ObjectEntryCountryCheckBoxFDSFilter(),
+				HashMapDictionaryBuilder.put(
+					"frontend.data.set.name", objectDefinition.getPortletId()
+				).build()),
+			_bundleContext.registerService(
+				FDSFilter.class, new ObjectEntryUserIdCheckBoxFDSFilter(),
 				HashMapDictionaryBuilder.put(
 					"frontend.data.set.name", objectDefinition.getPortletId()
 				).build()),

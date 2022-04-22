@@ -14,6 +14,7 @@
 
 package com.liferay.frontend.data.set.taglib.servlet.taglib;
 
+import com.liferay.frontend.data.set.filter.FDSFilter;
 import com.liferay.frontend.data.set.filter.FDSFilterSerializer;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.data.set.model.FDSPaginationEntry;
@@ -35,7 +36,9 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -92,6 +95,10 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 
 	public CreationMenu getCreationMenu() {
 		return _creationMenu;
+	}
+
+	public List<FDSFilter> getDynamicFDSFilters() {
+		return _dynamicFDSFilters;
 	}
 
 	public List<FDSActionDropdownItem> getFdsActionDropdownItems() {
@@ -178,6 +185,10 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 		_customViewsEnabled = customViewsEnabled;
 	}
 
+	public void setDynamicFDSFilters(List<FDSFilter> dynamicFDSFilters) {
+		_dynamicFDSFilters = dynamicFDSFilters;
+	}
+
 	public void setFdsActionDropdownItems(
 		List<FDSActionDropdownItem> fdsActionDropdownItems) {
 
@@ -212,7 +223,8 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 	public void setPageContext(PageContext pageContext) {
 		_fdsViewSerializer = ServletContextUtil.getFDSViewSerializer();
 
-		_fdsFilterSerializer = ServletContextUtil.getFDSFilterSerializer();
+		_fdsFilterSerializer =
+			ServletContextUtil.getFDSFilterSerializer("object_entries");
 
 		super.setPageContext(pageContext);
 
@@ -262,6 +274,7 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 		_bulkActionDropdownItems = new ArrayList<>();
 		_creationMenu = new CreationMenu();
 		_customViewsEnabled = false;
+		_dynamicFDSFilters = new ArrayList<>();
 		_fdsActionDropdownItems = new ArrayList<>();
 		_fdsFiltersContext = null;
 		_fdsFilterSerializer = null;
@@ -425,6 +438,7 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 	private List<DropdownItem> _bulkActionDropdownItems = new ArrayList<>();
 	private CreationMenu _creationMenu = new CreationMenu();
 	private boolean _customViewsEnabled;
+	private List<FDSFilter> _dynamicFDSFilters = new ArrayList<>();
 	private List<FDSActionDropdownItem> _fdsActionDropdownItems =
 		new ArrayList<>();
 	private Object _fdsFiltersContext;

@@ -116,11 +116,24 @@ public class ObjectEntryEntityModel implements EntityModel {
 	private Optional<EntityField> _getEntityField(ObjectField objectField) {
 		if (objectField.isIndexedAsKeyword()) {
 			return Optional.of(
+				new CollectionEntityField(
 				new StringEntityField(
 					objectField.getName(),
 					locale ->
 						"nestedFieldArray.value_keyword#" +
-							objectField.getName()));
+							objectField.getName())));
+		}
+		else if (Objects.equals(
+			objectField.getBusinessType(),
+			ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+			return Optional.of(
+				new CollectionEntityField(
+				new StringEntityField(
+					objectField.getName(),
+					locale ->
+						"nestedFieldArray.value_keyword_lowercase#" +
+						objectField.getName())));
 		}
 		else if (Objects.equals(
 					objectField.getBusinessType(),

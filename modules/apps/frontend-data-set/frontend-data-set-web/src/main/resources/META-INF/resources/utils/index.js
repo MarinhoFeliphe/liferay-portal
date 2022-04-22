@@ -216,6 +216,10 @@ export function getFiltersString(odataFiltersStrings, providedFilters) {
 		filtersString += createOdataFilter(odataFiltersStrings);
 	}
 
+	console.log(`providedFilters: ${providedFilters}`);
+	console.log(`odataFiltersStrings: ${odataFiltersStrings}`);
+	console.log(`filterString: ${filtersString}`);
+
 	return filtersString;
 }
 

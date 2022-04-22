@@ -79,7 +79,7 @@ function composeMultipleValuesOdataString(key, values, exclude) {
 		.join(exclude ? ' and ' : ' or ')})`;
 }
 
-function composeSingleValuesOdataString(key, value, exclude) {
+function composeSingleValuesOdataString(key, values, exclude) {
 	return `${key} ${exclude ? 'ne' : 'eq'} ${
 		typeof value === 'string' ? `'${value}'` : value
 	}`;
@@ -102,7 +102,7 @@ const getOdataString = ({id, selectedData, selectionType}) => {
 
 		return selectionType === 'multiple'
 			? composeMultipleValuesOdataString(id, values, exclude)
-			: composeSingleValuesOdataString(id, values[0], exclude);
+			: composeSingleValuesOdataString(id, values, exclude);
 	}
 
 	return null;
