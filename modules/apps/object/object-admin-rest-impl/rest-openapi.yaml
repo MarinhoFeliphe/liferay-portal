@@ -403,7 +403,7 @@ components:
                 definition:
                     type: string
                 filterType:
-                    enum: [EXCLUDES, INCLUDES]
+                    enum: [excludes, includes]
                     type: string
                 id:
                     format: int64
