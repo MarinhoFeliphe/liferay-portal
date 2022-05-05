@@ -32,6 +32,10 @@ interface IViewContextProps extends Array<TState | Function> {
 	1: React.Dispatch<React.ReducerAction<React.Reducer<TState, TAction>>>;
 }
 
+interface TInitialFilterColumn extends TObjectViewFilterColumn {
+	json: string;
+}
+
 const ViewContext = createContext({} as IViewContextProps);
 
 export const METADATAS = [
@@ -209,11 +213,14 @@ const viewReducer = (state: TState, action: TAction) => {
 			const [label] = labels;
 
 			const newFilterColumnItem: TObjectViewFilterColumn = {
-				definition: {
-					[filterType]: valueList.map(
-						(item: {label: string; value: string}) => item.value
-					),
-				},
+				definition: filterType
+					? {
+							[filterType]: valueList.map(
+								(item: {label: string; value: string}) =>
+									item.value
+							),
+					  }
+					: null,
 				fieldLabel: label[defaultLanguageId],
 				filterBy: label[defaultLanguageId],
 				filterType,
@@ -333,7 +340,11 @@ const viewReducer = (state: TState, action: TAction) => {
 		case TYPES.ADD_OBJECT_FIELDS: {
 			const {objectFields, objectView} = action.payload;
 
-			const {objectViewColumns, objectViewSortColumns} = objectView;
+			const {
+				objectViewColumns,
+				objectViewFilterColumns,
+				objectViewSortColumns,
+			} = objectView;
 
 			const objectFieldsWithCheck = objectFields.map(
 				(field: TObjectField) => {
@@ -363,6 +374,16 @@ const viewReducer = (state: TState, action: TAction) => {
 						}
 					}
 				);
+
+				const existingFilter = objectViewFilterColumns.find(
+					(filter: {objectFieldName: string}) => {
+						if (filter.objectFieldName === field.name) {
+							return filter;
+						}
+					}
+				);
+
+				field.hasFilter = existingFilter;
 			});
 
 			const newObjectViewColumns: TObjectViewColumn[] = [];
@@ -407,9 +428,41 @@ const viewReducer = (state: TState, action: TAction) => {
 				}
 			);
 
+			const newObjectViewFilterColumns = objectViewFilterColumns.map(
+				(filterColumn: TInitialFilterColumn) => {
+					const definition = JSON.parse(filterColumn.json);
+					const filterType = filterColumn.filterType?.toLowerCase();
+					const objectFieldName = filterColumn.objectFieldName;
+					const objectField = newObjectFields.find(
+						(field: TObjectField) => {
+							if (field.name === objectFieldName) {
+								return field;
+							}
+						}
+					);
+
+					return {
+						...filterColumn,
+						definition,
+						fieldLabel: objectField?.label[defaultLanguageId],
+						filterBy: objectFieldName,
+						filterType,
+						objectFieldBusinessType: objectField?.businessType,
+						valueList:
+							filterType &&
+							definition[filterType].map(
+								(item: TLabelValueObject) => {
+									return {label: item, value: item};
+								}
+							),
+					};
+				}
+			);
+
 			const newObjectView = {
 				...objectView,
 				objectViewColumns: newObjectViewColumns,
+				objectViewFilterColumns: newObjectViewFilterColumns,
 				objectViewSortColumns: newObjectViewSortColumns,
 			};
 
