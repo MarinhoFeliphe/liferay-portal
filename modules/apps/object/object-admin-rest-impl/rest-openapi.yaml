@@ -414,6 +414,9 @@ components:
                     type: string
                 objectFieldName:
                     type: string
+                valueSummary:
+                    readOnly: true
+                    type: string
         ObjectViewSortColumn:
             properties:
                 id:
