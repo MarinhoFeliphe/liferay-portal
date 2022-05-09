@@ -95,16 +95,16 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 		return _creationMenu;
 	}
 
-	public List<FDSFilter> getDynamicFDSFilters() {
-		return _dynamicFDSFilters;
-	}
-
 	public List<FDSActionDropdownItem> getFdsActionDropdownItems() {
 		return _fdsActionDropdownItems;
 	}
 
 	public List<FDSSortItem> getFdsSortItemList() {
 		return _fdsSortItemList;
+	}
+
+	public List<FDSFilter> getFilters() {
+		return _filters;
 	}
 
 	public String getFormId() {
@@ -183,10 +183,6 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 		_customViewsEnabled = customViewsEnabled;
 	}
 
-	public void setDynamicFDSFilters(List<FDSFilter> dynamicFDSFilters) {
-		_dynamicFDSFilters = dynamicFDSFilters;
-	}
-
 	public void setFdsActionDropdownItems(
 		List<FDSActionDropdownItem> fdsActionDropdownItems) {
 
@@ -195,6 +191,10 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 
 	public void setFdsSortItemList(FDSSortItemList fdsSortItemList) {
 		_fdsSortItemList = fdsSortItemList;
+	}
+
+	public void setFilters(List<FDSFilter> filters) {
+		_filters = filters;
 	}
 
 	public void setFormId(String formId) {
@@ -271,7 +271,6 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 		_bulkActionDropdownItems = new ArrayList<>();
 		_creationMenu = new CreationMenu();
 		_customViewsEnabled = false;
-		_dynamicFDSFilters = new ArrayList<>();
 		_fdsActionDropdownItems = new ArrayList<>();
 		_fdsFiltersContext = null;
 		_fdsFilterSerializer = null;
@@ -279,6 +278,7 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 		_fdsSortItemList = new FDSSortItemList();
 		_fdsViewsContext = null;
 		_fdsViewSerializer = null;
+		_filters = new ArrayList<>();
 		_formId = null;
 		_formName = null;
 		_itemsPerPage = 0;
@@ -393,8 +393,7 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 
 	private void _setFDSFiltersContext() {
 		_fdsFiltersContext = _fdsFilterSerializer.serialize(
-			getDynamicFDSFilters(), getId(),
-			PortalUtil.getLocale(getRequest()));
+			getId(), getFilters(), PortalUtil.getLocale(getRequest()));
 	}
 
 	private void _setFDSPaginationEntries() {
@@ -436,7 +435,6 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 	private List<DropdownItem> _bulkActionDropdownItems = new ArrayList<>();
 	private CreationMenu _creationMenu = new CreationMenu();
 	private boolean _customViewsEnabled;
-	private List<FDSFilter> _dynamicFDSFilters = new ArrayList<>();
 	private List<FDSActionDropdownItem> _fdsActionDropdownItems =
 		new ArrayList<>();
 	private Object _fdsFiltersContext;
@@ -445,6 +443,7 @@ public class HeadlessDisplayTag extends BaseDisplayTag {
 	private FDSSortItemList _fdsSortItemList = new FDSSortItemList();
 	private Object _fdsViewsContext;
 	private FDSViewSerializer _fdsViewSerializer;
+	private List<FDSFilter> _filters = new ArrayList<>();
 	private String _formId;
 	private String _formName;
 	private int _itemsPerPage;

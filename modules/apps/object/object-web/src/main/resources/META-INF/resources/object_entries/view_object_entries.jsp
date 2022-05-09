@@ -27,9 +27,9 @@ ObjectDefinition objectDefinition = viewObjectEntriesDisplayContext.getObjectDef
 		<frontend-data-set:headless-display
 			apiURL="<%= viewObjectEntriesDisplayContext.getAPIURL() %>"
 			creationMenu="<%= viewObjectEntriesDisplayContext.getCreationMenu() %>"
-			dynamicFDSFilters="<%= viewObjectEntriesDisplayContext.getDynamicFDSFilters() %>"
 			fdsActionDropdownItems="<%= viewObjectEntriesDisplayContext.getFDSActionDropdownItems() %>"
 			fdsSortItemList="<%= viewObjectEntriesDisplayContext.getFDSSortItemList() %>"
+			filters="<%= viewObjectEntriesDisplayContext.getFilters() %>"
 			formName="fm"
 			id="<%= viewObjectEntriesDisplayContext.getFDSId() %>"
 			itemsPerPage="<%= 20 %>"

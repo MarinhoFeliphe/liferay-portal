@@ -43,7 +43,7 @@ public class FDSFilterSerializerImpl implements FDSFilterSerializer {
 
 	@Override
 	public JSONArray serialize(
-		List<FDSFilter> dynamicFDSFilters, String fdsName, Locale locale) {
+		String fdsName, List<FDSFilter> filters, Locale locale) {
 
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
 
@@ -51,7 +51,7 @@ public class FDSFilterSerializerImpl implements FDSFilterSerializer {
 			"content.Language", locale, getClass());
 
 		List<FDSFilter> fdsFilters = ListUtil.concat(
-			dynamicFDSFilters, _fdsFilterRegistry.getFDSFilters(fdsName));
+			filters, _fdsFilterRegistry.getFDSFilters(fdsName));
 
 		for (FDSFilter fdsFilter : fdsFilters) {
 			String label = LanguageUtil.get(
