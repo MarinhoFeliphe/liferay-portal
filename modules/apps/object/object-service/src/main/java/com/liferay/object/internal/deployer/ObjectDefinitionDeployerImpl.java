@@ -14,6 +14,7 @@
 
 package com.liferay.object.internal.deployer;
 
+import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
@@ -75,6 +76,7 @@ import org.osgi.framework.ServiceRegistration;
 public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	public ObjectDefinitionDeployerImpl(
+		AssetTagLocalService assetTagLocalService,
 		BundleContext bundleContext,
 		DynamicQueryBatchIndexingActionableFactory
 			dynamicQueryBatchIndexingActionableFactory,
@@ -90,6 +92,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ResourceActions resourceActions,
 		ModelPreFilterContributor workflowStatusModelPreFilterContributor) {
 
+		_assetTagLocalService = assetTagLocalService;
 		_bundleContext = bundleContext;
 		_dynamicQueryBatchIndexingActionableFactory =
 			dynamicQueryBatchIndexingActionableFactory;
@@ -139,7 +142,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				InfoCollectionProvider.class,
 				new ObjectEntrySingleFormVariationInfoCollectionProvider(
-					_listTypeEntryLocalService, objectDefinition,
+					_assetTagLocalService, _listTypeEntryLocalService, objectDefinition,
 					_objectEntryLocalService, _objectFieldLocalService,
 					_objectScopeProviderRegistry),
 				HashMapDictionaryBuilder.<String, Object>put(
@@ -276,6 +279,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					})));
 	}
 
+	private final AssetTagLocalService _assetTagLocalService;
 	private final BundleContext _bundleContext;
 	private final DynamicQueryBatchIndexingActionableFactory
 		_dynamicQueryBatchIndexingActionableFactory;
