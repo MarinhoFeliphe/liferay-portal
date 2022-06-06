@@ -14,6 +14,7 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.layout.model.LayoutClassedModelUsage;
@@ -517,7 +518,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 		_addingObjectDefinitionDeployer(
 			new ObjectDefinitionDeployerImpl(
-				_assetTagLocalService, _bundleContext, _dynamicQueryBatchIndexingActionableFactory,
+				_assetCategoryLocalService, _assetTagLocalService,
+				_bundleContext, _dynamicQueryBatchIndexingActionableFactory,
 				_listTypeEntryLocalService, _modelSearchRegistrarHelper, this,
 				_objectEntryLocalService, _objectFieldLocalService,
 				_objectRelationshipLocalService, _objectScopeProviderRegistry,
@@ -1241,10 +1243,13 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinitionLocalServiceUtil.class, "undeployObjectDefinition",
 			ObjectDefinition.class);
 
-	private BundleContext _bundleContext;
+	@Reference
+	private AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;
+
+	private BundleContext _bundleContext;
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;

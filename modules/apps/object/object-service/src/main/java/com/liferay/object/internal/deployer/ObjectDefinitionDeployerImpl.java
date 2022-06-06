@@ -14,6 +14,7 @@
 
 package com.liferay.object.internal.deployer;
 
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
@@ -76,8 +77,8 @@ import org.osgi.framework.ServiceRegistration;
 public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	public ObjectDefinitionDeployerImpl(
-		AssetTagLocalService assetTagLocalService,
-		BundleContext bundleContext,
+		AssetCategoryLocalService assetCategoryLocalService,
+		AssetTagLocalService assetTagLocalService, BundleContext bundleContext,
 		DynamicQueryBatchIndexingActionableFactory
 			dynamicQueryBatchIndexingActionableFactory,
 		ListTypeEntryLocalService listTypeEntryLocalService,
@@ -92,6 +93,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ResourceActions resourceActions,
 		ModelPreFilterContributor workflowStatusModelPreFilterContributor) {
 
+		_assetCategoryLocalService = assetCategoryLocalService;
 		_assetTagLocalService = assetTagLocalService;
 		_bundleContext = bundleContext;
 		_dynamicQueryBatchIndexingActionableFactory =
@@ -142,7 +144,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				InfoCollectionProvider.class,
 				new ObjectEntrySingleFormVariationInfoCollectionProvider(
-					_assetTagLocalService, _listTypeEntryLocalService, objectDefinition,
+					_assetCategoryLocalService, _assetTagLocalService,
+					_listTypeEntryLocalService, objectDefinition,
 					_objectEntryLocalService, _objectFieldLocalService,
 					_objectScopeProviderRegistry),
 				HashMapDictionaryBuilder.<String, Object>put(
@@ -279,6 +282,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					})));
 	}
 
+	private final AssetCategoryLocalService _assetCategoryLocalService;
 	private final AssetTagLocalService _assetTagLocalService;
 	private final BundleContext _bundleContext;
 	private final DynamicQueryBatchIndexingActionableFactory

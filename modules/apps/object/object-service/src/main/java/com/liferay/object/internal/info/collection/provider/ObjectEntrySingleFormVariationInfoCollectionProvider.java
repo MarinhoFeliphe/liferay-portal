@@ -15,6 +15,7 @@
 package com.liferay.object.internal.info.collection.provider;
 
 import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.ConfigurableInfoCollectionProvider;
@@ -101,6 +102,7 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 			   SingleFormVariationInfoCollectionProvider<ObjectEntry> {
 
 	public ObjectEntrySingleFormVariationInfoCollectionProvider(
+		AssetCategoryLocalService assetCategoryLocalService,
 		AssetTagLocalService assetTagLocalService,
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinition objectDefinition,
@@ -108,6 +110,7 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
 
+		_assetCategoryLocalService = assetCategoryLocalService;
 		_assetTagLocalService = assetTagLocalService;
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinition = objectDefinition;
@@ -518,6 +521,7 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntrySingleFormVariationInfoCollectionProvider.class);
 
+	private final AssetCategoryLocalService _assetCategoryLocalService;
 	private final AssetTagLocalService _assetTagLocalService;
 	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectDefinition _objectDefinition;
