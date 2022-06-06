@@ -14,6 +14,7 @@
 
 package com.liferay.object.internal.info.collection.provider;
 
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
@@ -79,6 +80,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.util.TransformUtil;
+import com.liferay.portlet.asset.util.comparator.AssetCategoryCreateDateComparator;
 import com.liferay.portlet.asset.util.comparator.AssetTagNameComparator;
 
 import java.util.ArrayList;
@@ -157,6 +159,8 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 	@Override
 	public InfoForm getConfigurationInfoForm() {
 		return InfoForm.builder(
+		).infoFieldSetEntry(
+			_getAssetCategoriesInfoField()
 		).infoFieldSetEntry(
 			_getAssetTagsInfoField()
 		).infoFieldSetEntry(
@@ -281,6 +285,20 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 			searchContext.setAssetTagNames(assetTagNames);
 		}
 
+		String[] assetCategoryIds = configuration.get(Field.ASSET_CATEGORY_IDS);
+
+		if (ArrayUtil.isNotEmpty(assetCategoryIds) &&
+			Validator.isNotNull(assetCategoryIds[0])) {
+
+			long[] categoryIds = new long[assetCategoryIds.length];
+
+			for(int i = 0; i < assetCategoryIds.length; i++) {
+				categoryIds[i] = Long.parseLong(assetCategoryIds[i]);
+			}
+
+			searchContext.setCategoryIds(categoryIds);
+		}
+
 		searchContext.setStart(pagination.getStart());
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
@@ -289,6 +307,81 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 		queryConfig.setScoreEnabled(false);
 
 		return searchContext;
+	}
+
+	private boolean _hasCategorizationLayoutBox() {
+		List<ObjectLayout> objectLayouts = Stream.of(
+			ObjectLayoutLocalServiceUtil.getObjectLayouts(
+				_objectDefinition.getObjectDefinitionId())
+		).flatMap(
+			List::stream
+		).filter(
+			ObjectLayoutModel::isDefaultObjectLayout
+		).collect(
+			Collectors.toList()
+		);
+
+		if (!objectLayouts.isEmpty()) {
+			ObjectLayout objectLayout = objectLayouts.get(0);
+
+			for (ObjectLayoutTab objectLayoutTab :
+				objectLayout.getObjectLayoutTabs()) {
+
+				if (ListUtil.exists(
+					objectLayoutTab.getObjectLayoutBoxes(),
+					objectLayoutBox -> StringUtil.equals(
+						objectLayoutBox.getType(),
+						ObjectLayoutBoxConstants.
+							TYPE_CATEGORIZATION))) {
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private InfoField<?> _getAssetCategoriesInfoField() {
+		if (!StringUtil.equals(
+			_objectDefinition.getStorageType(),
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT) ||
+			!_hasCategorizationLayoutBox()) {
+
+			return null;
+		}
+
+		List<AssetCategory> assetCategories = new ArrayList<>(
+			_assetCategoryLocalService.getCategories());
+
+		List<SelectInfoFieldType.Option> options = new ArrayList<>();
+
+		for (AssetCategory assetCategory : assetCategories) {
+			options.add(
+				new SelectInfoFieldType.Option(
+					new SingleValueInfoLocalizedValue<>(assetCategory.getName()),
+					String.valueOf(assetCategory.getCategoryId())));
+		}
+
+		InfoField.FinalStep<?> finalStep = InfoField.builder(
+		).infoFieldType(
+			SelectInfoFieldType.INSTANCE
+		).namespace(
+			StringPool.BLANK
+		).name(
+			Field.ASSET_CATEGORY_IDS
+		).attribute(
+			SelectInfoFieldType.MULTIPLE, true
+		).attribute(
+			SelectInfoFieldType.OPTIONS, options
+		).labelInfoLocalizedValue(
+			InfoLocalizedValue.localize(getClass(), "category")
+		).localizable(
+			true
+		);
+
+		return finalStep.build();
 	}
 
 	private InfoField<?> _getAssetTagsInfoField() {
