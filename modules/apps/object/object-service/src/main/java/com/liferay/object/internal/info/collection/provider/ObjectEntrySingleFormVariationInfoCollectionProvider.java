@@ -277,26 +277,25 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 		Map<String, String[]> configuration = configurationOptional.orElse(
 			Collections.emptyMap());
 
+		String[] assetCategoryIds = configuration.get(Field.ASSET_CATEGORY_IDS);
+
+		if (ArrayUtil.isNotEmpty(assetCategoryIds) &&
+			Validator.isNotNull(assetCategoryIds[0])) {
+
+			searchContext.setAssetCategoryIds(
+				Arrays.stream(
+					assetCategoryIds
+				).mapToLong(
+					Long::parseLong
+				).toArray());
+		}
+
 		String[] assetTagNames = configuration.get(Field.ASSET_TAG_NAMES);
 
 		if (ArrayUtil.isNotEmpty(assetTagNames) &&
 			Validator.isNotNull(assetTagNames[0])) {
 
 			searchContext.setAssetTagNames(assetTagNames);
-		}
-
-		String[] assetCategoryIds = configuration.get(Field.ASSET_CATEGORY_IDS);
-
-		if (ArrayUtil.isNotEmpty(assetCategoryIds) &&
-			Validator.isNotNull(assetCategoryIds[0])) {
-
-			long[] categoryIds = new long[assetCategoryIds.length];
-
-			for(int i = 0; i < assetCategoryIds.length; i++) {
-				categoryIds[i] = Long.parseLong(assetCategoryIds[i]);
-			}
-
-			searchContext.setCategoryIds(categoryIds);
 		}
 
 		searchContext.setStart(pagination.getStart());
