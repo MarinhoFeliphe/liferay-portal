@@ -22,7 +22,7 @@ import SetupDXPCloud from '../../../../../common/containers/setup-forms/SetupDXP
 import {useAppPropertiesContext} from '../../../../../common/contexts/AppPropertiesContext';
 import {
 	getAccountSubscriptionGroups,
-	getAccountSubscriptionsTerms,
+	getCommerceOrderItems,
 } from '../../../../../common/services/liferay/graphql/queries';
 import getActivationStatusDateRange from '../../../../../common/utils/getActivationStatusDateRange';
 import {ALERT_UPDATE_DXP_CLOUD_STATUS} from '../../../containers/ActivationKeysTable/utils/constants';
@@ -210,10 +210,10 @@ const ActivationStatusDXPCloud = ({
 		];
 
 	useEffect(() => {
-		const getSubscriptionTerms = async () => {
-			const filterAccountSubscriptionERC = `accountSubscriptionGroupERC eq '${project.accountKey}_dxp-cloud'`;
+		const fetchCommerceOrderItems = async () => {
+			const filterAccountSubscriptionERC = `customFields/name eq 'accountSubscriptionGroupERC' and customFields/customValue/data eq '${project.accountKey}_dxp-cloud'`;
 			const {data} = await client.query({
-				query: getAccountSubscriptionsTerms,
+				query: getCommerceOrderItems,
 				variables: {
 					filter: filterAccountSubscriptionERC,
 				},
@@ -221,13 +221,13 @@ const ActivationStatusDXPCloud = ({
 
 			if (data) {
 				const activationStatusDateRange = getActivationStatusDateRange(
-					data.c?.accountSubscriptionTerms?.items
+					data.orderItems?.items
 				);
 				setActivationStatusDate(activationStatusDateRange);
 			}
 		};
 
-		getSubscriptionTerms();
+		fetchCommerceOrderItems();
 	}, [project]);
 
 	return (
