@@ -314,6 +314,10 @@ public interface ObjectRelationshipLocalService
 	public List<ObjectRelationship> getObjectRelationships(
 		long objectDefinitionId1, int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectRelationship> getObjectRelationships(
+		long objectDefinitionId1, long objectDefinition2);
+
 	/**
 	 * Returns the number of object relationships.
 	 *

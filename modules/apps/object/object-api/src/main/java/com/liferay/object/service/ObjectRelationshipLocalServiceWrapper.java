@@ -424,6 +424,15 @@ public class ObjectRelationshipLocalServiceWrapper
 			objectDefinitionId1, start, end);
 	}
 
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectRelationship>
+		getObjectRelationships(
+			long objectDefinitionId1, long objectDefinition2) {
+
+		return _objectRelationshipLocalService.getObjectRelationships(
+			objectDefinitionId1, objectDefinition2);
+	}
+
 	/**
 	 * Returns the number of object relationships.
 	 *
