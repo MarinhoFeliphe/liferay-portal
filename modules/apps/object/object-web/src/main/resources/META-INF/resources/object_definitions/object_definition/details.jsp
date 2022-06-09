@@ -23,7 +23,8 @@ ObjectDefinitionsDetailsDisplayContext objectDefinitionsDetailsDisplayContext = 
 
 ObjectDefinition objectDefinition = objectDefinitionsDetailsDisplayContext.getObjectDefinition();
 
-List<ObjectField> objectFields = (List<ObjectField>)request.getAttribute(ObjectWebKeys.OBJECT_FIELDS);
+List<ObjectField> objectAccountRelationshipFields = objectDefinitionsDetailsDisplayContext.getObjectAccountRelationshipFields();
+List<ObjectField> objectNonRelationshipFields = objectDefinitionsDetailsDisplayContext.getObjectNonRelationshipFields();
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(backURL);
@@ -99,7 +100,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 							<aui:option label='<%= LanguageUtil.get(request, "id") %>' selected="<%= true %>" value="" />
 
 							<%
-							for (ObjectField objectField : objectFields) {
+							for (ObjectField objectField : objectNonRelationshipFields) {
 							%>
 
 								<aui:option label="<%= objectField.getLabel(locale) %>" selected="<%= Objects.equals(objectField.getObjectFieldId(), objectDefinition.getTitleObjectFieldId()) %>" value="<%= objectField.getObjectFieldId() %>" />
@@ -121,7 +122,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 						<aui:select disabled="<%= objectDefinition.isSystem() || !objectDefinitionsDetailsDisplayContext.hasUpdateObjectDefinitionPermission() %>" name="descriptionObjectFieldId" showEmptyOption="<%= true %>">
 
 							<%
-							for (ObjectField objectField : objectFields) {
+							for (ObjectField objectField : objectNonRelationshipFields) {
 							%>
 
 								<aui:option label="<%= objectField.getLabel(locale) %>" selected="<%= Objects.equals(objectField.getObjectFieldId(), objectDefinition.getDescriptionObjectFieldId()) %>" value="<%= objectField.getObjectFieldId() %>" />
@@ -172,6 +173,39 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 							%>
 
 								<aui:option label="<%= keyValuePair.getValue() %>" selected="<%= Objects.equals(keyValuePair.getKey(), objectDefinition.getPanelCategoryKey()) %>" value="<%= keyValuePair.getKey() %>" />
+
+							<%
+							}
+							%>
+
+						</aui:select>
+					</clay:col>
+				</clay:row>
+			</clay:sheet-section>
+
+			<clay:sheet-section
+				cssClass='<%= objectDefinition.getName().equals("AccountEntry") ? "hide" : "" %>'
+			>
+				<h3 class="sheet-subtitle">
+					<%= LanguageUtil.get(request, "account-restriction") %>
+				</h3>
+
+				<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+					<aui:input disabled="<%= ListUtil.isEmpty(objectAccountRelationshipFields) %>" label="" labelOff='<%= LanguageUtil.get(request, "inactive") %>' labelOn='<%= LanguageUtil.get(request, "active") %>' name="accountEntryRestricted" onChange='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "handleAccountRestrictionToggleChange(event);" %>' type="toggle-switch" value="<%= objectDefinition.isAccountEntryRestricted() %>" />
+				</aui:field-wrapper>
+
+				<clay:row>
+					<clay:col
+						md="11"
+					>
+						<aui:select disabled="<%= ListUtil.isEmpty(objectAccountRelationshipFields) || !objectDefinition.isAccountEntryRestricted() %>" name="accountEntryRestrictedObjectFieldId" showEmptyOption="<%= false %>">
+							<aui:option label='<%= LanguageUtil.get(request, "choose-an-option") %>' selected="<%= true %>" value="0" />
+
+							<%
+							for (ObjectField objectAccountRelationshipField : objectAccountRelationshipFields) {
+							%>
+
+								<aui:option label="<%= objectAccountRelationshipField.getLabel(locale) %>" selected="<%= Objects.equals(objectAccountRelationshipField.getObjectFieldId(), objectDefinition.getTitleObjectFieldId()) %>" value="<%= objectAccountRelationshipField.getObjectFieldId() %>" />
 
 							<%
 							}
@@ -249,5 +283,24 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 		}
 
 		submitForm(form);
+	}
+
+	let restrictionToggleState = '<%= objectDefinition.isAccountEntryRestricted() %>' === 'true';
+
+	function <portlet:namespace />handleAccountRestrictionToggleChange(event) {
+		const accountRestrictionSelect = document.getElementById("<portlet:namespace />accountEntryRestrictedObjectFieldId");
+
+		restrictionToggleState = !restrictionToggleState;
+
+		console.log('LOG ' + event);
+
+		if (restrictionToggleState) {
+			accountRestrictionSelect.removeAttribute('disabled');
+			accountRestrictionSelect.className = 'form-control';
+		} else {
+			accountRestrictionSelect.setAttribute('disabled', '');
+			accountRestrictionSelect.className ='form-control disabled';
+			accountRestrictionSelect.value = '0';
+		}
 	}
 </script>
