@@ -335,6 +335,11 @@ public interface ObjectValidationRuleLocalService
 	public ObjectValidationRule updateObjectValidationRule(
 		ObjectValidationRule objectValidationRule);
 
+	public void validate(
+			Object object, long objectDefinitionId,
+			Map<String, Object> modelAttributes)
+		throws PortalException;
+
 	public void validate(ObjectEntry objectEntry) throws PortalException;
 
 }

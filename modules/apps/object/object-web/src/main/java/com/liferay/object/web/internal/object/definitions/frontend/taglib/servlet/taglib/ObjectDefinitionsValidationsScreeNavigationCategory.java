@@ -73,9 +73,7 @@ public class ObjectDefinitionsValidationsScreeNavigationCategory
 
 	@Override
 	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
-		if (!objectDefinition.isSystem() &&
-			objectDefinition.isDefaultStorageType()) {
-
+		if (objectDefinition.isDefaultStorageType()) {
 			return true;
 		}
 

@@ -21,6 +21,8 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
 import com.liferay.portal.aop.AopService;
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.liferay.portal.service.impl.UserLocalServiceImpl;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -174,6 +177,52 @@ public class ObjectValidationRuleLocalServiceImpl
 	}
 
 	@Override
+	public void validate(
+			Object object, long objectDefinitionId,
+			Map<String, Object> modelAttributes)
+		throws PortalException {
+
+		if (object == null) {
+			return;
+		}
+
+		HashMapBuilder.HashMapWrapper<String, Object> hashMapWrapper =
+			HashMapBuilder.<String, Object>putAll(modelAttributes);
+
+		if (PrincipalThreadLocal.getUserId() > 0) {
+			hashMapWrapper.put(
+				"currentUserId", PrincipalThreadLocal.getUserId());
+		}
+
+		List<ObjectValidationRule> objectValidationRules =
+			objectValidationRuleLocalService.getObjectValidationRules(
+				objectDefinitionId, true);
+
+		for (ObjectValidationRule objectValidationRule :
+				objectValidationRules) {
+
+			ObjectValidationRuleEngine objectValidationRuleEngine =
+				_objectValidationRuleEngineServicesTracker.
+					getObjectValidationRuleEngine(
+						objectValidationRule.getEngine());
+
+			Map<String, Object> results = objectValidationRuleEngine.execute(
+				hashMapWrapper.build(), objectValidationRule.getScript());
+
+			if (GetterUtil.getBoolean(results.get("invalidScript"))) {
+				throw new ObjectValidationRuleScriptException(
+					"Script is invalid");
+			}
+
+			if (GetterUtil.getBoolean(results.get("invalidFields"))) {
+				throw new ObjectValidationRuleEngineException(
+					objectValidationRule.getErrorLabel(
+						LocaleUtil.getMostRelevantLocale()));
+			}
+		}
+	}
+
+	@Override
 	public void validate(ObjectEntry objectEntry) throws PortalException {
 		if (objectEntry == null) {
 			return;
@@ -256,7 +305,13 @@ public class ObjectValidationRuleLocalServiceImpl
 	}
 
 	@Reference
+	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectFieldPersistence _objectFieldPersistence;
 
 	@Reference
 	private ObjectValidationRuleEngineServicesTracker
