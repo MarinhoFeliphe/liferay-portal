@@ -18,6 +18,10 @@
 
 <liferay-ui:error-header />
 
+<liferay-ui:error exception="<%= ObjectValidationRuleEngineException.class %>" message="an-unexpected-error-occurred" />
+<liferay-ui:error exception="<%= ScriptingException.class %>" message="an-unexpected-error-occurred" />
+<liferay-ui:error exception="<%= ModelListenerException.class %>" message="an-unexpected-error-occurred" />
+
 <liferay-ui:error exception="<%= ContactNameException.MustHaveFirstName.class %>" message="please-enter-a-valid-first-name" />
 <liferay-ui:error exception="<%= ContactNameException.MustHaveLastName.class %>" message="please-enter-a-valid-last-name" />
 <liferay-ui:error exception="<%= ContactNameException.MustHaveMiddleName.class %>" message="please-enter-a-valid-middle-name" />
