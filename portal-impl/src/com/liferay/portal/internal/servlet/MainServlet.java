@@ -14,7 +14,6 @@
 
 package com.liferay.portal.internal.servlet;
 
-import com.liferay.object.exception.ObjectValidationRuleScriptException;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -526,8 +525,8 @@ public class MainServlet extends HttpServlet {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Authenticated user id " + userId);
 			}
-		} catch(ObjectValidationRuleScriptException objectValidationRuleScriptException) {
-			throw new ServletException(objectValidationRuleScriptException);
+		} catch(PortalException portalException) {
+			throw new ServletException(portalException);
 		}
 		catch (Exception exception) {
 			_log.error(exception);
