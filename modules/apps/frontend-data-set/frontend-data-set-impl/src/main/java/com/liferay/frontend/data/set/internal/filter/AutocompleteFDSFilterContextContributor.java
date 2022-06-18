@@ -53,7 +53,8 @@ public class AutocompleteFDSFilterContextContributor
 		return HashMapBuilder.<String, Object>put(
 			"apiURL", baseAutocompleteFDSFilter.getAPIURL()
 		).put(
-			"entityFieldType", baseAutocompleteFDSFilter.getEntityFieldType()
+			"fieldIndexingType",
+			baseAutocompleteFDSFilter.getFieldIndexingType()
 		).put(
 			"inputPlaceholder",
 			LanguageUtil.get(locale, baseAutocompleteFDSFilter.getPlaceholder())

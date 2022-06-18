@@ -26,8 +26,8 @@ public abstract class BaseAutocompleteFDSFilter implements FDSFilter {
 
 	public abstract String getAPIURL();
 
-	public String getEntityFieldType() {
-		return "collection";
+	public String getFieldIndexingType() {
+		return "notIndexed";
 	}
 
 	public abstract String getItemKey();

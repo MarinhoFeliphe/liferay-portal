@@ -41,8 +41,8 @@ public class ListTypeEntryAutocompleteFDSFilter
 	}
 
 	@Override
-	public String getEntityFieldType() {
-		return "string";
+	public String getFieldIndexingType() {
+		return "indexedAsKeyword";
 	}
 
 	@Override
