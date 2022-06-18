@@ -36,6 +36,11 @@ public class CommerceCatalogFDSFilter extends BaseAutocompleteFDSFilter {
 	}
 
 	@Override
+	public String getFieldIndexingType() {
+		return "indexedAsKeyword";
+	}
+
+	@Override
 	public String getId() {
 		return "catalogId";
 	}
