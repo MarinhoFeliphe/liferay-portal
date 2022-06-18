@@ -68,15 +68,10 @@ Item.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
-function composeOdataExpressionLambda(key, values, exclude) {
-	return `${key}/any(x:${values
-		.map(
-			(value) =>
-				`(x ${exclude ? 'ne' : 'eq'} ${
-					typeof value === 'string' ? `'${value}'` : value
-				})`
-		)
-		.join(exclude ? ' and ' : ' or ')})`;
+function composeOdataExpressionEq(key, value, exclude) {
+	return `${key} ${exclude ? 'ne' : 'eq'} ${
+		typeof value === 'string' ? `'${value}'` : value
+	}`;
 }
 
 function composeOdataExpressionIn(key, values, exclude) {
@@ -91,10 +86,15 @@ function composeOdataExpressionIn(key, values, exclude) {
 	return expression;
 }
 
-function composeOdataExpressionEq(key, value, exclude) {
-	return `${key} ${exclude ? 'ne' : 'eq'} ${
-		typeof value === 'string' ? `'${value}'` : value
-	}`;
+function composeOdataExpressionLambda(key, values, exclude) {
+	return `${key}/any(x:${values
+		.map(
+			(value) =>
+				`(x ${exclude ? 'ne' : 'eq'} ${
+					typeof value === 'string' ? `'${value}'` : value
+				})`
+		)
+		.join(exclude ? ' and ' : ' or ')})`;
 }
 
 const getSelectedItemsLabel = ({selectedData}) => {
