@@ -68,7 +68,7 @@ Item.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
-function composeCollectionEntityFieldMultipleValuesOdata(key, values, exclude) {
+function composeOdataExpressionLambda(key, values, exclude) {
 	return `${key}/any(x:${values
 		.map(
 			(value) =>
@@ -79,7 +79,7 @@ function composeCollectionEntityFieldMultipleValuesOdata(key, values, exclude) {
 		.join(exclude ? ' and ' : ' or ')})`;
 }
 
-function composeStringEntityFieldMultipleValuesOdata(key, values, exclude) {
+function composeOdataExpressionIn(key, values, exclude) {
 	const expression = `${key} in (${values
 		.map((value) => `'${value}'`)
 		.join(', ')})`;
@@ -91,7 +91,7 @@ function composeStringEntityFieldMultipleValuesOdata(key, values, exclude) {
 	return expression;
 }
 
-function composeSingleValuesOdataString(key, value, exclude) {
+function composeOdataExpressionEq(key, value, exclude) {
 	return `${key} ${exclude ? 'ne' : 'eq'} ${
 		typeof value === 'string' ? `'${value}'` : value
 	}`;
@@ -106,34 +106,28 @@ const getSelectedItemsLabel = ({selectedData}) => {
 	);
 };
 
-const getOdataString = ({entityFieldType, id, selectedData, selectionType}) => {
+const getOdataString = ({fieldIndexingType, id, selectedData}) => {
 	const {exclude, itemsValues} = selectedData;
 
 	if (itemsValues?.length) {
 		const values = itemsValues.map((item) => item.value);
 
-		if (entityFieldType === 'string') {
-			return composeStringEntityFieldMultipleValuesOdata(
-				id,
-				values,
-				exclude
-			);
+		if (fieldIndexingType === 'indexedAsKeyword') {
+			if (values.length === 1) {
+				return composeOdataExpressionEq(id, values[0], exclude);
+			}
+
+			return composeOdataExpressionIn(id, values, exclude);
 		}
 
-		return selectionType === 'multiple'
-			? composeCollectionEntityFieldMultipleValuesOdata(
-					id,
-					values,
-					exclude
-			  )
-			: composeSingleValuesOdataString(id, values[0], exclude);
+		return composeOdataExpressionLambda(id, values, exclude);
 	}
 
 	return null;
 };
 function AutocompleteFilter({
 	apiURL,
-	entityFieldType,
+	fieldIndexingType,
 	id,
 	inputPlaceholder,
 	itemKey,
@@ -409,10 +403,9 @@ function AutocompleteFilter({
 								active: true,
 								id,
 								odataFilterString: getOdataString({
-									entityFieldType,
+									fieldIndexingType,
 									id,
 									selectedData: newSelectedData,
-									selectionType,
 								}),
 								selectedData: newSelectedData,
 								selectedItemsLabel: getSelectedItemsLabel({
@@ -439,7 +432,7 @@ function AutocompleteFilter({
 
 AutocompleteFilter.propTypes = {
 	apiURL: PropTypes.string.isRequired,
-	entityFieldType: PropTypes.string,
+	fieldIndexingType: PropTypes.string,
 	id: PropTypes.string.isRequired,
 	inputPlaceholder: PropTypes.string,
 	itemKey: PropTypes.string.isRequired,
