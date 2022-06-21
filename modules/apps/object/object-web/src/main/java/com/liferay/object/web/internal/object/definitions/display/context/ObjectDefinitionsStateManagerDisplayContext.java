@@ -48,14 +48,9 @@ public class ObjectDefinitionsStateManagerDisplayContext
 	public ObjectDefinitionsStateManagerDisplayContext(
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
-			objectDefinitionModelResourcePermission,
-		ObjectFieldBusinessTypeServicesTracker
-			objectFieldBusinessTypeServicesTracker) {
+			objectDefinitionModelResourcePermission) {
 
 		super(httpServletRequest, objectDefinitionModelResourcePermission);
-
-		_objectFieldBusinessTypeServicesTracker =
-			objectFieldBusinessTypeServicesTracker;
 	}
 
 	public CreationMenu getCreationMenu(ObjectDefinition objectDefinition)
@@ -196,8 +191,4 @@ public class ObjectDefinitionsStateManagerDisplayContext
 				_getObjectFieldSettingValue(businessType, objectFieldSetting)
 			));
 	}
-
-	private final ObjectFieldBusinessTypeServicesTracker
-		_objectFieldBusinessTypeServicesTracker;
-
 }
