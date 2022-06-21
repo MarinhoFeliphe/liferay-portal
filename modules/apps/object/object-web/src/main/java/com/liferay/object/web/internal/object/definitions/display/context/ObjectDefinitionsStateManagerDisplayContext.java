@@ -53,18 +53,8 @@ public class ObjectDefinitionsStateManagerDisplayContext
 		super(httpServletRequest, objectDefinitionModelResourcePermission);
 	}
 
-	public CreationMenu getCreationMenu(ObjectDefinition objectDefinition)
-		throws PortalException {
-
-		CreationMenu creationMenu = new CreationMenu();
-
-		if (objectDefinition.isSystem() ||
-			!hasUpdateObjectDefinitionPermission()) {
-
-			return creationMenu;
-		}
-
-		return creationMenu;
+	public CreationMenu getCreationMenu() throws PortalException {
+		return new CreationMenu();
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
