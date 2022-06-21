@@ -99,6 +99,7 @@ class SegmentEdit extends Component {
 			disabledSave: this._isQueryEmpty(contributors),
 			editing: showInEditMode,
 			hasChanged: false,
+			isSegmentationDisabledAlertDismissed: false,
 			membersCount: initialMembersCount,
 			queryHasEmptyValues: false,
 			validTitle: !!values.name[props.defaultLanguageId],
@@ -267,6 +268,9 @@ class SegmentEdit extends Component {
 				contributors={contributors}
 				editing={editing}
 				emptyContributors={emptyContributors}
+				isSegmentationDisabledAlertDismissed={
+					this.state.isSegmentationDisabledAlertDismissed
+				}
 				isSegmentationEnabled={this.props.isSegmentationEnabled}
 				membersCount={membersCount}
 				membersCountLoading={membersCountLoading}
@@ -441,6 +445,7 @@ class SegmentEdit extends Component {
 			availableLocales,
 			defaultLanguageId,
 			hasUpdatePermission,
+			isSegmentationEnabled,
 			portletNamespace,
 			values,
 		} = this.props;
@@ -449,6 +454,7 @@ class SegmentEdit extends Component {
 			contributors,
 			disabledSave,
 			editing,
+			isSegmentationDisabledAlertDismissed,
 			queryHasEmptyValues,
 			validTitle,
 		} = this.state;
@@ -457,12 +463,14 @@ class SegmentEdit extends Component {
 
 		const placeholder = Liferay.Language.get('untitled-segment');
 
+		const showDisabledSegmentationAlert =
+			!isSegmentationEnabled && !isSegmentationDisabledAlertDismissed;
+
 		return (
 			<div
 				className={classNames('segment-edit-page-root', {
 					'segment-edit-page-root--has-alert': queryHasEmptyValues,
-					'segment-edit-page-root--with-warning': !this.props
-						.isSegmentationEnabled,
+					'segment-edit-page-root--with-warning': showDisabledSegmentationAlert,
 				})}
 			>
 				<input
@@ -539,10 +547,15 @@ class SegmentEdit extends Component {
 				</div>
 
 				<div className="form-body">
-					{!this.props.isSegmentationEnabled && (
+					{showDisabledSegmentationAlert && (
 						<ClayAlert
 							className="mx-0"
 							displayType="warning"
+							onClose={() =>
+								this.setState({
+									isSegmentationDisabledAlertDismissed: true,
+								})
+							}
 							variant="stripe"
 						>
 							<strong className="lead">

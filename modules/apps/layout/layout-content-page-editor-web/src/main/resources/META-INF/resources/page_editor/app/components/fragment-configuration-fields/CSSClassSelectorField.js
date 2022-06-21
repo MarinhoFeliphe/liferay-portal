@@ -23,6 +23,8 @@ import useControlledState from '../../../core/hooks/useControlledState';
 import {useSelector} from '../../contexts/StoreContext';
 import {useId} from '../../utils/useId';
 
+const MAX_SUGGESTED_CLASSES = 20;
+
 export default function CSSClassSelectorField({
 	field,
 	onValueSelect,
@@ -45,17 +47,16 @@ export default function CSSClassSelectorField({
 	const cssClassesInputId = useId();
 	const helpTextId = useId();
 
-	const multiSelectRef = useRef();
+	const alignElementRef = useRef();
 	const firstOptionRef = useRef();
+	const multiSelectRef = useRef();
 
 	const onKeyDown = (event) => {
 		if (event.key === 'Escape') {
 			setDropdownActive(false);
 			setValue((previousValue) => previousValue.trim());
 
-			// https://github.com/liferay/clay/issues/4915
-
-			multiSelectRef.current?.querySelector('input').focus();
+			multiSelectRef.current?.focus();
 		}
 	};
 
@@ -81,9 +82,7 @@ export default function CSSClassSelectorField({
 
 		addItem(newItem);
 
-		// https://github.com/liferay/clay/issues/4915
-
-		multiSelectRef.current?.querySelector('input').focus();
+		multiSelectRef.current?.focus();
 	};
 
 	return (
@@ -96,60 +95,60 @@ export default function CSSClassSelectorField({
 					{Liferay.Language.get('css-classes')}
 				</label>
 
-				<ClayMultiSelect
-					autoComplete="off"
-					id={cssClassesInputId}
-					items={items}
-					onBlur={() => {
-						if (!dropDownActive) {
-							addItem(value);
-							setValue('');
-						}
-					}}
-					onChange={(value) => {
-						setValue(value);
+				<div ref={alignElementRef}>
+					<ClayMultiSelect
+						autoComplete="off"
+						id={cssClassesInputId}
+						items={items}
+						onBlur={() => {
+							if (!dropDownActive) {
+								addItem(value);
+								setValue('');
+							}
+						}}
+						onChange={(value) => {
+							setValue(value);
 
-						if (!dropDownActive) {
-							setDropdownActive(true);
-						}
-					}}
-					onFocus={() => {
-						setDropdownActive(false);
-						setValue((previousValue) => previousValue.trim());
-					}}
-					onItemsChange={(items) => {
-						const nextItems = [
-							...new Set(items.map((item) => item.value)),
-						];
+							if (!dropDownActive) {
+								setDropdownActive(true);
+							}
+						}}
+						onFocus={() => {
+							setDropdownActive(false);
+							setValue((previousValue) => previousValue.trim());
+						}}
+						onItemsChange={(items) => {
+							const nextItems = [
+								...new Set(items.map((item) => item.value)),
+							];
 
-						setItems(
-							nextItems.map((item) => ({
-								label: item,
-								value: item,
-							}))
-						);
+							setItems(
+								nextItems.map((item) => ({
+									label: item,
+									value: item,
+								}))
+							);
 
-						onValueSelect(field.name, nextItems);
-					}}
-					onKeyDown={(event) => {
-						if (event.key === ' ' && value.trim().length > 0) {
-							addItem(value.trim());
-							setValue('');
-						}
-						else if (event.key === 'ArrowDown') {
-							event.preventDefault();
+							onValueSelect(field.name, nextItems);
+						}}
+						onKeyDown={(event) => {
+							if (event.key === ' ' && value.trim().length > 0) {
+								addItem(value.trim());
+								setValue('');
+							}
+							else if (event.key === 'ArrowDown') {
+								event.preventDefault();
 
-							firstOptionRef.current?.focus();
-						}
-					}}
-					placeholder={
-						items.length > 0
-							? null
-							: Liferay.Language.get('type-to-add-a-class')
-					}
-					ref={multiSelectRef}
-					value={value}
-				/>
+								firstOptionRef.current?.focus();
+							}
+						}}
+						placeholder={Liferay.Language.get(
+							'type-to-add-a-class'
+						)}
+						ref={multiSelectRef}
+						value={value}
+					/>
+				</div>
 
 				<div className="mt-1 small text-secondary" id={helpTextId}>
 					{Liferay.Language.get(
@@ -159,9 +158,9 @@ export default function CSSClassSelectorField({
 			</ClayForm.Group>
 			<CSSClassSelectorDropDown
 				active={dropDownActive}
+				alignElementRef={alignElementRef}
 				cssClass={value}
 				firstOptionRef={firstOptionRef}
-				multiSelectRef={multiSelectRef}
 				onItemClick={onItemClick}
 				onKeyDown={onKeyDown}
 				onSetActive={setDropdownActive}
@@ -172,9 +171,9 @@ export default function CSSClassSelectorField({
 
 function CSSClassSelectorDropDown({
 	active,
+	alignElementRef,
 	cssClass,
 	firstOptionRef,
-	multiSelectRef,
 	onItemClick,
 	onKeyDown,
 	onSetActive,
@@ -196,16 +195,18 @@ function CSSClassSelectorDropDown({
 	});
 
 	const filteredCssClasses = useMemo(() => {
-		return availableCssClasses.filter(
-			(availableCssClass) =>
-				availableCssClass.indexOf(cssClass.trim()) !== -1
-		);
+		return availableCssClasses
+			.filter(
+				(availableCssClass) =>
+					availableCssClass.indexOf(cssClass.trim()) !== -1
+			)
+			.slice(0, MAX_SUGGESTED_CLASSES);
 	}, [availableCssClasses, cssClass]);
 
 	return (
 		<ClayDropDown.Menu
 			active={active && cssClass}
-			alignElementRef={multiSelectRef}
+			alignElementRef={alignElementRef}
 			className="page-editor__css-class-selector-dropdown"
 			containerProps={{
 				className: 'cadmin',

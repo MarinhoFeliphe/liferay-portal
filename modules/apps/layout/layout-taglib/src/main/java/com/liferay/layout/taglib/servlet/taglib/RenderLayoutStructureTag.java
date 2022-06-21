@@ -20,6 +20,8 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
+import com.liferay.fragment.util.configuration.FragmentConfigurationField;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ButtonTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ColTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.ContainerTag;
@@ -27,7 +29,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.PaginationBarTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.RowTag;
 import com.liferay.frontend.taglib.servlet.taglib.ComponentTag;
 import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.exception.InfoFormException;
+import com.liferay.info.exception.InfoFormValidationException;
 import com.liferay.info.exception.NoSuchFormVariationException;
+import com.liferay.info.field.InfoField;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormProvider;
@@ -69,6 +74,7 @@ import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -82,6 +88,8 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -171,6 +179,113 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	protected static final String LAYOUT_STRUCTURE =
 		RenderLayoutStructureTag.class.getName() + "#LAYOUT_STRUCTURE";
 
+	private String _getErrorMessage(
+			FormStyledLayoutStructureItem formStyledLayoutStructureItem,
+			InfoForm infoForm)
+		throws Exception {
+
+		HttpServletRequest httpServletRequest = getRequest();
+
+		InfoFormException infoFormException =
+			(InfoFormException)SessionErrors.get(
+				httpServletRequest, formStyledLayoutStructureItem.getItemId());
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (!(infoFormException instanceof InfoFormValidationException)) {
+			return infoFormException.getLocalizedMessage(
+				themeDisplay.getLocale());
+		}
+
+		InfoFormValidationException infoFormValidationException =
+			(InfoFormValidationException)infoFormException;
+
+		if (Validator.isNull(
+				infoFormValidationException.getInfoFieldUniqueId())) {
+
+			return infoFormException.getLocalizedMessage(
+				themeDisplay.getLocale());
+		}
+
+		String formInputLabel = _getFormInputLabel(
+			infoFormValidationException.getInfoFieldUniqueId(),
+			themeDisplay.getLocale());
+
+		if (Validator.isNotNull(formInputLabel)) {
+			return infoFormValidationException.getLocalizedMessage(
+				formInputLabel, themeDisplay.getLocale());
+		}
+
+		InfoField infoField = infoForm.getInfoField(
+			infoFormValidationException.getInfoFieldUniqueId());
+
+		formInputLabel = infoField.getLabel(themeDisplay.getLocale());
+
+		return infoFormValidationException.getLocalizedMessage(
+			formInputLabel, themeDisplay.getLocale());
+	}
+
+	private String _getFormInputLabel(String infoFieldUniqueId, Locale locale) {
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser =
+			ServletContextUtil.getFragmentEntryConfigurationParser();
+
+		Map<Long, LayoutStructureItem> fragmentLayoutStructureItems =
+			_layoutStructure.getFragmentLayoutStructureItems();
+
+		for (LayoutStructureItem layoutStructureItem :
+				fragmentLayoutStructureItems.values()) {
+
+			if (!(layoutStructureItem instanceof
+					FragmentStyledLayoutStructureItem)) {
+
+				continue;
+			}
+
+			FragmentStyledLayoutStructureItem
+				fragmentStyledLayoutStructureItem =
+					(FragmentStyledLayoutStructureItem)layoutStructureItem;
+
+			if (fragmentStyledLayoutStructureItem.getFragmentEntryLinkId() <=
+					0) {
+
+				continue;
+			}
+
+			FragmentEntryLink fragmentEntryLink =
+				FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
+					fragmentStyledLayoutStructureItem.getFragmentEntryLinkId());
+
+			if ((fragmentEntryLink == null) ||
+				Validator.isNull(fragmentEntryLink.getEditableValues())) {
+
+				continue;
+			}
+
+			String inputFieldId = GetterUtil.getString(
+				fragmentEntryConfigurationParser.getFieldValue(
+					fragmentEntryLink.getEditableValues(),
+					new FragmentConfigurationField(
+						"inputFieldId", "string", StringPool.BLANK, false,
+						"text"),
+					locale));
+
+			if (!Objects.equals(inputFieldId, infoFieldUniqueId)) {
+				continue;
+			}
+
+			return GetterUtil.getString(
+				fragmentEntryConfigurationParser.getFieldValue(
+					fragmentEntryLink.getEditableValues(),
+					new FragmentConfigurationField(
+						"inputLabel", "string", StringPool.BLANK, true, "text"),
+					locale));
+		}
+
+		return StringPool.BLANK;
+	}
+
 	private InfoForm _getInfoForm(
 		FormStyledLayoutStructureItem formStyledLayoutStructureItem) {
 
@@ -189,10 +304,17 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				PortalUtil.getClassName(classNameId));
 
 		if (infoItemFormProvider != null) {
+			HttpServletRequest httpServletRequest = getRequest();
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
 			try {
 				return infoItemFormProvider.getInfoForm(
 					String.valueOf(
-						formStyledLayoutStructureItem.getClassTypeId()));
+						formStyledLayoutStructureItem.getClassTypeId()),
+					themeDisplay.getScopeGroupId());
 			}
 			catch (NoSuchFormVariationException noSuchFormVariationException) {
 				if (_log.isDebugEnabled()) {
@@ -806,6 +928,22 @@ public class RenderLayoutStructureTag extends IncludeTag {
 			String.valueOf(formStyledLayoutStructureItem.getClassTypeId()));
 		jspWriter.write("\">");
 
+		jspWriter.write("<input name=\"formItemId\" type=\"hidden\" value=\"");
+		jspWriter.write(formStyledLayoutStructureItem.getItemId());
+		jspWriter.write("\">");
+
+		if (SessionErrors.contains(
+				getRequest(), formStyledLayoutStructureItem.getItemId())) {
+
+			jspWriter.write("<div class=\"alert alert-danger\">");
+			jspWriter.write(
+				_getErrorMessage(formStyledLayoutStructureItem, infoForm));
+			jspWriter.write("</div>");
+
+			SessionErrors.remove(
+				getRequest(), formStyledLayoutStructureItem.getItemId());
+		}
+
 		_renderLayoutStructure(
 			layoutStructureItem.getChildrenItemIds(), collectionElementIndex,
 			infoForm, renderLayoutStructureDisplayContext);
@@ -1182,6 +1320,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				jspWriter.write(
 					LayoutStructureItemCSSUtil.getFragmentEntryLinkCssClass(
 						fragmentEntryLink));
+				jspWriter.write(StringPool.SPACE);
 				jspWriter.write(
 					LayoutStructureItemCSSUtil.
 						getLayoutStructureItemUniqueCssClass(

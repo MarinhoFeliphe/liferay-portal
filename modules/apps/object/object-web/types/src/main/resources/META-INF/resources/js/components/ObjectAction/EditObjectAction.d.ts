@@ -21,6 +21,7 @@ export default function EditObjectAction({
 	objectActionExecutors,
 	objectActionTriggers,
 	readOnly,
+	validateExpressionBuilderContentURL,
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
@@ -28,5 +29,6 @@ interface IProps {
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	readOnly?: boolean;
+	validateExpressionBuilderContentURL: string;
 }
 export {};

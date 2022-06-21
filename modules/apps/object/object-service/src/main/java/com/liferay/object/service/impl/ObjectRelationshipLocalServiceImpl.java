@@ -302,18 +302,10 @@ public class ObjectRelationshipLocalServiceImpl
 
 	@Override
 	public List<ObjectRelationship> getObjectRelationships(
-		long objectDefinitionId1, long objectDefinition2) {
+		long objectDefinitionId1, long objectDefinition2, String type) {
 
-		return objectRelationshipPersistence.findByODI1_ODI2(
-			objectDefinitionId1, objectDefinition2);
-	}
-
-	@Override
-	public List<ObjectRelationship> getObjectRelationshipsByObjectDefinitionId2(
-		long objectDefinitionId2) {
-
-		return objectRelationshipPersistence.findByObjectDefinitionId2(
-			objectDefinitionId2);
+		return objectRelationshipPersistence.findByODI1_ODI2_T(
+			objectDefinitionId1, objectDefinition2, type);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)

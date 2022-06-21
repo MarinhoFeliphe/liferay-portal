@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal K8s Agent Implementation
 Bundle-SymbolicName: com.liferay.portal.k8s.agent.impl
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Import-Package:\
 	!android.*,\
 	\

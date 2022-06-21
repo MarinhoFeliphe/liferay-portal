@@ -37,13 +37,13 @@ PortletURL redirectURL = layoutsAdminDisplayContext.getRedirectURL();
 
 <aui:model-context bean="<%= selLayout %>" model="<%= Layout.class %>" />
 
-<aui:input name="devices" type="hidden" value="regular" />
-<aui:input name="faviconCETExternalReferenceCode" type="hidden" />
-<aui:input name="faviconFileEntryId" type="hidden" />
-
 <%
 LayoutLookAndFeelDisplayContext layoutLookAndFeelDisplayContext = new LayoutLookAndFeelDisplayContext(request, layoutsAdminDisplayContext, liferayPortletResponse);
 %>
+
+<aui:input name="devices" type="hidden" value="regular" />
+<aui:input name="faviconFileEntryId" type="hidden" value="<%= selLayout.getFaviconFileEntryId() %>" />
+<aui:input name="themeFaviconCETExternalReferenceCode" type="hidden" value="<%= layoutLookAndFeelDisplayContext.getThemeFaviconCETExternalReferenceCode() %>" />
 
 <clay:sheet-section>
 	<h3 class="sheet-subtitle"><liferay-ui:message key="favicon" /></h3>
@@ -158,7 +158,7 @@ else {
 		<div>
 			<react:component
 				module="js/layout/look_and_feel/GlobalCSSCETsConfiguration"
-				props="<%= layoutLookAndFeelDisplayContext.getGlobalCSSCETsConfigurationProps() %>"
+				props="<%= layoutLookAndFeelDisplayContext.getGlobalCSSCETsConfigurationProps(Layout.class.getName(), selLayout.getPlid()) %>"
 			/>
 		</div>
 	</clay:sheet-section>

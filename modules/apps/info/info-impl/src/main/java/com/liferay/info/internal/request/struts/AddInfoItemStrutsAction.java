@@ -16,20 +16,23 @@ package com.liferay.info.internal.request.struts;
 
 import com.liferay.captcha.util.CaptchaUtil;
 import com.liferay.info.exception.InfoFormException;
+import com.liferay.info.exception.InfoFormPrincipalException;
 import com.liferay.info.exception.InfoFormValidationException;
-import com.liferay.info.form.InfoForm;
 import com.liferay.info.internal.request.helper.InfoRequestFieldValuesProviderHelper;
 import com.liferay.info.item.InfoItemFieldValues;
+import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.creator.InfoItemCreator;
-import com.liferay.info.item.provider.InfoItemFormProvider;
+import com.liferay.portal.kernel.captcha.CaptchaException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rubén Pulido
  */
 @Component(
-	immediate = true, property = "path=/info/add_info_item",
+	immediate = true, property = "path=/portal/add_info_item",
 	service = StrutsAction.class
 )
 public class AddInfoItemStrutsAction implements StrutsAction {
@@ -76,7 +79,19 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 				).infoFieldValues(
 					_infoRequestFieldValuesProviderHelper.getInfoFieldValues(
 						httpServletRequest)
+				).infoItemReference(
+					new InfoItemReference(className, 0)
 				).build());
+		}
+		catch (CaptchaException captchaException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(captchaException);
+			}
+
+			SessionErrors.add(
+				originalHttpServletRequest,
+				ParamUtil.getString(httpServletRequest, "formItemId"),
+				new InfoFormValidationException.InvalidCaptcha());
 		}
 		catch (InfoFormValidationException infoFormValidationException) {
 			if (_log.isDebugEnabled()) {
@@ -85,23 +100,43 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 
 			SessionErrors.add(
 				originalHttpServletRequest,
-				infoFormValidationException.getInfoFieldUniqueId(),
+				ParamUtil.getString(httpServletRequest, "formItemId"),
 				infoFormValidationException);
+
+			if (Validator.isNotNull(
+					infoFormValidationException.getInfoFieldUniqueId())) {
+
+				SessionErrors.add(
+					originalHttpServletRequest,
+					infoFormValidationException.getInfoFieldUniqueId(),
+					infoFormValidationException);
+			}
+		}
+		catch (InfoFormException infoFormException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(infoFormException);
+			}
+
+			SessionErrors.add(
+				originalHttpServletRequest,
+				ParamUtil.getString(httpServletRequest, "formItemId"),
+				infoFormException);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to add info item", exception);
+				_log.debug(exception);
 			}
 
-			InfoItemFormProvider<?> infoItemFormProvider =
-				_infoItemServiceTracker.getFirstInfoItemService(
-					InfoItemFormProvider.class, className);
+			InfoFormException infoFormException = new InfoFormException();
 
-			InfoForm infoForm = infoItemFormProvider.getInfoForm();
+			if (exception instanceof PrincipalException) {
+				infoFormException = new InfoFormPrincipalException();
+			}
 
 			SessionErrors.add(
-				originalHttpServletRequest, infoForm.getName(),
-				new InfoFormException());
+				originalHttpServletRequest,
+				ParamUtil.getString(httpServletRequest, "formItemId"),
+				infoFormException);
 		}
 
 		httpServletResponse.sendRedirect(

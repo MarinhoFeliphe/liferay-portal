@@ -18,11 +18,17 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectServiceException;
 import com.liferay.portal.security.sso.openid.connect.internal.exception.StrangersNotAllowedException;
@@ -93,7 +99,7 @@ public class OpenIdConnectUserInfoProcessorImpl
 		String jobTitle = StringPool.BLANK;
 		long[] groupIds = null;
 		long[] organizationIds = null;
-		long[] roleIds = null;
+		long[] roleIds = _getRoleIds(companyId);
 		long[] userGroupIds = null;
 		boolean sendEmail = false;
 
@@ -131,8 +137,43 @@ public class OpenIdConnectUserInfoProcessorImpl
 		}
 	}
 
+	private long[] _getRoleIds(long companyId) {
+		String roleName = _props.get(
+			"open.id.connect.user.info.processor.impl.regular.role");
+
+		if (Validator.isNull(roleName)) {
+			return null;
+		}
+
+		try {
+			Role role = _roleLocalService.getRole(companyId, roleName);
+
+			if (role.getType() == RoleConstants.TYPE_REGULAR) {
+				return new long[] {role.getRoleId()};
+			}
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Role " + roleName + " is not a regular role");
+			}
+		}
+		catch (PortalException portalException) {
+			_log.error("Unable to get role " + roleName, portalException);
+		}
+
+		return null;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		OpenIdConnectUserInfoProcessorImpl.class);
+
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private Props _props;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

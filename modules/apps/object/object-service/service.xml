@@ -194,6 +194,7 @@
 
 		<!-- Other fields -->
 
+		<column name="externalReferenceCode" type="String" />
 		<column name="listTypeDefinitionId" type="long" />
 		<column name="objectDefinitionId" type="long" />
 		<column name="businessType" type="String" />
@@ -234,6 +235,11 @@
 		<finder name="ODI_S" return-type="Collection">
 			<finder-column name="objectDefinitionId" />
 			<finder-column name="system" />
+		</finder>
+		<finder name="C_ERC_ODI" return-type="ObjectEntry" unique="true">
+			<finder-column name="companyId" />
+			<finder-column name="externalReferenceCode" />
+			<finder-column name="objectDefinitionId" />
 		</finder>
 		<finder name="ODI_DBT_I" return-type="Collection">
 			<finder-column name="objectDefinitionId" />
@@ -451,13 +457,14 @@
 		<finder name="ObjectFieldId2" return-type="ObjectRelationship">
 			<finder-column name="objectFieldId2" />
 		</finder>
-		<finder name="ODI1_ODI2" return-type="Collection">
-			<finder-column name="objectDefinitionId1" />
-			<finder-column name="objectDefinitionId2" />
-		</finder>
 		<finder name="ODI1_N" return-type="ObjectRelationship">
 			<finder-column name="objectDefinitionId1" />
 			<finder-column name="name" />
+		</finder>
+		<finder name="ODI1_ODI2_T" return-type="Collection">
+			<finder-column name="objectDefinitionId1" />
+			<finder-column name="objectDefinitionId2" />
+			<finder-column name="type" />
 		</finder>
 		<finder name="ODI1_ODI2_N_T" return-type="Collection">
 			<finder-column name="objectDefinitionId1" />
@@ -632,12 +639,14 @@
 	<exceptions>
 		<exception>DefaultObjectLayout</exception>
 		<exception>DefaultObjectView</exception>
+		<exception>DuplicateObjectFieldExternalReferenceCode</exception>
 		<exception>DuplicateObjectRelationship</exception>
 		<exception>ObjectActionConditionExpression</exception>
 		<exception>ObjectActionExecutorKey</exception>
 		<exception>ObjectActionName</exception>
 		<exception>ObjectActionTriggerKey</exception>
 		<exception>ObjectDefinitionAccountEntryRestricted</exception>
+		<exception>ObjectDefinitionAccountEntryRestrictedObjectFieldId</exception>
 		<exception>ObjectDefinitionActive</exception>
 		<exception>ObjectDefinitionLabel</exception>
 		<exception>ObjectDefinitionName</exception>

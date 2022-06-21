@@ -95,16 +95,16 @@ export default withRouter(
 		const [pageSize, setPageSize] = useState(20);
 
 		const [loading, setLoading] = useState(true);
+		const [loadingAnswer, setLoadingAnswer] = useState(true);
 		const [question, setQuestion] = useState({});
-		const [answers, setAnswers] = useState({
-			totalCount: 0,
-		});
+		const [answers, setAnswers] = useState({});
 
 		const fetchMessages = useCallback(() => {
 			if (question && question.id) {
 				getMessages(question.id, page, pageSize).then(
 					({data: {messageBoardThreadMessageBoardMessages}}) => {
 						setAnswers(messageBoardThreadMessageBoardMessages);
+						setLoadingAnswer(false);
 					}
 				);
 			}
@@ -511,10 +511,10 @@ export default withRouter(
 								</div>
 
 								<h3 className="c-mt-4 text-secondary">
-									{loading
-										? Liferay.Language.get(
+									{loadingAnswer
+										? `${Liferay.Language.get(
 												'loading-answers'
-										  )
+										  )}`
 										: `${
 												answers.totalCount
 										  } ${Liferay.Language.get('answers')}`}

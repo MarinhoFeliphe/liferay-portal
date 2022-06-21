@@ -34,10 +34,20 @@ export default function propsTransformer({
 				`${portletNamespace}faviconTitle`
 			);
 
-			if (faviconFileEntryId && faviconImage && faviconTitle) {
-				faviconFileEntryId.value = '0';
+			const themeFaviconCETExternalReferenceCode = document.getElementById(
+				`${portletNamespace}themeFaviconCETExternalReferenceCode`
+			);
+
+			if (
+				faviconFileEntryId &&
+				faviconImage &&
+				faviconTitle &&
+				themeFaviconCETExternalReferenceCode
+			) {
+				faviconFileEntryId.value = 0;
 				faviconImage.classList.add('d-none');
 				faviconTitle.innerHTML = faviconTitleValue;
+				themeFaviconCETExternalReferenceCode.value = '';
 			}
 		},
 	};

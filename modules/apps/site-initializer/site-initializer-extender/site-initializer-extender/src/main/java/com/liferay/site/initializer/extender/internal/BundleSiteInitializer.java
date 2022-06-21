@@ -77,6 +77,7 @@ import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
+import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectRelationshipResource;
 import com.liferay.object.constants.ObjectDefinitionConstants;
@@ -715,7 +716,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 							StringPool.NEW_LINE),
 						"[$", "$]", documentsStringUtilReplaceValues)
 				).put(
-					"useESM", false
+					"useESM", jsonObject.getBoolean("useESM", false)
 				).buildString());
 
 			clientExtensionEntryIdsStringUtilReplaceValues.put(
@@ -1095,6 +1096,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 		).build();
 	}
 
+	private String _getExpandoPropertyKey(String entryKey) {
+		String[] keyParts = entryKey.split("(?=\\p{Upper})");
+
+		return StringUtil.merge(keyParts, StringPool.DASH).toLowerCase();
+	}
+
 	private void _addExpandoColumns(ServiceContext serviceContext)
 		throws Exception {
 
@@ -1121,10 +1128,23 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			if (expandoBridge.getAttribute(jsonObject.getString("name")) ==
 					null) {
-
 				expandoBridge.addAttribute(
 					jsonObject.getString("name"),
 					jsonObject.getInt("dataType"));
+
+				if (jsonObject.has("properties")) {
+					UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+					JSONObject jsonObjectProperties = jsonObject.getJSONObject("properties");
+
+					for (Map.Entry<String, Object> entry :
+						jsonObjectProperties.toMap().entrySet()) {
+						unicodeProperties.setProperty(
+								_getExpandoPropertyKey(entry.getKey()),
+							entry.getValue().toString());
+					}
+
+					expandoBridge.setAttributeProperties(jsonObject.getString("name"), unicodeProperties);
+				}
 			}
 		}
 	}
@@ -2032,6 +2052,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 
+				JSONObject parametersJSONObject = jsonObject.getJSONObject(
+					"parameters");
+
 				_objectActionLocalService.addObjectAction(
 					serviceContext.getUserId(), objectDefinition.getId(),
 					jsonObject.getBoolean("active"),
@@ -2040,9 +2063,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 					jsonObject.getString("name"),
 					jsonObject.getString("objectActionExecutorKey"),
 					jsonObject.getString("objectActionTriggerKey"),
-					UnicodePropertiesBuilder.put(
-						"parameters", jsonObject.getString("parameters")
-					).build());
+					ObjectActionUtil.toParametersUnicodeProperties(
+						parametersJSONObject.toMap()));
 			}
 		}
 

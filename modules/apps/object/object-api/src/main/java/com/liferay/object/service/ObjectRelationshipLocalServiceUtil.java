@@ -375,17 +375,10 @@ public class ObjectRelationshipLocalServiceUtil {
 	}
 
 	public static List<ObjectRelationship> getObjectRelationships(
-		long objectDefinitionId1, long objectDefinition2) {
+		long objectDefinitionId1, long objectDefinition2, String type) {
 
 		return getService().getObjectRelationships(
-			objectDefinitionId1, objectDefinition2);
-	}
-
-	public static List<ObjectRelationship>
-		getObjectRelationshipsByObjectDefinitionId2(long objectDefinitionId2) {
-
-		return getService().getObjectRelationshipsByObjectDefinitionId2(
-			objectDefinitionId2);
+			objectDefinitionId1, objectDefinition2, type);
 	}
 
 	/**

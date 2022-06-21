@@ -66,18 +66,13 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 			formFields
 		);
 
-		fields.push(
-			{
-				defaultValue: isRequiredField,
-				disabled: isRequiredField,
-				label: Liferay.Language.get('mark-as-required'),
-				name: REQUIRED_CONFIGURATION_KEY,
-				type: 'checkbox',
-			},
-			{
-				type: 'separator',
-			}
-		);
+		fields.push({
+			defaultValue: isRequiredField,
+			disabled: isRequiredField,
+			label: Liferay.Language.get('mark-as-required'),
+			name: REQUIRED_CONFIGURATION_KEY,
+			type: 'checkbox',
+		});
 	}
 
 	fields.push(
@@ -96,30 +91,18 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 			type: 'text',
 		},
 		{
-			type: 'separator',
-		},
-		{
-			defaultValue: true,
+			defaultValue: false,
 			label: Liferay.Language.get('show-help-text'),
 			name: SHOW_HELP_TEXT_CONFIGURATION_KEY,
 			type: 'checkbox',
 			typeOptions: {displayType: 'toggle'},
 		},
 		{
-			defaultValue: '',
+			defaultValue: Liferay.Language.get('add-your-help-text-here'),
 			label: Liferay.Language.get('help-text'),
 			localizable: true,
 			name: HELP_TEXT_CONFIGURATION_KEY,
 			type: 'text',
-			typeOptions: {
-				component: 'textarea',
-				placeholder: Liferay.Language.get(
-					'guide-your-users-to-fill-in-the-field-by-adding-help-text-here'
-				),
-			},
-		},
-		{
-			type: 'separator',
 		}
 	);
 
@@ -205,9 +188,9 @@ export function FormInputGeneralPanel({item}) {
 
 						if (
 							fragmentEntryType === FRAGMENT_ENTRY_TYPES.input &&
-							editableValues[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR][
-								FIELD_ID_CONFIGURATION_KEY
-							]
+							editableValues[
+								FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
+							]?.[FIELD_ID_CONFIGURATION_KEY]
 						) {
 							selectedFields.push(
 								editableValues[
@@ -336,14 +319,22 @@ export function FormInputGeneralPanel({item}) {
 					)}
 
 					{configurationValues[FIELD_ID_CONFIGURATION_KEY] && (
-						<FieldSet
-							fields={configFields}
-							item={item}
-							label=""
-							languageId={languageId}
-							onValueSelect={handleValueSelect}
-							values={configurationValues}
-						/>
+						<>
+							<span className="sr-only">
+								{Liferay.Language.get(
+									'input-fragment-configuration'
+								)}
+							</span>
+
+							<FieldSet
+								fields={configFields}
+								item={item}
+								label=""
+								languageId={languageId}
+								onValueSelect={handleValueSelect}
+								values={configurationValues}
+							/>
+						</>
 					)}
 				</Collapse>
 			</div>

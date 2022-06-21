@@ -90,6 +90,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -503,13 +504,21 @@ public class LayoutsAdminDisplayContext {
 		return StringPool.BLANK;
 	}
 
-	public String getFaviconImage() {
-		return FaviconUtil.getFaviconURL(_cetManager, getSelLayoutSet());
-	}
-
 	public String getFaviconTitle() {
 		return FaviconUtil.getFaviconTitle(
 			getSelLayoutSet(), themeDisplay.getLocale());
+	}
+
+	public String getFaviconURL() {
+		String faviconURL = FaviconUtil.getFaviconURL(
+			_cetManager, getSelLayoutSet());
+
+		if (Validator.isNotNull(faviconURL)) {
+			return faviconURL;
+		}
+
+		return themeDisplay.getPathThemeImages() + "/" +
+			PropsUtil.get(PropsKeys.THEME_SHORTCUT_ICON);
 	}
 
 	public String getFileEntryItemSelectorURL() {
@@ -520,11 +529,11 @@ public class LayoutsAdminDisplayContext {
 			new FileEntryItemSelectorReturnType());
 
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153457"))) {
-			PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-				getSelectFaviconEventName(), itemSelectorCriterion);
-
-			return itemSelectorURL.toString();
+			return String.valueOf(
+				_itemSelector.getItemSelectorURL(
+					RequestBackedPortletURLFactoryUtil.create(
+						httpServletRequest),
+					getSelectFaviconEventName(), itemSelectorCriterion));
 		}
 
 		CETItemSelectorCriterion cetItemSelectorCriterion =
@@ -535,12 +544,11 @@ public class LayoutsAdminDisplayContext {
 		cetItemSelectorCriterion.setType(
 			ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
 
-		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-			getSelectFaviconEventName(), itemSelectorCriterion,
-			cetItemSelectorCriterion);
-
-		return itemSelectorURL.toString();
+		return String.valueOf(
+			_itemSelector.getItemSelectorURL(
+				RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
+				getSelectFaviconEventName(), itemSelectorCriterion,
+				cetItemSelectorCriterion));
 	}
 
 	public String getFirstColumnConfigureLayoutURL(boolean privatePages) {
@@ -1227,14 +1235,28 @@ public class LayoutsAdminDisplayContext {
 			selectThemeCSSClientExtensionEventName
 		).put(
 			"selectThemeCSSClientExtensionURL",
-			() -> {
-				PortletURL cetItemSelectorURL = getCETItemSelectorURL(
+			() -> String.valueOf(
+				getCETItemSelectorURL(
 					selectThemeCSSClientExtensionEventName,
-					ClientExtensionEntryConstants.TYPE_THEME_CSS);
-
-				return cetItemSelectorURL.toString();
-			}
+					ClientExtensionEntryConstants.TYPE_THEME_CSS))
 		).build();
+	}
+
+	public String getThemeFaviconCETExternalReferenceCode() {
+		LayoutSet setLayoutSet = getSelLayoutSet();
+
+		ClientExtensionEntryRel clientExtensionEntryRel =
+			ClientExtensionEntryRelLocalServiceUtil.
+				fetchClientExtensionEntryRel(
+					PortalUtil.getClassNameId(LayoutSet.class),
+					setLayoutSet.getLayoutSetId(),
+					ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+
+		if (clientExtensionEntryRel != null) {
+			return clientExtensionEntryRel.getCETExternalReferenceCode();
+		}
+
+		return StringPool.BLANK;
 	}
 
 	public String getTitle(boolean privatePages) {
