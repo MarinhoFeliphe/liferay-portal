@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,7 +61,7 @@ public class ObjectDefinitionsStateManagerDisplayContext
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
 		throws Exception {
 
-		return Arrays.asList(
+		return Collections.singletonList(
 			new FDSActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
@@ -73,11 +74,7 @@ public class ObjectDefinitionsStateManagerDisplayContext
 				).buildString(),
 				"view", "view",
 				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
-				"get", null, "sidePanel"),
-			new FDSActionDropdownItem(
-				"/o/object-admin/v1.0/object-fields/{id}", "trash", "delete",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "delete"),
-				"delete", "delete", "async"));
+				"get", null, "sidePanel"));
 	}
 
 	public JSONObject getObjectFieldJSONObject(ObjectField objectField) {
