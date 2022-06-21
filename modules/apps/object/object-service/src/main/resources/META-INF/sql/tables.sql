@@ -92,6 +92,7 @@ create table ObjectField (
 	name VARCHAR(75) null,
 	relationshipType VARCHAR(75) null,
 	required BOOLEAN,
+	state_ BOOLEAN,
 	system_ BOOLEAN
 );
 

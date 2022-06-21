@@ -534,6 +534,27 @@ public interface ObjectFieldModel
 	public void setRequired(boolean required);
 
 	/**
+	 * Returns the state of this object field.
+	 *
+	 * @return the state of this object field
+	 */
+	public boolean getState();
+
+	/**
+	 * Returns <code>true</code> if this object field is state.
+	 *
+	 * @return <code>true</code> if this object field is state; <code>false</code> otherwise
+	 */
+	public boolean isState();
+
+	/**
+	 * Sets whether this object field is state.
+	 *
+	 * @param state the state of this object field
+	 */
+	public void setState(boolean state);
+
+	/**
 	 * Returns the system of this object field.
 	 *
 	 * @return the system of this object field

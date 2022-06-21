@@ -168,6 +168,8 @@ public class ObjectFieldPersistenceTest {
 
 		newObjectField.setRequired(RandomTestUtil.randomBoolean());
 
+		newObjectField.setState(RandomTestUtil.randomBoolean());
+
 		newObjectField.setSystem(RandomTestUtil.randomBoolean());
 
 		_objectFields.add(_persistence.update(newObjectField));
@@ -235,6 +237,8 @@ public class ObjectFieldPersistenceTest {
 			newObjectField.getRelationshipType());
 		Assert.assertEquals(
 			existingObjectField.isRequired(), newObjectField.isRequired());
+		Assert.assertEquals(
+			existingObjectField.isState(), newObjectField.isState());
 		Assert.assertEquals(
 			existingObjectField.isSystem(), newObjectField.isSystem());
 	}
@@ -351,8 +355,8 @@ public class ObjectFieldPersistenceTest {
 			"businessType", true, "dbColumnName", true, "dbTableName", true,
 			"dbType", true, "defaultValue", true, "indexed", true,
 			"indexedAsKeyword", true, "indexedLanguageId", true, "label", true,
-			"name", true, "relationshipType", true, "required", true, "system",
-			true);
+			"name", true, "relationshipType", true, "required", true, "state",
+			true, "system", true);
 	}
 
 	@Test
@@ -691,6 +695,8 @@ public class ObjectFieldPersistenceTest {
 		objectField.setRelationshipType(RandomTestUtil.randomString());
 
 		objectField.setRequired(RandomTestUtil.randomBoolean());
+
+		objectField.setState(RandomTestUtil.randomBoolean());
 
 		objectField.setSystem(RandomTestUtil.randomBoolean());
 

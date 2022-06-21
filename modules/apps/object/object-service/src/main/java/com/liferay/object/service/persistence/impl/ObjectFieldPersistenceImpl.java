@@ -4544,6 +4544,7 @@ public class ObjectFieldPersistenceImpl
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("state", "state_");
 		dbColumnNames.put("system", "system_");
 
 		setDBColumnNames(dbColumnNames);
@@ -5397,7 +5398,7 @@ public class ObjectFieldPersistenceImpl
 		ObjectFieldPersistenceImpl.class);
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid", "system"});
+		new String[] {"uuid", "state", "system"});
 
 	@Override
 	protected FinderCache getFinderCache() {

@@ -66,6 +66,7 @@ public class ObjectFieldWrapper
 		attributes.put("name", getName());
 		attributes.put("relationshipType", getRelationshipType());
 		attributes.put("required", isRequired());
+		attributes.put("state", isState());
 		attributes.put("system", isSystem());
 
 		return attributes;
@@ -211,6 +212,12 @@ public class ObjectFieldWrapper
 
 		if (required != null) {
 			setRequired(required);
+		}
+
+		Boolean state = (Boolean)attributes.get("state");
+
+		if (state != null) {
+			setState(state);
 		}
 
 		Boolean system = (Boolean)attributes.get("system");
@@ -517,6 +524,16 @@ public class ObjectFieldWrapper
 	}
 
 	/**
+	 * Returns the state of this object field.
+	 *
+	 * @return the state of this object field
+	 */
+	@Override
+	public boolean getState() {
+		return model.getState();
+	}
+
+	/**
 	 * Returns the system of this object field.
 	 *
 	 * @return the system of this object field
@@ -594,6 +611,16 @@ public class ObjectFieldWrapper
 	@Override
 	public boolean isRequired() {
 		return model.isRequired();
+	}
+
+	/**
+	 * Returns <code>true</code> if this object field is state.
+	 *
+	 * @return <code>true</code> if this object field is state; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isState() {
+		return model.isState();
 	}
 
 	/**
@@ -895,6 +922,16 @@ public class ObjectFieldWrapper
 	@Override
 	public void setRequired(boolean required) {
 		model.setRequired(required);
+	}
+
+	/**
+	 * Sets whether this object field is state.
+	 *
+	 * @param state the state of this object field
+	 */
+	@Override
+	public void setState(boolean state) {
+		model.setState(state);
 	}
 
 	/**
