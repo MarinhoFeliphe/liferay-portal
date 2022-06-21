@@ -442,6 +442,7 @@ public class ObjectFieldLocalServiceImpl
 
 		_validateIndexed(
 			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId);
+		_validateState(required, state);
 		_validateDefaultValue(businessType, defaultValue);
 
 		if (Validator.isNotNull(objectField.getRelationshipType())) {
@@ -527,11 +528,12 @@ public class ObjectFieldLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		_validateDefaultValue(businessType, defaultValue);
 		_validateIndexed(
 			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId);
 		_validateLabel(labelMap);
 		_validateName(0, objectDefinition, name, system);
+		_validateState(required, state);
+		_validateDefaultValue(businessType, defaultValue);
 
 		ObjectField objectField = objectFieldPersistence.create(
 			counterLocalService.increment());
@@ -859,6 +861,15 @@ public class ObjectFieldLocalServiceImpl
 			(objectField.getObjectFieldId() != objectFieldId)) {
 
 			throw new ObjectFieldNameException.MustNotBeDuplicate(name);
+		}
+	}
+
+	private void _validateState(boolean required, boolean state)
+		throws PortalException {
+
+		if (state && !required) {
+			throw new ObjectFieldStateException(
+				"Object field must be mandatory when the state is true");
 		}
 	}
 
