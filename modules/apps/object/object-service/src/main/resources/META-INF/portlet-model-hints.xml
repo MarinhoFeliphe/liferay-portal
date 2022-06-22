@@ -205,6 +205,42 @@
 		<field name="reverse" type="boolean" />
 		<field name="type" type="String" />
 	</model>
+	<model name="com.liferay.object.model.ObjectState">
+		<field name="mvccVersion" type="long" />
+		<field name="uuid" type="String" />
+		<field name="objectStateId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="listTypeEntryId" type="long" />
+		<field name="objectStateFlowId" type="long" />
+	</model>
+	<model name="com.liferay.object.model.ObjectStateFlow">
+		<field name="mvccVersion" type="long" />
+		<field name="uuid" type="String" />
+		<field name="objectStateFlowId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="objectFieldId" type="long" />
+	</model>
+	<model name="com.liferay.object.model.ObjectStateTransition">
+		<field name="mvccVersion" type="long" />
+		<field name="uuid" type="String" />
+		<field name="objectStateTransitionId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="objectStateFlowId" type="long" />
+		<field name="sourceObjectStateId" type="long" />
+		<field name="targetObjectStateId" type="long" />
+	</model>
 	<model name="com.liferay.object.model.ObjectValidationRule">
 		<field name="mvccVersion" type="long" />
 		<field name="uuid" type="String" />
