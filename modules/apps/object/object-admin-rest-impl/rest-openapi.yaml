@@ -1,5 +1,10 @@
 components:
     schemas:
+        NextObjectState:
+            properties:
+                listTypeEntryId:
+                    format: int64
+                    type: integer
         ObjectAction:
             properties:
                 actions:
@@ -327,6 +332,27 @@ components:
                 type:
                     enum: [oneToMany, oneToOne, manyToMany]
                     type: string
+        ObjectState:
+            properties:
+                id:
+                    format: int64
+                    type: integer
+                listTypeEntryId:
+                    format: int64
+                    type: integer
+                nextObjectStates:
+                    items:
+                        $ref: "#/components/schemas/NextObjectState"
+                    type: array
+        ObjectStateFlow:
+            properties:
+                id:
+                    format: int64
+                    type: integer
+                objectStates:
+                    items:
+                        $ref: "#/components/schemas/ObjectState"
+                    type: array
         ObjectValidationRule:
             properties:
                 actions:
