@@ -482,6 +482,84 @@
 			<finder-column name="type" />
 		</finder>
 	</entity>
+	<entity local-service="true" name="ObjectState" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="objectStateId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="listTypeEntryId" type="long" />
+		<column name="objectStateFlowId" type="long" />
+
+		<!-- Finder methods -->
+
+		<finder name="ObjectStateFlowId" return-type="Collection">
+			<finder-column name="objectStateFlowId" />
+		</finder>
+	</entity>
+	<entity local-service="true" name="ObjectStateFlow" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="objectStateFlowId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="objectFieldId" type="long" />
+
+		<!-- Finder methods -->
+
+		<finder name="ObjectFieldId" return-type="ObjectStateFlow">
+			<finder-column name="objectFieldId" />
+		</finder>
+	</entity>
+	<entity local-service="true" name="ObjectStateTransition" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="objectStateTransitionId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="objectStateFlowId" type="long" />
+		<column name="sourceObjectStateId" type="long" />
+		<column name="targetObjectStateId" type="long" />
+
+		<!-- Finder methods -->
+
+		<finder name="SourceObjectStateId" return-type="Collection">
+			<finder-column name="sourceObjectStateId" />
+		</finder>
+		<finder name="TargetObjectStateId" return-type="Collection">
+			<finder-column name="targetObjectStateId" />
+		</finder>
+	</entity>
 	<entity local-service="true" name="ObjectValidationRule" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
