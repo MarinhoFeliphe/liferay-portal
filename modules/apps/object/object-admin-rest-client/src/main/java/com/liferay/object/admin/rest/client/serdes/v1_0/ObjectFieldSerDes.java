@@ -224,6 +224,16 @@ public class ObjectFieldSerDes {
 			sb.append("]");
 		}
 
+		if (objectField.getObjectStateFlow() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectStateFlow\": ");
+
+			sb.append(String.valueOf(objectField.getObjectStateFlow()));
+		}
+
 		if (objectField.getRelationshipType() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -404,6 +414,15 @@ public class ObjectFieldSerDes {
 				String.valueOf(objectField.getObjectFieldSettings()));
 		}
 
+		if (objectField.getObjectStateFlow() == null) {
+			map.put("objectStateFlow", null);
+		}
+		else {
+			map.put(
+				"objectStateFlow",
+				String.valueOf(objectField.getObjectStateFlow()));
+		}
+
 		if (objectField.getRelationshipType() == null) {
 			map.put("relationshipType", null);
 		}
@@ -552,6 +571,13 @@ public class ObjectFieldSerDes {
 						).toArray(
 							size -> new ObjectFieldSetting[size]
 						));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "objectStateFlow")) {
+				if (jsonParserFieldValue != null) {
+					objectField.setObjectStateFlow(
+						ObjectStateFlowSerDes.toDTO(
+							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "relationshipType")) {
