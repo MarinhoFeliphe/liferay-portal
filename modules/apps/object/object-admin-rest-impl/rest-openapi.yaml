@@ -165,6 +165,8 @@ components:
                     items:
                         $ref: "#/components/schemas/ObjectFieldSetting"
                     type: array
+                objectStateFlow:
+                    $ref: "#/components/schemas/ObjectStateFlow"
                 relationshipType:
                     enum: [oneToMany, oneToOne]
                     readOnly: true
