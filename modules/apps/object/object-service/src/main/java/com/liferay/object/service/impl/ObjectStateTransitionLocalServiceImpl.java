@@ -14,6 +14,7 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.model.ObjectStateTransition;
 import com.liferay.object.service.base.ObjectStateTransitionLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 
@@ -28,4 +29,18 @@ import org.osgi.service.component.annotations.Component;
 )
 public class ObjectStateTransitionLocalServiceImpl
 	extends ObjectStateTransitionLocalServiceBaseImpl {
+
+	@Override
+	public ObjectStateTransition addObjectStateTransition(
+		long sourceObjectStateId, long targetObjectStateId) {
+
+		ObjectStateTransition objectStateTransition =
+			createObjectStateTransition(0L);
+
+		objectStateTransition.setSourceObjectStateId(sourceObjectStateId);
+		objectStateTransition.setTargetObjectStateId(targetObjectStateId);
+
+		return updateObjectStateTransition(objectStateTransition);
+	}
+
 }
