@@ -123,9 +123,11 @@ public class PicklistObjectFieldBusinessType
 		LocalizedValue ddmFormFieldPredefinedValueLocalizedValue =
 			new LocalizedValue(objectFieldRenderingContext.getLocale());
 
-		ddmFormFieldPredefinedValueLocalizedValue.addString(
-			objectFieldRenderingContext.getLocale(),
-			objectField.getDefaultValue());
+		if (objectField.isState()) {
+			ddmFormFieldPredefinedValueLocalizedValue.addString(
+				objectFieldRenderingContext.getLocale(),
+				objectField.getDefaultValue());
+		}
 
 		return ddmFormFieldPredefinedValueLocalizedValue;
 	}
