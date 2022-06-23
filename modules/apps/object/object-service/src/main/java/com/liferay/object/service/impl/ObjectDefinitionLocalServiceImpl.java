@@ -224,7 +224,7 @@ public class ObjectDefinitionLocalServiceImpl
 					newObjectField.getDBType(),
 					newObjectField.getDefaultValue(), false, false, "",
 					newObjectField.getLabelMap(), newObjectField.getName(),
-					newObjectField.isRequired());
+					newObjectField.isRequired(), newObjectField.isState());
 			}
 			else {
 				if (!Objects.equals(
@@ -770,7 +770,7 @@ public class ObjectDefinitionLocalServiceImpl
 				false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "create-date")),
-				"dateCreated", false);
+				"dateCreated", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
@@ -779,7 +779,7 @@ public class ObjectDefinitionLocalServiceImpl
 				false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "author")),
-				"creator", false);
+				"creator", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Integer",
@@ -788,7 +788,7 @@ public class ObjectDefinitionLocalServiceImpl
 				false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "id")),
-				"id", false);
+				"id", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Date",
@@ -797,7 +797,7 @@ public class ObjectDefinitionLocalServiceImpl
 				false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "modified-date")),
-				"dateModified", false);
+				"dateModified", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
@@ -806,7 +806,7 @@ public class ObjectDefinitionLocalServiceImpl
 				false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "status")),
-				"status", false);
+				"status", false, false);
 		}
 
 		if (objectFields != null) {
@@ -822,7 +822,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.getName(),
-						objectField.isRequired());
+						objectField.isRequired(), objectField.isState());
 				}
 				else {
 					_objectFieldLocalService.addCustomObjectField(
@@ -833,7 +833,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.getName(),
-						objectField.isRequired(),
+						objectField.isRequired(), objectField.isState(),
 						objectField.getObjectFieldSettings());
 				}
 			}

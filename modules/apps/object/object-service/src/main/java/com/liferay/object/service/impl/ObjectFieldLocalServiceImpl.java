@@ -498,7 +498,8 @@ public class ObjectFieldLocalServiceImpl
 		return objectFieldLocalService.updateCustomObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, name, required, objectFieldSettings);
+			indexedLanguageId, labelMap, name, required, state,
+			objectFieldSettings);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
