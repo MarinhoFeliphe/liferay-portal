@@ -515,6 +515,34 @@ public class ObjectField implements Serializable {
 	protected Boolean required;
 
 	@Schema
+	public Boolean getState() {
+		return state;
+	}
+
+	public void setState(Boolean state) {
+		this.state = state;
+	}
+
+	@JsonIgnore
+	public void setState(
+		UnsafeSupplier<Boolean, Exception> stateUnsafeSupplier) {
+
+		try {
+			state = stateUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean state;
+
+	@Schema
 	public Boolean getSystem() {
 		return system;
 	}
@@ -792,6 +820,16 @@ public class ObjectField implements Serializable {
 			sb.append("\"required\": ");
 
 			sb.append(required);
+		}
+
+		if (state != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"state\": ");
+
+			sb.append(state);
 		}
 
 		if (system != null) {

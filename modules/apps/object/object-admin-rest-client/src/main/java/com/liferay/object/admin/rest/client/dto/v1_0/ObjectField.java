@@ -375,6 +375,27 @@ public class ObjectField implements Cloneable, Serializable {
 
 	protected Boolean required;
 
+	public Boolean getState() {
+		return state;
+	}
+
+	public void setState(Boolean state) {
+		this.state = state;
+	}
+
+	public void setState(
+		UnsafeSupplier<Boolean, Exception> stateUnsafeSupplier) {
+
+		try {
+			state = stateUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean state;
+
 	public Boolean getSystem() {
 		return system;
 	}
