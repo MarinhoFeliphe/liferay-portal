@@ -44,6 +44,11 @@ public class ObjectStateLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectStateLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static ObjectState addObjectState(
+		long listTypeEntryId, long objectStateFlowId) {
+
+		return getService().addObjectState(listTypeEntryId, objectStateFlowId);
+	}
 
 	/**
 	 * Adds the object state to the database. Also notifies the appropriate model listeners.

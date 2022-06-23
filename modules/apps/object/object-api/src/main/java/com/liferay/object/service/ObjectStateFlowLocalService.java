@@ -63,6 +63,7 @@ public interface ObjectStateFlowLocalService
 	 *
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectStateFlowLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object state flow local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectStateFlowLocalServiceUtil} if injection and service tracking are not available.
 	 */
+	public ObjectStateFlow addObjectStateFlow(long objectFieldId);
 
 	/**
 	 * Adds the object state flow to the database. Also notifies the appropriate model listeners.

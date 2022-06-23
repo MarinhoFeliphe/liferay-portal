@@ -44,6 +44,9 @@ public class ObjectStateFlowLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectStateFlowLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static ObjectStateFlow addObjectStateFlow(long objectFieldId) {
+		return getService().addObjectStateFlow(objectFieldId);
+	}
 
 	/**
 	 * Adds the object state flow to the database. Also notifies the appropriate model listeners.

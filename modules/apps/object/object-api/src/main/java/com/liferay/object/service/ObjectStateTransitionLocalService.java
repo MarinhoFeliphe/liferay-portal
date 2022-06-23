@@ -63,6 +63,8 @@ public interface ObjectStateTransitionLocalService
 	 *
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectStateTransitionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object state transition local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectStateTransitionLocalServiceUtil} if injection and service tracking are not available.
 	 */
+	public ObjectStateTransition addObjectStateTransition(
+		long sourceObjectStateId, long targetObjectStateId);
 
 	/**
 	 * Adds the object state transition to the database. Also notifies the appropriate model listeners.
