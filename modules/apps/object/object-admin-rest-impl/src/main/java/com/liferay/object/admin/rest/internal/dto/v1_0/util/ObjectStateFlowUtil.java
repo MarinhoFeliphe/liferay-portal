@@ -14,11 +14,15 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
-import com.liferay.object.admin.rest.dto.v1_0.ObjectState;
+import com.liferay.object.admin.rest.dto.v1_0.NextObjectState;
+import com.liferay.object.exception.NoSuchObjectStateException;
+import com.liferay.object.model.ObjectState;
 import com.liferay.object.model.ObjectStateFlow;
-import com.liferay.object.service.ObjectStateFlowLocalService;
-import com.liferay.object.service.ObjectStateLocalService;
-import com.liferay.object.service.ObjectStateTransitionLocalService;
+import com.liferay.object.model.ObjectStateTransition;
+import com.liferay.object.service.ObjectStateFlowLocalServiceUtil;
+import com.liferay.object.service.ObjectStateLocalServiceUtil;
+import com.liferay.object.service.ObjectStateTransitionLocalServiceUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 /**
  * @author Feliphe Marinho
@@ -26,26 +30,69 @@ import com.liferay.object.service.ObjectStateTransitionLocalService;
 public class ObjectStateFlowUtil {
 
 	public static ObjectStateFlow toObjectStateFlow(
+		long objectFieldId,
 		com.liferay.object.admin.rest.dto.v1_0.ObjectStateFlow
-			objectStateFlowDTO,
-		ObjectStateLocalService objectStateLocalService,
-		ObjectStateFlowLocalService objectStateFlowLocalService,
-		ObjectStateTransitionLocalService objectStateTransitionLocalService) {
+			objectStateFlowDTO) {
 
-		ObjectStateFlow objectStateFlow =
-			objectStateFlowLocalService.createObjectStateFlow(0L);
-
-		for (ObjectState objectStateDTO :
-				objectStateFlowDTO.getObjectStates()) {
-
-			com.liferay.object.model.ObjectState objectState =
-				objectStateLocalService.createObjectState(0L);
-
-			objectState.setObjectStateFlowId(
-				objectStateFlow.getObjectStateFlowId());
+		if (objectStateFlowDTO == null) {
+			return null;
 		}
 
-		return null;
+		ObjectStateFlow objectStateFlow =
+			ObjectStateFlowLocalServiceUtil.createObjectStateFlow(0L);
+
+		objectStateFlow.setObjectStateFlowId(objectStateFlowDTO.getId());
+		objectStateFlow.setObjectFieldId(objectFieldId);
+		objectStateFlow.setObjectStates(
+			TransformUtil.transformToList(
+				objectStateFlowDTO.getObjectStates(),
+				objectStateDTO -> _toObjectState(
+					objectStateDTO, objectStateFlowDTO.getId())));
+
+		return objectStateFlow;
+	}
+
+	private static ObjectState _toObjectState(
+		com.liferay.object.admin.rest.dto.v1_0.ObjectState objectStateDTO,
+		long objectStateFlowId) {
+
+		ObjectState objectState = ObjectStateLocalServiceUtil.createObjectState(
+			0L);
+
+		objectState.setObjectStateId(objectStateDTO.getId());
+		objectState.setListTypeEntryId(objectStateDTO.getListTypeEntryId());
+		objectState.setObjectStateFlowId(objectStateFlowId);
+		objectState.setObjectStateTransitions(
+			TransformUtil.transformToList(
+				objectStateDTO.getNextObjectStates(),
+				nextObjectState -> _toObjectStateTransition(
+					nextObjectState, objectStateFlowId,
+					objectStateDTO.getId())));
+
+		return objectState;
+	}
+
+	private static ObjectStateTransition _toObjectStateTransition(
+			NextObjectState nextObjectState, long objectStateFlowId,
+			long sourceObjectStateId)
+		throws NoSuchObjectStateException {
+
+		ObjectStateTransition objectStateTransition =
+			ObjectStateTransitionLocalServiceUtil.createObjectStateTransition(
+				0L);
+
+		objectStateTransition.setObjectStateFlowId(objectStateFlowId);
+		objectStateTransition.setSourceObjectStateId(sourceObjectStateId);
+
+		ObjectState targetObjectState =
+			ObjectStateLocalServiceUtil.
+				findByListTypeEntryIdAndObjectStateFlowId(
+					nextObjectState.getListTypeEntryId(), objectStateFlowId);
+
+		objectStateTransition.setTargetObjectStateId(
+			targetObjectState.getObjectStateId());
+
+		return objectStateTransition;
 	}
 
 }
