@@ -482,7 +482,7 @@
 			<finder-column name="type" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="ObjectState" remote-service="true" uuid="true">
+	<entity local-service="true" name="ObjectState" remote-service="false" uuid="true">
 
 		<!-- PK fields -->
 
@@ -507,7 +507,7 @@
 			<finder-column name="objectStateFlowId" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="ObjectStateFlow" remote-service="true" uuid="true">
+	<entity local-service="true" name="ObjectStateFlow" remote-service="false" uuid="true">
 
 		<!-- PK fields -->
 
@@ -531,7 +531,7 @@
 			<finder-column name="objectFieldId" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="ObjectStateTransition" remote-service="true" uuid="true">
+	<entity local-service="true" name="ObjectStateTransition" remote-service="false" uuid="true">
 
 		<!-- PK fields -->
 
