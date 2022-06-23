@@ -22,7 +22,6 @@ import com.liferay.object.model.ObjectStateFlowModel;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
@@ -61,7 +60,6 @@ import java.util.function.Function;
  * @see ObjectStateFlowImpl
  * @generated
  */
-@JSON(strict = true)
 public class ObjectStateFlowModelImpl
 	extends BaseModelImpl<ObjectStateFlow> implements ObjectStateFlowModel {
 
@@ -300,7 +298,6 @@ public class ObjectStateFlowModelImpl
 			(Map)attributeSetterBiConsumers);
 	}
 
-	@JSON
 	@Override
 	public long getMvccVersion() {
 		return _mvccVersion;
@@ -315,7 +312,6 @@ public class ObjectStateFlowModelImpl
 		_mvccVersion = mvccVersion;
 	}
 
-	@JSON
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
@@ -344,7 +340,6 @@ public class ObjectStateFlowModelImpl
 		return getColumnOriginalValue("uuid_");
 	}
 
-	@JSON
 	@Override
 	public long getObjectStateFlowId() {
 		return _objectStateFlowId;
@@ -359,7 +354,6 @@ public class ObjectStateFlowModelImpl
 		_objectStateFlowId = objectStateFlowId;
 	}
 
-	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -384,7 +378,6 @@ public class ObjectStateFlowModelImpl
 			this.<Long>getColumnOriginalValue("companyId"));
 	}
 
-	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -415,7 +408,6 @@ public class ObjectStateFlowModelImpl
 	public void setUserUuid(String userUuid) {
 	}
 
-	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -435,7 +427,6 @@ public class ObjectStateFlowModelImpl
 		_userName = userName;
 	}
 
-	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -450,7 +441,6 @@ public class ObjectStateFlowModelImpl
 		_createDate = createDate;
 	}
 
-	@JSON
 	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
@@ -471,7 +461,6 @@ public class ObjectStateFlowModelImpl
 		_modifiedDate = modifiedDate;
 	}
 
-	@JSON
 	@Override
 	public long getObjectFieldId() {
 		return _objectFieldId;

@@ -22,7 +22,6 @@ import com.liferay.object.model.ObjectStateModel;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
@@ -61,7 +60,6 @@ import java.util.function.Function;
  * @see ObjectStateImpl
  * @generated
  */
-@JSON(strict = true)
 public class ObjectStateModelImpl
 	extends BaseModelImpl<ObjectState> implements ObjectStateModel {
 
@@ -298,7 +296,6 @@ public class ObjectStateModelImpl
 			(Map)attributeSetterBiConsumers);
 	}
 
-	@JSON
 	@Override
 	public long getMvccVersion() {
 		return _mvccVersion;
@@ -313,7 +310,6 @@ public class ObjectStateModelImpl
 		_mvccVersion = mvccVersion;
 	}
 
-	@JSON
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
@@ -342,7 +338,6 @@ public class ObjectStateModelImpl
 		return getColumnOriginalValue("uuid_");
 	}
 
-	@JSON
 	@Override
 	public long getObjectStateId() {
 		return _objectStateId;
@@ -357,7 +352,6 @@ public class ObjectStateModelImpl
 		_objectStateId = objectStateId;
 	}
 
-	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -382,7 +376,6 @@ public class ObjectStateModelImpl
 			this.<Long>getColumnOriginalValue("companyId"));
 	}
 
-	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -413,7 +406,6 @@ public class ObjectStateModelImpl
 	public void setUserUuid(String userUuid) {
 	}
 
-	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -433,7 +425,6 @@ public class ObjectStateModelImpl
 		_userName = userName;
 	}
 
-	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -448,7 +439,6 @@ public class ObjectStateModelImpl
 		_createDate = createDate;
 	}
 
-	@JSON
 	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
@@ -469,7 +459,6 @@ public class ObjectStateModelImpl
 		_modifiedDate = modifiedDate;
 	}
 
-	@JSON
 	@Override
 	public long getListTypeEntryId() {
 		return _listTypeEntryId;
@@ -484,7 +473,6 @@ public class ObjectStateModelImpl
 		_listTypeEntryId = listTypeEntryId;
 	}
 
-	@JSON
 	@Override
 	public long getObjectStateFlowId() {
 		return _objectStateFlowId;

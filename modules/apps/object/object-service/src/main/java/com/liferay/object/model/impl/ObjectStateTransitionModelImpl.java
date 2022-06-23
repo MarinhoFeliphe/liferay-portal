@@ -22,7 +22,6 @@ import com.liferay.object.model.ObjectStateTransitionModel;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
@@ -61,7 +60,6 @@ import java.util.function.Function;
  * @see ObjectStateTransitionImpl
  * @generated
  */
-@JSON(strict = true)
 public class ObjectStateTransitionModelImpl
 	extends BaseModelImpl<ObjectStateTransition>
 	implements ObjectStateTransitionModel {
@@ -339,7 +337,6 @@ public class ObjectStateTransitionModelImpl
 			(Map)attributeSetterBiConsumers);
 	}
 
-	@JSON
 	@Override
 	public long getMvccVersion() {
 		return _mvccVersion;
@@ -354,7 +351,6 @@ public class ObjectStateTransitionModelImpl
 		_mvccVersion = mvccVersion;
 	}
 
-	@JSON
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
@@ -383,7 +379,6 @@ public class ObjectStateTransitionModelImpl
 		return getColumnOriginalValue("uuid_");
 	}
 
-	@JSON
 	@Override
 	public long getObjectStateTransitionId() {
 		return _objectStateTransitionId;
@@ -398,7 +393,6 @@ public class ObjectStateTransitionModelImpl
 		_objectStateTransitionId = objectStateTransitionId;
 	}
 
-	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -423,7 +417,6 @@ public class ObjectStateTransitionModelImpl
 			this.<Long>getColumnOriginalValue("companyId"));
 	}
 
-	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -454,7 +447,6 @@ public class ObjectStateTransitionModelImpl
 	public void setUserUuid(String userUuid) {
 	}
 
-	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -474,7 +466,6 @@ public class ObjectStateTransitionModelImpl
 		_userName = userName;
 	}
 
-	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -489,7 +480,6 @@ public class ObjectStateTransitionModelImpl
 		_createDate = createDate;
 	}
 
-	@JSON
 	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
@@ -510,7 +500,6 @@ public class ObjectStateTransitionModelImpl
 		_modifiedDate = modifiedDate;
 	}
 
-	@JSON
 	@Override
 	public long getObjectStateFlowId() {
 		return _objectStateFlowId;
@@ -549,7 +538,6 @@ public class ObjectStateTransitionModelImpl
 			this.<Long>getColumnOriginalValue("sourceObjectStateId"));
 	}
 
-	@JSON
 	@Override
 	public long getTargetObjectStateId() {
 		return _targetObjectStateId;
