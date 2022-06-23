@@ -62,7 +62,7 @@ public class ObjectFieldSettingLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), RandomTestUtil.randomBoolean(),
+			StringUtil.randomId(), RandomTestUtil.randomBoolean(), false,
 			Collections.emptyList());
 	}
 

@@ -384,7 +384,7 @@ public class ObjectLayoutLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null, LocalizedMapUtil.getLocalizedMap(name),
-			StringUtil.randomId(), true, Collections.emptyList());
+			StringUtil.randomId(), true, false, Collections.emptyList());
 
 		return objectField.getObjectFieldId();
 	}

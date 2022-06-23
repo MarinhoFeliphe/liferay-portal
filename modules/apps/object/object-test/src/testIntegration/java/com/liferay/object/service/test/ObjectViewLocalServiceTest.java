@@ -351,7 +351,7 @@ public class ObjectViewLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null,
 			LocalizedMapUtil.getLocalizedMap(objectFieldLabel), objectFieldName,
-			true, Collections.emptyList());
+			true, false, Collections.emptyList());
 
 		return objectField.getName();
 	}

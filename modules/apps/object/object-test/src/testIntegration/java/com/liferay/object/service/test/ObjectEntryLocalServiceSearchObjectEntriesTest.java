@@ -551,7 +551,7 @@ public class ObjectEntryLocalServiceSearchObjectEntriesTest {
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			true, true, null, LocalizedMapUtil.getLocalizedMap("Beta"), "beta",
-			false, Collections.emptyList());
+			false, false, Collections.emptyList());
 
 		return objectField.getObjectFieldId();
 	}

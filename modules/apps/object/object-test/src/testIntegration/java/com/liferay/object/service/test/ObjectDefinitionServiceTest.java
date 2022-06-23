@@ -409,7 +409,8 @@ public class ObjectDefinitionServiceTest {
 					null, false, false, null,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					StringUtil.randomId(), false, Collections.emptyList());
+					StringUtil.randomId(), false, false,
+					Collections.emptyList());
 
 			objectDefinition =
 				_objectDefinitionService.updateTitleObjectFieldId(

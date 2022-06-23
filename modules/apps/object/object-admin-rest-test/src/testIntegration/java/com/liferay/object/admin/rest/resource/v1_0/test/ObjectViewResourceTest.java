@@ -66,7 +66,7 @@ public class ObjectViewResourceTest extends BaseObjectViewResourceTestCase {
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null, LocalizedMapUtil.getLocalizedMap("Able"),
-			"able", true, Collections.emptyList());
+			"able", true, false, Collections.emptyList());
 	}
 
 	@After
