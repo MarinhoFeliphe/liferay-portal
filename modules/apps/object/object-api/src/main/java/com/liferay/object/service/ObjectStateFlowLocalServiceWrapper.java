@@ -38,10 +38,19 @@ public class ObjectStateFlowLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.object.model.ObjectStateFlow addObjectStateFlow(
-		long objectFieldId) {
+	public com.liferay.object.model.ObjectStateFlow addDefaultObjectStateFlow(
+		com.liferay.object.model.ObjectField objectField) {
 
-		return _objectStateFlowLocalService.addObjectStateFlow(objectFieldId);
+		return _objectStateFlowLocalService.addDefaultObjectStateFlow(
+			objectField);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectStateFlow addObjectStateFlow(
+		long objectFieldId, long userId, String userName) {
+
+		return _objectStateFlowLocalService.addObjectStateFlow(
+			objectFieldId, userId, userName);
 	}
 
 	/**

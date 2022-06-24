@@ -39,10 +39,11 @@ public class ObjectStateLocalServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectState addObjectState(
-		long listTypeEntryId, long objectStateFlowId) {
+		long listTypeEntryId, long objectStateFlowId, long userId,
+		String userName) {
 
 		return _objectStateLocalService.addObjectState(
-			listTypeEntryId, objectStateFlowId);
+			listTypeEntryId, objectStateFlowId, userId, userName);
 	}
 
 	/**
