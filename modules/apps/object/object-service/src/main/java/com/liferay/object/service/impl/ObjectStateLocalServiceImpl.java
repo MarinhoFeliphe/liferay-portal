@@ -32,12 +32,16 @@ public class ObjectStateLocalServiceImpl
 
 	@Override
 	public ObjectState addObjectState(
-		long listTypeEntryId, long objectStateFlowId) {
+		long listTypeEntryId, long objectStateFlowId, long userId,
+		String userName) {
 
-		ObjectState objectState = createObjectState(0L);
+		ObjectState objectState = createObjectState(
+			counterLocalService.increment());
 
 		objectState.setListTypeEntryId(listTypeEntryId);
 		objectState.setObjectStateFlowId(objectStateFlowId);
+		objectState.setUserId(userId);
+		objectState.setUserName(userName);
 
 		return updateObjectState(objectState);
 	}

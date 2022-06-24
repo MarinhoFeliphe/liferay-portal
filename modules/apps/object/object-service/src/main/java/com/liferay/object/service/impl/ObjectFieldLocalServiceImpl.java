@@ -36,6 +36,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -126,6 +127,8 @@ public class ObjectFieldLocalServiceImpl
 				DynamicObjectDefinitionTable.getAlterTableAddColumnSQL(
 					dbTableName, objectField.getDBColumnName(), dbType));
 		}
+
+		_objectStateFlowLocalService.addDefaultObjectStateFlow(objectField);
 
 		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
 
@@ -931,6 +934,9 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectRelationshipPersistence _objectRelationshipPersistence;
+
+	@Reference
+	private ObjectStateFlowLocalService _objectStateFlowLocalService;
 
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;
