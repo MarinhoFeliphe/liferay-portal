@@ -88,6 +88,11 @@ public class ObjectStateFlowLocalServiceImpl
 		return addObjectStateFlow(objectStateFlow);
 	}
 
+	@Override
+	public ObjectStateFlow fetchByObjectFieldId(long objectFieldId) {
+		return objectStateFlowPersistence.fetchByObjectFieldId(objectFieldId);
+	}
+
 	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
 

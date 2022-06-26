@@ -15,10 +15,16 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.object.model.ObjectState;
+import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.base.ObjectStateLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
@@ -38,12 +44,37 @@ public class ObjectStateLocalServiceImpl
 		ObjectState objectState = createObjectState(
 			counterLocalService.increment());
 
-		objectState.setListTypeEntryId(listTypeEntryId);
-		objectState.setObjectStateFlowId(objectStateFlowId);
 		objectState.setUserId(userId);
 		objectState.setUserName(userName);
+		objectState.setListTypeEntryId(listTypeEntryId);
+		objectState.setObjectStateFlowId(objectStateFlowId);
 
 		return updateObjectState(objectState);
 	}
+
+	@Override
+	public List<ObjectState> findByObjectStateFlowId(long objectStateFlowId) {
+		return objectStatePersistence.findByObjectStateFlowId(
+			objectStateFlowId);
+	}
+
+	@Override
+	public List<ObjectState> getNextObjectStates(long sourceObjectStateId) {
+		return Stream.of(
+			_objectStateTransitionLocalService.findBySourceObjectStateId(
+				sourceObjectStateId)
+		).flatMap(
+			List::stream
+		).map(
+			objectStateTransition -> objectStatePersistence.fetchByPrimaryKey(
+				objectStateTransition.getTargetObjectStateId())
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	@Reference
+	private ObjectStateTransitionLocalService
+		_objectStateTransitionLocalService;
 
 }
