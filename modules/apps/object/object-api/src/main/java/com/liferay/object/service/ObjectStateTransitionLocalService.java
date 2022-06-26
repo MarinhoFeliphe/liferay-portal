@@ -221,6 +221,9 @@ public interface ObjectStateTransitionLocalService
 	public ObjectStateTransition fetchObjectStateTransitionByUuidAndCompanyId(
 		String uuid, long companyId);
 
+	public List<ObjectStateTransition> findBySourceObjectStateId(
+		long sourceObjectStateId);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 

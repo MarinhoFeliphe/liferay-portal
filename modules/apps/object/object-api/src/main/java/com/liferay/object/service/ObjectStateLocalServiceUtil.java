@@ -229,6 +229,12 @@ public class ObjectStateLocalServiceUtil {
 		return getService().fetchObjectStateByUuidAndCompanyId(uuid, companyId);
 	}
 
+	public static List<ObjectState> findByObjectStateFlowId(
+		long objectStateFlowId) {
+
+		return getService().findByObjectStateFlowId(objectStateFlowId);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
@@ -248,6 +254,12 @@ public class ObjectStateLocalServiceUtil {
 			getIndexableActionableDynamicQuery() {
 
 		return getService().getIndexableActionableDynamicQuery();
+	}
+
+	public static List<ObjectState> getNextObjectStates(
+		long sourceObjectStateId) {
+
+		return getService().getNextObjectStates(sourceObjectStateId);
 	}
 
 	/**

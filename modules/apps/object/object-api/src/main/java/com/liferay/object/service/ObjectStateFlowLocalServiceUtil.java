@@ -222,6 +222,10 @@ public class ObjectStateFlowLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
+	public static ObjectStateFlow fetchByObjectFieldId(long objectFieldId) {
+		return getService().fetchByObjectFieldId(objectFieldId);
+	}
+
 	public static ObjectStateFlow fetchObjectStateFlow(long objectStateFlowId) {
 		return getService().fetchObjectStateFlow(objectStateFlowId);
 	}

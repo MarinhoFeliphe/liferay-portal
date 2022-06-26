@@ -216,6 +216,8 @@ public interface ObjectStateLocalService
 	public ObjectState fetchObjectStateByUuidAndCompanyId(
 		String uuid, long companyId);
 
+	public List<ObjectState> findByObjectStateFlowId(long objectStateFlowId);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
@@ -225,6 +227,9 @@ public interface ObjectStateLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectState> getNextObjectStates(long sourceObjectStateId);
 
 	/**
 	 * Returns the object state with the primary key.

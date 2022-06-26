@@ -259,6 +259,14 @@ public class ObjectStateLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectState>
+		findByObjectStateFlowId(long objectStateFlowId) {
+
+		return _objectStateLocalService.findByObjectStateFlowId(
+			objectStateFlowId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
@@ -280,6 +288,14 @@ public class ObjectStateLocalServiceWrapper
 		getIndexableActionableDynamicQuery() {
 
 		return _objectStateLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectState>
+		getNextObjectStates(long sourceObjectStateId) {
+
+		return _objectStateLocalService.getNextObjectStates(
+			sourceObjectStateId);
 	}
 
 	/**

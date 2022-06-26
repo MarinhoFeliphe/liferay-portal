@@ -274,6 +274,14 @@ public class ObjectStateTransitionLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectStateTransition>
+		findBySourceObjectStateId(long sourceObjectStateId) {
+
+		return _objectStateTransitionLocalService.findBySourceObjectStateId(
+			sourceObjectStateId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
