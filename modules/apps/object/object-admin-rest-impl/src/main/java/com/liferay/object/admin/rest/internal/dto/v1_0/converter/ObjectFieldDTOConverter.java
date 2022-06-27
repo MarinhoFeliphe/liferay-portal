@@ -60,6 +60,7 @@ public class ObjectFieldDTOConverter
 				businessType = ObjectField.BusinessType.create(
 					objectField.getBusinessType());
 				DBType = ObjectField.DBType.create(objectField.getDBType());
+				defaultValue = objectField.getDefaultValue();
 				externalReferenceCode = objectField.getExternalReferenceCode();
 				id = objectField.getObjectFieldId();
 				indexed = objectField.getIndexed();
@@ -79,6 +80,7 @@ public class ObjectFieldDTOConverter
 				relationshipType = ObjectField.RelationshipType.create(
 					objectField.getRelationshipType());
 				required = objectField.isRequired();
+				state = objectField.isState();
 				system = objectField.getSystem();
 				type = ObjectField.Type.create(objectField.getDBType());
 			}

@@ -16,6 +16,7 @@ package com.liferay.object.admin.rest.internal.resource.v1_0;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
+import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectFieldDTOConverter;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectFieldEntityModel;
@@ -23,7 +24,6 @@ import com.liferay.object.admin.rest.resource.v1_0.ObjectFieldResource;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -217,8 +218,9 @@ public class ObjectFieldResourceImpl
 	}
 
 	private ObjectField _toObjectField(
-		com.liferay.object.model.ObjectDefinition objectDefinition,
-		com.liferay.object.model.ObjectField objectField) {
+			com.liferay.object.model.ObjectDefinition objectDefinition,
+			com.liferay.object.model.ObjectField objectField)
+		throws Exception {
 
 		boolean updateable =
 			(!objectDefinition.isApproved() && !objectDefinition.isSystem()) ||
@@ -226,49 +228,54 @@ public class ObjectFieldResourceImpl
 				objectDefinition.getExtensionDBTableName(),
 				objectField.getDBTableName());
 
-		return ObjectFieldUtil.toObjectField(
-			HashMapBuilder.put(
-				"delete",
-				() -> {
-					if (!updateable ||
-						Validator.isNotNull(
-							objectField.getRelationshipType())) {
+		return _objectFieldDTOConverter.toDTO(
+			new DefaultDTOConverterContext(
+				false,
+				HashMapBuilder.put(
+					"delete",
+					() -> {
+						if (!updateable ||
+							Validator.isNotNull(
+								objectField.getRelationshipType())) {
 
-						return null;
+							return null;
+						}
+
+						return addAction(
+							ActionKeys.UPDATE, "deleteObjectField",
+							com.liferay.object.model.ObjectDefinition.class.
+								getName(),
+							objectField.getObjectDefinitionId());
 					}
-
-					return addAction(
-						ActionKeys.UPDATE, "deleteObjectField",
+				).put(
+					"get",
+					addAction(
+						ActionKeys.VIEW, "getObjectField",
 						com.liferay.object.model.ObjectDefinition.class.
 							getName(),
-						objectField.getObjectDefinitionId());
-				}
-			).put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getObjectField",
-					com.liferay.object.model.ObjectDefinition.class.getName(),
-					objectField.getObjectDefinitionId())
-			).put(
-				"update",
-				() -> {
-					if (!updateable) {
-						return null;
-					}
+						objectField.getObjectDefinitionId())
+				).put(
+					"update",
+					() -> {
+						if (!updateable) {
+							return null;
+						}
 
-					return addAction(
-						ActionKeys.UPDATE, "putObjectField",
-						com.liferay.object.model.ObjectDefinition.class.
-							getName(),
-						objectField.getObjectDefinitionId());
-				}
-			).build(),
+						return addAction(
+							ActionKeys.UPDATE, "putObjectField",
+							com.liferay.object.model.ObjectDefinition.class.
+								getName(),
+							objectField.getObjectDefinitionId());
+					}
+				).build(),
+				null, null, contextAcceptLanguage.getPreferredLocale(), null,
+				null),
 			objectField);
 	}
 
 	private ObjectField _toObjectField(
 			com.liferay.object.model.ObjectField objectField)
-		throws PortalException {
+		throws Exception {
 
 		return _toObjectField(
 			_objectDefinitionLocalService.getObjectDefinition(
@@ -281,6 +288,9 @@ public class ObjectFieldResourceImpl
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldDTOConverter _objectFieldDTOConverter;
 
 	@Reference
 	private ObjectFieldService _objectFieldService;
