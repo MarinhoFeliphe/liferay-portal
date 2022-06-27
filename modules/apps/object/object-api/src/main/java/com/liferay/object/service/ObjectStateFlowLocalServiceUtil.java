@@ -94,6 +94,12 @@ public class ObjectStateFlowLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteByObjectFieldId(long objectFieldId)
+		throws com.liferay.object.exception.NoSuchObjectStateFlowException {
+
+		getService().deleteByObjectFieldId(objectFieldId);
+	}
+
 	/**
 	 * Deletes the object state flow with the primary key from the database. Also notifies the appropriate model listeners.
 	 *

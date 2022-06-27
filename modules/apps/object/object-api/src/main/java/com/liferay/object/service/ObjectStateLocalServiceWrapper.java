@@ -87,6 +87,11 @@ public class ObjectStateLocalServiceWrapper
 		return _objectStateLocalService.createPersistedModel(primaryKeyObj);
 	}
 
+	@Override
+	public void deleteByObjectStateFlowId(long objectStateFlowId) {
+		_objectStateLocalService.deleteByObjectStateFlowId(objectStateFlowId);
+	}
+
 	/**
 	 * Deletes the object state with the primary key from the database. Also notifies the appropriate model listeners.
 	 *

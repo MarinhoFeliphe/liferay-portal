@@ -86,6 +86,10 @@ public class ObjectStateLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteByObjectStateFlowId(long objectStateFlowId) {
+		getService().deleteByObjectStateFlowId(objectStateFlowId);
+	}
+
 	/**
 	 * Deletes the object state with the primary key from the database. Also notifies the appropriate model listeners.
 	 *

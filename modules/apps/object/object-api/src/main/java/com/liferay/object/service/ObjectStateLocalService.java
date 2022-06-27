@@ -95,6 +95,8 @@ public interface ObjectStateLocalService
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public void deleteByObjectStateFlowId(long objectStateFlowId);
+
 	/**
 	 * Deletes the object state with the primary key from the database. Also notifies the appropriate model listeners.
 	 *

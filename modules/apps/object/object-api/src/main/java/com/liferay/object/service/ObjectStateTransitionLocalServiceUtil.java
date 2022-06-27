@@ -92,6 +92,10 @@ public class ObjectStateTransitionLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteByObjectStateFlowId(long objectStateFlowId) {
+		getService().deleteByObjectStateFlowId(objectStateFlowId);
+	}
+
 	/**
 	 * Deletes the object state transition with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
