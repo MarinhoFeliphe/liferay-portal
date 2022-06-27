@@ -211,14 +211,16 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {objectDefinitionObjectFields(objectDefinitionId: ___, page: ___, pageSize: ___, search: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {objectDefinitionObjectFields(filter: ___, objectDefinitionId: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public ObjectFieldPage objectDefinitionObjectFields(
 			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
 			@GraphQLName("search") String search,
+			@GraphQLName("filter") String filterString,
 			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page)
+			@GraphQLName("page") int page,
+			@GraphQLName("sort") String sortsString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -227,7 +229,9 @@ public class Query {
 			objectFieldResource -> new ObjectFieldPage(
 				objectFieldResource.getObjectDefinitionObjectFieldsPage(
 					objectDefinitionId, search,
-					Pagination.of(page, pageSize))));
+					_filterBiFunction.apply(objectFieldResource, filterString),
+					Pagination.of(page, pageSize),
+					_sortsBiFunction.apply(objectFieldResource, sortsString))));
 	}
 
 	/**
