@@ -65,6 +65,7 @@ public class ObjectStateFlowLocalServiceImpl
 				}
 
 				_objectStateTransitionLocalService.addObjectStateTransition(
+					objectStateFlow.getObjectStateFlowId(),
 					sourceObjectState.getObjectStateId(),
 					targetObjectState.getObjectStateId(),
 					objectField.getUserId(), objectField.getUserName());

@@ -553,6 +553,9 @@
 
 		<!-- Finder methods -->
 
+		<finder name="ObjectStateFlowId" return-type="Collection">
+			<finder-column name="objectStateFlowId" />
+		</finder>
 		<finder name="SourceObjectStateId" return-type="Collection">
 			<finder-column name="sourceObjectStateId" />
 		</finder>

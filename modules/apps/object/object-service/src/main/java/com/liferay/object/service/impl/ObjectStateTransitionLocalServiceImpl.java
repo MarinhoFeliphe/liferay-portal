@@ -34,14 +34,15 @@ public class ObjectStateTransitionLocalServiceImpl
 
 	@Override
 	public ObjectStateTransition addObjectStateTransition(
-		long sourceObjectStateId, long targetObjectStateId, long userId,
-		String userName) {
+		long objectStateFlowId, long sourceObjectStateId,
+		long targetObjectStateId, long userId, String userName) {
 
 		ObjectStateTransition objectStateTransition =
 			createObjectStateTransition(counterLocalService.increment());
 
 		objectStateTransition.setUserId(userId);
 		objectStateTransition.setUserName(userName);
+		objectStateTransition.setObjectStateFlowId(objectStateFlowId);
 		objectStateTransition.setSourceObjectStateId(sourceObjectStateId);
 		objectStateTransition.setTargetObjectStateId(targetObjectStateId);
 
