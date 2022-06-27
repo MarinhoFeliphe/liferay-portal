@@ -40,11 +40,12 @@ public class ObjectStateTransitionLocalServiceWrapper
 	@Override
 	public com.liferay.object.model.ObjectStateTransition
 		addObjectStateTransition(
-			long sourceObjectStateId, long targetObjectStateId, long userId,
-			String userName) {
+			long objectStateFlowId, long sourceObjectStateId,
+			long targetObjectStateId, long userId, String userName) {
 
 		return _objectStateTransitionLocalService.addObjectStateTransition(
-			sourceObjectStateId, targetObjectStateId, userId, userName);
+			objectStateFlowId, sourceObjectStateId, targetObjectStateId, userId,
+			userName);
 	}
 
 	/**

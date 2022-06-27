@@ -57,6 +57,7 @@ create index IX_FBD0BBAC on ObjectState (uuid_[$COLUMN_LENGTH:75$], companyId);
 create index IX_AE828160 on ObjectStateFlow (objectFieldId);
 create index IX_C6174FA on ObjectStateFlow (uuid_[$COLUMN_LENGTH:75$], companyId);
 
+create index IX_DB56B27E on ObjectStateTransition (objectStateFlowId);
 create index IX_9C3FAB55 on ObjectStateTransition (sourceObjectStateId);
 create index IX_FB9AC71F on ObjectStateTransition (targetObjectStateId);
 create index IX_4D699221 on ObjectStateTransition (uuid_[$COLUMN_LENGTH:75$], companyId);

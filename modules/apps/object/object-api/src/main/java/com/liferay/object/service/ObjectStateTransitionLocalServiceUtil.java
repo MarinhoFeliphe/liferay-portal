@@ -45,11 +45,12 @@ public class ObjectStateTransitionLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectStateTransitionLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static ObjectStateTransition addObjectStateTransition(
-		long sourceObjectStateId, long targetObjectStateId, long userId,
-		String userName) {
+		long objectStateFlowId, long sourceObjectStateId,
+		long targetObjectStateId, long userId, String userName) {
 
 		return getService().addObjectStateTransition(
-			sourceObjectStateId, targetObjectStateId, userId, userName);
+			objectStateFlowId, sourceObjectStateId, targetObjectStateId, userId,
+			userName);
 	}
 
 	/**
