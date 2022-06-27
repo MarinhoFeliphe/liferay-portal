@@ -50,6 +50,12 @@ public class ObjectStateTransitionLocalServiceImpl
 	}
 
 	@Override
+	public void deleteByObjectStateFlowId(long objectStateFlowId) {
+		objectStateTransitionPersistence.removeByObjectStateFlowId(
+			objectStateFlowId);
+	}
+
+	@Override
 	public List<ObjectStateTransition> findBySourceObjectStateId(
 		long sourceObjectStateId) {
 

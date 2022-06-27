@@ -53,6 +53,11 @@ public class ObjectStateLocalServiceImpl
 	}
 
 	@Override
+	public void deleteByObjectStateFlowId(long objectStateFlowId) {
+		objectStatePersistence.removeByObjectStateFlowId(objectStateFlowId);
+	}
+
+	@Override
 	public List<ObjectState> findByObjectStateFlowId(long objectStateFlowId) {
 		return objectStatePersistence.findByObjectStateFlowId(
 			objectStateFlowId);

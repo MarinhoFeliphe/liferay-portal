@@ -90,6 +90,26 @@ public class ObjectStateFlowLocalServiceImpl
 	}
 
 	@Override
+	public void deleteByObjectFieldId(long objectFieldId)
+		throws NoSuchObjectStateFlowException {
+
+		ObjectStateFlow objectStateFlow = fetchByObjectFieldId(objectFieldId);
+
+		if (objectStateFlow == null) {
+			return;
+		}
+
+		objectStateFlowPersistence.remove(
+			objectStateFlow.getObjectStateFlowId());
+
+		_objectStateLocalService.deleteByObjectStateFlowId(
+			objectStateFlow.getObjectStateFlowId());
+
+		_objectStateTransitionLocalService.deleteByObjectStateFlowId(
+			objectStateFlow.getObjectStateFlowId());
+	}
+
+	@Override
 	public ObjectStateFlow fetchByObjectFieldId(long objectFieldId) {
 		return objectStateFlowPersistence.fetchByObjectFieldId(objectFieldId);
 	}

@@ -683,6 +683,13 @@ public class ObjectFieldLocalServiceImpl
 
 			objectFieldSettingFileSource = objectFieldSetting.getValue();
 		}
+		else if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+			_objectStateFlowLocalService.deleteByObjectFieldId(
+				objectField.getObjectFieldId());
+		}
 
 		_objectFieldSettingPersistence.removeByObjectFieldId(
 			objectField.getObjectFieldId());
