@@ -56,7 +56,7 @@ public class ObjectFieldServiceHttp {
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required,
+			boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -69,7 +69,7 @@ public class ObjectFieldServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, listTypeDefinitionId, objectDefinitionId,
 				businessType, dbType, defaultValue, indexed, indexedAsKeyword,
-				indexedLanguageId, labelMap, name, required,
+				indexedLanguageId, labelMap, name, required, state,
 				objectFieldSettings);
 
 			Object returnObj = null;
@@ -183,7 +183,7 @@ public class ObjectFieldServiceHttp {
 			String businessType, String dbType, String defaultValue,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required,
+			boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -197,7 +197,7 @@ public class ObjectFieldServiceHttp {
 				methodKey, objectFieldId, externalReferenceCode,
 				listTypeDefinitionId, businessType, dbType, defaultValue,
 				indexed, indexedAsKeyword, indexedLanguageId, labelMap, name,
-				required, objectFieldSettings);
+				required, state, objectFieldSettings);
 
 			Object returnObj = null;
 
@@ -234,7 +234,7 @@ public class ObjectFieldServiceHttp {
 		new Class[] {
 			long.class, long.class, String.class, String.class, String.class,
 			boolean.class, boolean.class, String.class, java.util.Map.class,
-			String.class, boolean.class, java.util.List.class
+			String.class, boolean.class, boolean.class, java.util.List.class
 		};
 	private static final Class<?>[] _deleteObjectFieldParameterTypes1 =
 		new Class[] {long.class};
@@ -244,7 +244,7 @@ public class ObjectFieldServiceHttp {
 		new Class[] {
 			long.class, String.class, long.class, String.class, String.class,
 			String.class, boolean.class, boolean.class, String.class,
-			java.util.Map.class, String.class, boolean.class,
+			java.util.Map.class, String.class, boolean.class, boolean.class,
 			java.util.List.class
 		};
 

@@ -43,7 +43,7 @@ public class ObjectFieldLocalServiceWrapper
 			String businessType, String dbType, String defaultValue,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required,
+			boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -51,7 +51,7 @@ public class ObjectFieldLocalServiceWrapper
 		return _objectFieldLocalService.addCustomObjectField(
 			userId, listTypeDefinitionId, objectDefinitionId, businessType,
 			dbType, defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required, objectFieldSettings);
+			labelMap, name, required, state, objectFieldSettings);
 	}
 
 	/**
@@ -78,13 +78,13 @@ public class ObjectFieldLocalServiceWrapper
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required)
+			boolean required, boolean state)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectFieldLocalService.addOrUpdateSystemObjectField(
 			userId, objectDefinitionId, businessType, dbColumnName, dbTableName,
 			dbType, defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required);
+			labelMap, name, required, state);
 	}
 
 	@Override
@@ -94,13 +94,13 @@ public class ObjectFieldLocalServiceWrapper
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required)
+			boolean required, boolean state)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectFieldLocalService.addSystemObjectField(
 			userId, objectDefinitionId, businessType, dbColumnName, dbTableName,
 			dbType, defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required);
+			labelMap, name, required, state);
 	}
 
 	/**
@@ -500,7 +500,7 @@ public class ObjectFieldLocalServiceWrapper
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required,
+			boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -508,7 +508,8 @@ public class ObjectFieldLocalServiceWrapper
 		return _objectFieldLocalService.updateCustomObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, name, required, objectFieldSettings);
+			indexedLanguageId, labelMap, name, required, state,
+			objectFieldSettings);
 	}
 
 	@Override
@@ -519,7 +520,7 @@ public class ObjectFieldLocalServiceWrapper
 			String dbType, String defaultValue, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
-			boolean required, boolean system,
+			boolean required, boolean state, boolean system,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -528,7 +529,7 @@ public class ObjectFieldLocalServiceWrapper
 			userId, objectDefinitionId, objectFieldId, externalReferenceCode,
 			listTypeDefinitionId, businessType, dbColumnName, dbTableName,
 			dbType, defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required, system, objectFieldSettings);
+			labelMap, name, required, state, system, objectFieldSettings);
 	}
 
 	/**
