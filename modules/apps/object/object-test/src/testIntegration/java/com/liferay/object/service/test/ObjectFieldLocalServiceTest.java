@@ -809,7 +809,7 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), StringPool.BLANK, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
-			ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
+			ObjectFieldConstants.DB_TYPE_LONG, null, true, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			Arrays.asList(
@@ -829,7 +829,7 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), StringPool.BLANK, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+			ObjectFieldConstants.DB_TYPE_STRING, null, true, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false, _getObjectFieldSettings("Text"));
 
@@ -846,7 +846,7 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), StringPool.BLANK, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+			ObjectFieldConstants.DB_TYPE_STRING, null, true, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			Arrays.asList(
@@ -861,7 +861,7 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), StringPool.BLANK, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+			ObjectFieldConstants.DB_TYPE_STRING, null, true, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			Collections.singletonList(
@@ -909,7 +909,7 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), StringPool.BLANK, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
-			ObjectFieldConstants.DB_TYPE_LONG, false, true, "",
+			ObjectFieldConstants.DB_TYPE_LONG, null, false, true, "",
 			LocalizedMapUtil.getLocalizedMap("able"), "able", false,
 			Collections.emptyList());
 
@@ -932,9 +932,9 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), externalReferenceCode, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, true, false, indexedLanguageId,
-			LocalizedMapUtil.getLocalizedMap("baker"), "baker", true,
-			_getObjectFieldSettings("Text"));
+			ObjectFieldConstants.DB_TYPE_STRING, null, true, false,
+			indexedLanguageId, LocalizedMapUtil.getLocalizedMap("baker"),
+			"baker", true, _getObjectFieldSettings("Text"));
 
 		Assert.assertEquals(
 			externalReferenceCode, objectField.getExternalReferenceCode());
@@ -958,7 +958,7 @@ public class ObjectFieldLocalServiceTest {
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), StringPool.BLANK, 0,
 			ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
-			ObjectFieldConstants.DB_TYPE_INTEGER, false, true, "",
+			ObjectFieldConstants.DB_TYPE_INTEGER, null, false, true, "",
 			LocalizedMapUtil.getLocalizedMap("charlie"), "charlie", false,
 			_getObjectFieldSettings(ObjectFieldConstants.BUSINESS_TYPE_TEXT));
 
@@ -1129,7 +1129,8 @@ public class ObjectFieldLocalServiceTest {
 				objectField.getObjectFieldId(), StringPool.BLANK,
 				objectField.getListTypeDefinitionId(),
 				objectField.getBusinessType(),
-				ObjectFieldConstants.DB_TYPE_STRING, objectField.isIndexed(),
+				ObjectFieldConstants.DB_TYPE_STRING,
+				objectField.getDefaultValue(), objectField.isIndexed(),
 				objectField.isIndexedAsKeyword(),
 				objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 				"able", objectField.isRequired(), Collections.emptyList());
