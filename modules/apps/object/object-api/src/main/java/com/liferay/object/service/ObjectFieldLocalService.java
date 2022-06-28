@@ -363,9 +363,9 @@ public interface ObjectFieldLocalService
 	public ObjectField updateCustomObjectField(
 			long objectFieldId, String externalReferenceCode,
 			long listTypeDefinitionId, String businessType, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, String name, boolean required,
-			List<ObjectFieldSetting> objectFieldSettings)
+			String defaultValue, boolean indexed, boolean indexedAsKeyword,
+			String indexedLanguageId, Map<Locale, String> labelMap, String name,
+			boolean required, List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException;
 
 	public ObjectField updateObjectField(

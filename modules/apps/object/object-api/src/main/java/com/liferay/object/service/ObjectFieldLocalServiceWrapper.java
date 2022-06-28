@@ -497,7 +497,8 @@ public class ObjectFieldLocalServiceWrapper
 	public com.liferay.object.model.ObjectField updateCustomObjectField(
 			long objectFieldId, String externalReferenceCode,
 			long listTypeDefinitionId, String businessType, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			String defaultValue, boolean indexed, boolean indexedAsKeyword,
+			String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			boolean required,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
@@ -506,8 +507,8 @@ public class ObjectFieldLocalServiceWrapper
 
 		return _objectFieldLocalService.updateCustomObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
-			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required, objectFieldSettings);
+			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
+			indexedLanguageId, labelMap, name, required, objectFieldSettings);
 	}
 
 	@Override
