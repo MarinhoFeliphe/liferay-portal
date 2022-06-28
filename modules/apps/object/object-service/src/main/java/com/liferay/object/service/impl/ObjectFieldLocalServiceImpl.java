@@ -441,6 +441,7 @@ public class ObjectFieldLocalServiceImpl
 
 		_validateIndexed(
 			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId);
+		_validateDefaultValue(businessType, defaultValue);
 
 		if (Validator.isNotNull(objectField.getRelationshipType())) {
 			if (!Objects.equals(objectField.getDBType(), dbType) ||
@@ -459,6 +460,7 @@ public class ObjectFieldLocalServiceImpl
 
 		objectField.setListTypeDefinitionId(listTypeDefinitionId);
 		objectField.setDBColumnName(name + StringPool.UNDERLINE);
+		objectField.setDefaultValue(defaultValue);
 		objectField.setIndexed(indexed);
 		objectField.setIndexedAsKeyword(indexedAsKeyword);
 		objectField.setIndexedLanguageId(indexedLanguageId);
