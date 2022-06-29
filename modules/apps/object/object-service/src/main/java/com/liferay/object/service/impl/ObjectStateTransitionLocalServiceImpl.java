@@ -56,6 +56,14 @@ public class ObjectStateTransitionLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectStateTransition> findByObjectStateFlowId(
+		long objectStateFlowId) {
+
+		return objectStateTransitionPersistence.findByObjectStateFlowId(
+			objectStateFlowId);
+	}
+
+	@Override
 	public List<ObjectStateTransition> findBySourceObjectStateId(
 		long sourceObjectStateId) {
 
