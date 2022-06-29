@@ -282,6 +282,14 @@ public class ObjectStateTransitionLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.object.model.ObjectStateTransition>
+		findByObjectStateFlowId(long objectStateFlowId) {
+
+		return _objectStateTransitionLocalService.findByObjectStateFlowId(
+			objectStateFlowId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectStateTransition>
 		findBySourceObjectStateId(long sourceObjectStateId) {
 
 		return _objectStateTransitionLocalService.findBySourceObjectStateId(

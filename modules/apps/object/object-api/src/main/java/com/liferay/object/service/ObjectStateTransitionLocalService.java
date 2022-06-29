@@ -223,6 +223,9 @@ public interface ObjectStateTransitionLocalService
 	public ObjectStateTransition fetchObjectStateTransitionByUuidAndCompanyId(
 		String uuid, long companyId);
 
+	public List<ObjectStateTransition> findByObjectStateFlowId(
+		long objectStateFlowId);
+
 	public List<ObjectStateTransition> findBySourceObjectStateId(
 		long sourceObjectStateId);
 

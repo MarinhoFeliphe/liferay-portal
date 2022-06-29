@@ -247,6 +247,12 @@ public class ObjectStateTransitionLocalServiceUtil {
 			uuid, companyId);
 	}
 
+	public static List<ObjectStateTransition> findByObjectStateFlowId(
+		long objectStateFlowId) {
+
+		return getService().findByObjectStateFlowId(objectStateFlowId);
+	}
+
 	public static List<ObjectStateTransition> findBySourceObjectStateId(
 		long sourceObjectStateId) {
 
