@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -124,6 +125,27 @@ public class ObjectFieldResourceImpl
 			Long objectDefinitionId, ObjectField objectField)
 		throws Exception {
 
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-152677"))) {
+			return _toObjectField(
+				_objectFieldService.addCustomObjectField(
+					objectField.getListTypeDefinitionId(), objectDefinitionId,
+					objectField.getBusinessTypeAsString(),
+					ObjectFieldUtil.getDBType(
+						objectField.getDBTypeAsString(),
+						objectField.getTypeAsString()),
+					null, objectField.getIndexed(),
+					objectField.getIndexedAsKeyword(),
+					objectField.getIndexedLanguageId(),
+					LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
+					objectField.getName(), objectField.getRequired(), false,
+					transformToList(
+						objectField.getObjectFieldSettings(),
+						objectFieldSetting ->
+							ObjectFieldSettingUtil.toObjectFieldSetting(
+								objectFieldSetting,
+								_objectFieldSettingLocalService))));
+		}
+
 		return _toObjectField(
 			_objectFieldService.addCustomObjectField(
 				objectField.getListTypeDefinitionId(), objectDefinitionId,
@@ -149,6 +171,28 @@ public class ObjectFieldResourceImpl
 	public ObjectField putObjectField(
 			Long objectFieldId, ObjectField objectField)
 		throws Exception {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-152677"))) {
+			return _toObjectField(
+				_objectFieldService.updateObjectField(
+					objectFieldId, objectField.getExternalReferenceCode(),
+					objectField.getListTypeDefinitionId(),
+					objectField.getBusinessTypeAsString(),
+					ObjectFieldUtil.getDBType(
+						objectField.getDBTypeAsString(),
+						objectField.getTypeAsString()),
+					null, objectField.getIndexed(),
+					objectField.getIndexedAsKeyword(),
+					objectField.getIndexedLanguageId(),
+					LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
+					objectField.getName(), objectField.getRequired(), false,
+					transformToList(
+						objectField.getObjectFieldSettings(),
+						objectFieldSetting ->
+							ObjectFieldSettingUtil.toObjectFieldSetting(
+								objectFieldSetting,
+								_objectFieldSettingLocalService))));
+		}
 
 		return _toObjectField(
 			_objectFieldService.updateObjectField(
