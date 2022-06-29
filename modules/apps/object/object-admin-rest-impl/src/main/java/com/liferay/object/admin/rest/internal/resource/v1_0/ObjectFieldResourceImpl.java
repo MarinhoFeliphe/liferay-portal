@@ -20,6 +20,7 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectFieldDTOC
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectFieldEntityModel;
+import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectStateFlowUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFieldResource;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldService;
@@ -214,7 +215,9 @@ public class ObjectFieldResourceImpl
 					objectFieldSetting ->
 						ObjectFieldSettingUtil.toObjectFieldSetting(
 							objectFieldSetting,
-							_objectFieldSettingLocalService))));
+							_objectFieldSettingLocalService)),
+				ObjectStateFlowUtil.toObjectStateFlow(
+					objectFieldId, objectField.getObjectStateFlow())));
 	}
 
 	private ObjectField _toObjectField(

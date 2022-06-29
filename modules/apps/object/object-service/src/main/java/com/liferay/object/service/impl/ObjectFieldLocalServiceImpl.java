@@ -35,6 +35,7 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
@@ -414,7 +415,8 @@ public class ObjectFieldLocalServiceImpl
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
 			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
+			List<ObjectFieldSetting> objectFieldSettings,
+			ObjectStateFlow objectStateFlow)
 		throws PortalException {
 
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
@@ -490,7 +492,8 @@ public class ObjectFieldLocalServiceImpl
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
 			boolean state, boolean system,
-			List<ObjectFieldSetting> objectFieldSettings)
+			List<ObjectFieldSetting> objectFieldSettings,
+			ObjectStateFlow objectStateFlow)
 		throws PortalException {
 
 		if (system) {
@@ -504,7 +507,7 @@ public class ObjectFieldLocalServiceImpl
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
 			indexedLanguageId, labelMap, name, required, state,
-			objectFieldSettings);
+			objectFieldSettings, objectStateFlow);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
