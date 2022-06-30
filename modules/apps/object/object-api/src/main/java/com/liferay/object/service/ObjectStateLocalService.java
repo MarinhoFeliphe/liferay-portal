@@ -15,6 +15,7 @@
 package com.liferay.object.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.object.exception.NoSuchObjectStateException;
 import com.liferay.object.model.ObjectState;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -217,6 +218,10 @@ public interface ObjectStateLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectState fetchObjectStateByUuidAndCompanyId(
 		String uuid, long companyId);
+
+	public ObjectState findByListTypeEntryIdAndObjectStateFlowId(
+			long listTypeEntryId, long objectStateFlowId)
+		throws NoSuchObjectStateException;
 
 	public List<ObjectState> findByObjectStateFlowId(long objectStateFlowId);
 

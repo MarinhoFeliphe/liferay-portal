@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUID;
 
@@ -53,6 +54,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1206,6 +1208,248 @@ public class ObjectStatePersistenceImpl
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
 		"objectState.companyId = ?";
 
+	private FinderPath _finderPathFetchByLTEI_OSFI;
+	private FinderPath _finderPathCountByLTEI_OSFI;
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or throws a <code>NoSuchObjectStateException</code> if it could not be found.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the matching object state
+	 * @throws NoSuchObjectStateException if a matching object state could not be found
+	 */
+	@Override
+	public ObjectState findByLTEI_OSFI(
+			long listTypeEntryId, long objectStateFlowId)
+		throws NoSuchObjectStateException {
+
+		ObjectState objectState = fetchByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
+
+		if (objectState == null) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("listTypeEntryId=");
+			sb.append(listTypeEntryId);
+
+			sb.append(", objectStateFlowId=");
+			sb.append(objectStateFlowId);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchObjectStateException(sb.toString());
+		}
+
+		return objectState;
+	}
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
+	 */
+	@Override
+	public ObjectState fetchByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId) {
+
+		return fetchByLTEI_OSFI(listTypeEntryId, objectStateFlowId, true);
+	}
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
+	 */
+	@Override
+	public ObjectState fetchByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId, boolean useFinderCache) {
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {listTypeEntryId, objectStateFlowId};
+		}
+
+		Object result = null;
+
+		if (useFinderCache) {
+			result = finderCache.getResult(
+				_finderPathFetchByLTEI_OSFI, finderArgs);
+		}
+
+		if (result instanceof ObjectState) {
+			ObjectState objectState = (ObjectState)result;
+
+			if ((listTypeEntryId != objectState.getListTypeEntryId()) ||
+				(objectStateFlowId != objectState.getObjectStateFlowId())) {
+
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_SQL_SELECT_OBJECTSTATE_WHERE);
+
+			sb.append(_FINDER_COLUMN_LTEI_OSFI_LISTTYPEENTRYID_2);
+
+			sb.append(_FINDER_COLUMN_LTEI_OSFI_OBJECTSTATEFLOWID_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(listTypeEntryId);
+
+				queryPos.add(objectStateFlowId);
+
+				List<ObjectState> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByLTEI_OSFI, finderArgs, list);
+					}
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									listTypeEntryId, objectStateFlowId
+								};
+							}
+
+							_log.warn(
+								"ObjectStatePersistenceImpl.fetchByLTEI_OSFI(long, long, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					ObjectState objectState = list.get(0);
+
+					result = objectState;
+
+					cacheResult(objectState);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (ObjectState)result;
+		}
+	}
+
+	/**
+	 * Removes the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; from the database.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the object state that was removed
+	 */
+	@Override
+	public ObjectState removeByLTEI_OSFI(
+			long listTypeEntryId, long objectStateFlowId)
+		throws NoSuchObjectStateException {
+
+		ObjectState objectState = findByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
+
+		return remove(objectState);
+	}
+
+	/**
+	 * Returns the number of object states where listTypeEntryId = &#63; and objectStateFlowId = &#63;.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the number of matching object states
+	 */
+	@Override
+	public int countByLTEI_OSFI(long listTypeEntryId, long objectStateFlowId) {
+		FinderPath finderPath = _finderPathCountByLTEI_OSFI;
+
+		Object[] finderArgs = new Object[] {listTypeEntryId, objectStateFlowId};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_COUNT_OBJECTSTATE_WHERE);
+
+			sb.append(_FINDER_COLUMN_LTEI_OSFI_LISTTYPEENTRYID_2);
+
+			sb.append(_FINDER_COLUMN_LTEI_OSFI_OBJECTSTATEFLOWID_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(listTypeEntryId);
+
+				queryPos.add(objectStateFlowId);
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_LTEI_OSFI_LISTTYPEENTRYID_2 =
+		"objectState.listTypeEntryId = ? AND ";
+
+	private static final String _FINDER_COLUMN_LTEI_OSFI_OBJECTSTATEFLOWID_2 =
+		"objectState.objectStateFlowId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByObjectStateFlowId;
 	private FinderPath _finderPathWithoutPaginationFindByObjectStateFlowId;
 	private FinderPath _finderPathCountByObjectStateFlowId;
@@ -1738,6 +1982,14 @@ public class ObjectStatePersistenceImpl
 	public void cacheResult(ObjectState objectState) {
 		entityCache.putResult(
 			ObjectStateImpl.class, objectState.getPrimaryKey(), objectState);
+
+		finderCache.putResult(
+			_finderPathFetchByLTEI_OSFI,
+			new Object[] {
+				objectState.getListTypeEntryId(),
+				objectState.getObjectStateFlowId()
+			},
+			objectState);
 	}
 
 	private int _valueObjectFinderCacheListThreshold;
@@ -1806,6 +2058,20 @@ public class ObjectStatePersistenceImpl
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(ObjectStateImpl.class, primaryKey);
 		}
+	}
+
+	protected void cacheUniqueFindersCache(
+		ObjectStateModelImpl objectStateModelImpl) {
+
+		Object[] args = new Object[] {
+			objectStateModelImpl.getListTypeEntryId(),
+			objectStateModelImpl.getObjectStateFlowId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByLTEI_OSFI, args, Long.valueOf(1));
+		finderCache.putResult(
+			_finderPathFetchByLTEI_OSFI, args, objectStateModelImpl);
 	}
 
 	/**
@@ -1989,6 +2255,8 @@ public class ObjectStatePersistenceImpl
 
 		entityCache.putResult(
 			ObjectStateImpl.class, objectStateModelImpl, false, true);
+
+		cacheUniqueFindersCache(objectStateModelImpl);
 
 		if (isNew) {
 			objectState.setNew(false);
@@ -2309,6 +2577,16 @@ public class ObjectStatePersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
+
+		_finderPathFetchByLTEI_OSFI = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByLTEI_OSFI",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			new String[] {"listTypeEntryId", "objectStateFlowId"}, true);
+
+		_finderPathCountByLTEI_OSFI = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByLTEI_OSFI",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			new String[] {"listTypeEntryId", "objectStateFlowId"}, false);
 
 		_finderPathWithPaginationFindByObjectStateFlowId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByObjectStateFlowId",

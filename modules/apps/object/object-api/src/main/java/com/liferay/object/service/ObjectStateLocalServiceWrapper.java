@@ -264,6 +264,17 @@ public class ObjectStateLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.object.model.ObjectState
+			findByListTypeEntryIdAndObjectStateFlowId(
+				long listTypeEntryId, long objectStateFlowId)
+		throws com.liferay.object.exception.NoSuchObjectStateException {
+
+		return _objectStateLocalService.
+			findByListTypeEntryIdAndObjectStateFlowId(
+				listTypeEntryId, objectStateFlowId);
+	}
+
+	@Override
 	public java.util.List<com.liferay.object.model.ObjectState>
 		findByObjectStateFlowId(long objectStateFlowId) {
 

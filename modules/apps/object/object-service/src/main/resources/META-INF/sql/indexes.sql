@@ -51,6 +51,7 @@ create index IX_DE3EBEF8 on ObjectRelationship (objectDefinitionId2);
 create index IX_F1DC092D on ObjectRelationship (objectFieldId2);
 create index IX_11DAE1F1 on ObjectRelationship (uuid_[$COLUMN_LENGTH:75$], companyId);
 
+create index IX_C34F0F9E on ObjectState (listTypeEntryId, objectStateFlowId);
 create index IX_F9D4BA53 on ObjectState (objectStateFlowId);
 create index IX_FBD0BBAC on ObjectState (uuid_[$COLUMN_LENGTH:75$], companyId);
 

@@ -233,6 +233,14 @@ public class ObjectStateLocalServiceUtil {
 		return getService().fetchObjectStateByUuidAndCompanyId(uuid, companyId);
 	}
 
+	public static ObjectState findByListTypeEntryIdAndObjectStateFlowId(
+			long listTypeEntryId, long objectStateFlowId)
+		throws com.liferay.object.exception.NoSuchObjectStateException {
+
+		return getService().findByListTypeEntryIdAndObjectStateFlowId(
+			listTypeEntryId, objectStateFlowId);
+	}
+
 	public static List<ObjectState> findByObjectStateFlowId(
 		long objectStateFlowId) {
 
