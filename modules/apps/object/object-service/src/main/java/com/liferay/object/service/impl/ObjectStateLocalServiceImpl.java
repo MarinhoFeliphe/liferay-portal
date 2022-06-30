@@ -16,9 +16,13 @@ package com.liferay.object.service.impl;
 
 import com.liferay.object.exception.NoSuchObjectStateException;
 import com.liferay.object.model.ObjectState;
+import com.liferay.object.model.ObjectStateTransition;
+import com.liferay.object.model.ObjectStateTransitionModel;
 import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.base.ObjectStateLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -86,6 +90,52 @@ public class ObjectStateLocalServiceImpl
 		).collect(
 			Collectors.toList()
 		);
+	}
+
+	@Override
+	public void updateObjectStateTransitions(
+			long objectStateId,
+			List<ObjectStateTransition> objectStateTransitions)
+		throws PortalException {
+
+		List<ObjectStateTransition> persistedObjectStateTransitions =
+			_objectStateTransitionLocalService.findBySourceObjectStateId(
+				objectStateId);
+
+		if (persistedObjectStateTransitions.isEmpty()) {
+			_objectStateTransitionLocalService.createObjectStateTransitions(
+				objectStateTransitions);
+
+			return;
+		}
+
+		if (objectStateTransitions.isEmpty()) {
+			_objectStateTransitionLocalService.deleteObjectStateTransitions(
+				persistedObjectStateTransitions);
+
+			return;
+		}
+
+		List<Long> targetObjectStateIds = ListUtil.toList(
+			objectStateTransitions,
+			ObjectStateTransitionModel::getTargetObjectStateId);
+
+		_objectStateTransitionLocalService.deleteObjectStateTransitions(
+			ListUtil.filter(
+				persistedObjectStateTransitions,
+				objectStateTransition -> !targetObjectStateIds.contains(
+					objectStateTransition.getTargetObjectStateId())));
+
+		List<Long> persistedTargetObjectStateIds = ListUtil.toList(
+			persistedObjectStateTransitions,
+			ObjectStateTransitionModel::getTargetObjectStateId);
+
+		_objectStateTransitionLocalService.createObjectStateTransitions(
+			ListUtil.filter(
+				objectStateTransitions,
+				objectStateTransition ->
+					!persistedTargetObjectStateIds.contains(
+						objectStateTransition.getTargetObjectStateId())));
 	}
 
 	@Reference

@@ -443,6 +443,9 @@ public class ObjectFieldLocalServiceImpl
 
 			_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
 
+			_objectStateFlowLocalService.updateObjectStateTransitions(
+				objectStateFlow);
+
 			return objectField;
 		}
 
@@ -479,6 +482,9 @@ public class ObjectFieldLocalServiceImpl
 		objectField = objectFieldPersistence.update(objectField);
 
 		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
+
+		_objectStateFlowLocalService.updateObjectStateTransitions(
+			objectStateFlow);
 
 		return objectField;
 	}

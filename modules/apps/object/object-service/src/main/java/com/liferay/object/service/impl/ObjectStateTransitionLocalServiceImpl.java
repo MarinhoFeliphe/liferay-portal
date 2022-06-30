@@ -14,13 +14,19 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.exception.NoSuchObjectStateTransitionException;
 import com.liferay.object.model.ObjectStateTransition;
 import com.liferay.object.service.base.ObjectStateTransitionLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
@@ -50,9 +56,48 @@ public class ObjectStateTransitionLocalServiceImpl
 	}
 
 	@Override
+	public void createObjectStateTransitions(
+		List<ObjectStateTransition> objectStateTransitions) {
+
+		if (ListUtil.isEmpty(objectStateTransitions)) {
+			return;
+		}
+
+		User user = _userLocalService.fetchUser(
+			PrincipalThreadLocal.getUserId());
+
+		for (ObjectStateTransition objectStateTransition :
+				objectStateTransitions) {
+
+			addObjectStateTransition(
+				objectStateTransition.getObjectStateFlowId(),
+				objectStateTransition.getSourceObjectStateId(),
+				objectStateTransition.getTargetObjectStateId(),
+				user.getUserId(), user.getFullName());
+		}
+	}
+
+	@Override
 	public void deleteByObjectStateFlowId(long objectStateFlowId) {
 		objectStateTransitionPersistence.removeByObjectStateFlowId(
 			objectStateFlowId);
+	}
+
+	@Override
+	public void deleteObjectStateTransitions(
+			List<ObjectStateTransition> objectStateTransitions)
+		throws NoSuchObjectStateTransitionException {
+
+		if (ListUtil.isEmpty(objectStateTransitions)) {
+			return;
+		}
+
+		for (ObjectStateTransition objectStateTransition :
+				objectStateTransitions) {
+
+			objectStateTransitionPersistence.remove(
+				objectStateTransition.getObjectStateTransitionId());
+		}
 	}
 
 	@Override
@@ -70,5 +115,8 @@ public class ObjectStateTransitionLocalServiceImpl
 		return objectStateTransitionPersistence.findBySourceObjectStateId(
 			sourceObjectStateId);
 	}
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

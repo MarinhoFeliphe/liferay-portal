@@ -23,6 +23,7 @@ import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.base.ObjectStateFlowLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
@@ -112,6 +113,21 @@ public class ObjectStateFlowLocalServiceImpl
 	@Override
 	public ObjectStateFlow fetchByObjectFieldId(long objectFieldId) {
 		return objectStateFlowPersistence.fetchByObjectFieldId(objectFieldId);
+	}
+
+	@Override
+	public void updateObjectStateTransitions(ObjectStateFlow objectStateFlow)
+		throws PortalException {
+
+		if (objectStateFlow == null) {
+			return;
+		}
+
+		for (ObjectState objectState : objectStateFlow.getObjectStates()) {
+			_objectStateLocalService.updateObjectStateTransitions(
+				objectState.getObjectStateId(),
+				objectState.getObjectStateTransitions());
+		}
 	}
 
 	@Reference
