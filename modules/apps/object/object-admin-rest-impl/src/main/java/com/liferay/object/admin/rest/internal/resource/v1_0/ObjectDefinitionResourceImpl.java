@@ -134,12 +134,6 @@ public class ObjectDefinitionResourceImpl
 			ObjectDefinition objectDefinition)
 		throws Exception {
 
-		if (!Validator.isBlank(objectDefinition.getStorageType()) &&
-			!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-135430"))) {
-
-			throw new ObjectDefinitionStorageTypeException();
-		}
-
 		return _toObjectDefinition(
 			_objectDefinitionService.addCustomObjectDefinition(
 				LocalizedMapUtil.getLocalizedMap(objectDefinition.getLabel()),
