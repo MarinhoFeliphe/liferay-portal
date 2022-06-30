@@ -14,6 +14,7 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.exception.NoSuchObjectStateException;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.base.ObjectStateLocalServiceBaseImpl;
@@ -55,6 +56,15 @@ public class ObjectStateLocalServiceImpl
 	@Override
 	public void deleteByObjectStateFlowId(long objectStateFlowId) {
 		objectStatePersistence.removeByObjectStateFlowId(objectStateFlowId);
+	}
+
+	@Override
+	public ObjectState findByListTypeEntryIdAndObjectStateFlowId(
+			long listTypeEntryId, long objectStateFlowId)
+		throws NoSuchObjectStateException {
+
+		return objectStatePersistence.findByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
 	}
 
 	@Override

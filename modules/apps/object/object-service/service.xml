@@ -506,6 +506,10 @@
 		<finder name="ObjectStateFlowId" return-type="Collection">
 			<finder-column name="objectStateFlowId" />
 		</finder>
+		<finder name="LTEI_OSFI" return-type="ObjectState">
+			<finder-column name="listTypeEntryId" />
+			<finder-column name="objectStateFlowId" />
+		</finder>
 	</entity>
 	<entity local-service="true" name="ObjectStateFlow" remote-service="false" uuid="true">
 
