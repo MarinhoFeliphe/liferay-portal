@@ -339,59 +339,6 @@ public interface ObjectStatePersistence extends BasePersistence<ObjectState> {
 	public int countByUuid_C(String uuid, long companyId);
 
 	/**
-	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or throws a <code>NoSuchObjectStateException</code> if it could not be found.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the matching object state
-	 * @throws NoSuchObjectStateException if a matching object state could not be found
-	 */
-	public ObjectState findByLTEI_OSFI(
-			long listTypeEntryId, long objectStateFlowId)
-		throws NoSuchObjectStateException;
-
-	/**
-	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
-	 */
-	public ObjectState fetchByLTEI_OSFI(
-		long listTypeEntryId, long objectStateFlowId);
-
-	/**
-	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
-	 */
-	public ObjectState fetchByLTEI_OSFI(
-		long listTypeEntryId, long objectStateFlowId, boolean useFinderCache);
-
-	/**
-	 * Removes the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; from the database.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the object state that was removed
-	 */
-	public ObjectState removeByLTEI_OSFI(
-			long listTypeEntryId, long objectStateFlowId)
-		throws NoSuchObjectStateException;
-
-	/**
-	 * Returns the number of object states where listTypeEntryId = &#63; and objectStateFlowId = &#63;.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the number of matching object states
-	 */
-	public int countByLTEI_OSFI(long listTypeEntryId, long objectStateFlowId);
-
-	/**
 	 * Returns all the object states where objectStateFlowId = &#63;.
 	 *
 	 * @param objectStateFlowId the object state flow ID
@@ -534,6 +481,59 @@ public interface ObjectStatePersistence extends BasePersistence<ObjectState> {
 	 * @return the number of matching object states
 	 */
 	public int countByObjectStateFlowId(long objectStateFlowId);
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or throws a <code>NoSuchObjectStateException</code> if it could not be found.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the matching object state
+	 * @throws NoSuchObjectStateException if a matching object state could not be found
+	 */
+	public ObjectState findByLTEI_OSFI(
+			long listTypeEntryId, long objectStateFlowId)
+		throws NoSuchObjectStateException;
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
+	 */
+	public ObjectState fetchByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId);
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
+	 */
+	public ObjectState fetchByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId, boolean useFinderCache);
+
+	/**
+	 * Removes the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; from the database.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the object state that was removed
+	 */
+	public ObjectState removeByLTEI_OSFI(
+			long listTypeEntryId, long objectStateFlowId)
+		throws NoSuchObjectStateException;
+
+	/**
+	 * Returns the number of object states where listTypeEntryId = &#63; and objectStateFlowId = &#63;.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the number of matching object states
+	 */
+	public int countByLTEI_OSFI(long listTypeEntryId, long objectStateFlowId);
 
 	/**
 	 * Caches the object state in the entity cache if it is enabled.

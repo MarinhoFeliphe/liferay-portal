@@ -368,7 +368,7 @@ public interface ObjectFieldLocalService
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings,
-			ObjectStateFlow objectStateFlow
+			ObjectStateFlow objectStateFlow)
 		throws PortalException;
 
 	public ObjectField updateObjectField(

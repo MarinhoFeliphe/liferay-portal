@@ -462,7 +462,7 @@ public class ObjectFieldLocalServiceUtil {
 			listTypeDefinitionId, businessType, dbColumnName, dbTableName,
 			dbType, defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
 			labelMap, name, required, state, system, objectFieldSettings,
-		objectStateFlow);
+			objectStateFlow);
 	}
 
 	/**

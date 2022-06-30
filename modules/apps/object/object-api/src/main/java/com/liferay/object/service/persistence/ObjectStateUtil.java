@@ -468,80 +468,6 @@ public class ObjectStateUtil {
 	}
 
 	/**
-	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or throws a <code>NoSuchObjectStateException</code> if it could not be found.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the matching object state
-	 * @throws NoSuchObjectStateException if a matching object state could not be found
-	 */
-	public static ObjectState findByLTEI_OSFI(
-			long listTypeEntryId, long objectStateFlowId)
-		throws com.liferay.object.exception.NoSuchObjectStateException {
-
-		return getPersistence().findByLTEI_OSFI(
-			listTypeEntryId, objectStateFlowId);
-	}
-
-	/**
-	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
-	 */
-	public static ObjectState fetchByLTEI_OSFI(
-		long listTypeEntryId, long objectStateFlowId) {
-
-		return getPersistence().fetchByLTEI_OSFI(
-			listTypeEntryId, objectStateFlowId);
-	}
-
-	/**
-	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
-	 */
-	public static ObjectState fetchByLTEI_OSFI(
-		long listTypeEntryId, long objectStateFlowId, boolean useFinderCache) {
-
-		return getPersistence().fetchByLTEI_OSFI(
-			listTypeEntryId, objectStateFlowId, useFinderCache);
-	}
-
-	/**
-	 * Removes the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; from the database.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the object state that was removed
-	 */
-	public static ObjectState removeByLTEI_OSFI(
-			long listTypeEntryId, long objectStateFlowId)
-		throws com.liferay.object.exception.NoSuchObjectStateException {
-
-		return getPersistence().removeByLTEI_OSFI(
-			listTypeEntryId, objectStateFlowId);
-	}
-
-	/**
-	 * Returns the number of object states where listTypeEntryId = &#63; and objectStateFlowId = &#63;.
-	 *
-	 * @param listTypeEntryId the list type entry ID
-	 * @param objectStateFlowId the object state flow ID
-	 * @return the number of matching object states
-	 */
-	public static int countByLTEI_OSFI(
-		long listTypeEntryId, long objectStateFlowId) {
-
-		return getPersistence().countByLTEI_OSFI(
-			listTypeEntryId, objectStateFlowId);
-	}
-
-	/**
 	 * Returns all the object states where objectStateFlowId = &#63;.
 	 *
 	 * @param objectStateFlowId the object state flow ID
@@ -715,6 +641,80 @@ public class ObjectStateUtil {
 	 */
 	public static int countByObjectStateFlowId(long objectStateFlowId) {
 		return getPersistence().countByObjectStateFlowId(objectStateFlowId);
+	}
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or throws a <code>NoSuchObjectStateException</code> if it could not be found.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the matching object state
+	 * @throws NoSuchObjectStateException if a matching object state could not be found
+	 */
+	public static ObjectState findByLTEI_OSFI(
+			long listTypeEntryId, long objectStateFlowId)
+		throws com.liferay.object.exception.NoSuchObjectStateException {
+
+		return getPersistence().findByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
+	}
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
+	 */
+	public static ObjectState fetchByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId) {
+
+		return getPersistence().fetchByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
+	}
+
+	/**
+	 * Returns the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching object state, or <code>null</code> if a matching object state could not be found
+	 */
+	public static ObjectState fetchByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId, boolean useFinderCache) {
+
+		return getPersistence().fetchByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId, useFinderCache);
+	}
+
+	/**
+	 * Removes the object state where listTypeEntryId = &#63; and objectStateFlowId = &#63; from the database.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the object state that was removed
+	 */
+	public static ObjectState removeByLTEI_OSFI(
+			long listTypeEntryId, long objectStateFlowId)
+		throws com.liferay.object.exception.NoSuchObjectStateException {
+
+		return getPersistence().removeByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
+	}
+
+	/**
+	 * Returns the number of object states where listTypeEntryId = &#63; and objectStateFlowId = &#63;.
+	 *
+	 * @param listTypeEntryId the list type entry ID
+	 * @param objectStateFlowId the object state flow ID
+	 * @return the number of matching object states
+	 */
+	public static int countByLTEI_OSFI(
+		long listTypeEntryId, long objectStateFlowId) {
+
+		return getPersistence().countByLTEI_OSFI(
+			listTypeEntryId, objectStateFlowId);
 	}
 
 	/**

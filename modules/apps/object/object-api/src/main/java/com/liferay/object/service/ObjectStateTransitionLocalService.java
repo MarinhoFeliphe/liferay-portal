@@ -15,6 +15,7 @@
 package com.liferay.object.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.object.exception.NoSuchObjectStateTransitionException;
 import com.liferay.object.model.ObjectStateTransition;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -91,6 +92,9 @@ public interface ObjectStateTransitionLocalService
 	public ObjectStateTransition createObjectStateTransition(
 		long objectStateTransitionId);
 
+	public void createObjectStateTransitions(
+		List<ObjectStateTransition> objectStateTransitions);
+
 	/**
 	 * @throws PortalException
 	 */
@@ -128,6 +132,10 @@ public interface ObjectStateTransitionLocalService
 	@Indexable(type = IndexableType.DELETE)
 	public ObjectStateTransition deleteObjectStateTransition(
 		ObjectStateTransition objectStateTransition);
+
+	public void deleteObjectStateTransitions(
+			List<ObjectStateTransition> objectStateTransitions)
+		throws NoSuchObjectStateTransitionException;
 
 	/**
 	 * @throws PortalException

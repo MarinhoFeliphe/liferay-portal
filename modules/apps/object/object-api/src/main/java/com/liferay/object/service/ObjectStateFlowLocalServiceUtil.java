@@ -360,6 +360,13 @@ public class ObjectStateFlowLocalServiceUtil {
 		return getService().updateObjectStateFlow(objectStateFlow);
 	}
 
+	public static void updateObjectStateTransitions(
+			ObjectStateFlow objectStateFlow)
+		throws PortalException {
+
+		getService().updateObjectStateTransitions(objectStateFlow);
+	}
+
 	public static ObjectStateFlowLocalService getService() {
 		return _service;
 	}

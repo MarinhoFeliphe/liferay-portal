@@ -126,7 +126,8 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 			businessType, objectField.getDBColumnName(),
 			objectField.getDBTableName(), dbType, defaultValue, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, name, required,
-			state, objectField.isSystem(), objectFieldSettings, objectStateFlow);
+			state, objectField.isSystem(), objectFieldSettings,
+			objectStateFlow);
 	}
 
 	@Reference(

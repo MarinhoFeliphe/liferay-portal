@@ -194,18 +194,18 @@ public class ObjectStatePersistenceTest {
 	}
 
 	@Test
+	public void testCountByObjectStateFlowId() throws Exception {
+		_persistence.countByObjectStateFlowId(RandomTestUtil.nextLong());
+
+		_persistence.countByObjectStateFlowId(0L);
+	}
+
+	@Test
 	public void testCountByLTEI_OSFI() throws Exception {
 		_persistence.countByLTEI_OSFI(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
 		_persistence.countByLTEI_OSFI(0L, 0L);
-	}
-
-	@Test
-	public void testCountByObjectStateFlowId() throws Exception {
-		_persistence.countByObjectStateFlowId(RandomTestUtil.nextLong());
-
-		_persistence.countByObjectStateFlowId(0L);
 	}
 
 	@Test

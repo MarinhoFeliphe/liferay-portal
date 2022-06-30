@@ -82,6 +82,15 @@ public class ObjectStateTransitionLocalServiceWrapper
 			objectStateTransitionId);
 	}
 
+	@Override
+	public void createObjectStateTransitions(
+		java.util.List<com.liferay.object.model.ObjectStateTransition>
+			objectStateTransitions) {
+
+		_objectStateTransitionLocalService.createObjectStateTransitions(
+			objectStateTransitions);
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -138,6 +147,17 @@ public class ObjectStateTransitionLocalServiceWrapper
 
 		return _objectStateTransitionLocalService.deleteObjectStateTransition(
 			objectStateTransition);
+	}
+
+	@Override
+	public void deleteObjectStateTransitions(
+			java.util.List<com.liferay.object.model.ObjectStateTransition>
+				objectStateTransitions)
+		throws com.liferay.object.exception.
+			NoSuchObjectStateTransitionException {
+
+		_objectStateTransitionLocalService.deleteObjectStateTransitions(
+			objectStateTransitions);
 	}
 
 	/**
