@@ -289,6 +289,13 @@ public class ObjectFieldLocalServiceUtil {
 		return getService().fetchObjectFieldByUuidAndCompanyId(uuid, companyId);
 	}
 
+	public static List<ObjectField> findByListTypeDefinitionIdAndState(
+		long listTypeDefinitionId, boolean state) {
+
+		return getService().findByListTypeDefinitionIdAndState(
+			listTypeDefinitionId, state);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 

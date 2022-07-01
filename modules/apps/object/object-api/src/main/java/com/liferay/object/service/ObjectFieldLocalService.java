@@ -259,6 +259,9 @@ public interface ObjectFieldLocalService
 	public ObjectField fetchObjectFieldByUuidAndCompanyId(
 		String uuid, long companyId);
 
+	public List<ObjectField> findByListTypeDefinitionIdAndState(
+		long listTypeDefinitionId, boolean state);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 

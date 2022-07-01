@@ -326,6 +326,15 @@ public class ObjectFieldLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectField>
+		findByListTypeDefinitionIdAndState(
+			long listTypeDefinitionId, boolean state) {
+
+		return _objectFieldLocalService.findByListTypeDefinitionIdAndState(
+			listTypeDefinitionId, state);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
