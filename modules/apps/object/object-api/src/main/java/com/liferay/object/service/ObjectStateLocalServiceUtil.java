@@ -86,6 +86,10 @@ public class ObjectStateLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteByListTypeEntryId(long listTypeEntryId) {
+		getService().deleteByListTypeEntryId(listTypeEntryId);
+	}
+
 	public static void deleteByObjectStateFlowId(long objectStateFlowId) {
 		getService().deleteByObjectStateFlowId(objectStateFlowId);
 	}

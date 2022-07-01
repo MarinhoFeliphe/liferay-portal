@@ -102,6 +102,10 @@ public class ObjectStateTransitionLocalServiceUtil {
 		getService().deleteByObjectStateFlowId(objectStateFlowId);
 	}
 
+	public static void deleteByObjectStateId(long objectStateId) {
+		getService().deleteByObjectStateId(objectStateId);
+	}
+
 	/**
 	 * Deletes the object state transition with the primary key from the database. Also notifies the appropriate model listeners.
 	 *

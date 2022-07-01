@@ -97,6 +97,8 @@ public interface ObjectStateLocalService
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public void deleteByListTypeEntryId(long listTypeEntryId);
+
 	public void deleteByObjectStateFlowId(long objectStateFlowId);
 
 	/**

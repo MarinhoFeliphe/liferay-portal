@@ -194,6 +194,13 @@ public class ObjectStatePersistenceTest {
 	}
 
 	@Test
+	public void testCountByListTypeEntryId() throws Exception {
+		_persistence.countByListTypeEntryId(RandomTestUtil.nextLong());
+
+		_persistence.countByListTypeEntryId(0L);
+	}
+
+	@Test
 	public void testCountByObjectStateFlowId() throws Exception {
 		_persistence.countByObjectStateFlowId(RandomTestUtil.nextLong());
 

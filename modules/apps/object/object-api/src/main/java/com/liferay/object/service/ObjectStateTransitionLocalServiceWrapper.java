@@ -109,6 +109,11 @@ public class ObjectStateTransitionLocalServiceWrapper
 			objectStateFlowId);
 	}
 
+	@Override
+	public void deleteByObjectStateId(long objectStateId) {
+		_objectStateTransitionLocalService.deleteByObjectStateId(objectStateId);
+	}
+
 	/**
 	 * Deletes the object state transition with the primary key from the database. Also notifies the appropriate model listeners.
 	 *

@@ -88,6 +88,11 @@ public class ObjectStateLocalServiceWrapper
 	}
 
 	@Override
+	public void deleteByListTypeEntryId(long listTypeEntryId) {
+		_objectStateLocalService.deleteByListTypeEntryId(listTypeEntryId);
+	}
+
+	@Override
 	public void deleteByObjectStateFlowId(long objectStateFlowId) {
 		_objectStateLocalService.deleteByObjectStateFlowId(objectStateFlowId);
 	}
