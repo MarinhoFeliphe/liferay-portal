@@ -58,6 +58,19 @@ public class ObjectStateLocalServiceImpl
 	}
 
 	@Override
+	public void deleteByListTypeEntryId(long listTypeEntryId) {
+		List<ObjectState> objectStates =
+			objectStatePersistence.findByListTypeEntryId(listTypeEntryId);
+
+		for (ObjectState objectState : objectStates) {
+			_objectStateTransitionLocalService.deleteByObjectStateId(
+				objectState.getObjectStateId());
+		}
+
+		objectStatePersistence.removeByListTypeEntryId(listTypeEntryId);
+	}
+
+	@Override
 	public void deleteByObjectStateFlowId(long objectStateFlowId) {
 		objectStatePersistence.removeByObjectStateFlowId(objectStateFlowId);
 	}

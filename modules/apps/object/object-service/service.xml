@@ -503,6 +503,9 @@
 
 		<!-- Finder methods -->
 
+		<finder name="ListTypeEntryId" return-type="Collection">
+			<finder-column name="listTypeEntryId" />
+		</finder>
 		<finder name="ObjectStateFlowId" return-type="Collection">
 			<finder-column name="objectStateFlowId" />
 		</finder>
