@@ -253,6 +253,13 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectField> findByListTypeDefinitionIdAndState(
+		long listTypeDefinitionId, boolean state) {
+
+		return objectFieldPersistence.findByLTDI_S(listTypeDefinitionId, state);
+	}
+
+	@Override
 	public List<ObjectField> getActiveObjectFields(
 			List<ObjectField> objectFields)
 		throws PortalException {
