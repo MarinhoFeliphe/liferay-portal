@@ -15,10 +15,16 @@
 package com.liferay.object.internal.model.listener;
 
 import com.liferay.list.type.model.ListTypeEntry;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectStateFlow;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
+
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,6 +39,25 @@ public class ListTypeEntryModelListener
 	@Override
 	public void onAfterCreate(ListTypeEntry listTypeEntry)
 		throws ModelListenerException {
+
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.findByListTypeDefinitionIdAndState(
+				listTypeEntry.getListTypeDefinitionId(), true);
+
+		if (objectFields.isEmpty()) {
+			return;
+		}
+
+		for (ObjectField objectField : objectFields) {
+			ObjectStateFlow objectStateFlow =
+				_objectStateFlowLocalService.fetchByObjectFieldId(
+					objectField.getObjectFieldId());
+
+			_objectStateLocalService.addObjectState(
+				listTypeEntry.getListTypeEntryId(),
+				objectStateFlow.getObjectStateFlowId(),
+				listTypeEntry.getUserId(), listTypeEntry.getUserName());
+		}
 	}
 
 	@Override
@@ -42,6 +67,12 @@ public class ListTypeEntryModelListener
 		_objectStateLocalService.deleteByListTypeEntryId(
 			listTypeEntry.getListTypeEntryId());
 	}
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectStateFlowLocalService _objectStateFlowLocalService;
 
 	@Reference
 	private ObjectStateLocalService _objectStateLocalService;
