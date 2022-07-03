@@ -27,6 +27,7 @@ import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
+import com.liferay.object.rest.dto.v1_0.converter.ObjectEntryDTOConverter;
 import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
@@ -78,8 +79,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = "dto.class.name=com.liferay.object.model.ObjectEntry",
 	service = {DTOConverter.class, ObjectEntryDTOConverter.class}
 )
-public class ObjectEntryDTOConverter
-	implements DTOConverter<com.liferay.object.model.ObjectEntry, ObjectEntry> {
+public class ObjectEntryDTOConverterImpl implements ObjectEntryDTOConverter {
 
 	@Override
 	public String getContentType() {
@@ -496,7 +496,7 @@ public class ObjectEntryDTOConverter
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		ObjectEntryDTOConverter.class);
+		ObjectEntryDTOConverterImpl.class);
 
 	@Reference
 	private DLFileEntryLocalService _dLFileEntryLocalService;
