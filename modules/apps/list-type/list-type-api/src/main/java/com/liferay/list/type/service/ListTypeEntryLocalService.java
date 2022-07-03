@@ -225,6 +225,8 @@ public interface ListTypeEntryLocalService
 	public ListTypeEntry fetchListTypeEntryByUuidAndCompanyId(
 		String uuid, long companyId);
 
+	public List<ListTypeEntry> findByListTypeEntryIds(long[] listTypeEntryIds);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 

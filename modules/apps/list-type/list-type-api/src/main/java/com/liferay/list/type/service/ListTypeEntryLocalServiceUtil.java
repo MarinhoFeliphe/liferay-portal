@@ -241,6 +241,12 @@ public class ListTypeEntryLocalServiceUtil {
 			uuid, companyId);
 	}
 
+	public static List<ListTypeEntry> findByListTypeEntryIds(
+		long[] listTypeEntryIds) {
+
+		return getService().findByListTypeEntryIds(listTypeEntryIds);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 

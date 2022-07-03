@@ -219,6 +219,19 @@ public class ListTypeEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByListTypeEntryId() throws Exception {
+		_persistence.countByListTypeEntryId(RandomTestUtil.nextLong());
+
+		_persistence.countByListTypeEntryId(0L);
+	}
+
+	@Test
+	public void testCountByListTypeEntryIdArrayable() throws Exception {
+		_persistence.countByListTypeEntryId(
+			new long[] {RandomTestUtil.nextLong(), 0L});
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ListTypeEntry newListTypeEntry = addListTypeEntry();
 

@@ -269,6 +269,14 @@ public class ListTypeEntryLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.list.type.model.ListTypeEntry>
+		findByListTypeEntryIds(long[] listTypeEntryIds) {
+
+		return _listTypeEntryLocalService.findByListTypeEntryIds(
+			listTypeEntryIds);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
