@@ -45,6 +45,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.util.List;
 
+import com.liferay.poshi.core.util.PropsUtil;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;

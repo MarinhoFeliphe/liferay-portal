@@ -20,6 +20,7 @@ import com.liferay.object.exception.NoSuchObjectStateFlowException;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.model.ObjectStateFlow;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.base.ObjectStateFlowLocalServiceBaseImpl;
@@ -82,6 +83,11 @@ public class ObjectStateFlowLocalServiceImpl
 			}
 		}
 
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			objectField.getUserId(), objectField.getObjectFieldId(),
+			"stateFlow",
+			String.valueOf(objectStateFlow.getObjectStateFlowId()));
+
 		return objectStateFlow;
 	}
 
@@ -140,6 +146,9 @@ public class ObjectStateFlowLocalServiceImpl
 
 	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
+	@Reference
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Reference
 	private ObjectStateLocalService _objectStateLocalService;

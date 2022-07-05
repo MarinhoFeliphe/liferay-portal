@@ -15,6 +15,7 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.base.ObjectFieldSettingLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.portal.aop.AopService;
