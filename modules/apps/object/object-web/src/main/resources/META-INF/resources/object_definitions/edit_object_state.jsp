@@ -24,7 +24,7 @@ ObjectDefinitionsStateManagerDisplayContext objectDefinitionsStateManagerDisplay
 	module="js/components/EditObjectStateField"
 	props='<%=
 		HashMapBuilder.<String, Object>put(
-			"objectField", objectDefinitionsStateManagerDisplayContext.getObjectStateFlowJSONObject((ObjectField)request.getAttribute(ObjectWebKeys.OBJECT_FIELD))
+			"objectField", objectDefinitionsStateManagerDisplayContext.getObjectFieldJSONObject((ObjectField)request.getAttribute(ObjectWebKeys.OBJECT_FIELD))
 		).build()
 	%>'
 />
