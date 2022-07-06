@@ -15,7 +15,10 @@
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+
+import java.util.Objects;
 
 /**
  * @author Carolina Barbosa
@@ -34,6 +37,13 @@ public class ObjectFieldSettingUtil {
 		serviceBuilderObjectFieldSetting.setName(objectFieldSetting.getName());
 		serviceBuilderObjectFieldSetting.setValue(
 			objectFieldSetting.getValue());
+
+		if (Objects.equals(
+			ObjectFieldSettingConstants.NAME_STATE_FLOW,
+			objectFieldSetting.getName())) {
+
+			
+		}
 
 		return serviceBuilderObjectFieldSetting;
 	}

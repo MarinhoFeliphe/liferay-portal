@@ -12,23 +12,21 @@
  * details.
  */
 
-package com.liferay.object.model.impl;
+package com.liferay.object.internal.field.setting.contributor;
 
-import com.liferay.object.model.ObjectStateFlow;
+import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Marco Leo
+ * @author Feliphe Marinho
  */
-public class ObjectFieldSettingImpl extends ObjectFieldSettingBaseImpl {
+public interface ObjectFieldSettingContributor {
 
-	public ObjectStateFlow getObjectStateFlow() {
-		return _objectStateFlow;
-	}
+	public void addObjectFieldSetting(
+		long userId, long objectFieldId,
+		ObjectFieldSetting newObjectFieldSetting) throws PortalException;
 
-	public void setObjectStateFlow(
-		ObjectStateFlow objectStateFlow) {
-		_objectStateFlow = objectStateFlow;
-	}
-
-	private ObjectStateFlow _objectStateFlow;
+	public void updateObjectFieldSetting(
+		long oldObjectFieldSettingId, ObjectFieldSetting newObjectFieldSetting)
+		throws PortalException;
 }

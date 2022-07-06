@@ -12,23 +12,12 @@
  * details.
  */
 
-package com.liferay.object.model.impl;
-
-import com.liferay.object.model.ObjectStateFlow;
+package com.liferay.object.constants;
 
 /**
- * @author Marco Leo
+ * @author Feliphe Marinho
  */
-public class ObjectFieldSettingImpl extends ObjectFieldSettingBaseImpl {
+public class ObjectFieldSettingConstants {
 
-	public ObjectStateFlow getObjectStateFlow() {
-		return _objectStateFlow;
-	}
-
-	public void setObjectStateFlow(
-		ObjectStateFlow objectStateFlow) {
-		_objectStateFlow = objectStateFlow;
-	}
-
-	private ObjectStateFlow _objectStateFlow;
+	public static final String NAME_STATE_FLOW = "stateFlow";
 }
