@@ -18,6 +18,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -29,24 +30,28 @@ import org.osgi.service.component.annotations.Reference;
 	property = "object.field.setting.type.key=" + ObjectFieldSettingConstants.NAME_STATE_FLOW,
 	service = ObjectFieldSettingContributor.class
 )
-public class StateFlowObjectFieldSettingContributor implements
-	ObjectFieldSettingContributor {
+public class StateFlowObjectFieldSettingContributor
+	implements ObjectFieldSettingContributor {
 
 	@Override
 	public void addObjectFieldSetting(
-		long userId, long objectFieldId,
-		ObjectFieldSetting newObjectFieldSetting) throws PortalException {
+			long userId, long objectFieldId,
+			ObjectFieldSetting newObjectFieldSetting)
+		throws PortalException {
 	}
 
 	@Override
 	public void updateObjectFieldSetting(
-		long oldObjectFieldSettingId,
-		ObjectFieldSetting newObjectFieldSetting) throws PortalException {
+			long oldObjectFieldSettingId,
+			ObjectFieldSetting newObjectFieldSetting)
+		throws PortalException {
 
 		_objectStateTransitionLocalService.updateObjectStateTransitions(
 			newObjectFieldSetting.getObjectStateFlow());
 	}
 
 	@Reference
-	private ObjectStateTransitionLocalService _objectStateTransitionLocalService;
+	private ObjectStateTransitionLocalService
+		_objectStateTransitionLocalService;
+
 }

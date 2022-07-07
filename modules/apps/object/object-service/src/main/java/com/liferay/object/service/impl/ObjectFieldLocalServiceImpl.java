@@ -39,10 +39,8 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
-import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -623,8 +621,9 @@ public class ObjectFieldLocalServiceImpl
 					newObjectFieldSetting.getName());
 
 			ObjectFieldSettingContributor objectFieldSettingContributor =
-				_objectFieldSettingContributorServicesTracker.getObjectFieldSettingContributor(
-					newObjectFieldSetting.getName());
+				_objectFieldSettingContributorServicesTracker.
+					getObjectFieldSettingContributor(
+						newObjectFieldSetting.getName());
 
 			if (oldObjectFieldSetting == null) {
 				objectFieldSettingContributor.addObjectFieldSetting(
@@ -802,7 +801,7 @@ public class ObjectFieldLocalServiceImpl
 			throw new ObjectFieldDefaultValueException(
 				StringBundler.concat(
 					"Default value \"", defaultValue, "\" is not a list entry ",
-					"in list definition " + listTypeDefinitionId));
+					"in list definition ", listTypeDefinitionId));
 		}
 
 		if (!state) {

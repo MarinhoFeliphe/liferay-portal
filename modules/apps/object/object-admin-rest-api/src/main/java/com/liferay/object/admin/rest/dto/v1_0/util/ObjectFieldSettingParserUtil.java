@@ -42,6 +42,53 @@ public class ObjectFieldSettingParserUtil {
 		return jsonArray;
 	}
 
+	private static Object _getObjectFieldSettingValue(
+		String businessType, ObjectFieldSetting objectFieldSetting) {
+
+		if (Objects.equals(
+				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT, businessType)) {
+
+			if (Objects.equals(
+					objectFieldSetting.getName(), "maximumFileSize")) {
+
+				return GetterUtil.getInteger(objectFieldSetting.getValue());
+			}
+			else if (Objects.equals(
+						objectFieldSetting.getName(),
+						"showFilesInDocumentsAndMedia")) {
+
+				return GetterUtil.getBoolean(objectFieldSetting.getValue());
+			}
+		}
+		else if (Objects.equals(
+					ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT,
+					businessType) ||
+				 Objects.equals(
+					 ObjectFieldConstants.BUSINESS_TYPE_TEXT, businessType)) {
+
+			if (Objects.equals(objectFieldSetting.getName(), "maxLength")) {
+				return GetterUtil.getInteger(objectFieldSetting.getValue());
+			}
+			else if (Objects.equals(
+						objectFieldSetting.getName(), "showCounter")) {
+
+				return GetterUtil.getBoolean(objectFieldSetting.getValue());
+			}
+		}
+		else if (Objects.equals(
+					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST,
+					businessType)) {
+
+			if (Objects.equals(objectFieldSetting.getName(), "stateFlow")) {
+				return ObjectStateFlowParserUtil.parse(
+					ObjectStateFlowLocalServiceUtil.fetchObjectStateFlow(
+						GetterUtil.getLong(objectFieldSetting.getValue())));
+			}
+		}
+
+		return objectFieldSetting.getValue();
+	}
+
 	private static void _putObjectFieldSettingJSONObject(
 		String businessType, JSONArray jsonArray,
 		ObjectFieldSetting objectFieldSetting) {
@@ -55,49 +102,4 @@ public class ObjectFieldSettingParserUtil {
 			));
 	}
 
-	private static Object _getObjectFieldSettingValue(
-		String businessType, ObjectFieldSetting objectFieldSetting) {
-
-		if (Objects.equals(
-			ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT, businessType)) {
-
-			if (Objects.equals(
-				objectFieldSetting.getName(), "maximumFileSize")) {
-
-				return GetterUtil.getInteger(objectFieldSetting.getValue());
-			}
-			else if (Objects.equals(
-				objectFieldSetting.getName(),
-				"showFilesInDocumentsAndMedia")) {
-
-				return GetterUtil.getBoolean(objectFieldSetting.getValue());
-			}
-		}
-		else if (Objects.equals(
-			ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT,
-			businessType) ||
-				 Objects.equals(
-					 ObjectFieldConstants.BUSINESS_TYPE_TEXT, businessType)) {
-
-			if (Objects.equals(objectFieldSetting.getName(), "maxLength")) {
-				return GetterUtil.getInteger(objectFieldSetting.getValue());
-			}
-			else if (Objects.equals(
-				objectFieldSetting.getName(), "showCounter")) {
-
-				return GetterUtil.getBoolean(objectFieldSetting.getValue());
-			}
-		}
-		else if (Objects.equals(
-			ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, businessType)) {
-
-			if (Objects.equals(objectFieldSetting.getName(), "stateFlow")) {
-				return ObjectStateFlowParserUtil.parse(
-					ObjectStateFlowLocalServiceUtil.fetchObjectStateFlow(
-						GetterUtil.getLong(objectFieldSetting.getValue())));
-			}
-		}
-
-		return objectFieldSetting.getValue();
-	}
 }

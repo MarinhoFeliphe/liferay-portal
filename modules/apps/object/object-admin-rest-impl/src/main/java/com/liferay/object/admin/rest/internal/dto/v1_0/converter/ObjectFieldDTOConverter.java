@@ -21,6 +21,7 @@ import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.TransformUtil;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -77,4 +78,5 @@ public class ObjectFieldDTOConverter
 			}
 		};
 	}
+
 }

@@ -25,10 +25,10 @@ public class ObjectFieldSettingImpl extends ObjectFieldSettingBaseImpl {
 		return _objectStateFlow;
 	}
 
-	public void setObjectStateFlow(
-		ObjectStateFlow objectStateFlow) {
+	public void setObjectStateFlow(ObjectStateFlow objectStateFlow) {
 		_objectStateFlow = objectStateFlow;
 	}
 
 	private ObjectStateFlow _objectStateFlow;
+
 }

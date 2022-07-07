@@ -16,6 +16,7 @@ package com.liferay.object.internal.field.setting.contributor;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -30,7 +31,8 @@ import org.osgi.service.component.annotations.Deactivate;
 )
 public class ObjectFieldSettingContributorServicesTracker {
 
-	public ObjectFieldSettingContributor getObjectFieldSettingContributor(String key) {
+	public ObjectFieldSettingContributor getObjectFieldSettingContributor(
+		String key) {
 
 		ObjectFieldSettingContributor objectFieldSettingContributor =
 			_serviceTrackerMap.getService(key);

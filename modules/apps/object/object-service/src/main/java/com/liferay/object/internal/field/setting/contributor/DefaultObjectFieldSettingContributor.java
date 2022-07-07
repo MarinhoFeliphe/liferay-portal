@@ -17,6 +17,7 @@ package com.liferay.object.internal.field.setting.contributor;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -27,13 +28,14 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true, property = "object.field.setting.type.key=default",
 	service = ObjectFieldSettingContributor.class
 )
-public class DefaultObjectFieldSettingContributor implements
-	ObjectFieldSettingContributor {
+public class DefaultObjectFieldSettingContributor
+	implements ObjectFieldSettingContributor {
 
 	@Override
 	public void addObjectFieldSetting(
-		long userId, long objectFieldId,
-		ObjectFieldSetting newObjectFieldSetting) throws PortalException {
+			long userId, long objectFieldId,
+			ObjectFieldSetting newObjectFieldSetting)
+		throws PortalException {
 
 		_objectFieldSettingLocalService.addObjectFieldSetting(
 			userId, objectFieldId, newObjectFieldSetting.getName(),
@@ -42,8 +44,9 @@ public class DefaultObjectFieldSettingContributor implements
 
 	@Override
 	public void updateObjectFieldSetting(
-		long oldObjectFieldSettingId,
-		ObjectFieldSetting newObjectFieldSetting) throws PortalException {
+			long oldObjectFieldSettingId,
+			ObjectFieldSetting newObjectFieldSetting)
+		throws PortalException {
 
 		_objectFieldSettingLocalService.updateObjectFieldSetting(
 			oldObjectFieldSettingId, newObjectFieldSetting.getValue());
@@ -51,4 +54,5 @@ public class DefaultObjectFieldSettingContributor implements
 
 	@Reference
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
+
 }
