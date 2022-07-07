@@ -30,6 +30,8 @@ import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
+import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
+import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorServicesTracker;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -620,16 +622,19 @@ public class ObjectFieldLocalServiceImpl
 					objectField.getObjectFieldId(),
 					newObjectFieldSetting.getName());
 
+			ObjectFieldSettingContributor objectFieldSettingContributor =
+				_objectFieldSettingContributorServicesTracker.getObjectFieldSettingContributor(
+					newObjectFieldSetting.getName());
+
 			if (oldObjectFieldSetting == null) {
-				_objectFieldSettingLocalService.addObjectFieldSetting(
+				objectFieldSettingContributor.addObjectFieldSetting(
 					objectField.getUserId(), objectField.getObjectFieldId(),
-					newObjectFieldSetting.getName(),
-					newObjectFieldSetting.getValue());
+					newObjectFieldSetting);
 			}
 			else {
-				_objectFieldSettingLocalService.updateObjectFieldSetting(
+				objectFieldSettingContributor.updateObjectFieldSetting(
 					oldObjectFieldSetting.getObjectFieldSettingId(),
-					newObjectFieldSetting.getValue());
+					newObjectFieldSetting);
 			}
 		}
 	}
@@ -955,6 +960,10 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;
+
+	@Reference
+	private ObjectFieldSettingContributorServicesTracker
+		_objectFieldSettingContributorServicesTracker;
 
 	@Reference
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
