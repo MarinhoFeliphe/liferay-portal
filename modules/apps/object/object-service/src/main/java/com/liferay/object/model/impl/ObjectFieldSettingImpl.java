@@ -14,8 +14,21 @@
 
 package com.liferay.object.model.impl;
 
+import com.liferay.object.model.ObjectStateFlow;
+
 /**
  * @author Marco Leo
  */
 public class ObjectFieldSettingImpl extends ObjectFieldSettingBaseImpl {
+
+	public ObjectStateFlow getObjectStateFlow() {
+		return _objectStateFlow;
+	}
+
+	public void setObjectStateFlow(
+		ObjectStateFlow objectStateFlow) {
+		_objectStateFlow = objectStateFlow;
+	}
+
+	private ObjectStateFlow _objectStateFlow;
 }
