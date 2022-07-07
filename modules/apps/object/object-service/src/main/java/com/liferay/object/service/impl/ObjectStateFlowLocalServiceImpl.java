@@ -15,9 +15,11 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.model.ObjectStateFlow;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.base.ObjectStateFlowLocalServiceBaseImpl;
@@ -86,6 +88,11 @@ public class ObjectStateFlowLocalServiceImpl
 			}
 		}
 
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			objectField.getUserId(), objectField.getObjectFieldId(),
+			ObjectFieldSettingConstants.NAME_STATE_FLOW,
+			String.valueOf(objectStateFlowId));
+
 		return objectStateFlow;
 	}
 
@@ -114,6 +121,9 @@ public class ObjectStateFlowLocalServiceImpl
 
 	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
+	@Reference
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Reference
 	private ObjectStateLocalService _objectStateLocalService;
