@@ -53,38 +53,35 @@ public class ObjectState implements Cloneable, Serializable {
 
 	protected Long id;
 
-	public Long getListTypeEntryId() {
-		return listTypeEntryId;
+	public String getKey() {
+		return key;
 	}
 
-	public void setListTypeEntryId(Long listTypeEntryId) {
-		this.listTypeEntryId = listTypeEntryId;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
-	public void setListTypeEntryId(
-		UnsafeSupplier<Long, Exception> listTypeEntryIdUnsafeSupplier) {
-
+	public void setKey(UnsafeSupplier<String, Exception> keyUnsafeSupplier) {
 		try {
-			listTypeEntryId = listTypeEntryIdUnsafeSupplier.get();
+			key = keyUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Long listTypeEntryId;
+	protected String key;
 
-	public NextObjectState[] getNextObjectStates() {
+	public String[] getNextObjectStates() {
 		return nextObjectStates;
 	}
 
-	public void setNextObjectStates(NextObjectState[] nextObjectStates) {
+	public void setNextObjectStates(String[] nextObjectStates) {
 		this.nextObjectStates = nextObjectStates;
 	}
 
 	public void setNextObjectStates(
-		UnsafeSupplier<NextObjectState[], Exception>
-			nextObjectStatesUnsafeSupplier) {
+		UnsafeSupplier<String[], Exception> nextObjectStatesUnsafeSupplier) {
 
 		try {
 			nextObjectStates = nextObjectStatesUnsafeSupplier.get();
@@ -94,7 +91,7 @@ public class ObjectState implements Cloneable, Serializable {
 		}
 	}
 
-	protected NextObjectState[] nextObjectStates;
+	protected String[] nextObjectStates;
 
 	@Override
 	public ObjectState clone() throws CloneNotSupportedException {

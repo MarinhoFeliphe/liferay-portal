@@ -36,8 +36,6 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.Valid;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -85,20 +83,18 @@ public class ObjectState implements Serializable {
 	protected Long id;
 
 	@Schema
-	public Long getListTypeEntryId() {
-		return listTypeEntryId;
+	public String getKey() {
+		return key;
 	}
 
-	public void setListTypeEntryId(Long listTypeEntryId) {
-		this.listTypeEntryId = listTypeEntryId;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	@JsonIgnore
-	public void setListTypeEntryId(
-		UnsafeSupplier<Long, Exception> listTypeEntryIdUnsafeSupplier) {
-
+	public void setKey(UnsafeSupplier<String, Exception> keyUnsafeSupplier) {
 		try {
-			listTypeEntryId = listTypeEntryIdUnsafeSupplier.get();
+			key = keyUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -110,22 +106,20 @@ public class ObjectState implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long listTypeEntryId;
+	protected String key;
 
 	@Schema
-	@Valid
-	public NextObjectState[] getNextObjectStates() {
+	public String[] getNextObjectStates() {
 		return nextObjectStates;
 	}
 
-	public void setNextObjectStates(NextObjectState[] nextObjectStates) {
+	public void setNextObjectStates(String[] nextObjectStates) {
 		this.nextObjectStates = nextObjectStates;
 	}
 
 	@JsonIgnore
 	public void setNextObjectStates(
-		UnsafeSupplier<NextObjectState[], Exception>
-			nextObjectStatesUnsafeSupplier) {
+		UnsafeSupplier<String[], Exception> nextObjectStatesUnsafeSupplier) {
 
 		try {
 			nextObjectStates = nextObjectStatesUnsafeSupplier.get();
@@ -140,7 +134,7 @@ public class ObjectState implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected NextObjectState[] nextObjectStates;
+	protected String[] nextObjectStates;
 
 	@Override
 	public boolean equals(Object object) {
@@ -179,14 +173,18 @@ public class ObjectState implements Serializable {
 			sb.append(id);
 		}
 
-		if (listTypeEntryId != null) {
+		if (key != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"listTypeEntryId\": ");
+			sb.append("\"key\": ");
 
-			sb.append(listTypeEntryId);
+			sb.append("\"");
+
+			sb.append(_escape(key));
+
+			sb.append("\"");
 		}
 
 		if (nextObjectStates != null) {
@@ -199,7 +197,11 @@ public class ObjectState implements Serializable {
 			sb.append("[");
 
 			for (int i = 0; i < nextObjectStates.length; i++) {
-				sb.append(String.valueOf(nextObjectStates[i]));
+				sb.append("\"");
+
+				sb.append(_escape(nextObjectStates[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < nextObjectStates.length) {
 					sb.append(", ");

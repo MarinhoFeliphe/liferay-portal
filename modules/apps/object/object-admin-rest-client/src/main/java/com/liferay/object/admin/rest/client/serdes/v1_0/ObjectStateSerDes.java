@@ -14,7 +14,6 @@
 
 package com.liferay.object.admin.rest.client.serdes.v1_0;
 
-import com.liferay.object.admin.rest.client.dto.v1_0.NextObjectState;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectState;
 import com.liferay.object.admin.rest.client.json.BaseJSONParser;
 
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -67,14 +65,18 @@ public class ObjectStateSerDes {
 			sb.append(objectState.getId());
 		}
 
-		if (objectState.getListTypeEntryId() != null) {
+		if (objectState.getKey() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"listTypeEntryId\": ");
+			sb.append("\"key\": ");
 
-			sb.append(objectState.getListTypeEntryId());
+			sb.append("\"");
+
+			sb.append(_escape(objectState.getKey()));
+
+			sb.append("\"");
 		}
 
 		if (objectState.getNextObjectStates() != null) {
@@ -87,7 +89,11 @@ public class ObjectStateSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < objectState.getNextObjectStates().length; i++) {
-				sb.append(String.valueOf(objectState.getNextObjectStates()[i]));
+				sb.append("\"");
+
+				sb.append(_escape(objectState.getNextObjectStates()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < objectState.getNextObjectStates().length) {
 					sb.append(", ");
@@ -123,13 +129,11 @@ public class ObjectStateSerDes {
 			map.put("id", String.valueOf(objectState.getId()));
 		}
 
-		if (objectState.getListTypeEntryId() == null) {
-			map.put("listTypeEntryId", null);
+		if (objectState.getKey() == null) {
+			map.put("key", null);
 		}
 		else {
-			map.put(
-				"listTypeEntryId",
-				String.valueOf(objectState.getListTypeEntryId()));
+			map.put("key", String.valueOf(objectState.getKey()));
 		}
 
 		if (objectState.getNextObjectStates() == null) {
@@ -168,23 +172,15 @@ public class ObjectStateSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "listTypeEntryId")) {
+			else if (Objects.equals(jsonParserFieldName, "key")) {
 				if (jsonParserFieldValue != null) {
-					objectState.setListTypeEntryId(
-						Long.valueOf((String)jsonParserFieldValue));
+					objectState.setKey((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "nextObjectStates")) {
 				if (jsonParserFieldValue != null) {
 					objectState.setNextObjectStates(
-						Stream.of(
-							toStrings((Object[])jsonParserFieldValue)
-						).map(
-							object -> NextObjectStateSerDes.toDTO(
-								(String)object)
-						).toArray(
-							size -> new NextObjectState[size]
-						));
+						toStrings((Object[])jsonParserFieldValue));
 				}
 			}
 		}
