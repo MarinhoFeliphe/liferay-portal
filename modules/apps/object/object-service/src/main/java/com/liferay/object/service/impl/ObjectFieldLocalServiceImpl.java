@@ -448,9 +448,15 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 
 		if (objectDefinition.isApproved()) {
+			ObjectField oldObjectField =
+				objectFieldPersistence.findByPrimaryKey(objectFieldId);
+
 			objectField = objectFieldPersistence.update(objectField);
 
 			_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
+
+			_objectStateFlowLocalService.updateDefaultObjectStateFlow(
+				objectField, oldObjectField);
 
 			return objectField;
 		}
