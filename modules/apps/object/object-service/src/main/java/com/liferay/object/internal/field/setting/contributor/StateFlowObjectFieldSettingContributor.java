@@ -47,7 +47,7 @@ public class StateFlowObjectFieldSettingContributor implements
 		ObjectFieldSetting newObjectFieldSetting) throws PortalException {
 
 		_objectStateTransitionLocalService.updateObjectStateTransitions(
-			null);
+			newObjectFieldSetting.getObjectStateFlow());
 	}
 
 	@Reference

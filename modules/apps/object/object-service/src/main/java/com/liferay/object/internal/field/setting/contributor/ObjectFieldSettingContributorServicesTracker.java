@@ -31,7 +31,15 @@ import org.osgi.service.component.annotations.Deactivate;
 public class ObjectFieldSettingContributorServicesTracker {
 
 	public ObjectFieldSettingContributor getObjectFieldSettingContributor(String key) {
-		return _serviceTrackerMap.getService(key);
+
+		ObjectFieldSettingContributor objectFieldSettingContributor =
+			_serviceTrackerMap.getService(key);
+
+		if (objectFieldSettingContributor != null) {
+			return objectFieldSettingContributor;
+		}
+
+		return _serviceTrackerMap.getService("default");
 	}
 
 	@Activate

@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.render.ObjectFieldRenderingContext;
 import com.liferay.object.model.ObjectField;
@@ -34,11 +35,13 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,6 +58,11 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class PicklistObjectFieldBusinessType
 	implements ObjectFieldBusinessType {
+
+	@Override
+	public Set<String> getAllowedObjectFieldSettingsNames() {
+		return SetUtil.fromArray(ObjectFieldSettingConstants.NAME_STATE_FLOW);
+	}
 
 	@Override
 	public String getDBType() {

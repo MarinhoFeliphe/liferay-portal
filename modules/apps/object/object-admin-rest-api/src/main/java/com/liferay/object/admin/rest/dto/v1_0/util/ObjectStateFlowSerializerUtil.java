@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.object.web.internal.object.definitions.display.context.util;
+package com.liferay.object.admin.rest.dto.v1_0.util;
 
 import com.liferay.object.admin.rest.dto.v1_0.NextObjectState;
 import com.liferay.object.model.ObjectState;

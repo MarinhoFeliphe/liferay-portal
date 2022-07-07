@@ -16,6 +16,7 @@ package com.liferay.object.service.impl;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.exception.DuplicateObjectFieldExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectFieldBusinessTypeException;
@@ -316,8 +317,23 @@ public class ObjectFieldLocalServiceImpl
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
 			objectFieldId);
 
-		objectField.setObjectFieldSettings(
-			_objectFieldSettingPersistence.findByObjectFieldId(objectFieldId));
+		List<ObjectFieldSetting> objectFieldSettings =
+			_objectFieldSettingPersistence.findByObjectFieldId(objectFieldId);
+
+		if (objectField.isState()) {
+			for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+				if (Objects.equals(
+					ObjectFieldSettingConstants.NAME_STATE_FLOW,
+					objectFieldSetting.getName())) {
+					
+					objectFieldSetting.setObjectStateFlow(
+						_objectStateFlowLocalService.fetchObjectStateFlow(
+							GetterUtil.getLong(objectFieldSetting.getValue())));
+				}
+			}
+		}
+
+		objectField.setObjectFieldSettings(objectFieldSettings);
 
 		return objectField;
 	}
@@ -453,9 +469,6 @@ public class ObjectFieldLocalServiceImpl
 
 			_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
 
-			_objectStateTransitionLocalService.updateObjectStateTransitions(
-				objectStateFlow);
-
 			return objectField;
 		}
 
@@ -492,9 +505,6 @@ public class ObjectFieldLocalServiceImpl
 		objectField = objectFieldPersistence.update(objectField);
 
 		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
-
-		_objectStateTransitionLocalService.updateObjectStateTransitions(
-			objectStateFlow);
 
 		return objectField;
 	}
@@ -961,13 +971,13 @@ public class ObjectFieldLocalServiceImpl
 	private ObjectFieldSettingPersistence _objectFieldSettingPersistence;
 
 	@Reference
+	private ObjectStateFlowLocalService _objectStateFlowLocalService;
+
+	@Reference
 	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
 
 	@Reference
 	private ObjectRelationshipPersistence _objectRelationshipPersistence;
-
-	@Reference
-	private ObjectStateFlowLocalService _objectStateFlowLocalService;
 
 	@Reference
 	private ObjectStateTransitionLocalService
