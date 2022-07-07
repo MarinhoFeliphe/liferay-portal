@@ -83,15 +83,14 @@ public class ObjectFieldServiceUtil {
 			String indexedLanguageId, Map<java.util.Locale, String> labelMap,
 			String name, boolean required, boolean state,
 			List<com.liferay.object.model.ObjectFieldSetting>
-				objectFieldSettings,
-			com.liferay.object.model.ObjectStateFlow objectStateFlow)
+				objectFieldSettings)
 		throws PortalException {
 
 		return getService().updateObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
 			indexedLanguageId, labelMap, name, required, state,
-			objectFieldSettings, objectStateFlow);
+			objectFieldSettings);
 	}
 
 	public static ObjectFieldService getService() {

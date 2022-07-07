@@ -16,7 +16,6 @@ package com.liferay.object.service;
 
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -82,8 +81,7 @@ public interface ObjectFieldService extends BaseService {
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
 			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings,
-			ObjectStateFlow objectStateFlow)
+			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException;
 
 }
