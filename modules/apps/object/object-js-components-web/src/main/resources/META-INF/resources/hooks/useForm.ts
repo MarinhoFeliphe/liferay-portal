@@ -33,8 +33,7 @@ export function useForm<T, P = {}, K extends Partial<T> = Partial<T>>({
 
 		if (Object.keys(errors).length) {
 			setErrors(errors);
-		}
-		else {
+		} else {
 			setErrors({});
 
 			onSubmit((values as unknown) as T);
