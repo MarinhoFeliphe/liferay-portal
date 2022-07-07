@@ -452,7 +452,8 @@ public class ObjectFieldLocalServiceImpl
 		if (objectDefinition.isApproved()) {
 			newObjectField = objectFieldPersistence.update(newObjectField);
 
-			_addOrUpdateObjectFieldSettings(newObjectField, objectFieldSettings);
+			_addOrUpdateObjectFieldSettings(
+				newObjectField, objectFieldSettings);
 
 			return newObjectField;
 		}

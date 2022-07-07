@@ -27,9 +27,9 @@ public class ObjectFieldParserUtil {
 		return JSONUtil.put(
 			"businessType", objectField.getBusinessType()
 		).put(
-			"defaultValue", objectField.getDefaultValue()
-		).put(
 			"DBType", objectField.getDBType()
+		).put(
+			"defaultValue", objectField.getDefaultValue()
 		).put(
 			"externalReferenceCode", objectField.getExternalReferenceCode()
 		).put(

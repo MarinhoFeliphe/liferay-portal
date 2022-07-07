@@ -121,7 +121,8 @@ public class ObjectStateFlowLocalServiceImpl
 
 	@Override
 	public ObjectStateFlow updateDefaultObjectStateFlow(
-		ObjectField newObjectField, ObjectField oldObjectField) throws PortalException {
+			ObjectField newObjectField, ObjectField oldObjectField)
+		throws PortalException {
 
 		if (!oldObjectField.isState() && !newObjectField.isState()) {
 			return null;
@@ -137,9 +138,8 @@ public class ObjectStateFlowLocalServiceImpl
 			return addDefaultObjectStateFlow(newObjectField);
 		}
 
-
 		if (oldObjectField.getListTypeDefinitionId() !=
-			newObjectField.getListTypeDefinitionId()) {
+				newObjectField.getListTypeDefinitionId()) {
 
 			deleteObjectFieldObjectStateFlow(oldObjectField.getObjectFieldId());
 
