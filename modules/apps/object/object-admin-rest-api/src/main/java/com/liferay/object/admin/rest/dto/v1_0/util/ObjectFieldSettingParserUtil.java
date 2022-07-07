@@ -97,6 +97,8 @@ public class ObjectFieldSettingParserUtil {
 			JSONUtil.put(
 				"name", objectFieldSetting.getName()
 			).put(
+				"objectFieldId", objectFieldSetting.getObjectFieldId()
+			).put(
 				"value",
 				_getObjectFieldSettingValue(businessType, objectFieldSetting)
 			));
