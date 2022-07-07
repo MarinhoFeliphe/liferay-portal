@@ -58,4 +58,8 @@ public interface ObjectFieldSetting
 
 			};
 
+	public ObjectStateFlow getObjectStateFlow();
+
+	public void setObjectStateFlow(ObjectStateFlow objectStateFlow);
+
 }

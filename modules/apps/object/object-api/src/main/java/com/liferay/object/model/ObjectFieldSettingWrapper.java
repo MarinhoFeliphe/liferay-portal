@@ -203,6 +203,11 @@ public class ObjectFieldSettingWrapper
 		return model.getObjectFieldSettingId();
 	}
 
+	@Override
+	public ObjectStateFlow getObjectStateFlow() {
+		return model.getObjectStateFlow();
+	}
+
 	/**
 	 * Returns the primary key of this object field setting.
 	 *
@@ -336,6 +341,11 @@ public class ObjectFieldSettingWrapper
 	@Override
 	public void setObjectFieldSettingId(long objectFieldSettingId) {
 		model.setObjectFieldSettingId(objectFieldSettingId);
+	}
+
+	@Override
+	public void setObjectStateFlow(ObjectStateFlow objectStateFlow) {
+		model.setObjectStateFlow(objectStateFlow);
 	}
 
 	/**
