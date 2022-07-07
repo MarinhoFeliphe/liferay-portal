@@ -14,21 +14,14 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.converter;
 
-import com.liferay.object.admin.rest.dto.v1_0.NextObjectState;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
-import com.liferay.object.admin.rest.dto.v1_0.ObjectStateFlow;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
-import com.liferay.object.model.ObjectState;
-import com.liferay.object.service.ObjectStateFlowLocalService;
-import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.TransformUtil;
-
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Feliphe Marinho
@@ -75,9 +68,6 @@ public class ObjectFieldDTOConverter
 					objectField.getObjectFieldSettings(),
 					ObjectFieldSettingUtil::toObjectFieldSetting,
 					ObjectFieldSetting.class);
-				objectStateFlow = _toObjectStateFlow(
-					_objectStateFlowLocalService.getObjectFieldObjectStateFlow(
-						objectField.getObjectFieldId()));
 				relationshipType = ObjectField.RelationshipType.create(
 					objectField.getRelationshipType());
 				required = objectField.isRequired();
@@ -87,54 +77,4 @@ public class ObjectFieldDTOConverter
 			}
 		};
 	}
-
-	private NextObjectState _toNextObjectState(ObjectState nextObjectState) {
-		return new NextObjectState() {
-			{
-				listTypeEntryId = nextObjectState.getListTypeEntryId();
-			}
-		};
-	}
-
-	private com.liferay.object.admin.rest.dto.v1_0.ObjectState _toObjectState(
-		ObjectState objectState) {
-
-		return new com.liferay.object.admin.rest.dto.v1_0.ObjectState() {
-			{
-				id = objectState.getObjectStateId();
-				listTypeEntryId = objectState.getListTypeEntryId();
-				nextObjectStates = TransformUtil.transformToArray(
-					_objectStateLocalService.getNextObjectStates(
-						objectState.getObjectStateId()),
-					nextObjectState -> _toNextObjectState(nextObjectState),
-					NextObjectState.class);
-			}
-		};
-	}
-
-	private ObjectStateFlow _toObjectStateFlow(
-		com.liferay.object.model.ObjectStateFlow objectStateFlow) {
-
-		if (objectStateFlow == null) {
-			return null;
-		}
-
-		return new ObjectStateFlow() {
-			{
-				id = objectStateFlow.getObjectStateFlowId();
-				objectStates = TransformUtil.transformToArray(
-					_objectStateLocalService.getObjectStateFlowObjectStates(
-						objectStateFlow.getObjectStateFlowId()),
-					objectState -> _toObjectState(objectState),
-					com.liferay.object.admin.rest.dto.v1_0.ObjectState.class);
-			}
-		};
-	}
-
-	@Reference
-	private ObjectStateFlowLocalService _objectStateFlowLocalService;
-
-	@Reference
-	private ObjectStateLocalService _objectStateLocalService;
-
 }
