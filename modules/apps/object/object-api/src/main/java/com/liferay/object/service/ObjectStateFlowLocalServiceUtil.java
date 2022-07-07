@@ -341,6 +341,15 @@ public class ObjectStateFlowLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static ObjectStateFlow updateDefaultObjectStateFlow(
+			com.liferay.object.model.ObjectField newObjectField,
+			com.liferay.object.model.ObjectField oldObjectField)
+		throws PortalException {
+
+		return getService().updateDefaultObjectStateFlow(
+			newObjectField, oldObjectField);
+	}
+
 	/**
 	 * Updates the object state flow in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *

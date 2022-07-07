@@ -387,6 +387,17 @@ public class ObjectStateFlowLocalServiceWrapper
 		return _objectStateFlowLocalService.getPersistedModel(primaryKeyObj);
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectStateFlow
+			updateDefaultObjectStateFlow(
+				com.liferay.object.model.ObjectField newObjectField,
+				com.liferay.object.model.ObjectField oldObjectField)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectStateFlowLocalService.updateDefaultObjectStateFlow(
+			newObjectField, oldObjectField);
+	}
+
 	/**
 	 * Updates the object state flow in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *

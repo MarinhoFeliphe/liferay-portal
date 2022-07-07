@@ -294,6 +294,10 @@ public interface ObjectStateFlowLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public ObjectStateFlow updateDefaultObjectStateFlow(
+			ObjectField newObjectField, ObjectField oldObjectField)
+		throws PortalException;
+
 	/**
 	 * Updates the object state flow in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
