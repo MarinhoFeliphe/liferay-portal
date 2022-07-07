@@ -324,28 +324,6 @@ public class ObjectField implements Cloneable, Serializable {
 
 	protected ObjectFieldSetting[] objectFieldSettings;
 
-	public ObjectStateFlow getObjectStateFlow() {
-		return objectStateFlow;
-	}
-
-	public void setObjectStateFlow(ObjectStateFlow objectStateFlow) {
-		this.objectStateFlow = objectStateFlow;
-	}
-
-	public void setObjectStateFlow(
-		UnsafeSupplier<ObjectStateFlow, Exception>
-			objectStateFlowUnsafeSupplier) {
-
-		try {
-			objectStateFlow = objectStateFlowUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected ObjectStateFlow objectStateFlow;
-
 	public RelationshipType getRelationshipType() {
 		return relationshipType;
 	}
