@@ -1,10 +1,5 @@
 components:
     schemas:
-        NextObjectState:
-            properties:
-                listTypeEntryId:
-                    format: int64
-                    type: integer
         ObjectAction:
             properties:
                 actions:
@@ -343,12 +338,11 @@ components:
                 id:
                     format: int64
                     type: integer
-                listTypeEntryId:
-                    format: int64
-                    type: integer
+                key:
+                    type: string
                 nextObjectStates:
                     items:
-                        $ref: "#/components/schemas/NextObjectState"
+                        type: string
                     type: array
         ObjectStateFlow:
             properties:

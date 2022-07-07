@@ -20,6 +20,7 @@ import com.liferay.object.admin.rest.dto.v1_0.util.ObjectStateFlowParserUtil;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
@@ -31,9 +32,10 @@ import java.util.Objects;
 public class ObjectFieldSettingUtil {
 
 	public static com.liferay.object.model.ObjectFieldSetting
-		toObjectFieldSetting(
-			ObjectFieldSetting objectFieldSetting,
-			ObjectFieldSettingLocalService objectFieldSettingLocalService) {
+			toObjectFieldSetting(
+				ObjectFieldSetting objectFieldSetting,
+				ObjectFieldSettingLocalService objectFieldSettingLocalService)
+		throws PortalException {
 
 		com.liferay.object.model.ObjectFieldSetting
 			serviceBuilderObjectFieldSetting =

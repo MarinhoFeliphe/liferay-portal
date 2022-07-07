@@ -14,11 +14,13 @@
 
 package com.liferay.object.admin.rest.dto.v1_0.util;
 
-import com.liferay.object.admin.rest.dto.v1_0.NextObjectState;
+import com.liferay.list.type.model.ListTypeEntry;
+import com.liferay.list.type.service.ListTypeEntryLocalServiceUtil;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.object.service.ObjectStateLocalServiceUtil;
 import com.liferay.object.util.JSONUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 /**
@@ -42,28 +44,33 @@ public class ObjectStateFlowParserUtil {
 			});
 	}
 
-	private static NextObjectState _toNextObjectState(
-		ObjectState nextObjectState) {
+	private static String _toNextObjectState(ObjectState nextObjectState)
+		throws PortalException {
 
-		return new NextObjectState() {
-			{
-				listTypeEntryId = nextObjectState.getListTypeEntryId();
-			}
-		};
+		ListTypeEntry listTypeEntry =
+			ListTypeEntryLocalServiceUtil.getListTypeEntry(
+				nextObjectState.getListTypeEntryId());
+
+		return listTypeEntry.getKey();
 	}
 
 	private static com.liferay.object.admin.rest.dto.v1_0.ObjectState
-		_toObjectState(ObjectState objectState) {
+			_toObjectState(ObjectState objectState)
+		throws PortalException {
+
+		ListTypeEntry listTypeEntry =
+			ListTypeEntryLocalServiceUtil.getListTypeEntry(
+				objectState.getListTypeEntryId());
 
 		return new com.liferay.object.admin.rest.dto.v1_0.ObjectState() {
 			{
 				id = objectState.getObjectStateId();
-				listTypeEntryId = objectState.getListTypeEntryId();
+				key = listTypeEntry.getKey();
 				nextObjectStates = TransformUtil.transformToArray(
 					ObjectStateLocalServiceUtil.getNextObjectStates(
 						objectState.getObjectStateId()),
 					ObjectStateFlowParserUtil::_toNextObjectState,
-					NextObjectState.class);
+					String.class);
 			}
 		};
 	}
