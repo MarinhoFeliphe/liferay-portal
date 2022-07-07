@@ -166,6 +166,11 @@ public class PicklistObjectFieldBusinessType
 				(ListEntry)objectFieldRenderingContext.getProperty(
 					objectField.getName());
 
+			if (listEntry == null) {
+				return _listTypeEntryLocalService.getListTypeEntries(
+					objectField.getListTypeDefinitionId());
+			}
+
 			listEntryKey = listEntry.getKey();
 		}
 
