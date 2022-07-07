@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,19 +11,26 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/init.jsp" %>
+package com.liferay.object.util;
 
-<%
-ObjectDefinitionsStateManagerDisplayContext objectDefinitionsStateManagerDisplayContext = (ObjectDefinitionsStateManagerDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-%>
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 
-<react:component
-	module="js/components/EditObjectStateField"
-	props='<%=
-		HashMapBuilder.<String, Object>put(
-			"objectField", objectDefinitionsStateManagerDisplayContext.getObjectFieldJSONObject((ObjectField)request.getAttribute(ObjectWebKeys.OBJECT_FIELD))
-		).build()
-	%>'
-/>
+/**
+ * @author Feliphe Marinho
+ */
+public class JSONUtil {
+
+	public static String getJSONString(Object object) {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+
+		Gson gson = gsonBuilder.create();
+
+		JsonParser jsonParser = new JsonParser();
+
+		return gson.toJson(jsonParser.parse(object.toString()));
+	}
+
+}
