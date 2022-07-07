@@ -268,7 +268,7 @@ public class ObjectFieldServiceTest {
 				"String", null, true, false,
 				LanguageUtil.getLanguageId(LocaleUtil.getDefault()),
 				LocalizedMapUtil.getLocalizedMap("baker"), "baker", true, false,
-				Collections.emptyList(), null);
+				Collections.emptyList());
 		}
 		finally {
 			if (objectField != null) {

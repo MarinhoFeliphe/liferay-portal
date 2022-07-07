@@ -193,8 +193,7 @@ public class ObjectFieldResourceImpl
 						objectFieldSetting ->
 							ObjectFieldSettingUtil.toObjectFieldSetting(
 								objectFieldSetting,
-								_objectFieldSettingLocalService)),
-					null));
+								_objectFieldSettingLocalService))));
 		}
 
 		return _toObjectField(
@@ -216,9 +215,7 @@ public class ObjectFieldResourceImpl
 					objectFieldSetting ->
 						ObjectFieldSettingUtil.toObjectFieldSetting(
 							objectFieldSetting,
-							_objectFieldSettingLocalService)),
-				ObjectStateFlowUtil.toObjectStateFlow(
-					objectFieldId, objectField.getObjectStateFlow())));
+							_objectFieldSettingLocalService))));
 	}
 
 	private ObjectField _toObjectField(

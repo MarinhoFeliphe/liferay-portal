@@ -425,8 +425,7 @@ public class ObjectFieldLocalServiceImpl
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
 			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings,
-			ObjectStateFlow objectStateFlow)
+			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
@@ -452,9 +451,6 @@ public class ObjectFieldLocalServiceImpl
 			objectField = objectFieldPersistence.update(objectField);
 
 			_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
-
-			_objectStateTransitionLocalService.updateObjectStateTransitions(
-				objectStateFlow);
 
 			return objectField;
 		}
@@ -494,9 +490,6 @@ public class ObjectFieldLocalServiceImpl
 
 		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
 
-		_objectStateTransitionLocalService.updateObjectStateTransitions(
-			objectStateFlow);
-
 		return objectField;
 	}
 
@@ -509,8 +502,7 @@ public class ObjectFieldLocalServiceImpl
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
 			boolean state, boolean system,
-			List<ObjectFieldSetting> objectFieldSettings,
-			ObjectStateFlow objectStateFlow)
+			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
 		if (system) {
@@ -524,7 +516,7 @@ public class ObjectFieldLocalServiceImpl
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
 			indexedLanguageId, labelMap, name, required, state,
-			objectFieldSettings, objectStateFlow);
+			objectFieldSettings);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -978,10 +970,6 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectStateFlowLocalService _objectStateFlowLocalService;
-
-	@Reference
-	private ObjectStateTransitionLocalService
-		_objectStateTransitionLocalService;
 
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;
