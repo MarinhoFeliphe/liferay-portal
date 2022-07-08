@@ -119,6 +119,36 @@ public class ObjectStateFlowLocalServiceImpl
 		return objectStateFlowPersistence.fetchByObjectFieldId(objectFieldId);
 	}
 
+	@Override
+	public ObjectStateFlow updateDefaultObjectStateFlow(
+			ObjectField newObjectField, ObjectField oldObjectField)
+		throws PortalException {
+
+		if (!oldObjectField.isState() && !newObjectField.isState()) {
+			return null;
+		}
+
+		if (oldObjectField.isState() && !newObjectField.isState()) {
+			deleteObjectFieldObjectStateFlow(oldObjectField.getObjectFieldId());
+
+			return null;
+		}
+
+		if (!oldObjectField.isState() && newObjectField.isState()) {
+			return addDefaultObjectStateFlow(newObjectField);
+		}
+
+		if (oldObjectField.getListTypeDefinitionId() !=
+				newObjectField.getListTypeDefinitionId()) {
+
+			deleteObjectFieldObjectStateFlow(oldObjectField.getObjectFieldId());
+
+			addDefaultObjectStateFlow(newObjectField);
+		}
+
+		return null;
+	}
+
 	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
 
