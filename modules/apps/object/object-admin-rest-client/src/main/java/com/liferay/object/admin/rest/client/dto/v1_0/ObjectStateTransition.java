@@ -15,7 +15,7 @@
 package com.liferay.object.admin.rest.client.dto.v1_0;
 
 import com.liferay.object.admin.rest.client.function.UnsafeSupplier;
-import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectStateSerDes;
+import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectStateTransitionSerDes;
 
 import java.io.Serializable;
 
@@ -28,30 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ObjectState implements Cloneable, Serializable {
+public class ObjectStateTransition implements Cloneable, Serializable {
 
-	public static ObjectState toDTO(String json) {
-		return ObjectStateSerDes.toDTO(json);
+	public static ObjectStateTransition toDTO(String json) {
+		return ObjectStateTransitionSerDes.toDTO(json);
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
-		try {
-			id = idUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long id;
 
 	public String getKey() {
 		return key;
@@ -72,33 +53,9 @@ public class ObjectState implements Cloneable, Serializable {
 
 	protected String key;
 
-	public ObjectStateTransition[] getObjectStateTransitions() {
-		return objectStateTransitions;
-	}
-
-	public void setObjectStateTransitions(
-		ObjectStateTransition[] objectStateTransitions) {
-
-		this.objectStateTransitions = objectStateTransitions;
-	}
-
-	public void setObjectStateTransitions(
-		UnsafeSupplier<ObjectStateTransition[], Exception>
-			objectStateTransitionsUnsafeSupplier) {
-
-		try {
-			objectStateTransitions = objectStateTransitionsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected ObjectStateTransition[] objectStateTransitions;
-
 	@Override
-	public ObjectState clone() throws CloneNotSupportedException {
-		return (ObjectState)super.clone();
+	public ObjectStateTransition clone() throws CloneNotSupportedException {
+		return (ObjectStateTransition)super.clone();
 	}
 
 	@Override
@@ -107,13 +64,14 @@ public class ObjectState implements Cloneable, Serializable {
 			return true;
 		}
 
-		if (!(object instanceof ObjectState)) {
+		if (!(object instanceof ObjectStateTransition)) {
 			return false;
 		}
 
-		ObjectState objectState = (ObjectState)object;
+		ObjectStateTransition objectStateTransition =
+			(ObjectStateTransition)object;
 
-		return Objects.equals(toString(), objectState.toString());
+		return Objects.equals(toString(), objectStateTransition.toString());
 	}
 
 	@Override
@@ -124,7 +82,7 @@ public class ObjectState implements Cloneable, Serializable {
 	}
 
 	public String toString() {
-		return ObjectStateSerDes.toJSON(this);
+		return ObjectStateTransitionSerDes.toJSON(this);
 	}
 
 }

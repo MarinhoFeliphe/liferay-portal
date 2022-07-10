@@ -14,7 +14,6 @@
 
 package com.liferay.object.admin.rest.client.serdes.v1_0;
 
-import com.liferay.object.admin.rest.client.dto.v1_0.ObjectState;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectStateTransition;
 import com.liferay.object.admin.rest.client.json.BaseJSONParser;
 
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -32,24 +30,24 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ObjectStateSerDes {
+public class ObjectStateTransitionSerDes {
 
-	public static ObjectState toDTO(String json) {
-		ObjectStateJSONParser objectStateJSONParser =
-			new ObjectStateJSONParser();
+	public static ObjectStateTransition toDTO(String json) {
+		ObjectStateTransitionJSONParser objectStateTransitionJSONParser =
+			new ObjectStateTransitionJSONParser();
 
-		return objectStateJSONParser.parseToDTO(json);
+		return objectStateTransitionJSONParser.parseToDTO(json);
 	}
 
-	public static ObjectState[] toDTOs(String json) {
-		ObjectStateJSONParser objectStateJSONParser =
-			new ObjectStateJSONParser();
+	public static ObjectStateTransition[] toDTOs(String json) {
+		ObjectStateTransitionJSONParser objectStateTransitionJSONParser =
+			new ObjectStateTransitionJSONParser();
 
-		return objectStateJSONParser.parseToDTOs(json);
+		return objectStateTransitionJSONParser.parseToDTOs(json);
 	}
 
-	public static String toJSON(ObjectState objectState) {
-		if (objectState == null) {
+	public static String toJSON(ObjectStateTransition objectStateTransition) {
+		if (objectStateTransition == null) {
 			return "null";
 		}
 
@@ -57,17 +55,7 @@ public class ObjectStateSerDes {
 
 		sb.append("{");
 
-		if (objectState.getId() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"id\": ");
-
-			sb.append(objectState.getId());
-		}
-
-		if (objectState.getKey() != null) {
+		if (objectStateTransition.getKey() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
@@ -76,32 +64,9 @@ public class ObjectStateSerDes {
 
 			sb.append("\"");
 
-			sb.append(_escape(objectState.getKey()));
+			sb.append(_escape(objectStateTransition.getKey()));
 
 			sb.append("\"");
-		}
-
-		if (objectState.getObjectStateTransitions() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectStateTransitions\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < objectState.getObjectStateTransitions().length;
-				 i++) {
-
-				sb.append(
-					String.valueOf(objectState.getObjectStateTransitions()[i]));
-
-				if ((i + 1) < objectState.getObjectStateTransitions().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
 		}
 
 		sb.append("}");
@@ -110,87 +75,52 @@ public class ObjectStateSerDes {
 	}
 
 	public static Map<String, Object> toMap(String json) {
-		ObjectStateJSONParser objectStateJSONParser =
-			new ObjectStateJSONParser();
+		ObjectStateTransitionJSONParser objectStateTransitionJSONParser =
+			new ObjectStateTransitionJSONParser();
 
-		return objectStateJSONParser.parseToMap(json);
+		return objectStateTransitionJSONParser.parseToMap(json);
 	}
 
-	public static Map<String, String> toMap(ObjectState objectState) {
-		if (objectState == null) {
+	public static Map<String, String> toMap(
+		ObjectStateTransition objectStateTransition) {
+
+		if (objectStateTransition == null) {
 			return null;
 		}
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (objectState.getId() == null) {
-			map.put("id", null);
-		}
-		else {
-			map.put("id", String.valueOf(objectState.getId()));
-		}
-
-		if (objectState.getKey() == null) {
+		if (objectStateTransition.getKey() == null) {
 			map.put("key", null);
 		}
 		else {
-			map.put("key", String.valueOf(objectState.getKey()));
-		}
-
-		if (objectState.getObjectStateTransitions() == null) {
-			map.put("objectStateTransitions", null);
-		}
-		else {
-			map.put(
-				"objectStateTransitions",
-				String.valueOf(objectState.getObjectStateTransitions()));
+			map.put("key", String.valueOf(objectStateTransition.getKey()));
 		}
 
 		return map;
 	}
 
-	public static class ObjectStateJSONParser
-		extends BaseJSONParser<ObjectState> {
+	public static class ObjectStateTransitionJSONParser
+		extends BaseJSONParser<ObjectStateTransition> {
 
 		@Override
-		protected ObjectState createDTO() {
-			return new ObjectState();
+		protected ObjectStateTransition createDTO() {
+			return new ObjectStateTransition();
 		}
 
 		@Override
-		protected ObjectState[] createDTOArray(int size) {
-			return new ObjectState[size];
+		protected ObjectStateTransition[] createDTOArray(int size) {
+			return new ObjectStateTransition[size];
 		}
 
 		@Override
 		protected void setField(
-			ObjectState objectState, String jsonParserFieldName,
-			Object jsonParserFieldValue) {
+			ObjectStateTransition objectStateTransition,
+			String jsonParserFieldName, Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "id")) {
+			if (Objects.equals(jsonParserFieldName, "key")) {
 				if (jsonParserFieldValue != null) {
-					objectState.setId(
-						Long.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "key")) {
-				if (jsonParserFieldValue != null) {
-					objectState.setKey((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "objectStateTransitions")) {
-
-				if (jsonParserFieldValue != null) {
-					objectState.setObjectStateTransitions(
-						Stream.of(
-							toStrings((Object[])jsonParserFieldValue)
-						).map(
-							object -> ObjectStateTransitionSerDes.toDTO(
-								(String)object)
-						).toArray(
-							size -> new ObjectStateTransition[size]
-						));
+					objectStateTransition.setKey((String)jsonParserFieldValue);
 				}
 			}
 		}

@@ -36,8 +36,6 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.Valid;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -45,44 +43,19 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("ObjectState")
+@GraphQLName("ObjectStateTransition")
 @JsonFilter("Liferay.Vulcan")
-@XmlRootElement(name = "ObjectState")
-public class ObjectState implements Serializable {
+@XmlRootElement(name = "ObjectStateTransition")
+public class ObjectStateTransition implements Serializable {
 
-	public static ObjectState toDTO(String json) {
-		return ObjectMapperUtil.readValue(ObjectState.class, json);
+	public static ObjectStateTransition toDTO(String json) {
+		return ObjectMapperUtil.readValue(ObjectStateTransition.class, json);
 	}
 
-	public static ObjectState unsafeToDTO(String json) {
-		return ObjectMapperUtil.unsafeReadValue(ObjectState.class, json);
+	public static ObjectStateTransition unsafeToDTO(String json) {
+		return ObjectMapperUtil.unsafeReadValue(
+			ObjectStateTransition.class, json);
 	}
-
-	@Schema
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
-		try {
-			id = idUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long id;
 
 	@Schema
 	public String getKey() {
@@ -110,51 +83,20 @@ public class ObjectState implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String key;
 
-	@Schema
-	@Valid
-	public ObjectStateTransition[] getObjectStateTransitions() {
-		return objectStateTransitions;
-	}
-
-	public void setObjectStateTransitions(
-		ObjectStateTransition[] objectStateTransitions) {
-
-		this.objectStateTransitions = objectStateTransitions;
-	}
-
-	@JsonIgnore
-	public void setObjectStateTransitions(
-		UnsafeSupplier<ObjectStateTransition[], Exception>
-			objectStateTransitionsUnsafeSupplier) {
-
-		try {
-			objectStateTransitions = objectStateTransitionsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ObjectStateTransition[] objectStateTransitions;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
 		}
 
-		if (!(object instanceof ObjectState)) {
+		if (!(object instanceof ObjectStateTransition)) {
 			return false;
 		}
 
-		ObjectState objectState = (ObjectState)object;
+		ObjectStateTransition objectStateTransition =
+			(ObjectStateTransition)object;
 
-		return Objects.equals(toString(), objectState.toString());
+		return Objects.equals(toString(), objectStateTransition.toString());
 	}
 
 	@Override
@@ -168,16 +110,6 @@ public class ObjectState implements Serializable {
 		StringBundler sb = new StringBundler();
 
 		sb.append("{");
-
-		if (id != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"id\": ");
-
-			sb.append(id);
-		}
 
 		if (key != null) {
 			if (sb.length() > 1) {
@@ -193,26 +125,6 @@ public class ObjectState implements Serializable {
 			sb.append("\"");
 		}
 
-		if (objectStateTransitions != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectStateTransitions\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < objectStateTransitions.length; i++) {
-				sb.append(String.valueOf(objectStateTransitions[i]));
-
-				if ((i + 1) < objectStateTransitions.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -220,7 +132,7 @@ public class ObjectState implements Serializable {
 
 	@Schema(
 		accessMode = Schema.AccessMode.READ_ONLY,
-		defaultValue = "com.liferay.object.admin.rest.dto.v1_0.ObjectState",
+		defaultValue = "com.liferay.object.admin.rest.dto.v1_0.ObjectStateTransition",
 		name = "x-class-name"
 	)
 	public String xClassName;
