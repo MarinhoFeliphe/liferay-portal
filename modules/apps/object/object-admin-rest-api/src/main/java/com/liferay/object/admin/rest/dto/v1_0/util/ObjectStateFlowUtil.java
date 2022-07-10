@@ -17,6 +17,7 @@ package com.liferay.object.admin.rest.dto.v1_0.util;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalServiceUtil;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectStateFlow;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectStateTransition;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.service.ObjectStateLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -54,17 +55,26 @@ public class ObjectStateFlowUtil {
 			{
 				id = objectState.getObjectStateId();
 				key = listTypeEntry.getKey();
-				nextObjectStates = TransformUtil.transformToArray(
+				objectStateTransitions = TransformUtil.transformToArray(
 					ObjectStateLocalServiceUtil.getNextObjectStates(
 						objectState.getObjectStateId()),
-					nextObjectState -> {
-						ListTypeEntry listTypeEntry =
-							ListTypeEntryLocalServiceUtil.getListTypeEntry(
-								nextObjectState.getListTypeEntryId());
-
-						return listTypeEntry.getKey();
-					},
+					ObjectStateFlowUtil::_toObjectStateTransition,
 					String.class);
+			}
+		};
+	}
+
+	private static ObjectStateTransition _toObjectStateTransition(
+			ObjectState objectState)
+		throws PortalException {
+
+		ListTypeEntry listTypeEntry =
+			ListTypeEntryLocalServiceUtil.getListTypeEntry(
+				objectState.getListTypeEntryId());
+
+		return new ObjectStateTransition() {
+			{
+				key = listTypeEntry.getKey();
 			}
 		};
 	}

@@ -83,38 +83,42 @@ public class ObjectStateFlowUtil {
 		serviceBuilderObjectState.setObjectStateFlowId(objectStateFlowId);
 		serviceBuilderObjectState.setObjectStateTransitions(
 			TransformUtil.transformToList(
-				objectState.getNextObjectStates(),
-				nextObjectStateJSON -> _toObjectStateTransition(
-					listTypeDefinitionId, nextObjectStateJSON,
-					objectStateFlowId, objectState.getId())));
+				objectState.getObjectStateTransitions(),
+				nextObjectState -> _toObjectStateTransition(
+					listTypeDefinitionId, nextObjectState, objectStateFlowId,
+					objectState.getId())));
 
 		return serviceBuilderObjectState;
 	}
 
 	private static ObjectStateTransition _toObjectStateTransition(
-			long listTypeDefinitionId, String nextObjectStateJSON,
+			long listTypeDefinitionId,
+			com.liferay.object.admin.rest.dto.v1_0.ObjectStateTransition
+				objectStateTransition,
 			long objectStateFlowId, long sourceObjectStateId)
 		throws PortalException {
 
-		ObjectStateTransition objectStateTransition =
+		ObjectStateTransition serviceBuilderObjectStateTransition =
 			ObjectStateTransitionLocalServiceUtil.createObjectStateTransition(
 				0L);
 
-		objectStateTransition.setObjectStateFlowId(objectStateFlowId);
-		objectStateTransition.setSourceObjectStateId(sourceObjectStateId);
+		serviceBuilderObjectStateTransition.setObjectStateFlowId(
+			objectStateFlowId);
+		serviceBuilderObjectStateTransition.setSourceObjectStateId(
+			sourceObjectStateId);
 
 		ListTypeEntry listTypeEntry =
 			ListTypeEntryLocalServiceUtil.fetchListTypeEntry(
-				listTypeDefinitionId, nextObjectStateJSON);
+				listTypeDefinitionId, objectStateTransition.getKey());
 
 		ObjectState targetObjectState =
 			ObjectStateLocalServiceUtil.getObjectStateFlowObjectState(
 				listTypeEntry.getListTypeEntryId(), objectStateFlowId);
 
-		objectStateTransition.setTargetObjectStateId(
+		serviceBuilderObjectStateTransition.setTargetObjectStateId(
 			targetObjectState.getObjectStateId());
 
-		return objectStateTransition;
+		return serviceBuilderObjectStateTransition;
 	}
 
 }
