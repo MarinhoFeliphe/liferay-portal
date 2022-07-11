@@ -54,8 +54,8 @@ export default function EditObjectStateField({objectField, readOnly}: IProps) {
 			(item: ObjectState) => item.key === currentKey
 		);
 
-		return currentState?.nextObjectStates.find(
-			(item: string) => item === pickListItemKey
+		return currentState?.objectStateTransitions.find(
+			({key}: {key: string}) => key === pickListItemKey
 		);
 	};
 

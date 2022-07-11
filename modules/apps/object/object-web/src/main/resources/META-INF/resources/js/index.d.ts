@@ -222,5 +222,5 @@ interface ObjectDefinitionsRelationship {
 
 interface ObjectState {
 	key: string;
-	nextObjectStates: string[];
+	objectStateTransitions: {key: string}[];
 }

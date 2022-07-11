@@ -55,14 +55,14 @@ export default function StateDefinition({
 
 		const currentStateIndex = objectStates.indexOf(currentState);
 
-		const newNextObjectStates = items.filter((item) => item.checked);
+		const newObjectStateTransitions = items.filter((item) => item.checked);
 
 		const newObjectStates = [...objectStates];
 
 		newObjectStates[currentStateIndex] = {
 			...currentState,
-			nextObjectStates: newNextObjectStates.map(({value}) => {
-				return value;
+			objectStateTransitions: newObjectStateTransitions.map(({value}) => {
+				return {key: value};
 			}),
 		};
 
