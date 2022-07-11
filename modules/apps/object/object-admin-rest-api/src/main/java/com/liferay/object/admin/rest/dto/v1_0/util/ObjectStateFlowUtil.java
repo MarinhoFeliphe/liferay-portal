@@ -59,7 +59,7 @@ public class ObjectStateFlowUtil {
 					ObjectStateLocalServiceUtil.getNextObjectStates(
 						objectState.getObjectStateId()),
 					ObjectStateFlowUtil::_toObjectStateTransition,
-					String.class);
+					ObjectStateTransition.class);
 			}
 		};
 	}
