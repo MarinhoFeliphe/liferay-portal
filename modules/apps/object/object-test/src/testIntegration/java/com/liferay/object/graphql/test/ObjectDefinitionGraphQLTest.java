@@ -15,12 +15,17 @@
 package com.liferay.object.graphql.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.object.util.LocalizedMapUtil;
+import com.liferay.object.util.ObjectFieldBuilder;
 import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -40,6 +45,7 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.Serializable;
@@ -70,7 +76,23 @@ public class ObjectDefinitionGraphQLTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_objectFieldName = StringUtil.randomId();
+		_objectFieldTextName = StringUtil.randomId();
+		_objectFieldPicklistName = StringUtil.randomId();
+
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionLocalService.addListTypeDefinition(
+				TestPropsValues.getUserId(),
+				LocalizedMapUtil.getLocalizedMap(
+					RandomTestUtil.randomString()));
+
+		for (String key : Arrays.asList("item1", "item2", "item3")) {
+			_listTypeEntryLocalService.addListTypeEntry(
+				TestPropsValues.getUserId(),
+				listTypeDefinition.getListTypeDefinitionId(), key,
+				LocalizedMapUtil.getLocalizedMap(key));
+		}
+
+		ObjectFieldBuilder objectFieldBuilder = new ObjectFieldBuilder();
 
 		_objectDefinition =
 			ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
@@ -80,11 +102,29 @@ public class ObjectDefinitionGraphQLTest {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				Collections.singletonList(
+				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						"Text", "String", true, true, null,
-						RandomTestUtil.randomString(), _objectFieldName,
-						false)));
+						RandomTestUtil.randomString(), _objectFieldTextName,
+						false),
+					objectFieldBuilder.businessType(
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST
+					).dbType(
+						ObjectFieldConstants.DB_TYPE_STRING
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							StringUtil.randomString())
+					).name(
+						_objectFieldPicklistName
+					).objectFieldSettings(
+						Collections.emptyList()
+					).indexed(
+						true
+					).required(
+						false
+					).build()));
 
 		_objectDefinition =
 			ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
@@ -99,17 +139,19 @@ public class ObjectDefinitionGraphQLTest {
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
-				_objectFieldName, "peter@liferay.com"
+				_objectFieldPicklistName, "item1"
+			).put(
+				_objectFieldTextName, "peter@liferay.com"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
 	public void testAddObjectEntry() throws Exception {
-		String value = RandomTestUtil.randomString();
+		String value = "item1";
 
 		Assert.assertEquals(
-			value,
+			"{\"key\":\"item1\"}",
 			JSONUtil.getValueAsString(
 				_invoke(
 					new GraphQLField(
@@ -121,13 +163,15 @@ public class ObjectDefinitionGraphQLTest {
 								HashMapBuilder.<String, Object>put(
 									_objectDefinitionName,
 									StringBundler.concat(
-										"{", _objectFieldName, ": \"", value,
-										"\"}")
+										"{", _objectFieldPicklistName,
+										": { key: \"", value, "\"}}")
 								).build(),
-								new GraphQLField(_objectFieldName))))),
+								new GraphQLField(
+									_objectFieldPicklistName,
+									new GraphQLField("key")))))),
 				"JSONObject/data", "JSONObject/c",
 				"JSONObject/create" + _objectDefinitionName,
-				"Object/" + _objectFieldName));
+				"Object/" + _objectFieldPicklistName));
 
 		Assert.assertEquals(
 			"Bad Request",
@@ -142,11 +186,11 @@ public class ObjectDefinitionGraphQLTest {
 								HashMapBuilder.<String, Object>put(
 									_objectDefinitionName,
 									StringBundler.concat(
-										"{", _objectFieldName, ": \"",
+										"{", _objectFieldTextName, ": \"",
 										RandomTestUtil.randomString(), "\"",
 										", status: draft }")
 								).build(),
-								new GraphQLField(_objectFieldName))))),
+								new GraphQLField(_objectFieldTextName))))),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
 	}
@@ -196,14 +240,14 @@ public class ObjectDefinitionGraphQLTest {
 								key,
 								HashMapBuilder.<String, Object>put(
 									"filter",
-									"\"" + _objectFieldName +
+									"\"" + _objectFieldTextName +
 										" eq 'peter@liferay.com'\""
 								).build(),
 								new GraphQLField(
 									"items",
-									new GraphQLField(_objectFieldName)))))),
+									new GraphQLField(_objectFieldTextName)))))),
 				"JSONObject/data", "JSONObject/c", "JSONObject/" + key,
-				"Object/items", "Object/0", "Object/" + _objectFieldName));
+				"Object/items", "Object/0", "Object/" + _objectFieldTextName));
 		Assert.assertEquals(
 			"peter@liferay.com",
 			JSONUtil.getValueAsString(
@@ -216,14 +260,14 @@ public class ObjectDefinitionGraphQLTest {
 								key,
 								HashMapBuilder.<String, Object>put(
 									"filter",
-									"\"contains(" + _objectFieldName +
+									"\"contains(" + _objectFieldTextName +
 										",'peter@liferay.com')\""
 								).build(),
 								new GraphQLField(
 									"items",
-									new GraphQLField(_objectFieldName)))))),
+									new GraphQLField(_objectFieldTextName)))))),
 				"JSONObject/data", "JSONObject/c", "JSONObject/" + key,
-				"Object/items", "Object/0", "Object/" + _objectFieldName));
+				"Object/items", "Object/0", "Object/" + _objectFieldTextName));
 		Assert.assertEquals(
 			"peter@liferay.com",
 			JSONUtil.getValueAsString(
@@ -241,9 +285,9 @@ public class ObjectDefinitionGraphQLTest {
 								).build(),
 								new GraphQLField(
 									"items",
-									new GraphQLField(_objectFieldName)))))),
+									new GraphQLField(_objectFieldTextName)))))),
 				"JSONObject/data", "JSONObject/c", "JSONObject/" + key,
-				"Object/items", "Object/0", "Object/" + _objectFieldName));
+				"Object/items", "Object/0", "Object/" + _objectFieldTextName));
 	}
 
 	@Test
@@ -265,7 +309,7 @@ public class ObjectDefinitionGraphQLTest {
 								key,
 								HashMapBuilder.<String, Object>put(
 									"filter",
-									"\"" + _objectFieldName +
+									"\"" + _objectFieldTextName +
 										" ne 'peter@liferay.com'\""
 								).build(),
 								new GraphQLField("totalCount"))))),
@@ -291,9 +335,9 @@ public class ObjectDefinitionGraphQLTest {
 									_objectDefinitionPrimaryKeyName,
 									_objectEntry.getObjectEntryId()
 								).build(),
-								new GraphQLField(_objectFieldName))))),
+								new GraphQLField(_objectFieldTextName))))),
 				"JSONObject/data", "JSONObject/c", "JSONObject/" + key,
-				"Object/" + _objectFieldName));
+				"Object/" + _objectFieldTextName));
 
 		JSONObject jsonObject = _invoke(
 			new GraphQLField(
@@ -306,7 +350,7 @@ public class ObjectDefinitionGraphQLTest {
 							_objectDefinitionPrimaryKeyName,
 							_objectEntry.getObjectEntryId()
 						).build(),
-						new GraphQLField(_objectFieldName),
+						new GraphQLField(_objectFieldTextName),
 						new GraphQLField("dateCreated"),
 						new GraphQLField("dateModified"),
 						new GraphQLField("status")))));
@@ -339,9 +383,9 @@ public class ObjectDefinitionGraphQLTest {
 						HashMapBuilder.<String, Object>put(
 							_objectDefinitionName,
 							StringBundler.concat(
-								"{", _objectFieldName, ": \"", value, "\"}")
+								"{", _objectFieldTextName, ": \"", value, "\"}")
 						).build(),
-						new GraphQLField(_objectFieldName),
+						new GraphQLField(_objectFieldTextName),
 						new GraphQLField(_objectDefinitionPrimaryKeyName)))));
 
 		Assert.assertEquals(
@@ -349,7 +393,7 @@ public class ObjectDefinitionGraphQLTest {
 			JSONUtil.getValueAsString(
 				jsonObject, "JSONObject/data", "JSONObject/c",
 				"JSONObject/create" + _objectDefinitionName,
-				"Object/" + _objectFieldName));
+				"Object/" + _objectFieldTextName));
 
 		value = RandomTestUtil.randomString();
 
@@ -371,16 +415,16 @@ public class ObjectDefinitionGraphQLTest {
 								HashMapBuilder.<String, Object>put(
 									_objectDefinitionName,
 									StringBundler.concat(
-										"{", _objectFieldName, ": \"", value,
-										"\"}")
+										"{", _objectFieldTextName, ": \"",
+										value, "\"}")
 								).put(
 									_objectDefinitionPrimaryKeyName,
 									String.valueOf(objectEntryId)
 								).build(),
-								new GraphQLField(_objectFieldName))))),
+								new GraphQLField(_objectFieldTextName))))),
 				"JSONObject/data", "JSONObject/c",
 				"JSONObject/update" + _objectDefinitionName,
-				"Object/" + _objectFieldName));
+				"Object/" + _objectFieldTextName));
 	}
 
 	private JSONObject _invoke(GraphQLField queryGraphQLField)
@@ -404,13 +448,20 @@ public class ObjectDefinitionGraphQLTest {
 		return JSONFactoryUtil.createJSONObject(HttpUtil.URLtoString(options));
 	}
 
+	@Inject
+	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+
+	@Inject
+	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
 	@DeleteAfterTestRun
 	private ObjectDefinition _objectDefinition;
 
 	private String _objectDefinitionName;
 	private String _objectDefinitionPrimaryKeyName;
 	private ObjectEntry _objectEntry;
-	private String _objectFieldName;
+	private String _objectFieldPicklistName;
+	private String _objectFieldTextName;
 
 	private static class GraphQLField {
 
