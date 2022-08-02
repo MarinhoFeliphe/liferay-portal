@@ -305,6 +305,18 @@ public class ObjectRelationshipPersistenceTest {
 	}
 
 	@Test
+	public void testCountByDT_ODI2_R_T() throws Exception {
+		_persistence.countByDT_ODI2_R_T(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(), "");
+
+		_persistence.countByDT_ODI2_R_T(
+			"null", 0L, RandomTestUtil.randomBoolean(), "null");
+
+		_persistence.countByDT_ODI2_R_T(
+			(String)null, 0L, RandomTestUtil.randomBoolean(), (String)null);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ObjectRelationship newObjectRelationship = addObjectRelationship();
 
