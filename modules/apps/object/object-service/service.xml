@@ -513,6 +513,12 @@
 			<finder-column name="reverse" />
 			<finder-column name="type" />
 		</finder>
+		<finder name="DT_ODI2_R_T" return-type="Collection">
+			<finder-column name="deletionType" />
+			<finder-column name="objectDefinitionId2" />
+			<finder-column name="reverse" />
+			<finder-column name="type" />
+		</finder>
 	</entity>
 	<entity local-service="true" name="ObjectState" remote-service="false" uuid="true">
 
