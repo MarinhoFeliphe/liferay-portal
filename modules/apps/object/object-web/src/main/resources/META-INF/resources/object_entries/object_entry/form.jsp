@@ -53,6 +53,8 @@ portletDisplay.setURLBack(backURL);
 		</liferay-frontend:fieldset-group>
 
 		<%@ include file="/object_entries/object_entry/categorization.jspf" %>
+
+		<%@ include file="/object_entries/object_entry/discussion.jspf" %>
 	</liferay-frontend:edit-form-body>
 
 	<c:if test="<%= !objectEntryDisplayContext.isReadOnly() %>">
