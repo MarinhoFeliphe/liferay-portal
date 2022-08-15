@@ -51,7 +51,6 @@ page import="com.liferay.object.model.ObjectRelationship" %><%@
 page import="com.liferay.object.model.ObjectValidationRule" %><%@
 page import="com.liferay.object.model.ObjectView" %><%@
 page import="com.liferay.object.rest.dto.v1_0.ObjectEntry" %><%@
-page import="com.liferay.headless.delivery.dto.v1_0.Creator" %><%@
 page import="com.liferay.object.scope.ObjectScopeProvider" %><%@
 page import="com.liferay.object.web.internal.constants.ObjectWebKeys" %><%@
 page import="com.liferay.object.web.internal.list.type.constants.ListTypeFDSNames" %><%@
