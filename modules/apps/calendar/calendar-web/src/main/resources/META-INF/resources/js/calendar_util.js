@@ -74,6 +74,49 @@ AUI.add(
 		const CalendarUtil = {
 			NOTIFICATION_DEFAULT_TYPE: 'email',
 
+			getDateDescription(date, today) {
+				const stringDate = String(date);
+				const splittedStringDate = stringDate.split(' ');
+
+				const dayOfMonth = splittedStringDate[2];
+				const year = splittedStringDate[3];
+
+				//TODO use translation
+
+				const daysOfWeekMap = {
+					'Sun': 'Sunday',
+					'Mon': 'Monday',
+					'Tue': 'Tuesday',
+					'Wed': 'Wednesday',
+					'Thu': 'Thursday',
+					'Fri': 'Friday',
+					'Sat': 'Saturday'
+				};
+
+				const dayOfWeek = daysOfWeekMap[splittedStringDate[0]];
+
+				const monthsMap = {
+					'Jan': 'January',
+					'Feb': 'February',
+					'Mar': 'March',
+					'Apr': 'April',
+					'May': 'May',
+					'Jun': 'June',
+					'Jul': 'July',
+					'Aug': 'August',
+					'Sep': 'September',
+					'Oct': 'October',
+					'Nov': 'November',
+					'Dec': 'December',
+				};
+
+				const month = monthsMap[splittedStringDate[1]];
+
+				//TODO use the proper format for each region
+
+				return `${month} ${dayOfMonth} ${dayOfWeek} ${today ? ', Today' : ''}`;
+			},
+
 			createSchedulerEvent(calendarBooking) {
 				const endDate = new Date(
 					calendarBooking.endTimeYear,
