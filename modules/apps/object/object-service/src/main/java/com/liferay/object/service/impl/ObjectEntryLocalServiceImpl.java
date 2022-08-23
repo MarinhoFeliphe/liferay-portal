@@ -1447,6 +1447,33 @@ public class ObjectEntryLocalServiceImpl
 		throw new IllegalArgumentException("Invalid function " + function);
 	}
 
+	private Map<String, String> _get(
+		ObjectDefinition objectDefinition1, ObjectDefinition objectDefinition2,
+		boolean reverse) {
+
+		if (objectDefinition1.getObjectDefinitionId() != objectDefinition2.getObjectDefinitionId()) {
+			return HashMapBuilder.put(
+				"pkObjectFieldDBColumnName1",
+				objectDefinition1.getPKObjectFieldDBColumnName()
+			).put(
+				"pkObjectFieldDBColumnName2",
+				objectDefinition2.getPKObjectFieldDBColumnName()
+			).build();
+		}
+
+		return HashMapBuilder.put(
+			"pkObjectFieldDBColumnName1",
+			StringBundler.concat(
+				objectDefinition1.getPKObjectFieldDBColumnName(),
+				reverse ? "2" : "1")
+		).put(
+			"pkObjectFieldDBColumnName2",
+			StringBundler.concat(
+				objectDefinition1.getPKObjectFieldDBColumnName(),
+				reverse ? "1" : "2")
+		).build();
+	}
+
 	private GroupByStep _getManyToManyRelatedObjectEntriesGroupByStep(
 			long groupId, long objectRelationshipId, long primaryKey,
 			boolean reverse, FromStep fromStep)
