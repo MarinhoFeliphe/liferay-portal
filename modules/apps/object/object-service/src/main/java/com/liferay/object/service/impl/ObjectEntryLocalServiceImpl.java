@@ -34,6 +34,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectRelationshipReverseException;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.model.ObjectDefinition;
@@ -50,6 +51,7 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.object.service.base.ObjectEntryLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
@@ -1775,25 +1777,12 @@ public class ObjectEntryLocalServiceImpl
 			ObjectDefinition objectDefinition =
 				dynamicObjectDefinitionTable.getObjectDefinition();
 
-			List<ObjectRelationship> objectRelationships =
-				_objectRelationshipPersistence.findByODI1_N(
+			ObjectRelationship objectRelationship =
+				ObjectRelationshipLocalServiceUtil.getObjectRelationship(
 					objectDefinition.getObjectDefinitionId(),
 					GetterUtil.getString(
 						objectFieldSettingsValues.get(
 							"objectRelationshipName")));
-
-			ObjectRelationship objectRelationship = null;
-
-			if (objectRelationships.size() == 1) {
-				objectRelationship = objectRelationships.get(0);
-			}
-			else if (objectRelationships.size() > 1) {
-				for (ObjectRelationship item : objectRelationships) {
-					if (!item.getReverse()) {
-						objectRelationship = item;
-					}
-				}
-			}
 
 			ObjectDefinition relatedObjectDefinition =
 				_objectDefinitionPersistence.findByPrimaryKey(
