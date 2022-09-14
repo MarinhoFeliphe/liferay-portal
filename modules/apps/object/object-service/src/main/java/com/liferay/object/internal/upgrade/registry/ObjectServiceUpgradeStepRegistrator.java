@@ -219,6 +219,15 @@ public class ObjectServiceUpgradeStepRegistrator
 			"3.23.0", "3.23.1",
 			new com.liferay.object.internal.upgrade.v3_23_1.
 				ObjectFieldUpgradeProcess());
+
+		registry.register(
+			"3.23.1", "3.24.0",
+			UpgradeProcessFactory.addColumns(
+				"ObjectAction",
+				"scriptSyntaxVersion INTEGER NOT NULL DEFAULT 1"),
+			UpgradeProcessFactory.addColumns(
+				"ObjectValidationRule",
+				"scriptSyntaxVersion INTEGER NOT NULL DEFAULT 1"));
 	}
 
 	@Reference
