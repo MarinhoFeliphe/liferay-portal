@@ -183,10 +183,98 @@ public class ObjectDefinitionResourceImpl
 							_objectFieldSettingLocalService,
 							_objectFilterLocalService)));
 
+		long objectDefinitionId =
+			serviceBuilderObjectDefinition.getObjectDefinitionId();
+
 		if (!Validator.isBlank(objectDefinition.getExternalReferenceCode())) {
-			_objectDefinitionService.updateExternalReferenceCode(
-				objectDefinition.getExternalReferenceCode(),
-				objectDefinitionId);
+			serviceBuilderObjectDefinition =
+				_objectDefinitionService.updateExternalReferenceCode(
+					objectDefinition.getExternalReferenceCode(),
+					objectDefinitionId);
+		}
+
+		com.liferay.object.model.ObjectField titleObjectField =
+			_objectFieldLocalService.fetchObjectField(
+				objectDefinitionId, objectDefinition.getTitleObjectFieldName());
+
+		if (titleObjectField != null) {
+			serviceBuilderObjectDefinition =
+				_objectDefinitionService.updateTitleObjectFieldId(
+					objectDefinitionId, titleObjectField.getObjectFieldId());
+		}
+
+		ObjectAction[] objectActions = objectDefinition.getObjectActions();
+
+		if (objectActions != null) {
+			ObjectActionResource.Builder objectActionResourcedBuilder =
+				_objectActionResourceFactory.create();
+
+			ObjectActionResource objectActionResource =
+				objectActionResourcedBuilder.user(
+					contextUser
+				).build();
+
+			for (ObjectAction objectAction :
+					objectDefinition.getObjectActions()) {
+
+				objectActionResource.postObjectDefinitionObjectAction(
+					objectDefinitionId, objectAction);
+			}
+		}
+
+		ObjectLayout[] objectLayouts = objectDefinition.getObjectLayouts();
+
+		if (objectLayouts != null) {
+			ObjectLayoutResource.Builder builder =
+				_objectLayoutResourceFactory.create();
+
+			ObjectLayoutResource objectLayoutResource = builder.user(
+				contextUser
+			).build();
+
+			for (ObjectLayout objectLayout : objectLayouts) {
+				objectLayoutResource.postObjectDefinitionObjectLayout(
+					objectDefinitionId, objectLayout);
+			}
+		}
+
+		ObjectRelationship[] objectRelationships =
+			objectDefinition.getObjectRelationships();
+
+		if (objectRelationships != null) {
+			ObjectRelationshipResource.Builder
+				objectRelationshipResourcedBuilder =
+					_objectRelationshipResourceFactory.create();
+
+			ObjectRelationshipResource objectRelationshipResource =
+				objectRelationshipResourcedBuilder.user(
+					contextUser
+				).build();
+
+			for (ObjectRelationship objectRelationship :
+					objectDefinition.getObjectRelationships()) {
+
+				objectRelationshipResource.
+					postObjectDefinitionObjectRelationship(
+						objectDefinitionId, objectRelationship);
+			}
+		}
+
+		ObjectView[] objectViews = objectDefinition.getObjectViews();
+
+		if (objectViews != null) {
+			ObjectViewResource.Builder objectViewResourcedBuilder =
+				_objectViewResourceFactory.create();
+
+			ObjectViewResource objectViewResource =
+				objectViewResourcedBuilder.user(
+					contextUser
+				).build();
+
+			for (ObjectView objectView : objectDefinition.getObjectViews()) {
+				objectViewResource.postObjectDefinitionObjectView(
+					objectDefinitionId, objectView);
+			}
 		}
 
 		return _toObjectDefinition(serviceBuilderObjectDefinition);
