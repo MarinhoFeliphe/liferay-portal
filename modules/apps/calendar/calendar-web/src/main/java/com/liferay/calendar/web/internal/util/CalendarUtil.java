@@ -68,6 +68,8 @@ public class CalendarUtil {
 			long startTime, long endTime, String ruleName, TimeZone timeZone)
 		throws PortalException {
 
+		//TODO here we need to retrieve all days of the month instead of days with events
+
 		List<CalendarBooking> calendarBookings = _calendarBookingService.search(
 			themeDisplay.getCompanyId(), null, calendarIds, new long[0], -1,
 			null, startTime, endTime, timeZone, true, statuses,

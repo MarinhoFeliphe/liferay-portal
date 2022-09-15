@@ -674,16 +674,27 @@
 
 						DateMath.toMidnight(date);
 
-						var selected =
-							selectedDates.length > 0 &&
-							A.Date.isInRange(
-								date,
-								selectedDates[0],
-								selectedDates[selectedDates.length - 1]
-							);
+						const today = A.DataType.DateMath.isToday(date);
 
-						if (A.DataType.DateMath.isToday(date)) {
+						if (today) {
 							node.addClass('lfr-current-day');
+						}
+
+						node.setAttribute(
+							'aria-label',
+							Liferay.CalendarUtil.getDateDescription(
+								date, today));
+
+						const selected =
+							selectedDates.length > 0 &&
+								A.Date.isInRange(
+									date,
+									selectedDates[0],
+									selectedDates[selectedDates.length - 1]
+								);
+
+						if (selected) {
+							node.setAttribute('tabindex', 0);
 						}
 
 						node.toggleClass('yui3-calendar-day-selected', selected);
