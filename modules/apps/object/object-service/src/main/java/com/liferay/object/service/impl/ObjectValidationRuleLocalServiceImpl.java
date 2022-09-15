@@ -94,6 +94,7 @@ public class ObjectValidationRuleLocalServiceImpl
 		objectValidationRule.setErrorLabelMap(errorLabelMap);
 		objectValidationRule.setNameMap(nameMap);
 		objectValidationRule.setScript(script);
+		objectValidationRule.setScriptSyntaxVersion(_SCRIPT_SYNTAX_VERSION);
 
 		return objectValidationRulePersistence.update(objectValidationRule);
 	}
@@ -308,6 +309,8 @@ public class ObjectValidationRuleLocalServiceImpl
 			throw new ObjectValidationRuleScriptException("syntax-error");
 		}
 	}
+
+	private static final int _SCRIPT_SYNTAX_VERSION = 2;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectValidationRuleLocalServiceImpl.class);

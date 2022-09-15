@@ -106,6 +106,7 @@ public class ObjectActionLocalServiceImpl
 		objectAction.setObjectActionExecutorKey(objectActionExecutorKey);
 		objectAction.setObjectActionTriggerKey(objectActionTriggerKey);
 		objectAction.setParameters(parametersUnicodeProperties.toString());
+		objectAction.setScriptSyntaxVersion(_SCRIPT_SYNTAX_VERSION);
 		objectAction.setStatus(ObjectActionConstants.STATUS_NEVER_RAN);
 
 		return objectActionPersistence.update(objectAction);
@@ -372,6 +373,8 @@ public class ObjectActionLocalServiceImpl
 				"predefinedValues", predefinedValuesErrorMessageKeys);
 		}
 	}
+
+	private static final int _SCRIPT_SYNTAX_VERSION = 2;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectActionLocalServiceImpl.class);
