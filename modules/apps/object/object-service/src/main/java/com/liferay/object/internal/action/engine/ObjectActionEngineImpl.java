@@ -142,6 +142,10 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 					_objectActionExecutorRegistry.getObjectActionExecutor(
 						objectAction.getObjectActionExecutorKey());
 
+				payloadJSONObject.put(
+					"scriptSyntaxVersion",
+					objectAction.getScriptSyntaxVersion());
+
 				objectActionExecutor.execute(
 					companyId, objectAction.getParametersUnicodeProperties(),
 					payloadJSONObject, userId);
