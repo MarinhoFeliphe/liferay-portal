@@ -18,8 +18,10 @@ import com.liferay.petra.sql.dsl.Table;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
@@ -31,20 +33,21 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.view.count.configuration.ViewCountConfiguration;
+import com.liferay.view.count.increment.listener.ViewCountIncrementListener;
+import com.liferay.view.count.increment.listener.ViewCountIncrementListenerServiceTracker;
 import com.liferay.view.count.model.ViewCountEntry;
 import com.liferay.view.count.model.ViewCountEntryTable;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
 import com.liferay.view.count.service.base.ViewCountEntryLocalServiceBaseImpl;
 import com.liferay.view.count.service.persistence.ViewCountEntryPK;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Preston Crary
@@ -121,7 +124,30 @@ public class ViewCountEntryLocalServiceImpl
 			viewCountEntryFinder.incrementViewCount(
 				companyId, classNameId, classPK, increment);
 		}
+
+		try {
+			ClassName className = _classNameLocalService.getClassName(classNameId);
+			ViewCountIncrementListener viewCountIncrementListener = _viewCountIncrementListenerServiceTracker
+				.getViewCountIncrementListener(
+				className.getModelClassName());
+
+			if(viewCountIncrementListener == null){
+				return;
+			}
+
+			viewCountIncrementListener.afterIncrementListener(fetchViewCountEntry(new ViewCountEntryPK(
+				companyId, classNameId,
+				classPK)));
+		}
+		catch (PortalException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
+
+	@Reference
+	private ViewCountIncrementListenerServiceTracker
+		_viewCountIncrementListenerServiceTracker;
 
 	@Override
 	@Transactional(enabled = false)

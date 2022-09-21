@@ -71,9 +71,6 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 			new IntegerEntityField(
 				"ratingValue",
 				locale -> Field.getSortableFieldName("totalScore")),
-			new IntegerEntityField(
-				"viewCount",
-				locale -> Field.getSortableFieldName("viewCount")),
 			new StringEntityField(
 				"friendlyUrlPath",
 				locale -> Field.getSortableFieldName("urlSubject_String")),

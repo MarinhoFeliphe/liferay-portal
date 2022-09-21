@@ -102,8 +102,6 @@ public class MBMessageModelDocumentContributor
 				mbMessage.getThreadId());
 
 			document.addKeyword("question", mbThread.isQuestion());
-
-			document.addNumber("viewCount", mbThread.getViewCount());
 		}
 
 		document.addKeyword("threadId", mbMessage.getThreadId());
