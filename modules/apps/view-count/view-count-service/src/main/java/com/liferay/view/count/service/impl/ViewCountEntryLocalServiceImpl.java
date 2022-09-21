@@ -36,15 +36,14 @@ import com.liferay.view.count.model.ViewCountEntryTable;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
 import com.liferay.view.count.service.base.ViewCountEntryLocalServiceBaseImpl;
 import com.liferay.view.count.service.persistence.ViewCountEntryPK;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Preston Crary
