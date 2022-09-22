@@ -2,9 +2,9 @@ package com.liferay.view.count.increment.listener;
 
 import com.liferay.view.count.model.ViewCountEntry;
 
-public interface ViewCountIncrementListener {
+public interface ViewCountEntryModelListener {
 
-	public void afterIncrementListener(ViewCountEntry viewCountEntry);
+	public void afterIncrement(ViewCountEntry viewCountEntry);
 
 	public String getModelClassName();
 }

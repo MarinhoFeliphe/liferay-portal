@@ -14,6 +14,9 @@
 
 package com.liferay.view.count.service.impl;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -33,15 +36,16 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.view.count.configuration.ViewCountConfiguration;
-import com.liferay.view.count.increment.listener.ViewCountIncrementListener;
-import com.liferay.view.count.increment.listener.ViewCountIncrementListenerServiceTracker;
+import com.liferay.view.count.increment.listener.ViewCountEntryModelListener;
 import com.liferay.view.count.model.ViewCountEntry;
 import com.liferay.view.count.model.ViewCountEntryTable;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
 import com.liferay.view.count.service.base.ViewCountEntryLocalServiceBaseImpl;
 import com.liferay.view.count.service.persistence.ViewCountEntryPK;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -127,15 +131,13 @@ public class ViewCountEntryLocalServiceImpl
 
 		try {
 			ClassName className = _classNameLocalService.getClassName(classNameId);
-			ViewCountIncrementListener viewCountIncrementListener = _viewCountIncrementListenerServiceTracker
-				.getViewCountIncrementListener(
-				className.getModelClassName());
+			ViewCountEntryModelListener viewCountIncrementListener = _serviceTrackerMap.getService(className.getModelClassName());
 
 			if(viewCountIncrementListener == null){
 				return;
 			}
 
-			viewCountIncrementListener.afterIncrementListener(fetchViewCountEntry(new ViewCountEntryPK(
+			viewCountIncrementListener.afterIncrement(fetchViewCountEntry(new ViewCountEntryPK(
 				companyId, classNameId,
 				classPK)));
 		}
@@ -145,9 +147,12 @@ public class ViewCountEntryLocalServiceImpl
 
 	}
 
-	@Reference
-	private ViewCountIncrementListenerServiceTracker
-		_viewCountIncrementListenerServiceTracker;
+	@Deactivate
+	protected void deactivate() {_serviceTrackerMap.close();}
+
+	private ServiceTrackerMap<String, ViewCountEntryModelListener>
+		_serviceTrackerMap;
+
 
 	@Override
 	@Transactional(enabled = false)
@@ -166,8 +171,17 @@ public class ViewCountEntryLocalServiceImpl
 	}
 
 	@Activate
+	protected void activate(BundleContext bundleContext, Map<String, Object> properties) {
+		modified(properties);
+
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, ViewCountEntryModelListener.class, null,
+			ServiceReferenceMapperFactory.createFromFunction(
+				bundleContext,
+					ViewCountEntryModelListener::getModelClassName));
+	}
 	@Modified
-	protected void activate(Map<String, Object> properties) {
+	protected void modified(Map<String, Object> properties) {
 		ViewCountConfiguration viewCountConfiguration =
 			ConfigurableUtil.createConfigurable(
 				ViewCountConfiguration.class, properties);
@@ -184,6 +198,7 @@ public class ViewCountEntryLocalServiceImpl
 		_disabledClassNameIds = disabledClassNameIds;
 		_enabled = viewCountConfiguration.enabled();
 	}
+
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
