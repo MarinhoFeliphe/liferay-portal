@@ -14,12 +14,17 @@
 
 package com.liferay.view.count.service.impl;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
@@ -31,7 +36,9 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.view.count.configuration.ViewCountConfiguration;
+import com.liferay.view.count.entry.model.listener.ViewCountEntryModelListener;
 import com.liferay.view.count.model.ViewCountEntry;
+import com.liferay.view.count.model.ViewCountEntryModel;
 import com.liferay.view.count.model.ViewCountEntryTable;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
 import com.liferay.view.count.service.base.ViewCountEntryLocalServiceBaseImpl;
@@ -41,8 +48,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -120,6 +131,25 @@ public class ViewCountEntryLocalServiceImpl
 		if (isViewCountEnabled(classNameId)) {
 			viewCountEntryFinder.incrementViewCount(
 				companyId, classNameId, classPK, increment);
+
+			try {
+				ClassName className =
+					_classNameLocalService.getClassName(classNameId);
+
+				ViewCountEntryModelListener viewCountIncrementListener =
+					_serviceTrackerMap.getService(className.getValue());
+
+				if (viewCountIncrementListener == null){
+					return;
+				}
+
+				viewCountIncrementListener.afterIncrementListener(
+					fetchViewCountEntry(
+						new ViewCountEntryPK(companyId, classNameId, classPK)));
+			}
+			catch (PortalException portalException) {
+				throw new RuntimeException(portalException);
+			}
 		}
 	}
 
@@ -157,6 +187,24 @@ public class ViewCountEntryLocalServiceImpl
 
 		_disabledClassNameIds = disabledClassNameIds;
 		_enabled = viewCountConfiguration.enabled();
+
+		if (_enabled) {
+			Bundle bundle =
+				FrameworkUtil.getBundle(ViewCountEntryLocalServiceImpl.class);
+
+			BundleContext bundleContext = bundle.getBundleContext();
+
+			_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, ViewCountEntryModelListener.class, null,
+				ServiceReferenceMapperFactory.createFromFunction(
+					bundleContext,
+					ViewCountEntryModelListener::getModelClassName));
+		}
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
 	}
 
 	@Reference
@@ -164,5 +212,8 @@ public class ViewCountEntryLocalServiceImpl
 
 	private volatile Set<Long> _disabledClassNameIds;
 	private volatile boolean _enabled;
+
+	private ServiceTrackerMap<String, ViewCountEntryModelListener>
+		_serviceTrackerMap;
 
 }
