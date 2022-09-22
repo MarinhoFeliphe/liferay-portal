@@ -46,29 +46,14 @@ public class GroovyObjectActionExecutorImpl implements ObjectActionExecutor {
 			JSONObject payloadJSONObject, long userId)
 		throws Exception {
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				payloadJSONObject.getLong("objectDefinitionId"));
-
-		int scriptSyntaxVersion = (int)payloadJSONObject.get(
-			"scriptSyntaxVersion");
-
-		Map<String, Object> variables = null;
-
-		if (scriptSyntaxVersion == 1) {
-			variables = ObjectActionVariablesUtil.toVariables(
-				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-				_systemObjectDefinitionMetadataTracker);
-		}
-		else {
-			variables = ObjectScriptVariablesUtil.toVariables(
-				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-				_systemObjectDefinitionMetadataTracker, userId);
-		}
-
 		Map<String, Object> results = _objectScriptingExecutor.execute(
-			variables, new HashSet<>(),
-			parametersUnicodeProperties.get("script"));
+			ObjectActionVariablesUtil.toVariables(
+				_dtoConverterRegistry,
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					payloadJSONObject.getLong("objectDefinitionId")),
+				payloadJSONObject,
+				_systemObjectDefinitionMetadataTracker, userId),
+			new HashSet<>(), parametersUnicodeProperties.get("script"));
 
 		if (GetterUtil.getBoolean(results.get("invalidScript"))) {
 			throw new ScriptingException();

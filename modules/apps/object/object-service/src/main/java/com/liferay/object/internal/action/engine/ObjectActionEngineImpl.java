@@ -118,20 +118,25 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 		);
 
 		Set<Long> objectActionIds = _objectActionIdsThreadLocal.get();
-		Map<String, Object> variables = ObjectActionVariablesUtil.toVariables(
-			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-			_systemObjectDefinitionMetadataTracker);
 
 		for (ObjectAction objectAction :
 				_objectActionLocalService.getObjectActions(
 					objectDefinition.getObjectDefinitionId(),
 					objectActionTriggerKey)) {
 
+			payloadJSONObject.put(
+				"scriptSyntaxVersion", objectAction.getScriptSyntaxVersion()
+			);
+
 			try {
 				if (objectActionIds.contains(
 						objectAction.getObjectActionId()) ||
 					!_evaluateConditionExpression(
-						objectAction.getConditionExpression(), variables)) {
+						objectAction.getConditionExpression(),
+						ObjectActionVariablesUtil.toVariables(
+							_dtoConverterRegistry, objectDefinition,
+							payloadJSONObject,
+							_systemObjectDefinitionMetadataTracker, userId))) {
 
 					continue;
 				}

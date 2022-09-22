@@ -53,7 +53,7 @@ public class NotificationTemplateObjectActionExecutorImpl
 			objectDefinition.getClassName(),
 			ObjectActionVariablesUtil.toVariables(
 				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-				_systemObjectDefinitionMetadataTracker));
+				_systemObjectDefinitionMetadataTracker, userId));
 	}
 
 	@Override

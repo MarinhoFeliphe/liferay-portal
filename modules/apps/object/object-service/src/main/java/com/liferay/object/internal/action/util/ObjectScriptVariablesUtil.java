@@ -40,32 +40,23 @@ public class ObjectScriptVariablesUtil {
 			systemObjectDefinitionMetadataTracker,
 		long userId) {
 
-		Map<String, Object> allVariables = null;
-
-		Map<String, Object> selectedVariables = new HashMap<>();
+		Map<String, Object> allowedVariables =
+			HashMapBuilder.<String, Object>put("creator", userId).build();
+		Map<String, Object> allVariables = new HashMap<>();
 
 		if (objectDefinition.isSystem()) {
-			String contentType = _getContentType(
-				dtoConverterRegistry, objectDefinition,
-				systemObjectDefinitionMetadataTracker);
-
-			allVariables = HashMapBuilder.<String, Object>putAll(
+			allVariables.putAll(
 				(Map<String, Object>)payloadJSONObject.get(
-					"model" + objectDefinition.getName())
-			).putAll(
+					"model" + objectDefinition.getName()));
+			allVariables.putAll(
 				(Map<String, Object>)payloadJSONObject.get(
-					"modelDTO" + contentType)
-			).build();
-
-			if (allVariables == null) {
-				return new HashMap<>();
-			}
+					"modelDTO" + _getContentType(
+						dtoConverterRegistry, objectDefinition,
+						systemObjectDefinitionMetadataTracker)));
 		}
 		else {
-			allVariables = HashMapBuilder.<String, Object>putAll(
-				(Map<String, Object>)payloadJSONObject.get("objectEntry")
-			).build();
-
+			allVariables.putAll(
+				(Map<String, Object>)payloadJSONObject.get("objectEntry"));
 			allVariables.putAll(
 				(Map<String, Object>)allVariables.get("values"));
 
@@ -74,7 +65,7 @@ public class ObjectScriptVariablesUtil {
 			Object objectEntryId = allVariables.get("objectEntryId");
 
 			if (objectEntryId != null) {
-				selectedVariables.put("id", objectEntryId);
+				allowedVariables.put("id", objectEntryId);
 			}
 		}
 
@@ -83,16 +74,14 @@ public class ObjectScriptVariablesUtil {
 				objectDefinition.getObjectDefinitionId());
 
 		for (ObjectField objectField : objectFields) {
-			if (!selectedVariables.containsKey(objectField.getName())) {
-				Object value = allVariables.get(objectField.getName());
-
-				selectedVariables.put(objectField.getName(), value);
+			if (!allowedVariables.containsKey(objectField.getName())) {
+				allowedVariables.put(
+					objectField.getName(),
+					allVariables.get(objectField.getName()));
 			}
 		}
 
-		selectedVariables.put("creator", userId);
-
-		return selectedVariables;
+		return allowedVariables;
 	}
 
 	private static String _getContentType(

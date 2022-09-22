@@ -34,14 +34,21 @@ public class ObjectActionVariablesUtil {
 		DTOConverterRegistry dtoConverterRegistry,
 		ObjectDefinition objectDefinition, JSONObject payloadJSONObject,
 		SystemObjectDefinitionMetadataTracker
-			systemObjectDefinitionMetadataTracker) {
+			systemObjectDefinitionMetadataTracker, long userId) {
+
+		int scriptSyntaxVersion = (int)payloadJSONObject.get(
+			"scriptSyntaxVersion");
+
+		if (scriptSyntaxVersion == 2) {
+			return ObjectScriptVariablesUtil.toVariables(
+				dtoConverterRegistry, objectDefinition, payloadJSONObject,
+				systemObjectDefinitionMetadataTracker, userId);
+		}
 
 		if (objectDefinition.isSystem()) {
-			String contentType = _getContentType(
+			Object object = payloadJSONObject.get("modelDTO" + _getContentType(
 				dtoConverterRegistry, objectDefinition,
-				systemObjectDefinitionMetadataTracker);
-
-			Object object = payloadJSONObject.get("modelDTO" + contentType);
+				systemObjectDefinitionMetadataTracker));
 
 			if (object == null) {
 				return payloadJSONObject.toMap();

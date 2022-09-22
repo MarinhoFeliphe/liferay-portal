@@ -96,7 +96,7 @@ public class AddObjectEntryObjectActionExecutorImpl
 				{
 					properties = _getValues(
 						sourceObjectDefinition, parametersUnicodeProperties,
-						payloadJSONObject);
+						payloadJSONObject, userId);
 				}
 			},
 			String.valueOf(
@@ -198,14 +198,14 @@ public class AddObjectEntryObjectActionExecutorImpl
 	private Map<String, Object> _getValues(
 			ObjectDefinition objectDefinition,
 			UnicodeProperties parametersUnicodeProperties,
-			JSONObject payloadJSONObject)
+			JSONObject payloadJSONObject, long userId)
 		throws Exception {
 
 		Map<String, Object> values = new HashMap<>();
 
 		Map<String, Object> variables = ObjectActionVariablesUtil.toVariables(
 			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-			_systemObjectDefinitionMetadataTracker);
+			_systemObjectDefinitionMetadataTracker, userId);
 
 		JSONArray jsonArray = _jsonFactory.createJSONArray(
 			parametersUnicodeProperties.get("predefinedValues"));
