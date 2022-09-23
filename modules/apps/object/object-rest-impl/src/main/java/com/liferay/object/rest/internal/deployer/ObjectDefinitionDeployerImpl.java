@@ -108,13 +108,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_objectScopeProviderRegistry.getObjectScopeProvider(
 				objectDefinition.getScope());
 
-		if (!_objectDefinitionsMap.containsKey(
-				objectDefinition.getRESTContextPath())) {
-
+		if (!_objectDefinitionsMap.containsKey(_getKey(objectDefinition))) {
 			_excludeScopedMethods(objectDefinition, objectScopeProvider);
 
 			_componentInstancesMap.put(
-				objectDefinition.getRESTContextPath(),
+				_getKey(objectDefinition),
 				Arrays.asList(
 					_objectEntryApplicationComponentFactory.newInstance(
 						HashMapDictionaryBuilder.<String, Object>put(
@@ -132,7 +130,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 							"osgi.jaxrs.extension.select",
 							"(osgi.jaxrs.name=Liferay.Vulcan)"
 						).put(
-							"osgi.jaxrs.name", objectDefinition.getName()
+							"osgi.jaxrs.name", _getJaxRSName(objectDefinition)
 						).build()),
 					_objectEntryResourceComponentFactory.newInstance(
 						HashMapDictionaryBuilder.<String, Object>put(
@@ -156,8 +154,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 								objectDefinition.getName()
 						).put(
 							"osgi.jaxrs.application.select",
-							"(osgi.jaxrs.name=" + objectDefinition.getName() +
-								")"
+							"(osgi.jaxrs.name=" +
+								_getJaxRSName(objectDefinition) + ")"
 						).put(
 							"osgi.jaxrs.resource", "true"
 						).build())));
@@ -171,12 +169,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 						"enabled", "false"
 					).put(
 						"osgi.jaxrs.application.select",
-						"(osgi.jaxrs.name=" + objectDefinition.getName() + ")"
+						"(osgi.jaxrs.name=" + _getJaxRSName(objectDefinition) +
+							")"
 					).put(
 						"osgi.jaxrs.extension", "true"
 					).put(
 						"osgi.jaxrs.name",
-						objectDefinition.getName() +
+						_getJaxRSName(objectDefinition) +
 							"ObjectDefinitionContextProvider"
 					).build()),
 				_bundleContext.registerService(
@@ -184,12 +183,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					new ObjectEntryManagerHttpExceptionMapper(),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"osgi.jaxrs.application.select",
-						"(osgi.jaxrs.name=" + objectDefinition.getName() + ")"
+						"(osgi.jaxrs.name=" + _getJaxRSName(objectDefinition) +
+							")"
 					).put(
 						"osgi.jaxrs.extension", "true"
 					).put(
 						"osgi.jaxrs.name",
-						objectDefinition.getName() +
+						_getJaxRSName(objectDefinition) +
 							"ObjectEntryManagerHttpExceptionMapper"
 					).build()),
 				_bundleContext.registerService(
@@ -197,12 +197,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					new ObjectEntryValuesExceptionMapper(),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"osgi.jaxrs.application.select",
-						"(osgi.jaxrs.name=" + objectDefinition.getName() + ")"
+						"(osgi.jaxrs.name=" + _getJaxRSName(objectDefinition) +
+							")"
 					).put(
 						"osgi.jaxrs.extension", "true"
 					).put(
 						"osgi.jaxrs.name",
-						objectDefinition.getName() +
+						_getJaxRSName(objectDefinition) +
 							"ObjectEntryValuesExceptionMapper"
 					).build()),
 				_bundleContext.registerService(
@@ -210,12 +211,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					new ObjectValidationRuleEngineExceptionMapper(),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"osgi.jaxrs.application.select",
-						"(osgi.jaxrs.name=" + objectDefinition.getName() + ")"
+						"(osgi.jaxrs.name=" + _getJaxRSName(objectDefinition) +
+							")"
 					).put(
 						"osgi.jaxrs.extension", "true"
 					).put(
 						"osgi.jaxrs.name",
-						objectDefinition.getName() +
+						_getJaxRSName(objectDefinition) +
 							"ObjectValidationRuleEngineExceptionMapper"
 					).build()),
 				_bundleContext.registerService(
@@ -223,12 +225,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					new RequiredObjectRelationshipExceptionMapper(),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"osgi.jaxrs.application.select",
-						"(osgi.jaxrs.name=" + objectDefinition.getName() + ")"
+						"(osgi.jaxrs.name=" + _getJaxRSName(objectDefinition) +
+							")"
 					).put(
 						"osgi.jaxrs.extension", "true"
 					).put(
 						"osgi.jaxrs.name",
-						objectDefinition.getName() +
+						_getJaxRSName(objectDefinition) +
 							"RequiredObjectRelationshipExceptionMapper"
 					).build()));
 		}
@@ -248,7 +251,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 		Map<Long, ObjectDefinition> objectDefinitions =
 			_objectDefinitionsMap.computeIfAbsent(
-				objectDefinition.getRESTContextPath(), k -> new HashMap<>());
+				_getKey(objectDefinition), k -> new HashMap<>());
 
 		objectDefinitions.put(
 			objectDefinition.getCompanyId(), objectDefinition);
@@ -260,7 +263,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		long companyId, String restContextPath) {
 
 		Map<Long, ObjectDefinition> objectDefinitions =
-			_objectDefinitionsMap.get(restContextPath);
+			_objectDefinitionsMap.get(companyId + "#" + restContextPath);
 
 		if (objectDefinitions != null) {
 			return objectDefinitions.get(companyId);
@@ -272,23 +275,19 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	@Override
 	public synchronized void undeploy(ObjectDefinition objectDefinition) {
 		Map<Long, ObjectDefinition> objectDefinitions =
-			_objectDefinitionsMap.get(objectDefinition.getRESTContextPath());
+			_objectDefinitionsMap.get(_getKey(objectDefinition));
 
 		if (objectDefinitions != null) {
 			objectDefinitions.remove(objectDefinition.getCompanyId());
 
 			if (objectDefinitions.isEmpty()) {
-				_objectDefinitionsMap.remove(
-					objectDefinition.getRESTContextPath());
+				_objectDefinitionsMap.remove(_getKey(objectDefinition));
 			}
 		}
 
-		if (!_objectDefinitionsMap.containsKey(
-				objectDefinition.getRESTContextPath())) {
-
+		if (!_objectDefinitionsMap.containsKey(_getKey(objectDefinition))) {
 			List<ComponentInstance> componentInstances =
-				_componentInstancesMap.get(
-					objectDefinition.getRESTContextPath());
+				_componentInstancesMap.get(_getKey(objectDefinition));
 
 			if (componentInstances != null) {
 				for (ComponentInstance componentInstance : componentInstances) {
@@ -352,6 +351,15 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				_log.debug(exception);
 			}
 		}
+	}
+
+	private String _getJaxRSName(ObjectDefinition objectDefinition) {
+		return objectDefinition.getName();
+	}
+
+	private String _getKey(ObjectDefinition objectDefinition) {
+		return objectDefinition.getCompanyId() + "#" +
+			objectDefinition.getRESTContextPath();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
