@@ -156,17 +156,19 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 					exception);
 			}
 		}
-
-		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
-			objectDefinitionId, objectViewFilterColumn.getObjectFieldName());
-
-		if (Objects.equals(
-				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
-
-			_validate(
-				jsonArray, objectDefinitionId,
+		else {
+			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+				objectDefinitionId,
 				objectViewFilterColumn.getObjectFieldName());
+
+			if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+				_validate(
+					jsonArray, objectDefinitionId,
+					objectViewFilterColumn.getObjectFieldName());
+			}
 		}
 	}
 
