@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
@@ -84,14 +85,16 @@ public class ObjectDefinitionResourceTest
 				"feature.flag.LPS-152650", "true"
 			).build());
 
-		ObjectDefinition objectDefinition = randomObjectDefinition();
+		ObjectDefinition objectDefinition =
+			testGetObjectDefinitionsPage_addObjectDefinition(
+				randomObjectDefinition());
 
-		String expectedRestContextPath =
-			(objectDefinition.getSystem() ? "/o/" : "/o/c/") +
-				TextFormatter.formatPlural(objectDefinition.getName());
+		String objectDefinitionPluralName = StringUtil.lowerCaseFirstLetter(
+			TextFormatter.formatPlural(objectDefinition.getName()));
 
 		Assert.assertEquals(
-			expectedRestContextPath, objectDefinition.getRestContextPath());
+			"/o/c/" + objectDefinitionPluralName,
+			objectDefinition.getRestContextPath());
 
 		PropsUtil.addProperties(
 			UnicodePropertiesBuilder.setProperty(
