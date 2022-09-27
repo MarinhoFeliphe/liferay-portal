@@ -152,7 +152,7 @@ public class ObjectRelationshipLocalServiceTest {
 				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
 				null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"A" + RandomTestUtil.randomString(), null, null,
+				"TestSystemObjectDefinition", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionConstants.SCOPE_COMPANY, 1,
 				Arrays.asList(
@@ -520,7 +520,7 @@ public class ObjectRelationshipLocalServiceTest {
 		Assert.assertNotNull(objectFieldSetting);
 
 		Assert.assertEquals(
-			_objectDefinition1.getShortName(), objectFieldSetting.getValue());
+			objectDefinition1.getShortName(), objectFieldSetting.getValue());
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
