@@ -118,7 +118,9 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 	private void _addAllObjectFields(
 		FDSTableSchemaBuilder fdsTableSchemaBuilder, Locale locale) {
 
-		_addNonbjectField(fdsTableSchemaBuilder, "id", "externalReferenceCode");
+		_addNonbjectField(
+			fdsTableSchemaBuilder, "id",
+			_objectDefinition.isDefaultStorageType() ? "id" : "externalReferenceCode");
 
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
