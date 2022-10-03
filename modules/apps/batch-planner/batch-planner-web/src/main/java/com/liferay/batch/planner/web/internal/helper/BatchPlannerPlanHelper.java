@@ -309,7 +309,9 @@ public class BatchPlannerPlanHelper {
 			}
 
 			String suffix = StringUtil.extractLast(
-				parameterName, StringPool.UNDERLINE);
+				parameterName,
+				parameterName.startsWith("externalFieldName_") ?
+					"externalFieldName_" : StringPool.UNDERLINE);
 
 			String internalFieldName = ParamUtil.getString(
 				portletRequest, "internalFieldName_" + suffix);
