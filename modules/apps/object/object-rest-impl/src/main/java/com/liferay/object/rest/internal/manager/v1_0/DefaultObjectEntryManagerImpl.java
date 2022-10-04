@@ -65,11 +65,14 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.aggregation.Aggregations;
@@ -621,6 +624,20 @@ public class DefaultObjectEntryManagerImpl
 		}
 
 		serviceContext.setUserId(userId);
+
+		if (properties.get("createDate") != null) {
+			serviceContext.setCreateDate(
+				GetterUtil.getDate(properties.get("createDate"),
+					DateFormatFactoryUtil.getSimpleDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ss'Z'")));
+		}
+
+		if (properties.get("modifiedDate") != null) {
+			serviceContext.setCreateDate(
+				GetterUtil.getDate(properties.get("modifiedDate"),
+					DateFormatFactoryUtil.getSimpleDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ss'Z'")));
+		}
 
 		return serviceContext;
 	}
