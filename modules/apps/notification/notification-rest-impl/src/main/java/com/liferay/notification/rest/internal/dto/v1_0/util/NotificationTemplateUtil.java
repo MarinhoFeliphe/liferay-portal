@@ -80,6 +80,8 @@ public class NotificationTemplateUtil {
 			serviceBuilderNotificationTemplate.getNotificationTemplateId());
 		notificationTemplateRecipient.setNotificationTemplateRecipientSettings(
 			notificationType.createNotificationTemplateRecipientSettings(
+				notificationTemplateRecipient.
+					getNotificationTemplateRecipientId(),
 				notificationTemplate.getRecipients(), user));
 
 		serviceBuilderNotificationTemplate.setNotificationTemplateRecipient(
