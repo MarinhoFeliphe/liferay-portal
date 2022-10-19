@@ -70,6 +70,7 @@ import com.liferay.portal.security.auth.EmailAddressValidatorFactory;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -303,6 +304,32 @@ public class EmailNotificationType extends BaseNotificationType {
 					updateNotificationQueueEntry(notificationQueueEntry);
 			}
 		}
+	}
+
+	@Override
+	public Object[] toRecipients(
+		List<NotificationTemplateRecipientSetting>
+			notificationTemplateRecipientSettings) {
+
+		Map<String, Object> recipientsMap = new HashMap<>();
+
+		for (NotificationTemplateRecipientSetting
+				notificationTemplateRecipientSetting :
+					notificationTemplateRecipientSettings) {
+
+			Object value = notificationTemplateRecipientSetting.getValue();
+
+			if (Validator.isXml(
+					notificationTemplateRecipientSetting.getValue())) {
+
+				value = notificationTemplateRecipientSetting.getValueMap();
+			}
+
+			recipientsMap.put(
+				notificationTemplateRecipientSetting.getName(), value);
+		}
+
+		return new Object[] {recipientsMap};
 	}
 
 	@Override

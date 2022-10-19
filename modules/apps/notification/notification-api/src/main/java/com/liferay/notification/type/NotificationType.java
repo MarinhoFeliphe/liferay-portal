@@ -38,6 +38,10 @@ public interface NotificationType {
 	public default void sendUnsentNotifications() {
 	}
 
+	public Object[] toRecipients(
+		List<NotificationTemplateRecipientSetting>
+			notificationTemplateRecipientSettings);
+
 	public void validateNotificationTemplate(
 			NotificationContext notificationContext)
 		throws PortalException;

@@ -17,12 +17,14 @@ package com.liferay.notification.rest.internal.resource.v1_0;
 import com.liferay.notification.constants.NotificationActionKeys;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.model.NotificationTemplateAttachment;
+import com.liferay.notification.model.NotificationTemplateRecipient;
 import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.internal.dto.v1_0.util.NotificationTemplateUtil;
 import com.liferay.notification.rest.internal.odata.entity.v1_0.NotificationTemplateEntityModel;
 import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.notification.service.NotificationTemplateAttachmentLocalService;
 import com.liferay.notification.service.NotificationTemplateService;
+import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
 import com.liferay.notification.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -140,6 +142,14 @@ public class NotificationTemplateResourceImpl
 		com.liferay.notification.model.NotificationTemplate
 			serviceBuilderNotificationTemplate) {
 
+		NotificationTemplateRecipient notificationTemplateRecipient =
+			serviceBuilderNotificationTemplate.
+				getNotificationTemplateRecipient();
+
+		NotificationType notificationType =
+			_notificationTypeServiceTracker.getNotificationType(
+				serviceBuilderNotificationTemplate.getType());
+
 		return new NotificationTemplate() {
 			{
 				actions = HashMapBuilder.put(
@@ -198,6 +208,11 @@ public class NotificationTemplateResourceImpl
 					serviceBuilderNotificationTemplate.getNameMap());
 				objectDefinitionId =
 					serviceBuilderNotificationTemplate.getObjectDefinitionId();
+				recipients = notificationType.toRecipients(
+					notificationTemplateRecipient.
+						getNotificationTemplateRecipientSettings());
+				recipientType =
+					serviceBuilderNotificationTemplate.getRecipientType();
 				subject = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getSubjectMap());
 				type = serviceBuilderNotificationTemplate.getType();
