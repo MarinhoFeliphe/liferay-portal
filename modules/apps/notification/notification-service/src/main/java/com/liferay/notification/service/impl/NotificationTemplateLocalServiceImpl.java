@@ -186,16 +186,11 @@ public class NotificationTemplateLocalServiceImpl
 				notificationTemplateId);
 
 		notificationTemplate.setObjectDefinitionId(objectDefinitionId);
-		notificationTemplate.setBcc(bcc);
 		notificationTemplate.setBodyMap(bodyMap);
-		notificationTemplate.setCc(cc);
 		notificationTemplate.setDescription(description);
-		notificationTemplate.setFrom(from);
-		notificationTemplate.setFromNameMap(fromNameMap);
 		notificationTemplate.setName(name);
 		notificationTemplate.setRecipientType(recipientType);
 		notificationTemplate.setSubjectMap(subjectMap);
-		notificationTemplate.setToMap(toMap);
 
 		notificationTemplate = notificationTemplatePersistence.update(
 			notificationTemplate);
