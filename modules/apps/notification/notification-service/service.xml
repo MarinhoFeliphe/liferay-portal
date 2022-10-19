@@ -21,18 +21,12 @@
 		<!-- Other fields -->
 
 		<column name="notificationTemplateId" type="long" />
-		<column name="bcc" type="String" />
 		<column name="body" type="String" />
-		<column name="cc" type="String" />
 		<column name="classNameId" type="long" />
 		<column name="classPK" type="long" />
-		<column name="from" type="String" />
-		<column name="fromName" type="String" />
 		<column name="priority" type="double" />
 		<column name="sentDate" type="Date" />
 		<column name="subject" type="String" />
-		<column name="to" type="String" />
-		<column name="toName" type="String" />
 		<column name="type" type="String" />
 		<column name="status" type="int" />
 

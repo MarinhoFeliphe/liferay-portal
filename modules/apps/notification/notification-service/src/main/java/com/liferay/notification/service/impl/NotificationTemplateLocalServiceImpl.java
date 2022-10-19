@@ -133,6 +133,23 @@ public class NotificationTemplateLocalServiceImpl
 			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
+		NotificationTemplateRecipient notificationTemplateRecipient =
+			notificationTemplate.getNotificationTemplateRecipient();
+
+		for (NotificationTemplateRecipientSetting notificationTemplateRecipientSetting :
+			notificationTemplateRecipient.getNotificationTemplateRecipientSettings()) {
+
+			_notificationTemplateRecipientSettingLocalService.
+				deleteNotificationTemplateRecipientSetting(
+					notificationTemplateRecipientSetting.
+						getNotificationTemplateRecipientSettingId());
+		}
+
+		_notificationTemplateRecipientLocalService.
+			deleteNotificationTemplateRecipient(
+				notificationTemplateRecipient.
+					getNotificationTemplateRecipientId());
+
 		notificationTemplate = notificationTemplatePersistence.remove(
 			notificationTemplate);
 
@@ -165,6 +182,78 @@ public class NotificationTemplateLocalServiceImpl
 
 		return notificationTemplatePersistence.findByPrimaryKey(
 			notificationTemplateId);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public NotificationTemplate updateNotificationTemplate(
+		NotificationContext notificationContext)
+		throws PortalException {
+
+		NotificationType notificationType =
+			_notificationTypeServiceTracker.getNotificationType(
+				notificationContext.getType());
+
+		notificationType.validateNotificationTemplate(notificationContext);
+
+		NotificationTemplate notificationTemplate =
+			notificationContext.getNotificationTemplate();
+
+		notificationTemplatePersistence.update(
+			notificationContext.getNotificationTemplate());
+
+		NotificationTemplate originalNotificationTemplate =
+			notificationTemplatePersistence.fetchByPrimaryKey(
+				notificationTemplate.getNotificationTemplateId());
+
+		NotificationTemplateRecipient originalNotificationTemplateRecipient =
+			originalNotificationTemplate.getNotificationTemplateRecipient();
+
+		for (NotificationTemplateRecipientSetting notificationTemplateRecipientSetting :
+			originalNotificationTemplateRecipient.
+				getNotificationTemplateRecipientSettings()) {
+
+			_notificationTemplateRecipientSettingLocalService.
+				deleteNotificationTemplateRecipientSetting(
+					notificationTemplateRecipientSetting);
+		}
+
+		List<Long> oldAttachmentObjectFieldIds = new ArrayList<>();
+
+		for (NotificationTemplateAttachment notificationTemplateAttachment :
+			_notificationTemplateAttachmentPersistence.
+				findByNotificationTemplateId(
+					notificationTemplate.getNotificationTemplateId())) {
+
+			if (ListUtil.exists(
+				notificationContext.getAttachmentObjectFieldIds(),
+				attachmentObjectFieldId -> Objects.equals(
+					attachmentObjectFieldId,
+					notificationTemplateAttachment.getObjectFieldId()))) {
+
+				oldAttachmentObjectFieldIds.add(
+					notificationTemplateAttachment.getObjectFieldId());
+
+				continue;
+			}
+
+			_notificationTemplateAttachmentPersistence.remove(
+				notificationTemplateAttachment);
+		}
+
+		for (long attachmentObjectFieldId :
+			ListUtil.remove(
+				notificationContext.getAttachmentObjectFieldIds(),
+				oldAttachmentObjectFieldIds)) {
+
+			_notificationTemplateAttachmentLocalService.
+				addNotificationTemplateAttachment(
+					notificationTemplate.getCompanyId(),
+					notificationTemplate.getNotificationTemplateId(),
+					attachmentObjectFieldId);
+		}
+
+		return notificationTemplate;
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
