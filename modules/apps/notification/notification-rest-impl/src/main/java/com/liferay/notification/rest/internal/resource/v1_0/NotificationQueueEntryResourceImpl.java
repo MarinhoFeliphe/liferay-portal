@@ -150,11 +150,7 @@ public class NotificationQueueEntryResourceImpl
 								getNotificationQueueEntryId());
 					}
 				).build();
-				bcc = serviceBuilderNotificationQueueEntry.getBcc();
 				body = serviceBuilderNotificationQueueEntry.getBody();
-				cc = serviceBuilderNotificationQueueEntry.getCc();
-				from = serviceBuilderNotificationQueueEntry.getFrom();
-				fromName = serviceBuilderNotificationQueueEntry.getFromName();
 				id =
 					serviceBuilderNotificationQueueEntry.
 						getNotificationQueueEntryId();
@@ -162,8 +158,6 @@ public class NotificationQueueEntryResourceImpl
 				sentDate = serviceBuilderNotificationQueueEntry.getSentDate();
 				status = serviceBuilderNotificationQueueEntry.getStatus();
 				subject = serviceBuilderNotificationQueueEntry.getSubject();
-				to = serviceBuilderNotificationQueueEntry.getTo();
-				toName = serviceBuilderNotificationQueueEntry.getToName();
 				triggerBy = notificationHandler.getTriggerBy(
 					contextAcceptLanguage.getPreferredLocale());
 				type = serviceBuilderNotificationQueueEntry.getType();
