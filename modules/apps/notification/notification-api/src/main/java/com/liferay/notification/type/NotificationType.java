@@ -14,12 +14,20 @@
 
 package com.liferay.notification.type;
 
+import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
+
+import java.util.List;
 
 /**
  * @author Feliphe Marinho
  */
 public interface NotificationType {
+
+	public List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			long notificationRecipientId, Object[] recipients, User user);
 
 	public String getType();
 
@@ -28,6 +36,9 @@ public interface NotificationType {
 
 	public default void sendUnsentNotifications() {
 	}
+
+	public Object[] toRecipients(
+		List<NotificationRecipientSetting> notificationRecipientSettings);
 
 	public void validateNotificationTemplate(
 			NotificationContext notificationContext)
