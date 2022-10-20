@@ -19,15 +19,12 @@ import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.notification.service.base.NotificationTemplateServiceBaseImpl;
+import com.liferay.notification.type.NotificationContext;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -48,12 +45,7 @@ public class NotificationTemplateServiceImpl
 
 	@Override
 	public NotificationTemplate addNotificationTemplate(
-			long userId, long objectDefinitionId, String bcc,
-			Map<Locale, String> bodyMap, String cc, String description,
-			String from, Map<Locale, String> fromNameMap, String name,
-			String recipientType, Map<Locale, String> subjectMap,
-			Map<Locale, String> toMap, String type,
-			List<Long> attachmentObjectFieldIds)
+			NotificationContext notificationContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -61,9 +53,7 @@ public class NotificationTemplateServiceImpl
 			NotificationActionKeys.ADD_NOTIFICATION_TEMPLATE);
 
 		return _notificationTemplateLocalService.addNotificationTemplate(
-			userId, objectDefinitionId, bcc, bodyMap, cc, description, from,
-			fromNameMap, name, recipientType, subjectMap, toMap, type,
-			attachmentObjectFieldIds);
+			notificationContext);
 	}
 
 	@Override
@@ -106,21 +96,19 @@ public class NotificationTemplateServiceImpl
 
 	@Override
 	public NotificationTemplate updateNotificationTemplate(
-			long notificationTemplateId, long objectDefinitionId, String bcc,
-			Map<Locale, String> bodyMap, String cc, String description,
-			String from, Map<Locale, String> fromNameMap, String name,
-			String recipientType, Map<Locale, String> subjectMap,
-			Map<Locale, String> toMap, String type,
-			List<Long> attachmentObjectFieldIds)
+			NotificationContext notificationContext)
 		throws PortalException {
 
+		NotificationTemplate notificationTemplate =
+			notificationContext.getNotificationTemplate();
+
 		_notificationTemplateModelResourcePermission.check(
-			getPermissionChecker(), notificationTemplateId, ActionKeys.UPDATE);
+			getPermissionChecker(),
+			notificationTemplate.getNotificationTemplateId(),
+			ActionKeys.UPDATE);
 
 		return _notificationTemplateLocalService.updateNotificationTemplate(
-			notificationTemplateId, objectDefinitionId, bcc, bodyMap, cc,
-			description, from, fromNameMap, name, recipientType, subjectMap,
-			toMap, type, attachmentObjectFieldIds);
+			notificationContext);
 	}
 
 	@Reference
