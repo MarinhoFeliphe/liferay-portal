@@ -14,6 +14,7 @@
 
 package com.liferay.notification.type;
 
+import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
@@ -28,6 +29,18 @@ public interface NotificationType {
 	public List<NotificationRecipientSetting>
 		createNotificationRecipientSettings(
 			long notificationRecipientId, Object[] recipients, User user);
+
+	public default String getFromName(
+		NotificationQueueEntry notificationQueueEntry) {
+
+		return "-";
+	}
+
+	public default String getRecipientSummary(
+		NotificationQueueEntry notificationQueueEntry) {
+
+		return "-";
+	}
 
 	public String getType();
 
