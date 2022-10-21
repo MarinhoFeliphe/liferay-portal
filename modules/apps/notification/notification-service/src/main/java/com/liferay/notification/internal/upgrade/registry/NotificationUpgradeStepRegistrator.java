@@ -17,7 +17,8 @@ package com.liferay.notification.internal.upgrade.registry;
 import com.liferay.notification.internal.upgrade.v1_1_0.util.NotificationQueueEntryAttachmentTable;
 import com.liferay.notification.internal.upgrade.v1_1_0.util.NotificationTemplateAttachmentTable;
 import com.liferay.notification.internal.upgrade.v1_2_0.NotificationQueueEntryUpgradeProcess;
-import com.liferay.notification.internal.upgrade.v1_3_0.NotificationTemplateUpgradeProcess;
+import com.liferay.notification.internal.upgrade.v2_1_0.NotificationTemplateUpgradeProcess;
+import com.liferay.notification.internal.upgrade.v3_0_0.NotificationRecipientUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
@@ -48,6 +49,9 @@ public class NotificationUpgradeStepRegistrator
 
 		registry.register(
 			"2.0.0", "2.1.0", new NotificationTemplateUpgradeProcess());
+
+		registry.register(
+			"2.1.0", "3.0.0", new NotificationRecipientUpgradeProcess());
 	}
 
 }
