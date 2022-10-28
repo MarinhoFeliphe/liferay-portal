@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.util.PortalUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -87,7 +88,23 @@ public class ViewObjectDefinitionsDisplayContext {
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
 		throws Exception {
 
-		return Arrays.asList(
+		List<FDSActionDropdownItem> fdsActionDropdownItems = new ArrayList<>();
+
+		if (hasViewPermission && hasPublishObjectPermission()) {
+			fdsActionDropdownItems.add(new FDSActionDropdownItem(
+				PortletURLBuilder.create(
+					getPortletURL()
+				).setMVCRenderCommandName(
+					"/object_definitions/edit_object_definition"
+				).setParameter(
+					"objectDefinitionId", "{id}"
+				).buildString(),
+				"pencil", "update",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "edit"),
+				"update", null, null));
+		}
+		else if (hasViewPermission) {
+			fdsActionDropdownItems.add(
 			new FDSActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
@@ -98,28 +115,42 @@ public class ViewObjectDefinitionsDisplayContext {
 				).buildString(),
 				"view", "view",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
-				"get", null, null),
-			new FDSActionDropdownItem(
-				ResourceURLBuilder.createResourceURL(
-					_objectRequestHelper.getLiferayPortletResponse()
-				).setParameter(
-					"objectDefinitionId", "{id}"
-				).setResourceID(
-					"/object_definitions/export_object_definition"
-				).buildString(),
-				"export", "export",
-				LanguageUtil.get(
-					_objectRequestHelper.getRequest(), "export-as-json"),
-				"get", null, null),
-			new FDSActionDropdownItem(
-				null, "trash", "deleteObjectDefinition",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
-				"delete", "delete", null),
-			new FDSActionDropdownItem(
-				_getPermissionsURL(), null, "permissions",
-				LanguageUtil.get(
-					_objectRequestHelper.getRequest(), "permissions"),
-				"get", "permissions", "modal-permissions"));
+				"get", null, null));
+		}
+
+		fdsActionDropdownItems.add(new FDSActionDropdownItem(
+			ResourceURLBuilder.createResourceURL(
+				_objectRequestHelper.getLiferayPortletResponse()
+			).setParameter(
+				"objectDefinitionId", "{id}"
+			).setResourceID(
+				"/object_definitions/export_object_definition"
+			).buildString(),
+			"export", "export",
+			LanguageUtil.get(
+				_objectRequestHelper.getRequest(), "export-as-json"),
+			"get", null, null));
+		fdsActionDropdownItems.add(new FDSActionDropdownItem(
+			null, "trash", "deleteObjectDefinition",
+			LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
+			"delete", "delete", null));
+		fdsActionDropdownItems.add(new FDSActionDropdownItem(
+			_getPermissionsURL(), null, "permissions",
+			LanguageUtil.get(
+				_objectRequestHelper.getRequest(), "permissions"),
+			"get", "permissions", "modal-permissions"));
+
+		return fdsActionDropdownItems;
+	}
+
+	public boolean hasPublishObjectPermission() {
+		PortletResourcePermission portletResourcePermission =
+			_objectDefinitionModelResourcePermission.
+				getPortletResourcePermission();
+
+		return portletResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(), null,
+			ObjectActionKeys.PUBLISH_OBJECT_DEFINITION);
 	}
 
 	public PortletURL getPortletURL() throws PortletException {
