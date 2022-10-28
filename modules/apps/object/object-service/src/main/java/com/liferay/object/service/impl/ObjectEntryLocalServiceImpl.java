@@ -1820,7 +1820,7 @@ public class ObjectEntryLocalServiceImpl
 				}
 			).and(
 				() -> {
-					if (permissionChecker == null) {
+					if (ObjectRelationshipUtil.getSkipPermissionWherePredicate()) {
 						return null;
 					}
 

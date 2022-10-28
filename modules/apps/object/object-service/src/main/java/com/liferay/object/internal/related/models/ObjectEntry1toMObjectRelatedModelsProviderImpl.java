@@ -25,6 +25,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.util.ObjectRelationshipUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -70,9 +71,13 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			_objectRelationshipLocalService.getObjectRelationship(
 				objectRelationshipId);
 
+		ObjectRelationshipUtil.setSkipPermissionWherePredicate(true);
+
 		List<ObjectEntry> relatedModels = getRelatedModels(
 			groupId, objectRelationshipId, primaryKey, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
+
+		ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
 
 		if (relatedModels.isEmpty()) {
 			return;
