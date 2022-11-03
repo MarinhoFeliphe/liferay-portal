@@ -68,6 +68,7 @@ public class NotificationUtil {
 		notificationRecipient.setCompanyId(user.getCompanyId());
 		notificationRecipient.setUserId(user.getUserId());
 		notificationRecipient.setUserName(user.getFullName());
+
 		notificationRecipient.setClassPK(classPK);
 
 		return notificationRecipient;
@@ -95,7 +96,7 @@ public class NotificationUtil {
 		if (serviceBuilderNotificationTemplate == null) {
 			serviceBuilderNotificationTemplate =
 				NotificationTemplateLocalServiceUtil.createNotificationTemplate(
-					CounterLocalServiceUtil.increment());
+					0L);
 		}
 
 		serviceBuilderNotificationTemplate.setCompanyId(user.getCompanyId());
