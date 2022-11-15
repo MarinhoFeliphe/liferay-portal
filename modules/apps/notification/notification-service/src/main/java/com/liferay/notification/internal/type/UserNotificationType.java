@@ -53,39 +53,6 @@ import org.osgi.service.component.annotations.Reference;
 public class UserNotificationType extends BaseNotificationType {
 
 	@Override
-	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user) {
-
-		List<NotificationRecipientSetting> notificationRecipientSettings =
-			new ArrayList<>();
-
-		for (Object recipient : recipients) {
-			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
-
-			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
-				NotificationRecipientSetting notificationRecipientSetting =
-					notificationRecipientSettingLocalService.
-						createNotificationRecipientSetting(0L);
-
-				notificationRecipientSetting.setCompanyId(user.getCompanyId());
-				notificationRecipientSetting.setUserId(user.getUserId());
-				notificationRecipientSetting.setUserName(user.getFullName());
-
-				notificationRecipientSetting.setNotificationRecipientId(
-					notificationRecipientId);
-				notificationRecipientSetting.setName(entry.getKey());
-				notificationRecipientSetting.setValue(
-					String.valueOf(entry.getValue()));
-
-				notificationRecipientSettings.add(notificationRecipientSetting);
-			}
-		}
-
-		return notificationRecipientSettings;
-	}
-
-	@Override
 	public String getRecipientSummary(
 		NotificationQueueEntry notificationQueueEntry) {
 
@@ -169,19 +136,6 @@ public class UserNotificationType extends BaseNotificationType {
 
 		notificationQueueEntryLocalService.addNotificationQueueEntry(
 			notificationContext);
-	}
-
-	@Override
-	public Object[] toRecipients(
-		List<NotificationRecipientSetting> notificationRecipientSettings) {
-
-		return TransformUtil.transformToArray(
-			notificationRecipientSettings,
-			notificationRecipientSetting -> HashMapBuilder.put(
-				notificationRecipientSetting.getName(),
-				notificationRecipientSetting.getValue()
-			).build(),
-			Object.class);
 	}
 
 	@Override
