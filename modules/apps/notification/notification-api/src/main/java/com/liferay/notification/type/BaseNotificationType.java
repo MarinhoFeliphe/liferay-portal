@@ -256,34 +256,18 @@ public abstract class BaseNotificationType implements NotificationType {
 				getNotificationRecipientSetting(
 					notificationTemplateRecipientId, settingName);
 
-		String content = formatLocalizedContent(
+		String content = formatContent(
 			notificationTemplateRecipientSetting.getValue(), null,
 			notificationContext);
 
 		if (Validator.isNull(content)) {
-			return formatLocalizedContent(content, null, notificationContext);
+			return formatContent(content, null, notificationContext);
 		}
 
 		return content;
 	}
 
-	protected String formatLocalizedContent(
-			Map<Locale, String> contentMap,
-			NotificationContext notificationContext)
-		throws PortalException {
-
-		String content = formatLocalizedContent(
-			contentMap.get(userLocale), null, notificationContext);
-
-		if (Validator.isNotNull(content)) {
-			return content;
-		}
-
-		return formatLocalizedContent(
-			contentMap.get(siteDefaultLocale), null, notificationContext);
-	}
-
-	protected String formatLocalizedContent(
+	protected String formatContent(
 			String content, String notificationTermEvaluatorKey,
 			NotificationContext notificationContext)
 		throws PortalException {
@@ -328,6 +312,20 @@ public abstract class BaseNotificationType implements NotificationType {
 		}
 
 		return content;
+	}
+
+	protected String formatLocalizedContent(
+			Map<Locale, String> contentMap,
+			NotificationContext notificationContext)
+		throws PortalException {
+
+		String content = contentMap.get(userLocale);
+
+		if (Validator.isNull(content)) {
+			content = contentMap.get(siteDefaultLocale);
+		}
+
+		return formatContent(content, null, notificationContext);
 	}
 
 	protected void prepareNotificationContext(

@@ -204,7 +204,7 @@ public class EmailNotificationType extends BaseNotificationType {
 						return to;
 					}
 
-					return formatLocalizedContent(
+					return formatContent(
 						notificationRecipientSetting.getValue(
 							siteDefaultLocale),
 						NotificationTermEvaluatorConstants.RECIPIENT,
@@ -453,7 +453,7 @@ public class EmailNotificationType extends BaseNotificationType {
 			emailAddresses.add(matcher.group());
 		}
 
-		return formatLocalizedContent(
+		return formatContent(
 			StringUtil.merge(emailAddresses),
 			NotificationTermEvaluatorConstants.RECIPIENT, notificationContext);
 	}
