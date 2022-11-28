@@ -12,15 +12,14 @@
  * details.
  */
 
-package com.liferay.notification.constants;
+package com.liferay.notification.term.evaluator;
 
 /**
- * @author Gustavo Lima
+ * @author Feliphe Marinho
  */
-public class NotificationTermEvaluatorConstants {
+public interface NotificationTermEvaluatorTracker {
 
-	public static final String BODY_AND_SUBJECT = "bodyAndSubject";
-
-	public static final String RECIPIENT = "recipient";
+	public NotificationTermEvaluator getNotificationTermEvaluator(
+		String className);
 
 }

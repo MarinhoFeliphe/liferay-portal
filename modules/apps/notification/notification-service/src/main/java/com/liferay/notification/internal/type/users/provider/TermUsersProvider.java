@@ -20,7 +20,7 @@ import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
-import com.liferay.notification.term.evaluator.NotificationTermEvaluatorRegistry;
+import com.liferay.notification.term.evaluator.NotificationTermEvaluatorTracker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -83,22 +83,17 @@ public class TermUsersProvider implements UsersProvider {
 					notificationRecipient.getCompanyId(), screenName));
 		}
 
-		List<NotificationTermEvaluator> notificationTermEvaluators =
-			_notificationTermEvaluatorRegistry.
-				getNotificationTermEvaluatorsByNotificationTypeKey(
-					notificationContext.getClassName());
+		NotificationTermEvaluator notificationTermEvaluator =
+			_notificationTermEvaluatorTracker.getNotificationTermEvaluator(
+				notificationContext.getClassName());
 
-		for (NotificationTermEvaluator notificationTermEvaluator :
-				notificationTermEvaluators) {
-
-			for (String term : terms) {
-				users.add(
-					_userLocalService.getUser(
-						GetterUtil.getLong(
-							notificationTermEvaluator.evaluate(
-								NotificationTermEvaluator.Context.RECIPIENT,
-								notificationContext.getTermValues(), term))));
-			}
+		for (String term : terms) {
+			users.add(
+				_userLocalService.getUser(
+					GetterUtil.getLong(
+						notificationTermEvaluator.evaluate(
+							NotificationTermEvaluator.Context.RECIPIENT,
+							notificationContext.getTermValues(), term))));
 		}
 
 		return users;
@@ -108,8 +103,7 @@ public class TermUsersProvider implements UsersProvider {
 		"\\[%[^\\[%]+%\\]", Pattern.CASE_INSENSITIVE);
 
 	@Reference
-	private NotificationTermEvaluatorRegistry
-		_notificationTermEvaluatorRegistry;
+	private NotificationTermEvaluatorTracker _notificationTermEvaluatorTracker;
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -226,10 +226,7 @@ public class SystemObjectDefinitionMetadataPortalInstanceLifecycleListener
 					objectDefinition, _objectFieldLocalService,
 					_userLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
-					"notification.term.contributor.key",
-					objectDefinition.getClassName()
-				).put(
-					"notification.type.key", objectDefinition.getClassName()
+					"class.name", objectDefinition.getClassName()
 				).build());
 			_bundleContext.registerService(
 				NotificationHandler.class,

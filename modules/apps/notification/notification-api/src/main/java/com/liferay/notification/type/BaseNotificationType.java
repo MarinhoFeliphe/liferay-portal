@@ -27,7 +27,7 @@ import com.liferay.notification.service.NotificationQueueEntryLocalService;
 import com.liferay.notification.service.NotificationRecipientLocalService;
 import com.liferay.notification.service.NotificationRecipientSettingLocalService;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
-import com.liferay.notification.term.evaluator.NotificationTermEvaluatorRegistry;
+import com.liferay.notification.term.evaluator.NotificationTermEvaluatorTracker;
 import com.liferay.notification.util.LocalizedMapUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
@@ -247,29 +247,7 @@ public abstract class BaseNotificationType implements NotificationType {
 	}
 
 	protected String formatContent(
-			String settingName, NotificationContext notificationContext,
-			long notificationTemplateRecipientId)
-		throws PortalException {
-
-		NotificationRecipientSetting notificationTemplateRecipientSetting =
-			notificationRecipientSettingLocalService.
-				getNotificationRecipientSetting(
-					notificationTemplateRecipientId, settingName);
-
-		String content = formatContent(
-			notificationTemplateRecipientSetting.getValue(), null,
-			notificationContext);
-
-		if (Validator.isNull(content)) {
-			return formatContent(content, null, notificationContext);
-		}
-
-		return content;
-	}
-
-	protected String formatContent(
-			String content, String notificationTermEvaluatorKey,
-			NotificationContext notificationContext)
+			String content, NotificationContext notificationContext)
 		throws PortalException {
 
 		if (Validator.isNull(content)) {
@@ -284,31 +262,37 @@ public abstract class BaseNotificationType implements NotificationType {
 			termNames.add(matcher.group());
 		}
 
-		List<NotificationTermEvaluator> notificationTermEvaluators = null;
+		NotificationTermEvaluator notificationTermEvaluator =
+			notificationTermEvaluatorTracker.getNotificationTermEvaluator(
+				notificationContext.getClassName());
 
-		if (Validator.isNotNull(notificationTermEvaluatorKey)) {
-			notificationTermEvaluators =
-				notificationTermEvaluatorRegistry.
-					getNotificationTermEvaluatorsByNotificationTermEvaluatorKey(
-						notificationTermEvaluatorKey);
-		}
-		else {
-			notificationTermEvaluators =
-				notificationTermEvaluatorRegistry.
-					getNotificationTermEvaluatorsByNotificationTypeKey(
-						notificationContext.getClassName());
+		for (String termName : termNames) {
+			content = StringUtil.replace(
+				content, termName,
+				notificationTermEvaluator.evaluate(
+					NotificationTermEvaluator.Context.CONTENT,
+					notificationContext.getTermValues(), termName));
 		}
 
-		for (NotificationTermEvaluator notificationTermEvaluator :
-				notificationTermEvaluators) {
+		return content;
+	}
 
-			for (String termName : termNames) {
-				content = StringUtil.replace(
-					content, termName,
-					notificationTermEvaluator.evaluate(
-						NotificationTermEvaluator.Context.CONTENT,
-						notificationContext.getTermValues(), termName));
-			}
+	protected String formatContent(
+			String settingName, NotificationContext notificationContext,
+			long notificationTemplateRecipientId)
+		throws PortalException {
+
+		NotificationRecipientSetting notificationTemplateRecipientSetting =
+			notificationRecipientSettingLocalService.
+				getNotificationRecipientSetting(
+					notificationTemplateRecipientId, settingName);
+
+		String content = formatContent(
+			notificationTemplateRecipientSetting.getValue(),
+			notificationContext);
+
+		if (Validator.isNull(content)) {
+			return formatContent(content, notificationContext);
 		}
 
 		return content;
@@ -325,7 +309,7 @@ public abstract class BaseNotificationType implements NotificationType {
 			content = contentMap.get(siteDefaultLocale);
 		}
 
-		return formatContent(content, null, notificationContext);
+		return formatContent(content, notificationContext);
 	}
 
 	protected void prepareNotificationContext(
@@ -388,8 +372,7 @@ public abstract class BaseNotificationType implements NotificationType {
 		notificationRecipientSettingLocalService;
 
 	@Reference
-	protected NotificationTermEvaluatorRegistry
-		notificationTermEvaluatorRegistry;
+	protected NotificationTermEvaluatorTracker notificationTermEvaluatorTracker;
 
 	@Reference
 	protected Portal portal;
