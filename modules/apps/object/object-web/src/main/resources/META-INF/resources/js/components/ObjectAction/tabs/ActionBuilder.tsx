@@ -391,6 +391,30 @@ export default function ActionBuilder({
 		}));
 	};
 
+	const getDisplayType = (type: string) => {
+		if (type === 'email') {
+			return 'success';
+		}
+		else if (type === 'userNotification') {
+			return 'info';
+		}
+		else {
+			return 'unstyled';
+		}
+	}
+
+	const getLabel = (type: string) => {
+		if (type === 'email') {
+			return Liferay.Language.get('email');
+		}
+		else if (type === 'userNotification') {
+			return Liferay.Language.get('user-notification');
+		}
+		else {
+			return type;
+		}
+	}
+
 	return (
 		<>
 			{infoAlert && (
@@ -627,18 +651,10 @@ export default function ActionBuilder({
 										option.type && (
 											<ClayLabel
 												displayType={
-													option.type === 'email'
-														? 'success'
-														: 'info'
+													getDisplayType(option.type)
 												}
 											>
-												{option.type === 'email'
-													? Liferay.Language.get(
-															'email'
-													  )
-													: Liferay.Language.get(
-															'user-notification'
-													  )}
+												{getLabel(option.label)}
 											</ClayLabel>
 										)
 								)}
