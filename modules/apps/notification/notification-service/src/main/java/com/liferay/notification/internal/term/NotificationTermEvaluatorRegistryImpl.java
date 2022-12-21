@@ -37,16 +37,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = NotificationTermEvaluatorRegistry.class)
 public class NotificationTermEvaluatorRegistryImpl
 	implements NotificationTermEvaluatorRegistry {
-
-	@Override
-	public List<NotificationTermEvaluator>
-		getNotificationTermEvaluatorsByNotificationTermEvaluatorKey(
-			String key) {
-
-		return _getNotificationTermEvaluators(
-			key, _serviceTrackerMapByNotificationTermEvaluatorKey);
-	}
-
 	@Override
 	public List<NotificationTermEvaluator>
 		getNotificationTermEvaluatorsByNotificationTypeKey(String key) {

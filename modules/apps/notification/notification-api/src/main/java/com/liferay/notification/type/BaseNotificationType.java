@@ -257,11 +257,10 @@ public abstract class BaseNotificationType implements NotificationType {
 					notificationTemplateRecipientId, settingName);
 
 		String content = formatLocalizedContent(
-			notificationTemplateRecipientSetting.getValue(), null,
-			notificationContext);
+			notificationTemplateRecipientSetting.getValue(), notificationContext);
 
 		if (Validator.isNull(content)) {
-			return formatLocalizedContent(content, null, notificationContext);
+			return formatLocalizedContent(content, notificationContext);
 		}
 
 		return content;
@@ -273,19 +272,18 @@ public abstract class BaseNotificationType implements NotificationType {
 		throws PortalException {
 
 		String content = formatLocalizedContent(
-			contentMap.get(userLocale), null, notificationContext);
+			contentMap.get(userLocale), notificationContext);
 
 		if (Validator.isNotNull(content)) {
 			return content;
 		}
 
 		return formatLocalizedContent(
-			contentMap.get(siteDefaultLocale), null, notificationContext);
+			contentMap.get(siteDefaultLocale), notificationContext);
 	}
 
 	protected String formatLocalizedContent(
-			String content, String notificationTermEvaluatorKey,
-			NotificationContext notificationContext)
+			String content, NotificationContext notificationContext)
 		throws PortalException {
 
 		if (Validator.isNull(content)) {
@@ -300,20 +298,10 @@ public abstract class BaseNotificationType implements NotificationType {
 			termNames.add(matcher.group());
 		}
 
-		List<NotificationTermEvaluator> notificationTermEvaluators = null;
-
-		if (Validator.isNotNull(notificationTermEvaluatorKey)) {
-			notificationTermEvaluators =
-				notificationTermEvaluatorRegistry.
-					getNotificationTermEvaluatorsByNotificationTermEvaluatorKey(
-						notificationTermEvaluatorKey);
-		}
-		else {
-			notificationTermEvaluators =
-				notificationTermEvaluatorRegistry.
-					getNotificationTermEvaluatorsByNotificationTypeKey(
-						notificationContext.getClassName());
-		}
+		List<NotificationTermEvaluator> notificationTermEvaluators =
+			notificationTermEvaluatorRegistry.
+				getNotificationTermEvaluatorsByNotificationTypeKey(
+					notificationContext.getClassName());
 
 		for (NotificationTermEvaluator notificationTermEvaluator :
 				notificationTermEvaluators) {

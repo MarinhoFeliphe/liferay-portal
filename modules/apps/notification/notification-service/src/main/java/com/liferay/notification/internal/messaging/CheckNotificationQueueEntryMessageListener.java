@@ -53,7 +53,7 @@ public class CheckNotificationQueueEntryMessageListener
 			new SchedulerEntryImpl(
 				className,
 				_triggerFactory.createTrigger(
-					className, className, null, null, 15, TimeUnit.MINUTE)),
+					className, className, null, null, 1, TimeUnit.MINUTE)),
 			DestinationNames.SCHEDULER_DISPATCH);
 	}
 
