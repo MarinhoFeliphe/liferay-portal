@@ -3400,6 +3400,32 @@ public class ObjectEntryLocalServiceImpl
 				objectField.getObjectFieldId(), objectField.getName());
 		}
 		else if (StringUtil.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+			ObjectDefinition objectDefinition =
+				objectField.getObjectDefinition();
+
+			if (!objectDefinition.isAccountEntryRestricted() ||
+				!Objects.equals(
+					objectField.getObjectFieldId(),
+					objectDefinition.
+						getAccountEntryRestrictedObjectFieldId())) {
+
+				return;
+			}
+
+			Map<String, Serializable> originalValues = objectEntry.getValues();
+
+			if (!Objects.equals(
+					GetterUtil.getLong(originalValues.get(entry.getKey())),
+					GetterUtil.getLong(entry.getValue()))) {
+
+				throw new ObjectEntryValuesException.
+					AccountEntryObjectFieldUnmodifiable(objectField.getName());
+			}
+		}
+		else if (StringUtil.equals(
 					objectField.getDBType(),
 					ObjectFieldConstants.DB_TYPE_INTEGER)) {
 
