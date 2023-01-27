@@ -143,13 +143,14 @@ public class NotificationQueueEntryLocalServiceTest {
 		User user = TestPropsValues.getUser();
 
 		notificationQueueEntry.setUserId(user.getUserId());
+
+		notificationQueueEntry.setUserId(TestPropsValues.getUserId());
 		notificationQueueEntry.setUserName(user.getFullName());
 		notificationQueueEntry.setBody(body);
 		notificationQueueEntry.setSubject(subject);
+		notificationQueueEntry.setType(NotificationConstants.TYPE_EMAIL);
 		notificationQueueEntry.setStatus(
 			NotificationQueueEntryConstants.STATUS_UNSENT);
-		notificationQueueEntry.setUserId(TestPropsValues.getUserId());
-		notificationQueueEntry.setType(NotificationConstants.TYPE_EMAIL);
 
 		NotificationRecipient notificationRecipient =
 			_notificationRecipientLocalService.createNotificationRecipient(
