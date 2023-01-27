@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -132,13 +133,22 @@ public class UserNotificationType extends BaseNotificationType {
 		siteDefaultLocale = portal.getSiteDefaultLocale(user.getGroupId());
 		userLocale = user.getLocale();
 
-		prepareNotificationContext(
-			user, null, notificationContext, notificationRecipientSettings,
-			formatLocalizedContent(
-				notificationTemplate.getSubjectMap(), notificationContext));
+		NotificationQueueEntry notificationQueueEntry =
+			createNotificationQueueEntry(
+				user, null, notificationContext,
+				formatLocalizedContent(
+					notificationTemplate.getSubjectMap(), notificationContext));
+
+		NotificationRecipient notificationRecipient =
+			createNotificationRecipient(
+				user, notificationQueueEntry.getNotificationQueueEntryId());
 
 		notificationQueueEntryLocalService.addNotificationQueueEntry(
-			notificationContext);
+			Collections.emptyList(), notificationQueueEntry,
+			notificationRecipient,
+			createNotificationRecipientSettings(
+				user, notificationRecipientSettings,
+				notificationRecipient.getNotificationRecipientId()));
 	}
 
 	@Override

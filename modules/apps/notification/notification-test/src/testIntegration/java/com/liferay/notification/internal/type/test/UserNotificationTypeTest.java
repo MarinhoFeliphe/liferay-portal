@@ -19,7 +19,6 @@ import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.context.NotificationContextBuilder;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
@@ -35,6 +34,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -83,14 +83,10 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 			NotificationRecipientConstants.TYPE_USER);
 	}
 
-	private NotificationContext _createNotificationContext(
-		List<NotificationRecipientSetting> notificationRecipientSettings,
-		String recipientType) {
-
-		NotificationContext notificationContext = new NotificationContext();
-
-		notificationContext.setClassName(RandomTestUtil.randomString());
-		notificationContext.setClassPK(RandomTestUtil.randomLong());
+	private NotificationTemplate _addNotificationTemplate(
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			String recipientType)
+		throws Exception {
 
 		NotificationTemplate notificationTemplate =
 			notificationTemplateLocalService.createNotificationTemplate(0L);
@@ -103,16 +99,10 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 		notificationTemplate.setType(
 			NotificationConstants.TYPE_USER_NOTIFICATION);
 
-		notificationContext.setNotificationTemplate(notificationTemplate);
-
-		notificationContext.setNotificationRecipient(
-			notificationRecipientLocalService.createNotificationRecipient(0L));
-		notificationContext.setNotificationRecipientSettings(
-			notificationRecipientSettings);
-		notificationContext.setType(
-			NotificationConstants.TYPE_USER_NOTIFICATION);
-
-		return notificationContext;
+		return notificationTemplateLocalService.addNotificationTemplate(
+			Collections.emptyList(),
+			notificationRecipientLocalService.createNotificationRecipient(0L),
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	private void _testSendNotification(
@@ -137,9 +127,8 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 		sendNotification(
 			new NotificationContextBuilder(
 			).notificationTemplate(
-				notificationTemplateLocalService.addNotificationTemplate(
-					_createNotificationContext(
-						notificationRecipientSettings, recipientType))
+				_addNotificationTemplate(
+					notificationRecipientSettings, recipientType)
 			).termValues(
 				HashMapBuilder.<String, Object>put(
 					"[%term%]", "termValue"

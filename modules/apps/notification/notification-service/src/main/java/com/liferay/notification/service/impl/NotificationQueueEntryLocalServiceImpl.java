@@ -15,7 +15,6 @@
 package com.liferay.notification.service.impl;
 
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
@@ -53,11 +52,11 @@ public class NotificationQueueEntryLocalServiceImpl
 
 	@Override
 	public NotificationQueueEntry addNotificationQueueEntry(
-			NotificationContext notificationContext)
+			List<Long> fileEntryIds,
+			NotificationQueueEntry notificationQueueEntry,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings)
 		throws PortalException {
-
-		NotificationQueueEntry notificationQueueEntry =
-			notificationContext.getNotificationQueueEntry();
 
 		notificationQueueEntry.setNotificationQueueEntryId(
 			counterLocalService.increment());
@@ -72,15 +71,12 @@ public class NotificationQueueEntryLocalServiceImpl
 			notificationQueueEntry.getNotificationQueueEntryId(), false, true,
 			true);
 
-		for (long fileEntryId : notificationContext.getFileEntryIds()) {
+		for (long fileEntryId : fileEntryIds) {
 			_notificationQueueEntryAttachmentLocalService.
 				addNotificationQueueEntryAttachment(
 					notificationQueueEntry.getCompanyId(), fileEntryId,
 					notificationQueueEntry.getNotificationQueueEntryId());
 		}
-
-		NotificationRecipient notificationRecipient =
-			notificationContext.getNotificationRecipient();
 
 		notificationRecipient.setNotificationRecipientId(
 			counterLocalService.increment());
@@ -93,7 +89,7 @@ public class NotificationQueueEntryLocalServiceImpl
 			notificationRecipient);
 
 		for (NotificationRecipientSetting notificationRecipientSetting :
-				notificationContext.getNotificationRecipientSettings()) {
+				notificationRecipientSettings) {
 
 			notificationRecipientSetting.setNotificationRecipientSettingId(
 				counterLocalService.increment());

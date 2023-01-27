@@ -19,7 +19,6 @@ import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.context.NotificationContextBuilder;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
@@ -63,8 +62,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 		sendNotification(
 			new NotificationContextBuilder(
 			).notificationTemplate(
-				notificationTemplateLocalService.addNotificationTemplate(
-					_createNotificationContext())
+				_addNotificationTemplate()
 			).termValues(
 				HashMapBuilder.<String, Object>put(
 					"[%emailAddressTerm%]", "test@liferay.com"
@@ -116,12 +114,22 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			"test@liferay.com", notificationRecipientSettingsMap.get("to"));
 	}
 
-	private NotificationContext _createNotificationContext() {
-		NotificationContext notificationContext = new NotificationContext();
+	private NotificationTemplate _addNotificationTemplate() throws Exception {
+		NotificationTemplate notificationTemplate =
+			notificationTemplateLocalService.createNotificationTemplate(0L);
 
-		notificationContext.setNotificationRecipient(
-			notificationRecipientLocalService.createNotificationRecipient(0L));
-		notificationContext.setNotificationRecipientSettings(
+		notificationTemplate.setBody("Body [%term%]");
+		notificationTemplate.setEditorType(
+			NotificationTemplateConstants.EDITOR_TYPE_RICH_TEXT);
+		notificationTemplate.setName(RandomTestUtil.randomString());
+		notificationTemplate.setRecipientType(
+			NotificationRecipientConstants.TYPE_EMAIL);
+		notificationTemplate.setSubject("Subject [%term%]");
+		notificationTemplate.setType(NotificationConstants.TYPE_EMAIL);
+
+		return notificationTemplateLocalService.addNotificationTemplate(
+			Collections.emptyList(),
+			notificationRecipientLocalService.createNotificationRecipient(0L),
 			Arrays.asList(
 				createNotificationRecipientSetting(
 					"bcc", "[%emailAddressTerm%],bcc@liferay.com"),
@@ -136,25 +144,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				createNotificationRecipientSetting(
 					"to",
 					Collections.singletonMap(
-						LocaleUtil.US, "[%emailAddressTerm%]"))));
-
-		NotificationTemplate notificationTemplate =
-			notificationTemplateLocalService.createNotificationTemplate(0L);
-
-		notificationTemplate.setBody("Body [%term%]");
-		notificationTemplate.setEditorType(
-			NotificationTemplateConstants.EDITOR_TYPE_RICH_TEXT);
-		notificationTemplate.setName(RandomTestUtil.randomString());
-		notificationTemplate.setRecipientType(
-			NotificationRecipientConstants.TYPE_EMAIL);
-		notificationTemplate.setSubject("Subject [%term%]");
-		notificationTemplate.setType(NotificationConstants.TYPE_EMAIL);
-
-		notificationContext.setNotificationTemplate(notificationTemplate);
-
-		notificationContext.setType(NotificationConstants.TYPE_EMAIL);
-
-		return notificationContext;
+						LocaleUtil.US, "[%emailAddressTerm%]"))),
+			notificationTemplate);
 	}
 
 }

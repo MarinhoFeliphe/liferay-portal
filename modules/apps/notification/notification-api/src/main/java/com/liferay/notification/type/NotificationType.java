@@ -16,7 +16,9 @@ package com.liferay.notification.type;
 
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationQueueEntry;
+import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
+import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 
@@ -57,7 +59,10 @@ public interface NotificationType {
 		List<NotificationRecipientSetting> notificationRecipientSettings);
 
 	public void validateNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException;
 
 }

@@ -18,7 +18,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
@@ -35,6 +34,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -61,13 +61,13 @@ public class NotificationQueueEntryLocalServiceTest {
 			_notificationQueueEntryLocalService.
 				getNotificationQueueEntriesCount());
 
-		User user = TestPropsValues.getUser();
 		String body = StringUtil.randomString();
 		String subject = StringUtil.randomString();
 
 		NotificationQueueEntry notificationQueueEntry =
-			_addNotificationQueueEntry(
-				user, body, subject, NotificationConstants.TYPE_EMAIL);
+			_addNotificationQueueEntry(body, subject);
+
+		User user = TestPropsValues.getUser();
 
 		Assert.assertNotNull(notificationQueueEntry);
 		Assert.assertEquals(
@@ -96,7 +96,8 @@ public class NotificationQueueEntryLocalServiceTest {
 	@Test
 	public void testDeleteNotificationQueueEntry() throws Exception {
 		NotificationQueueEntry notificationQueueEntry =
-			_addNotificationQueueEntry();
+			_addNotificationQueueEntry(
+				StringUtil.randomString(), StringUtil.randomString());
 
 		_notificationQueueEntryLocalService.deleteNotificationQueueEntry(
 			notificationQueueEntry.getNotificationQueueEntryId());
@@ -110,7 +111,8 @@ public class NotificationQueueEntryLocalServiceTest {
 	@Test
 	public void testResendNotificationQueueEntry() throws Exception {
 		NotificationQueueEntry notificationQueueEntry =
-			_addNotificationQueueEntry();
+			_addNotificationQueueEntry(
+				StringUtil.randomString(), StringUtil.randomString());
 
 		notificationQueueEntry =
 			_notificationQueueEntryLocalService.updateStatus(
@@ -130,42 +132,24 @@ public class NotificationQueueEntryLocalServiceTest {
 			notificationQueueEntry.getStatus());
 	}
 
-	private NotificationQueueEntry _addNotificationQueueEntry()
-		throws Exception {
-
-		return _notificationQueueEntryLocalService.addNotificationQueueEntry(
-			_createNotificationContext(
-				TestPropsValues.getUser(), StringUtil.randomString(),
-				StringUtil.randomString(), NotificationConstants.TYPE_EMAIL));
-	}
-
 	private NotificationQueueEntry _addNotificationQueueEntry(
-			User user, String body, String subject, String type)
+			String body, String subject)
 		throws Exception {
-
-		return _notificationQueueEntryLocalService.addNotificationQueueEntry(
-			_createNotificationContext(user, body, subject, type));
-	}
-
-	private NotificationContext _createNotificationContext(
-			User user, String body, String subject, String type)
-		throws Exception {
-
-		NotificationContext notificationContext = new NotificationContext();
 
 		NotificationQueueEntry notificationQueueEntry =
 			_notificationQueueEntryLocalService.createNotificationQueueEntry(
 				RandomTestUtil.randomInt());
 
+		User user = TestPropsValues.getUser();
+
 		notificationQueueEntry.setUserId(user.getUserId());
 		notificationQueueEntry.setUserName(user.getFullName());
 		notificationQueueEntry.setBody(body);
 		notificationQueueEntry.setSubject(subject);
-		notificationQueueEntry.setType(type);
 		notificationQueueEntry.setStatus(
 			NotificationQueueEntryConstants.STATUS_UNSENT);
-
-		notificationContext.setNotificationQueueEntry(notificationQueueEntry);
+		notificationQueueEntry.setUserId(TestPropsValues.getUserId());
+		notificationQueueEntry.setType(NotificationConstants.TYPE_EMAIL);
 
 		NotificationRecipient notificationRecipient =
 			_notificationRecipientLocalService.createNotificationRecipient(
@@ -176,8 +160,6 @@ public class NotificationQueueEntryLocalServiceTest {
 		notificationRecipient.setClassPK(
 			notificationQueueEntry.getNotificationQueueEntryId());
 
-		notificationContext.setNotificationRecipient(notificationRecipient);
-
 		NotificationRecipientSetting notificationRecipientSetting =
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSetting(
@@ -186,13 +168,9 @@ public class NotificationQueueEntryLocalServiceTest {
 		notificationRecipientSetting.setNotificationRecipientId(
 			notificationRecipient.getNotificationRecipientId());
 
-		notificationContext.setNotificationRecipientSettings(
-			Arrays.asList(notificationRecipientSetting));
-
-		notificationContext.setType(
-			NotificationConstants.TYPE_USER_NOTIFICATION);
-
-		return notificationContext;
+		return _notificationQueueEntryLocalService.addNotificationQueueEntry(
+			Collections.emptyList(), notificationQueueEntry,
+			notificationRecipient, Arrays.asList(notificationRecipientSetting));
 	}
 
 	@Inject

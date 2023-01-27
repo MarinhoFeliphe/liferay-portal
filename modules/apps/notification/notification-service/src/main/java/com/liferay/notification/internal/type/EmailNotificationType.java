@@ -37,7 +37,6 @@ import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.model.NotificationTemplateAttachment;
 import com.liferay.notification.service.NotificationQueueEntryAttachmentLocalService;
-import com.liferay.notification.service.NotificationTemplateAttachmentLocalService;
 import com.liferay.notification.type.BaseNotificationType;
 import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.util.NotificationRecipientSettingUtil;
@@ -152,8 +151,8 @@ public class EmailNotificationType extends BaseNotificationType {
 
 		userLocale = user.getLocale();
 
-		notificationContext.setFileEntryIds(
-			_getFileEntryIds(user.getCompanyId(), notificationContext));
+		List<Long> fileEntryIds = _getFileEntryIds(
+			user.getCompanyId(), notificationContext);
 
 		NotificationTemplate notificationTemplate =
 			notificationContext.getNotificationTemplate();
@@ -244,25 +243,19 @@ public class EmailNotificationType extends BaseNotificationType {
 								emailAddressOrUserId);
 					}
 
-					prepareNotificationContext(
+					addNotificationQueueEntry(
 						userLocalService.getDefaultUser(
 							CompanyThreadLocal.getCompanyId()),
-						body, notificationContext,
+						body, fileEntryIds, notificationContext,
 						notificationRecipientSettingsEvaluatedMap, subject);
-
-					notificationQueueEntryLocalService.
-						addNotificationQueueEntry(notificationContext);
 
 					continue;
 				}
 			}
 
-			prepareNotificationContext(
-				user, body, notificationContext,
+			addNotificationQueueEntry(
+				user, body, fileEntryIds, notificationContext,
 				notificationRecipientSettingsEvaluatedMap, subject);
-
-			notificationQueueEntryLocalService.addNotificationQueueEntry(
-				notificationContext);
 		}
 	}
 
@@ -339,14 +332,19 @@ public class EmailNotificationType extends BaseNotificationType {
 
 	@Override
 	public void validateNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		super.validateNotificationTemplate(notificationContext);
+		super.validateNotificationTemplate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 
 		Map<String, Object> notificationRecipientSettingsMap =
 			NotificationRecipientSettingUtil.toMap(
-				notificationContext.getNotificationRecipientSettings());
+				notificationRecipientSettings);
 
 		if (Validator.isNull(notificationRecipientSettingsMap.get("from"))) {
 			throw new NotificationTemplateFromException("From is null");
@@ -494,9 +492,7 @@ public class EmailNotificationType extends BaseNotificationType {
 			notificationContext.getNotificationTemplate();
 
 		for (NotificationTemplateAttachment notificationTemplateAttachment :
-				_notificationTemplateAttachmentLocalService.
-					getNotificationTemplateAttachments(
-						notificationTemplate.getNotificationTemplateId())) {
+				notificationTemplate.getNotificationTemplateAttachments()) {
 
 			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
 				notificationTemplateAttachment.getObjectFieldId());
@@ -583,10 +579,6 @@ public class EmailNotificationType extends BaseNotificationType {
 	@Reference
 	private NotificationQueueEntryAttachmentLocalService
 		_notificationQueueEntryAttachmentLocalService;
-
-	@Reference
-	private NotificationTemplateAttachmentLocalService
-		_notificationTemplateAttachmentLocalService;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;

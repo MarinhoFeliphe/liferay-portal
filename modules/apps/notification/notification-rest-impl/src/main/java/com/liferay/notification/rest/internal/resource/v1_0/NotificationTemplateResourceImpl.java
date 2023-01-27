@@ -16,9 +16,9 @@ package com.liferay.notification.rest.internal.resource.v1_0;
 
 import com.liferay.notification.constants.NotificationActionKeys;
 import com.liferay.notification.constants.NotificationConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationTemplateAttachment;
+import com.liferay.notification.model.NotificationTemplateAttachmentModel;
 import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.dto.v1_0.util.NotificationUtil;
 import com.liferay.notification.rest.internal.odata.entity.v1_0.NotificationTemplateEntityModel;
@@ -142,34 +142,25 @@ public class NotificationTemplateResourceImpl
 			NotificationTemplate notificationTemplate)
 		throws Exception {
 
-		NotificationContext notificationContext =
-			NotificationUtil.toNotificationContext(
-				notificationTemplate, _objectFieldLocalService);
-
-		notificationContext.setNotificationRecipient(
-			NotificationUtil.toNotificationRecipient(contextUser, 0L));
-		notificationContext.setNotificationRecipientSettings(
-			NotificationUtil.toNotificationRecipientSetting(
-				0L,
-				_notificationTypeServiceTracker.getNotificationType(
-					notificationTemplate.getType()),
-				notificationTemplate.getRecipients(), contextUser));
-		notificationContext.setNotificationTemplate(
-			NotificationUtil.toNotificationTemplate(
-				0L, notificationTemplate, _objectDefinitionLocalService,
-				contextUser));
-
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
-				notificationContext));
+				NotificationUtil.toAttachmentObjectFieldIds(
+					notificationTemplate, _objectFieldLocalService),
+				NotificationUtil.toNotificationRecipient(contextUser, 0L),
+				NotificationUtil.toNotificationRecipientSetting(
+					0L,
+					_notificationTypeServiceTracker.getNotificationType(
+						notificationTemplate.getType()),
+					notificationTemplate.getRecipients(), contextUser),
+				NotificationUtil.toNotificationTemplate(
+					0L, notificationTemplate, _objectDefinitionLocalService,
+					contextUser)));
 	}
 
 	@Override
 	public NotificationTemplate postNotificationTemplateCopy(
 			Long notificationTemplateId)
 		throws Exception {
-
-		NotificationContext notificationContext = new NotificationContext();
 
 		com.liferay.notification.model.NotificationTemplate
 			notificationTemplate =
@@ -179,20 +170,18 @@ public class NotificationTemplateResourceImpl
 		NotificationRecipient notificationRecipient =
 			notificationTemplate.getNotificationRecipient();
 
-		notificationContext.setNotificationRecipient(notificationRecipient);
-		notificationContext.setNotificationRecipientSettings(
-			notificationRecipient.getNotificationRecipientSettings());
-
 		notificationTemplate.setName(
 			StringUtil.appendParentheticalSuffix(
 				notificationTemplate.getName(), "copy"));
 
-		notificationContext.setNotificationTemplate(notificationTemplate);
-		notificationContext.setType(notificationTemplate.getType());
-
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
-				notificationContext));
+				transform(
+					notificationTemplate.getNotificationTemplateAttachments(),
+					NotificationTemplateAttachmentModel::getObjectFieldId),
+				notificationRecipient,
+				notificationRecipient.getNotificationRecipientSettings(),
+				notificationTemplate));
 	}
 
 	@Override
@@ -201,30 +190,23 @@ public class NotificationTemplateResourceImpl
 			NotificationTemplate notificationTemplate)
 		throws Exception {
 
-		NotificationContext notificationContext =
-			NotificationUtil.toNotificationContext(
-				notificationTemplate, _objectFieldLocalService);
-
 		NotificationRecipient notificationRecipient =
 			NotificationUtil.toNotificationRecipient(
 				contextUser, notificationTemplateId);
 
-		notificationContext.setNotificationRecipient(notificationRecipient);
-		notificationContext.setNotificationRecipientSettings(
-			NotificationUtil.toNotificationRecipientSetting(
-				notificationRecipient.getNotificationRecipientId(),
-				_notificationTypeServiceTracker.getNotificationType(
-					notificationTemplate.getType()),
-				notificationTemplate.getRecipients(), contextUser));
-
-		notificationContext.setNotificationTemplate(
-			NotificationUtil.toNotificationTemplate(
-				notificationTemplateId, notificationTemplate,
-				_objectDefinitionLocalService, contextUser));
-
 		return _toNotificationTemplate(
 			_notificationTemplateService.updateNotificationTemplate(
-				notificationContext));
+				NotificationUtil.toAttachmentObjectFieldIds(
+					notificationTemplate, _objectFieldLocalService),
+				notificationRecipient,
+				NotificationUtil.toNotificationRecipientSetting(
+					notificationRecipient.getNotificationRecipientId(),
+					_notificationTypeServiceTracker.getNotificationType(
+						notificationTemplate.getType()),
+					notificationTemplate.getRecipients(), contextUser),
+				NotificationUtil.toNotificationTemplate(
+					notificationTemplateId, notificationTemplate,
+					_objectDefinitionLocalService, contextUser)));
 	}
 
 	@Override

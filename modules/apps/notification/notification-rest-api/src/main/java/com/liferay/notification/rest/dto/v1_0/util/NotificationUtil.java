@@ -15,7 +15,6 @@
 package com.liferay.notification.rest.dto.v1_0.util;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
@@ -43,12 +42,10 @@ import java.util.List;
  */
 public class NotificationUtil {
 
-	public static NotificationContext toNotificationContext(
+	public static List<Long> toAttachmentObjectFieldIds(
 		com.liferay.notification.rest.dto.v1_0.NotificationTemplate
 			notificationTemplate,
 		ObjectFieldLocalService objectFieldLocalService) {
-
-		NotificationContext notificationContext = new NotificationContext();
 
 		List<Long> attachmentObjectFieldIds = new ArrayList<>();
 
@@ -76,18 +73,11 @@ public class NotificationUtil {
 		}
 
 		if (attachmentObjectFieldIds.isEmpty()) {
-			notificationContext.setAttachmentObjectFieldIds(
-				ListUtil.fromArray(
-					notificationTemplate.getAttachmentObjectFieldIds()));
-		}
-		else {
-			notificationContext.setAttachmentObjectFieldIds(
-				attachmentObjectFieldIds);
+			return ListUtil.fromArray(
+				notificationTemplate.getAttachmentObjectFieldIds());
 		}
 
-		notificationContext.setType(notificationTemplate.getType());
-
-		return notificationContext;
+		return attachmentObjectFieldIds;
 	}
 
 	public static NotificationRecipient toNotificationRecipient(

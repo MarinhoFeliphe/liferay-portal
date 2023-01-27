@@ -132,11 +132,11 @@ public abstract class BaseNotificationType implements NotificationType {
 
 	@Override
 	public void validateNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
-
-		NotificationTemplate notificationTemplate =
-			notificationContext.getNotificationTemplate();
 
 		if (Validator.isNull(notificationTemplate.getEditorType())) {
 			throw new NotificationTemplateEditorTypeException(
@@ -157,9 +157,7 @@ public abstract class BaseNotificationType implements NotificationType {
 			}
 		}
 
-		for (long attachmentObjectFieldId :
-				notificationContext.getAttachmentObjectFieldIds()) {
-
+		for (long attachmentObjectFieldId : attachmentObjectFieldIds) {
 			ObjectField objectField =
 				ObjectFieldLocalServiceUtil.fetchObjectField(
 					attachmentObjectFieldId);
@@ -175,6 +173,27 @@ public abstract class BaseNotificationType implements NotificationType {
 				throw new NotificationTemplateAttachmentObjectFieldIdException();
 			}
 		}
+	}
+
+	protected NotificationQueueEntry addNotificationQueueEntry(
+			User user, String body, List<Long> fileEntryIds,
+			NotificationContext notificationContext,
+			Object evaluatedNotificationRecipientSettings, String subject)
+		throws PortalException {
+
+		NotificationQueueEntry notificationQueueEntry =
+			createNotificationQueueEntry(
+				user, body, notificationContext, subject);
+
+		NotificationRecipient notificationRecipient =
+			createNotificationRecipient(
+				user, notificationQueueEntry.getNotificationQueueEntryId());
+
+		return notificationQueueEntryLocalService.addNotificationQueueEntry(
+			fileEntryIds, notificationQueueEntry, notificationRecipient,
+			createNotificationRecipientSettings(
+				user, evaluatedNotificationRecipientSettings,
+				notificationRecipient.getNotificationRecipientId()));
 	}
 
 	protected NotificationQueueEntry createNotificationQueueEntry(
@@ -252,6 +271,33 @@ public abstract class BaseNotificationType implements NotificationType {
 		return notificationRecipientSettings;
 	}
 
+	protected List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			User user, Object evaluatedNotificationRecipientSettings,
+			long notificationRecipientId) {
+
+		if (evaluatedNotificationRecipientSettings instanceof Map) {
+			return createNotificationRecipientSettings(
+				user, notificationRecipientId,
+				(Map<String, String>)evaluatedNotificationRecipientSettings);
+		}
+
+		List<NotificationRecipientSetting> notificationRecipientSettings =
+			new ArrayList<>();
+
+		for (Map<String, String> evaluatedNotificationRecipientSetting :
+				(List<Map<String, String>>)
+					evaluatedNotificationRecipientSettings) {
+
+			notificationRecipientSettings.addAll(
+				createNotificationRecipientSettings(
+					user, notificationRecipientId,
+					evaluatedNotificationRecipientSetting));
+		}
+
+		return notificationRecipientSettings;
+	}
+
 	protected String formatContent(
 			String settingName, NotificationContext notificationContext,
 			long notificationTemplateRecipientId)
@@ -319,53 +365,6 @@ public abstract class BaseNotificationType implements NotificationType {
 		}
 
 		return content;
-	}
-
-	protected void prepareNotificationContext(
-		User user, String body, NotificationContext notificationContext,
-		Object evaluatedNotificationRecipientSettings, String subject) {
-
-		NotificationQueueEntry notificationQueueEntry =
-			createNotificationQueueEntry(
-				user, body, notificationContext, subject);
-
-		notificationContext.setNotificationQueueEntry(notificationQueueEntry);
-
-		NotificationRecipient notificationQueueEntryRecipient =
-			createNotificationRecipient(
-				user, notificationQueueEntry.getNotificationQueueEntryId());
-
-		notificationContext.setNotificationRecipient(
-			notificationQueueEntryRecipient);
-
-		if (evaluatedNotificationRecipientSettings instanceof Map) {
-			notificationContext.setNotificationRecipientSettings(
-				createNotificationRecipientSettings(
-					user,
-					notificationQueueEntryRecipient.
-						getNotificationRecipientId(),
-					(Map<String, String>)
-						evaluatedNotificationRecipientSettings));
-		}
-		else {
-			List<NotificationRecipientSetting> notificationRecipientSettings =
-				new ArrayList<>();
-
-			for (Map<String, String> evaluatedNotificationRecipientSetting :
-					(List<Map<String, String>>)
-						evaluatedNotificationRecipientSettings) {
-
-				notificationRecipientSettings.addAll(
-					createNotificationRecipientSettings(
-						user,
-						notificationQueueEntryRecipient.
-							getNotificationRecipientId(),
-						evaluatedNotificationRecipientSetting));
-			}
-
-			notificationContext.setNotificationRecipientSettings(
-				notificationRecipientSettings);
-		}
 	}
 
 	@Reference

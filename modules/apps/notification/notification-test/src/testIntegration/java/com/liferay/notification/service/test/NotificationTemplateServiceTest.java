@@ -18,7 +18,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
@@ -41,6 +40,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -156,10 +156,8 @@ public class NotificationTemplateServiceTest {
 		_testUpdateNotificationTemplate(_user, _user);
 	}
 
-	private NotificationContext _createNotificationContext(User user)
+	private NotificationTemplate _addNotificationTemplate(User user)
 		throws PortalException {
-
-		NotificationContext notificationContext = new NotificationContext();
 
 		NotificationTemplate notificationTemplate =
 			_notificationTemplateLocalService.createNotificationTemplate(
@@ -171,8 +169,6 @@ public class NotificationTemplateServiceTest {
 		notificationTemplate.setName(RandomTestUtil.randomString());
 		notificationTemplate.setType(NotificationConstants.TYPE_EMAIL);
 
-		notificationContext.setNotificationTemplate(notificationTemplate);
-
 		NotificationRecipient notificationRecipient =
 			_notificationRecipientLocalService.createNotificationRecipient(
 				_counterLocalService.increment());
@@ -182,8 +178,6 @@ public class NotificationTemplateServiceTest {
 		notificationRecipient.setClassPK(
 			notificationTemplate.getNotificationTemplateId());
 
-		notificationContext.setNotificationRecipient(notificationRecipient);
-
 		NotificationRecipientSetting notificationRecipientSetting =
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSetting(
@@ -192,13 +186,9 @@ public class NotificationTemplateServiceTest {
 		notificationRecipientSetting.setNotificationRecipientId(
 			notificationRecipient.getNotificationRecipientId());
 
-		notificationContext.setNotificationRecipientSettings(
-			Arrays.asList(notificationRecipientSetting));
-
-		notificationContext.setType(
-			NotificationConstants.TYPE_USER_NOTIFICATION);
-
-		return notificationContext;
+		return _notificationTemplateService.addNotificationTemplate(
+			Collections.emptyList(), notificationRecipient,
+			Arrays.asList(notificationRecipientSetting), notificationTemplate);
 	}
 
 	private void _setUser(User user) {
@@ -214,9 +204,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate =
-				_notificationTemplateService.addNotificationTemplate(
-					_createNotificationContext(user));
+			notificationTemplate = _addNotificationTemplate(user);
 		}
 		finally {
 			if ((notificationTemplate != null) &&
@@ -237,9 +225,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate =
-				_notificationTemplateLocalService.addNotificationTemplate(
-					_createNotificationContext(ownerUser));
+			notificationTemplate = _addNotificationTemplate(ownerUser);
 
 			deleteNotificationTemplate =
 				_notificationTemplateService.deleteNotificationTemplate(
@@ -261,9 +247,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate =
-				_notificationTemplateLocalService.addNotificationTemplate(
-					_createNotificationContext(ownerUser));
+			notificationTemplate = _addNotificationTemplate(ownerUser);
 
 			_notificationTemplateService.getNotificationTemplate(
 				notificationTemplate.getNotificationTemplateId());
@@ -284,18 +268,16 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			NotificationContext notificationContext =
-				_createNotificationContext(ownerUser);
+			notificationTemplate = _addNotificationTemplate(ownerUser);
 
-			notificationTemplate =
-				_notificationTemplateLocalService.addNotificationTemplate(
-					notificationContext);
-
-			notificationContext.setNotificationTemplate(notificationTemplate);
+			NotificationRecipient notificationRecipient =
+				notificationTemplate.getNotificationRecipient();
 
 			notificationTemplate =
 				_notificationTemplateService.updateNotificationTemplate(
-					notificationContext);
+					Collections.emptyList(), notificationRecipient,
+					notificationRecipient.getNotificationRecipientSettings(),
+					notificationTemplate);
 		}
 		finally {
 			if (notificationTemplate != null) {

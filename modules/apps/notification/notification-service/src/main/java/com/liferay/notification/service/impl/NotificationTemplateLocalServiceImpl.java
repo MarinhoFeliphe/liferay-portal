@@ -15,7 +15,6 @@
 package com.liferay.notification.service.impl;
 
 import com.liferay.notification.constants.NotificationTemplateConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
@@ -65,13 +64,15 @@ public class NotificationTemplateLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public NotificationTemplate addNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		_validate(notificationContext);
-
-		NotificationTemplate notificationTemplate =
-			notificationContext.getNotificationTemplate();
+		_validate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 
 		notificationTemplate.setNotificationTemplateId(
 			counterLocalService.increment());
@@ -86,9 +87,6 @@ public class NotificationTemplateLocalServiceImpl
 			notificationTemplate.getNotificationTemplateId(), false, true,
 			true);
 
-		NotificationRecipient notificationRecipient =
-			notificationContext.getNotificationRecipient();
-
 		notificationRecipient.setNotificationRecipientId(
 			counterLocalService.increment());
 		notificationRecipient.setClassNameId(
@@ -100,7 +98,7 @@ public class NotificationTemplateLocalServiceImpl
 			notificationRecipient);
 
 		for (NotificationRecipientSetting notificationRecipientSetting :
-				notificationContext.getNotificationRecipientSettings()) {
+				notificationRecipientSettings) {
 
 			notificationRecipientSetting.setNotificationRecipientSettingId(
 				counterLocalService.increment());
@@ -112,9 +110,7 @@ public class NotificationTemplateLocalServiceImpl
 					notificationRecipientSetting);
 		}
 
-		for (long attachmentObjectFieldId :
-				notificationContext.getAttachmentObjectFieldIds()) {
-
+		for (long attachmentObjectFieldId : attachmentObjectFieldIds) {
 			_notificationTemplateAttachmentLocalService.
 				addNotificationTemplateAttachment(
 					notificationTemplate.getCompanyId(),
@@ -255,14 +251,19 @@ public class NotificationTemplateLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public NotificationTemplate updateNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		_validate(notificationContext);
+		_validate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 
-		NotificationRecipient notificationRecipient =
+		notificationRecipient =
 			_notificationRecipientLocalService.updateNotificationRecipient(
-				notificationContext.getNotificationRecipient());
+				notificationRecipient);
 
 		for (NotificationRecipientSetting notificationRecipientSetting :
 				notificationRecipient.getNotificationRecipientSettings()) {
@@ -274,7 +275,7 @@ public class NotificationTemplateLocalServiceImpl
 		}
 
 		for (NotificationRecipientSetting notificationRecipientSetting :
-				notificationContext.getNotificationRecipientSettings()) {
+				notificationRecipientSettings) {
 
 			notificationRecipientSetting.setNotificationRecipientSettingId(
 				counterLocalService.increment());
@@ -284,9 +285,8 @@ public class NotificationTemplateLocalServiceImpl
 					notificationRecipientSetting);
 		}
 
-		NotificationTemplate notificationTemplate =
-			notificationTemplatePersistence.update(
-				notificationContext.getNotificationTemplate());
+		notificationTemplate = notificationTemplatePersistence.update(
+			notificationTemplate);
 
 		List<Long> oldAttachmentObjectFieldIds = new ArrayList<>();
 
@@ -296,7 +296,7 @@ public class NotificationTemplateLocalServiceImpl
 						notificationTemplate.getNotificationTemplateId())) {
 
 			if (ListUtil.exists(
-					notificationContext.getAttachmentObjectFieldIds(),
+					attachmentObjectFieldIds,
 					attachmentObjectFieldId -> Objects.equals(
 						attachmentObjectFieldId,
 						notificationTemplateAttachment.getObjectFieldId()))) {
@@ -313,8 +313,7 @@ public class NotificationTemplateLocalServiceImpl
 
 		for (long attachmentObjectFieldId :
 				ListUtil.remove(
-					notificationContext.getAttachmentObjectFieldIds(),
-					oldAttachmentObjectFieldIds)) {
+					attachmentObjectFieldIds, oldAttachmentObjectFieldIds)) {
 
 			_notificationTemplateAttachmentLocalService.
 				addNotificationTemplateAttachment(
@@ -353,14 +352,20 @@ public class NotificationTemplateLocalServiceImpl
 			updateNotificationRecipientSetting(notificationRecipientSetting);
 	}
 
-	private void _validate(NotificationContext notificationContext)
+	private void _validate(
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
 		NotificationType notificationType =
 			_notificationTypeServiceTracker.getNotificationType(
-				notificationContext.getType());
+				notificationTemplate.getType());
 
-		notificationType.validateNotificationTemplate(notificationContext);
+		notificationType.validateNotificationTemplate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	@Reference

@@ -59,18 +59,20 @@ public class FunctionNotificationType extends BaseNotificationType {
 		NotificationRecipient notificationRecipient =
 			notificationTemplate.getNotificationRecipient();
 
-		notificationContext.setNotificationRecipient(notificationRecipient);
-		notificationContext.setNotificationRecipientSettings(
-			notificationRecipient.getNotificationRecipientSettings());
-
 		_portalCatapult.launch(
 			_companyId,
 			_functionNotificationTypeConfiguration.
 				oAuth2ApplicationExternalReferenceCode(),
 			_jsonFactory.createJSONObject(
+				_jsonFactory.looseSerialize(notificationContext, "termValues")
+			).put(
+				"notificationRecipient",
+				() -> _jsonFactory.looseSerialize(notificationRecipient)
+			).put(
+				"notificationRecipientSettings",
 				_jsonFactory.looseSerialize(
-					notificationContext, "notificationRecipientSettings",
-					"termValues")),
+					notificationRecipient.getNotificationRecipientSettings())
+			),
 			_functionNotificationTypeConfiguration.resourcePath(),
 			notificationContext.getUserId());
 	}
