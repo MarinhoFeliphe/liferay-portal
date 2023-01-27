@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -41,6 +42,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -156,7 +158,24 @@ public class NotificationTemplateServiceTest {
 		_testUpdateNotificationTemplate(_user, _user);
 	}
 
-	private NotificationTemplate _addNotificationTemplate(User user)
+	private NotificationRecipientSetting _addNotificationRecipientSetting(
+		String name, long notificationRecipientId, String value) {
+
+		NotificationRecipientSetting notificationRecipientSetting =
+			_notificationRecipientSettingLocalService.
+				createNotificationRecipientSetting(
+					_counterLocalService.increment());
+
+		notificationRecipientSetting.setNotificationRecipientId(
+			notificationRecipientId);
+		notificationRecipientSetting.setName(name);
+		notificationRecipientSetting.setValue(value);
+
+		return notificationRecipientSetting;
+	}
+
+	private NotificationTemplate _addNotificationTemplate(
+			User user, boolean skipPermissionChecker)
 		throws PortalException {
 
 		NotificationTemplate notificationTemplate =
@@ -178,17 +197,28 @@ public class NotificationTemplateServiceTest {
 		notificationRecipient.setClassPK(
 			notificationTemplate.getNotificationTemplateId());
 
-		NotificationRecipientSetting notificationRecipientSetting =
-			_notificationRecipientSettingLocalService.
-				createNotificationRecipientSetting(
-					_counterLocalService.increment());
+		List<NotificationRecipientSetting> notificationRecipientSettings =
+			Arrays.asList(
+				_addNotificationRecipientSetting(
+					"from", notificationRecipient.getNotificationRecipientId(),
+					"from@liferay.com"),
+				_addNotificationRecipientSetting(
+					"fromName",
+					notificationRecipient.getNotificationRecipientId(),
+					RandomTestUtil.randomString()),
+				_addNotificationRecipientSetting(
+					"to", notificationRecipient.getNotificationRecipientId(),
+					"to@liferay.com"));
 
-		notificationRecipientSetting.setNotificationRecipientId(
-			notificationRecipient.getNotificationRecipientId());
+		if (skipPermissionChecker) {
+			return _notificationTemplateLocalService.addNotificationTemplate(
+				Collections.emptyList(), notificationRecipient,
+				notificationRecipientSettings, notificationTemplate);
+		}
 
 		return _notificationTemplateService.addNotificationTemplate(
 			Collections.emptyList(), notificationRecipient,
-			Arrays.asList(notificationRecipientSetting), notificationTemplate);
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	private void _setUser(User user) {
@@ -204,7 +234,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate = _addNotificationTemplate(user);
+			notificationTemplate = _addNotificationTemplate(user, false);
 		}
 		finally {
 			if ((notificationTemplate != null) &&
@@ -225,7 +255,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate = _addNotificationTemplate(ownerUser);
+			notificationTemplate = _addNotificationTemplate(ownerUser, true);
 
 			deleteNotificationTemplate =
 				_notificationTemplateService.deleteNotificationTemplate(
@@ -247,7 +277,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate = _addNotificationTemplate(ownerUser);
+			notificationTemplate = _addNotificationTemplate(ownerUser, true);
 
 			_notificationTemplateService.getNotificationTemplate(
 				notificationTemplate.getNotificationTemplateId());
@@ -268,7 +298,7 @@ public class NotificationTemplateServiceTest {
 		try {
 			_setUser(user);
 
-			notificationTemplate = _addNotificationTemplate(ownerUser);
+			notificationTemplate = _addNotificationTemplate(ownerUser, true);
 
 			NotificationRecipient notificationRecipient =
 				notificationTemplate.getNotificationRecipient();
@@ -308,6 +338,10 @@ public class NotificationTemplateServiceTest {
 
 	private String _originalName;
 	private PermissionChecker _originalPermissionChecker;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
 	private User _user;
 
 }
