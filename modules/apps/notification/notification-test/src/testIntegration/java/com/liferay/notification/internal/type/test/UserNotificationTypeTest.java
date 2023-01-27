@@ -149,9 +149,10 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 	}
 
 	private String _getTerm(String objectFieldName) {
-		return StringBundler.concat(
-			"[%", StringUtil.upperCase(_objectDefinition.getShortName()), "_",
-			StringUtil.upperCase(objectFieldName), "%]");
+		return StringUtil.upperCase(
+			StringBundler.concat(
+				"[%", _objectDefinition.getShortName(), "_", objectFieldName,
+				"%]"));
 	}
 
 	private void _testSendNotification(
