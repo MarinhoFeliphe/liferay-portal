@@ -41,12 +41,20 @@ public class NotificationQueueEntryLocalServiceWrapper
 	@Override
 	public com.liferay.notification.model.NotificationQueueEntry
 			addNotificationQueueEntry(
-				com.liferay.notification.context.NotificationContext
-					notificationContext)
+				java.util.List<Long> fileEntryIds,
+				com.liferay.notification.model.NotificationQueueEntry
+					notificationQueueEntry,
+				com.liferay.notification.model.NotificationRecipient
+					notificationRecipient,
+				java.util.List
+					<com.liferay.notification.model.
+						NotificationRecipientSetting>
+							notificationRecipientSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _notificationQueueEntryLocalService.addNotificationQueueEntry(
-			notificationContext);
+			fileEntryIds, notificationQueueEntry, notificationRecipient,
+			notificationRecipientSettings);
 	}
 
 	/**

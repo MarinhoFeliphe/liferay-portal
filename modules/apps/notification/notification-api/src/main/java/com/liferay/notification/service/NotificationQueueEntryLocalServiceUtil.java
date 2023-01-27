@@ -45,11 +45,17 @@ public class NotificationQueueEntryLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.notification.service.impl.NotificationQueueEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static NotificationQueueEntry addNotificationQueueEntry(
-			com.liferay.notification.context.NotificationContext
-				notificationContext)
+			List<Long> fileEntryIds,
+			NotificationQueueEntry notificationQueueEntry,
+			com.liferay.notification.model.NotificationRecipient
+				notificationRecipient,
+			List<com.liferay.notification.model.NotificationRecipientSetting>
+				notificationRecipientSettings)
 		throws PortalException {
 
-		return getService().addNotificationQueueEntry(notificationContext);
+		return getService().addNotificationQueueEntry(
+			fileEntryIds, notificationQueueEntry, notificationRecipient,
+			notificationRecipientSettings);
 	}
 
 	/**
