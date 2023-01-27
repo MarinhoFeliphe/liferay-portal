@@ -415,6 +415,13 @@ public class NotificationTemplateWrapper
 		return model.getNotificationRecipient();
 	}
 
+	@Override
+	public java.util.List<NotificationTemplateAttachment>
+		getNotificationTemplateAttachments() {
+
+		return model.getNotificationTemplateAttachments();
+	}
+
 	/**
 	 * Returns the notification template ID of this notification template.
 	 *

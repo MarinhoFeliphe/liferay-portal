@@ -17,6 +17,8 @@ package com.liferay.notification.service;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.portal.kernel.exception.PortalException;
 
+import java.util.List;
+
 /**
  * Provides the remote service utility for NotificationTemplate. This utility wraps
  * <code>com.liferay.notification.service.impl.NotificationTemplateServiceImpl</code> and is an
@@ -37,11 +39,17 @@ public class NotificationTemplateServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.notification.service.impl.NotificationTemplateServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static NotificationTemplate addNotificationTemplate(
-			com.liferay.notification.context.NotificationContext
-				notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			com.liferay.notification.model.NotificationRecipient
+				notificationRecipient,
+			List<com.liferay.notification.model.NotificationRecipientSetting>
+				notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		return getService().addNotificationTemplate(notificationContext);
+		return getService().addNotificationTemplate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	public static NotificationTemplate deleteNotificationTemplate(
@@ -84,11 +92,17 @@ public class NotificationTemplateServiceUtil {
 	}
 
 	public static NotificationTemplate updateNotificationTemplate(
-			com.liferay.notification.context.NotificationContext
-				notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			com.liferay.notification.model.NotificationRecipient
+				notificationRecipient,
+			List<com.liferay.notification.model.NotificationRecipientSetting>
+				notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		return getService().updateNotificationTemplate(notificationContext);
+		return getService().updateNotificationTemplate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	public static NotificationTemplateService getService() {

@@ -15,7 +15,8 @@
 package com.liferay.notification.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.model.NotificationRecipient;
+import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -68,7 +69,10 @@ public interface NotificationTemplateLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public NotificationTemplate addNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException;
 
 	/**
@@ -318,7 +322,10 @@ public interface NotificationTemplateLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public NotificationTemplate updateNotificationTemplate(
-			NotificationContext notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			NotificationRecipient notificationRecipient,
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException;
 
 	/**

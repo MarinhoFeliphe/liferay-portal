@@ -62,4 +62,7 @@ public interface NotificationTemplate
 
 	public NotificationRecipient getNotificationRecipient();
 
+	public java.util.List<NotificationTemplateAttachment>
+		getNotificationTemplateAttachments();
+
 }

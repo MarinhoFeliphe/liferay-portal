@@ -53,8 +53,15 @@ public class NotificationTemplateServiceHttp {
 	public static com.liferay.notification.model.NotificationTemplate
 			addNotificationTemplate(
 				HttpPrincipal httpPrincipal,
-				com.liferay.notification.context.NotificationContext
-					notificationContext)
+				java.util.List<Long> attachmentObjectFieldIds,
+				com.liferay.notification.model.NotificationRecipient
+					notificationRecipient,
+				java.util.List
+					<com.liferay.notification.model.
+						NotificationRecipientSetting>
+							notificationRecipientSettings,
+				com.liferay.notification.model.NotificationTemplate
+					notificationTemplate)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -64,7 +71,8 @@ public class NotificationTemplateServiceHttp {
 				_addNotificationTemplateParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, notificationContext);
+				methodKey, attachmentObjectFieldIds, notificationRecipient,
+				notificationRecipientSettings, notificationTemplate);
 
 			Object returnObj = null;
 
@@ -273,8 +281,15 @@ public class NotificationTemplateServiceHttp {
 	public static com.liferay.notification.model.NotificationTemplate
 			updateNotificationTemplate(
 				HttpPrincipal httpPrincipal,
-				com.liferay.notification.context.NotificationContext
-					notificationContext)
+				java.util.List<Long> attachmentObjectFieldIds,
+				com.liferay.notification.model.NotificationRecipient
+					notificationRecipient,
+				java.util.List
+					<com.liferay.notification.model.
+						NotificationRecipientSetting>
+							notificationRecipientSettings,
+				com.liferay.notification.model.NotificationTemplate
+					notificationTemplate)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -284,7 +299,8 @@ public class NotificationTemplateServiceHttp {
 				_updateNotificationTemplateParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, notificationContext);
+				methodKey, attachmentObjectFieldIds, notificationRecipient,
+				notificationRecipientSettings, notificationTemplate);
 
 			Object returnObj = null;
 
@@ -320,7 +336,10 @@ public class NotificationTemplateServiceHttp {
 
 	private static final Class<?>[] _addNotificationTemplateParameterTypes0 =
 		new Class[] {
-			com.liferay.notification.context.NotificationContext.class
+			java.util.List.class,
+			com.liferay.notification.model.NotificationRecipient.class,
+			java.util.List.class,
+			com.liferay.notification.model.NotificationTemplate.class
 		};
 	private static final Class<?>[] _deleteNotificationTemplateParameterTypes1 =
 		new Class[] {long.class};
@@ -333,7 +352,10 @@ public class NotificationTemplateServiceHttp {
 		new Class[] {long.class};
 	private static final Class<?>[] _updateNotificationTemplateParameterTypes5 =
 		new Class[] {
-			com.liferay.notification.context.NotificationContext.class
+			java.util.List.class,
+			com.liferay.notification.model.NotificationRecipient.class,
+			java.util.List.class,
+			com.liferay.notification.model.NotificationTemplate.class
 		};
 
 }

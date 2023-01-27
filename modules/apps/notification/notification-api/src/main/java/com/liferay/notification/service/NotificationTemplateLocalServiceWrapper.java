@@ -40,12 +40,20 @@ public class NotificationTemplateLocalServiceWrapper
 	@Override
 	public com.liferay.notification.model.NotificationTemplate
 			addNotificationTemplate(
-				com.liferay.notification.context.NotificationContext
-					notificationContext)
+				java.util.List<Long> attachmentObjectFieldIds,
+				com.liferay.notification.model.NotificationRecipient
+					notificationRecipient,
+				java.util.List
+					<com.liferay.notification.model.
+						NotificationRecipientSetting>
+							notificationRecipientSettings,
+				com.liferay.notification.model.NotificationTemplate
+					notificationTemplate)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _notificationTemplateLocalService.addNotificationTemplate(
-			notificationContext);
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	/**
@@ -421,12 +429,20 @@ public class NotificationTemplateLocalServiceWrapper
 	@Override
 	public com.liferay.notification.model.NotificationTemplate
 			updateNotificationTemplate(
-				com.liferay.notification.context.NotificationContext
-					notificationContext)
+				java.util.List<Long> attachmentObjectFieldIds,
+				com.liferay.notification.model.NotificationRecipient
+					notificationRecipient,
+				java.util.List
+					<com.liferay.notification.model.
+						NotificationRecipientSetting>
+							notificationRecipientSettings,
+				com.liferay.notification.model.NotificationTemplate
+					notificationTemplate)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _notificationTemplateLocalService.updateNotificationTemplate(
-			notificationContext);
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	/**

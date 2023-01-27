@@ -45,11 +45,17 @@ public class NotificationTemplateLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.notification.service.impl.NotificationTemplateLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static NotificationTemplate addNotificationTemplate(
-			com.liferay.notification.context.NotificationContext
-				notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			com.liferay.notification.model.NotificationRecipient
+				notificationRecipient,
+			List<com.liferay.notification.model.NotificationRecipientSetting>
+				notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		return getService().addNotificationTemplate(notificationContext);
+		return getService().addNotificationTemplate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	/**
@@ -364,11 +370,17 @@ public class NotificationTemplateLocalServiceUtil {
 	}
 
 	public static NotificationTemplate updateNotificationTemplate(
-			com.liferay.notification.context.NotificationContext
-				notificationContext)
+			List<Long> attachmentObjectFieldIds,
+			com.liferay.notification.model.NotificationRecipient
+				notificationRecipient,
+			List<com.liferay.notification.model.NotificationRecipientSetting>
+				notificationRecipientSettings,
+			NotificationTemplate notificationTemplate)
 		throws PortalException {
 
-		return getService().updateNotificationTemplate(notificationContext);
+		return getService().updateNotificationTemplate(
+			attachmentObjectFieldIds, notificationRecipient,
+			notificationRecipientSettings, notificationTemplate);
 	}
 
 	/**
