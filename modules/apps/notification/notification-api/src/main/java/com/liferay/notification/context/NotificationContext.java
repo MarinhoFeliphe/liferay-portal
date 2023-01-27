@@ -23,14 +23,6 @@ import java.util.Map;
  */
 public class NotificationContext {
 
-	public List<Long> getAttachmentObjectFieldIds() {
-		if (_attachmentObjectFieldIds == null) {
-			return Collections.emptyList();
-		}
-
-		return _attachmentObjectFieldIds;
-	}
-
 	public String getClassName() {
 		return _className;
 	}
