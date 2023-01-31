@@ -24,9 +24,9 @@ ObjectEntryDisplayContext objectEntryDisplayContext = (ObjectEntryDisplayContext
 ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab();
 %>
 
-<clay:navigation-bar
-	inverted="<%= false %>"
-	navigationItems="<%= objectEntryDisplayContext.getNavigationItems() %>"
+<liferay-frontend:screen-navigation
+	key="<%= String.valueOf(objectLayoutTab.getObjectLayoutId()) %>"
+	portletURL="<%= currentURLObj %>"
 />
 
 <c:choose>
