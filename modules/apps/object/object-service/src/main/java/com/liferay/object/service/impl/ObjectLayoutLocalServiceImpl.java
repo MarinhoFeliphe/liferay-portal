@@ -14,11 +14,15 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.constants.ObjectLayoutBoxConstants;
 import com.liferay.object.exception.DefaultObjectLayoutException;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectLayoutBoxCategorizationTypeException;
 import com.liferay.object.exception.ObjectLayoutColumnSizeException;
+import com.liferay.object.internal.layout.tab.screen.navigation.ObjectLayoutTabScreenNavigationCategory;
+import com.liferay.object.internal.layout.tab.screen.navigation.ObjectLayoutTabScreenNavigationEntry;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectLayout;
@@ -43,6 +47,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -54,6 +59,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -231,6 +238,11 @@ public class ObjectLayoutLocalServiceImpl
 		return objectLayout;
 	}
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
+	}
+
 	private ObjectLayoutBox _addObjectLayoutBox(
 			User user, long objectDefinitionId, long objectLayoutTabId,
 			ObjectLayoutBox objectLayoutBox)
@@ -388,6 +400,25 @@ public class ObjectLayoutLocalServiceImpl
 			_addObjectLayoutBoxes(
 				user, objectDefinitionId,
 				objectLayoutTab.getObjectLayoutTabId(), objectLayoutBoxes));
+
+		ScreenNavigationCategory screenNavigationCategory =
+			new ObjectLayoutTabScreenNavigationCategory(objectLayoutTab);
+
+		_bundleContext.registerService(
+			ScreenNavigationCategory.class, screenNavigationCategory,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"screen.navigation.category.order:Integer",
+				objectLayoutTab.getObjectLayoutTabId()
+			).build());
+		_bundleContext.registerService(
+			ScreenNavigationEntry.class,
+			new ObjectLayoutTabScreenNavigationEntry(
+				screenNavigationCategory.getCategoryKey(), objectLayoutTab,
+				screenNavigationCategory.getScreenNavigationKey()),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"screen.navigation.entry.order:Integer",
+				objectLayoutTab.getObjectLayoutTabId()
+			).build());
 
 		return objectLayoutTab;
 	}
@@ -606,6 +637,8 @@ public class ObjectLayoutLocalServiceImpl
 			}
 		}
 	}
+
+	private BundleContext _bundleContext;
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
