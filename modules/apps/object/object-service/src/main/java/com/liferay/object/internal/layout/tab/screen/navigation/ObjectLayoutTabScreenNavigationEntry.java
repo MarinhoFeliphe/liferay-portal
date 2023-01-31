@@ -31,17 +31,14 @@ public class ObjectLayoutTabScreenNavigationEntry
 	implements ScreenNavigationEntry<ObjectLayoutTab> {
 
 	public ObjectLayoutTabScreenNavigationEntry(
-		String categoryKey, ObjectLayoutTab objectLayoutTab,
-		String screenNavigationKey) {
+		ObjectLayoutTab objectLayoutTab) {
 
-		_categoryKey = categoryKey;
 		_objectLayoutTab = objectLayoutTab;
-		_screenNavigationKey = screenNavigationKey;
 	}
 
 	@Override
 	public String getCategoryKey() {
-		return _categoryKey;
+		return String.valueOf(_objectLayoutTab.getObjectLayoutTabId());
 	}
 
 	@Override
@@ -56,7 +53,7 @@ public class ObjectLayoutTabScreenNavigationEntry
 
 	@Override
 	public String getScreenNavigationKey() {
-		return _screenNavigationKey;
+		return String.valueOf(_objectLayoutTab.getObjectLayoutId());
 	}
 
 	@Override
@@ -66,8 +63,6 @@ public class ObjectLayoutTabScreenNavigationEntry
 		throws IOException {
 	}
 
-	private final String _categoryKey;
 	private final ObjectLayoutTab _objectLayoutTab;
-	private final String _screenNavigationKey;
 
 }

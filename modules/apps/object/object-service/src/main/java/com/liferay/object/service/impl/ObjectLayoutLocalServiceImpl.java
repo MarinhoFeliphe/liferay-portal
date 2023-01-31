@@ -39,6 +39,7 @@ import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -53,13 +54,16 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -401,24 +405,24 @@ public class ObjectLayoutLocalServiceImpl
 				user, objectDefinitionId,
 				objectLayoutTab.getObjectLayoutTabId(), objectLayoutBoxes));
 
-		ScreenNavigationCategory screenNavigationCategory =
-			new ObjectLayoutTabScreenNavigationCategory(objectLayoutTab);
-
-		_bundleContext.registerService(
-			ScreenNavigationCategory.class, screenNavigationCategory,
-			HashMapDictionaryBuilder.<String, Object>put(
-				"screen.navigation.category.order:Integer",
-				objectLayoutTab.getObjectLayoutTabId()
-			).build());
-		_bundleContext.registerService(
-			ScreenNavigationEntry.class,
-			new ObjectLayoutTabScreenNavigationEntry(
-				screenNavigationCategory.getCategoryKey(), objectLayoutTab,
-				screenNavigationCategory.getScreenNavigationKey()),
-			HashMapDictionaryBuilder.<String, Object>put(
-				"screen.navigation.entry.order:Integer",
-				objectLayoutTab.getObjectLayoutTabId()
-			).build());
+		_serviceRegistrationsMap.put(
+			_getServiceRegistrationMapKey(objectLayoutTab),
+			Arrays.asList(
+				_bundleContext.registerService(
+					ScreenNavigationCategory.class,
+					new ObjectLayoutTabScreenNavigationCategory(
+						objectLayoutTab),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"screen.navigation.category.order:Integer",
+						objectLayoutTab.getObjectLayoutTabId()
+					).build()),
+				_bundleContext.registerService(
+					ScreenNavigationEntry.class,
+					new ObjectLayoutTabScreenNavigationEntry(objectLayoutTab),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"screen.navigation.entry.order:Integer",
+						objectLayoutTab.getObjectLayoutTabId()
+					).build())));
 
 		return objectLayoutTab;
 	}
@@ -441,14 +445,22 @@ public class ObjectLayoutLocalServiceImpl
 		List<ObjectLayoutTab> objectLayoutTabs) {
 
 		for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
-			List<ObjectLayoutBox> objectLayoutBoxes =
+			_deleteObjectLayoutRows(
 				_objectLayoutBoxPersistence.findByObjectLayoutTabId(
-					objectLayoutTab.getObjectLayoutTabId());
+					objectLayoutTab.getObjectLayoutTabId()));
 
 			_objectLayoutBoxPersistence.removeByObjectLayoutTabId(
 				objectLayoutTab.getObjectLayoutTabId());
 
-			_deleteObjectLayoutRows(objectLayoutBoxes);
+			for (ServiceRegistration<?> serviceRegistration :
+					_serviceRegistrationsMap.get(
+						_getServiceRegistrationMapKey(objectLayoutTab))) {
+
+				serviceRegistration.unregister();
+			}
+
+			_serviceRegistrationsMap.remove(
+				String.valueOf(objectLayoutTab.getObjectLayoutTabId()));
 		}
 	}
 
@@ -529,6 +541,14 @@ public class ObjectLayoutLocalServiceImpl
 		}
 
 		return objectLayoutTabs;
+	}
+
+	private String _getServiceRegistrationMapKey(
+		ObjectLayoutTab objectLayoutTab) {
+
+		return StringBundler.concat(
+			objectLayoutTab.getCompanyId(), "#",
+			objectLayoutTab.getObjectLayoutTabId());
 	}
 
 	private void _validate(
@@ -660,6 +680,9 @@ public class ObjectLayoutLocalServiceImpl
 
 	@Reference
 	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
+
+	private final Map<String, List<ServiceRegistration<?>>>
+		_serviceRegistrationsMap = new ConcurrentHashMap<>();
 
 	@Reference
 	private UserLocalService _userLocalService;
