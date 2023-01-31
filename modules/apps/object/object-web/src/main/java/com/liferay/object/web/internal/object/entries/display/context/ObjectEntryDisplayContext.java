@@ -323,7 +323,7 @@ public class ObjectEntryDisplayContext {
 			objectLayout.getObjectLayoutTabs();
 
 		long objectLayoutTabId = ParamUtil.getLong(
-			_objectRequestHelper.getRequest(), "objectLayoutTabId");
+			_objectRequestHelper.getRequest(), "screenNavigationCategoryKey");
 
 		if (objectLayoutTabId == 0) {
 			return objectLayoutTabs.get(0);
