@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -403,22 +404,6 @@ public class ObjectLayoutLocalServiceImpl
 				user, objectDefinitionId,
 				objectLayoutTab.getObjectLayoutTabId(), objectLayoutBoxes));
 
-		_serviceRegistrationMap.put(
-			_getServiceRegistrationMapKey(objectLayoutTab),
-			_bundleContext.registerService(
-				new String[] {
-					ScreenNavigationCategory.class.getName(),
-					ScreenNavigationEntry.class.getName()
-				},
-				new ObjectLayoutTabScreenNavigationCategory(objectLayoutTab),
-				HashMapDictionaryBuilder.<String, Object>put(
-					"screen.navigation.category.order:Integer",
-					objectLayoutTab.getObjectLayoutTabId()
-				).put(
-					"screen.navigation.entry.order:Integer",
-					objectLayoutTab.getObjectLayoutTabId()
-				).build()));
-
 		return objectLayoutTab;
 	}
 
@@ -427,13 +412,41 @@ public class ObjectLayoutLocalServiceImpl
 			List<ObjectLayoutTab> objectLayoutTabs)
 		throws PortalException {
 
-		return TransformUtil.unsafeTransform(
+		objectLayoutTabs = TransformUtil.unsafeTransform(
 			objectLayoutTabs,
 			objectLayoutTab -> _addObjectLayoutTab(
 				user, objectDefinitionId, objectLayoutId,
 				objectLayoutTab.getObjectRelationshipId(),
 				objectLayoutTab.getNameMap(), objectLayoutTab.getPriority(),
 				objectLayoutTab.getObjectLayoutBoxes()));
+
+		Iterator<ObjectLayoutTab> objectLayoutTabIterator =
+			ListUtil.reverseIterator(objectLayoutTabs);
+
+		while (objectLayoutTabIterator.hasNext()) {
+			ObjectLayoutTab objectLayoutTab = objectLayoutTabIterator.next();
+
+			ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
+
+			_serviceRegistrationMap.put(
+				_getServiceRegistrationMapKey(objectLayoutTab),
+				_bundleContext.registerService(
+					new String[] {
+						ScreenNavigationCategory.class.getName(),
+						ScreenNavigationEntry.class.getName()
+					},
+					new ObjectLayoutTabScreenNavigationCategory(
+						objectLayout.getObjectDefinition(), objectLayoutTab),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"screen.navigation.category.order:Integer",
+						objectLayoutTab.getObjectLayoutTabId()
+					).put(
+						"screen.navigation.entry.order:Integer",
+						objectLayout.getObjectLayoutId()
+					).build()));
+		}
+
+		return objectLayoutTabs;
 	}
 
 	private void _deleteObjectLayoutBoxes(
