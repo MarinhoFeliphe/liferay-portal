@@ -40,7 +40,10 @@ import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
@@ -208,6 +211,31 @@ public class ObjectLayoutLocalServiceImpl
 	public int getObjectLayoutsCount(long objectDefinitionId) {
 		return objectLayoutPersistence.countByObjectDefinitionId(
 			objectDefinitionId);
+	}
+
+	@Override
+	public void setAopProxy(Object aopProxy) {
+		super.setAopProxy(aopProxy);
+
+		List<ObjectLayout> objectLayouts =
+			objectLayoutLocalService.getObjectLayouts(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (ObjectLayout objectLayout : objectLayouts) {
+			List<ObjectLayoutTab> objectLayoutTabs =
+				_objectLayoutTabPersistence.findByObjectLayoutId(
+					objectLayout.getObjectLayoutId());
+
+			for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
+				try {
+					_registryObjectLayoutTabScreenNavigationCategory(
+						objectLayoutTab);
+				}
+				catch (PortalException portalException) {
+					_log.error(portalException);
+				}
+			}
+		}
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -424,26 +452,8 @@ public class ObjectLayoutLocalServiceImpl
 			ListUtil.reverseIterator(objectLayoutTabs);
 
 		while (objectLayoutTabIterator.hasNext()) {
-			ObjectLayoutTab objectLayoutTab = objectLayoutTabIterator.next();
-
-			ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
-
-			_serviceRegistrationMap.put(
-				_getServiceRegistrationMapKey(objectLayoutTab),
-				_bundleContext.registerService(
-					new String[] {
-						ScreenNavigationCategory.class.getName(),
-						ScreenNavigationEntry.class.getName()
-					},
-					new ObjectLayoutTabScreenNavigationCategory(
-						objectLayout.getObjectDefinition(), objectLayoutTab),
-					HashMapDictionaryBuilder.<String, Object>put(
-						"screen.navigation.category.order:Integer",
-						objectLayoutTab.getObjectLayoutTabId()
-					).put(
-						"screen.navigation.entry.order:Integer",
-						objectLayout.getObjectLayoutId()
-					).build()));
+			_registryObjectLayoutTabScreenNavigationCategory(
+				objectLayoutTabIterator.next());
 		}
 
 		return objectLayoutTabs;
@@ -562,6 +572,30 @@ public class ObjectLayoutLocalServiceImpl
 			objectLayoutTab.getObjectLayoutTabId());
 	}
 
+	private void _registryObjectLayoutTabScreenNavigationCategory(
+			ObjectLayoutTab objectLayoutTab)
+		throws PortalException {
+
+		ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
+
+		_serviceRegistrationMap.put(
+			_getServiceRegistrationMapKey(objectLayoutTab),
+			_bundleContext.registerService(
+				new String[] {
+					ScreenNavigationCategory.class.getName(),
+					ScreenNavigationEntry.class.getName()
+				},
+				new ObjectLayoutTabScreenNavigationCategory(
+					objectLayout.getObjectDefinition(), objectLayoutTab),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"screen.navigation.category.order:Integer",
+					objectLayoutTab.getObjectLayoutTabId()
+				).put(
+					"screen.navigation.entry.order:Integer",
+					objectLayout.getObjectLayoutId()
+				).build()));
+	}
+
 	private void _validate(
 			long objectLayoutId, long objectDefinitionId,
 			boolean defaultObjectLayout, List<ObjectLayoutTab> objectLayoutTabs)
@@ -668,6 +702,9 @@ public class ObjectLayoutLocalServiceImpl
 			}
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ObjectLayoutLocalServiceImpl.class);
 
 	private BundleContext _bundleContext;
 
