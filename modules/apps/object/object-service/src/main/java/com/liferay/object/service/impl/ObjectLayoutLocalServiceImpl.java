@@ -37,7 +37,6 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
-import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
@@ -224,7 +223,7 @@ public class ObjectLayoutLocalServiceImpl
 
 		for (ObjectLayout objectLayout : objectLayouts) {
 			List<ObjectLayoutTab> objectLayoutTabs =
-				_objectLayoutTabPersistence.findByObjectLayoutId(
+				_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
 					objectLayout.getObjectLayoutId());
 
 			for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
@@ -415,18 +414,9 @@ public class ObjectLayoutLocalServiceImpl
 			int priority, List<ObjectLayoutBox> objectLayoutBoxes)
 		throws PortalException {
 
-		ObjectLayoutTab objectLayoutTab = _objectLayoutTabPersistence.create(
-			counterLocalService.increment());
-
-		objectLayoutTab.setCompanyId(user.getCompanyId());
-		objectLayoutTab.setUserId(user.getUserId());
-		objectLayoutTab.setUserName(user.getFullName());
-		objectLayoutTab.setObjectLayoutId(objectLayoutId);
-		objectLayoutTab.setObjectRelationshipId(objectRelationshipId);
-		objectLayoutTab.setNameMap(nameMap);
-		objectLayoutTab.setPriority(priority);
-
-		objectLayoutTab = _objectLayoutTabPersistence.update(objectLayoutTab);
+		ObjectLayoutTab objectLayoutTab =
+			_objectLayoutTabLocalService.addObjectLayoutTab(
+				user, objectLayoutId, objectRelationshipId, nameMap, priority);
 
 		objectLayoutTab.setObjectLayoutBoxes(
 			_addObjectLayoutBoxes(
@@ -512,9 +502,11 @@ public class ObjectLayoutLocalServiceImpl
 
 	private void _deleteObjectLayoutTabs(long objectLayoutId) {
 		List<ObjectLayoutTab> objectLayoutTabs =
-			_objectLayoutTabPersistence.findByObjectLayoutId(objectLayoutId);
+			_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
+				objectLayoutId);
 
-		_objectLayoutTabPersistence.removeByObjectLayoutId(objectLayoutId);
+		_objectLayoutTabLocalService.deleteObjectLayoutObjectLayoutTabs(
+			objectLayoutId);
 
 		_deleteObjectLayoutBoxes(objectLayoutTabs);
 	}
@@ -554,7 +546,7 @@ public class ObjectLayoutLocalServiceImpl
 		ObjectLayout objectLayout) {
 
 		List<ObjectLayoutTab> objectLayoutTabs =
-			_objectLayoutTabPersistence.findByObjectLayoutId(
+			_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
 				objectLayout.getObjectLayoutId());
 
 		for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
@@ -729,9 +721,6 @@ public class ObjectLayoutLocalServiceImpl
 
 	@Reference
 	private ObjectLayoutTabLocalService _objectLayoutTabLocalService;
-
-	@Reference
-	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
 
 	private final Map<String, ServiceRegistration<?>> _serviceRegistrationMap =
 		new ConcurrentHashMap<>();
