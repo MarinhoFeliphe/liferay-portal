@@ -16,7 +16,10 @@ package com.liferay.object.internal.layout.tab.screen.navigation;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectLayoutTab;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 
 import java.io.IOException;
 
@@ -33,8 +36,9 @@ public class ObjectLayoutTabScreenNavigationCategory
 			   ScreenNavigationEntry<ObjectLayoutTab> {
 
 	public ObjectLayoutTabScreenNavigationCategory(
-		ObjectLayoutTab objectLayoutTab) {
+		ObjectDefinition objectDefinition, ObjectLayoutTab objectLayoutTab) {
 
+		_objectDefinition = objectDefinition;
 		_objectLayoutTab = objectLayoutTab;
 	}
 
@@ -45,7 +49,10 @@ public class ObjectLayoutTabScreenNavigationCategory
 
 	@Override
 	public String getEntryKey() {
-		return String.valueOf(_objectLayoutTab.getObjectLayoutTabId());
+		return StringBundler.concat(
+			_objectDefinition.getClassName(), StringPool.POUND,
+			_objectDefinition.getCompanyId(), StringPool.POUND,
+			_objectLayoutTab.getObjectLayoutTabId());
 	}
 
 	@Override
@@ -55,7 +62,10 @@ public class ObjectLayoutTabScreenNavigationCategory
 
 	@Override
 	public String getScreenNavigationKey() {
-		return String.valueOf(_objectLayoutTab.getObjectLayoutId());
+		return StringBundler.concat(
+			_objectDefinition.getClassName(), StringPool.POUND,
+			_objectDefinition.getCompanyId(), StringPool.POUND,
+			_objectLayoutTab.getObjectLayoutId());
 	}
 
 	@Override
@@ -65,6 +75,7 @@ public class ObjectLayoutTabScreenNavigationCategory
 		throws IOException {
 	}
 
+	private final ObjectDefinition _objectDefinition;
 	private final ObjectLayoutTab _objectLayoutTab;
 
 }
