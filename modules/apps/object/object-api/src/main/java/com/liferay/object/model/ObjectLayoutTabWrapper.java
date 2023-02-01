@@ -267,6 +267,13 @@ public class ObjectLayoutTabWrapper
 	}
 
 	@Override
+	public ObjectLayout getObjectLayout()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getObjectLayout();
+	}
+
+	@Override
 	public java.util.List<ObjectLayoutBox> getObjectLayoutBoxes() {
 		return model.getObjectLayoutBoxes();
 	}

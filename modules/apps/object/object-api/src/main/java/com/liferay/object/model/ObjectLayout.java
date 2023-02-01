@@ -56,6 +56,9 @@ public interface ObjectLayout extends ObjectLayoutModel, PersistedModel {
 
 		};
 
+	public ObjectDefinition getObjectDefinition()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public java.util.List<ObjectLayoutTab> getObjectLayoutTabs();
 
 	public void setObjectLayoutTabs(

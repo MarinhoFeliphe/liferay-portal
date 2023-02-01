@@ -55,6 +55,9 @@ public interface ObjectLayoutTab extends ObjectLayoutTabModel {
 
 		};
 
+	public ObjectLayout getObjectLayout()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public java.util.List<ObjectLayoutBox> getObjectLayoutBoxes();
 
 	public void setObjectLayoutBoxes(
