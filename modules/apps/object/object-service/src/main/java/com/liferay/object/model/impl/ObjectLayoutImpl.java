@@ -14,7 +14,10 @@
 
 package com.liferay.object.model.impl;
 
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectLayoutTab;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
 
@@ -23,6 +26,12 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  */
 public class ObjectLayoutImpl extends ObjectLayoutBaseImpl {
+
+	@Override
+	public ObjectDefinition getObjectDefinition() throws PortalException {
+		return ObjectDefinitionLocalServiceUtil.getObjectDefinition(
+			getObjectDefinitionId());
+	}
 
 	@Override
 	public List<ObjectLayoutTab> getObjectLayoutTabs() {
