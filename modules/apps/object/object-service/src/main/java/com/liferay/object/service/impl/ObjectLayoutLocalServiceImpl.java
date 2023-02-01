@@ -22,7 +22,6 @@ import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectLayoutBoxCategorizationTypeException;
 import com.liferay.object.exception.ObjectLayoutColumnSizeException;
 import com.liferay.object.internal.layout.tab.screen.navigation.ObjectLayoutTabScreenNavigationCategory;
-import com.liferay.object.internal.layout.tab.screen.navigation.ObjectLayoutTabScreenNavigationEntry;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectLayout;
@@ -54,7 +53,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -405,24 +403,21 @@ public class ObjectLayoutLocalServiceImpl
 				user, objectDefinitionId,
 				objectLayoutTab.getObjectLayoutTabId(), objectLayoutBoxes));
 
-		_serviceRegistrationsMap.put(
+		_serviceRegistrationMap.put(
 			_getServiceRegistrationMapKey(objectLayoutTab),
-			Arrays.asList(
-				_bundleContext.registerService(
-					ScreenNavigationCategory.class,
-					new ObjectLayoutTabScreenNavigationCategory(
-						objectLayoutTab),
-					HashMapDictionaryBuilder.<String, Object>put(
-						"screen.navigation.category.order:Integer",
-						objectLayoutTab.getObjectLayoutTabId()
-					).build()),
-				_bundleContext.registerService(
-					ScreenNavigationEntry.class,
-					new ObjectLayoutTabScreenNavigationEntry(objectLayoutTab),
-					HashMapDictionaryBuilder.<String, Object>put(
-						"screen.navigation.entry.order:Integer",
-						objectLayoutTab.getObjectLayoutTabId()
-					).build())));
+			_bundleContext.registerService(
+				new String[] {
+					ScreenNavigationCategory.class.getName(),
+					ScreenNavigationEntry.class.getName()
+				},
+				new ObjectLayoutTabScreenNavigationCategory(objectLayoutTab),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"screen.navigation.category.order:Integer",
+					objectLayoutTab.getObjectLayoutTabId()
+				).put(
+					"screen.navigation.entry.order:Integer",
+					objectLayoutTab.getObjectLayoutTabId()
+				).build()));
 
 		return objectLayoutTab;
 	}
@@ -452,14 +447,17 @@ public class ObjectLayoutLocalServiceImpl
 			_objectLayoutBoxPersistence.removeByObjectLayoutTabId(
 				objectLayoutTab.getObjectLayoutTabId());
 
-			for (ServiceRegistration<?> serviceRegistration :
-					_serviceRegistrationsMap.get(
-						_getServiceRegistrationMapKey(objectLayoutTab))) {
+			ServiceRegistration<?> serviceRegistration =
+				_serviceRegistrationMap.get(
+					_getServiceRegistrationMapKey(objectLayoutTab));
 
-				serviceRegistration.unregister();
+			if (serviceRegistration == null) {
+				return;
 			}
 
-			_serviceRegistrationsMap.remove(
+			serviceRegistration.unregister();
+
+			_serviceRegistrationMap.remove(
 				String.valueOf(objectLayoutTab.getObjectLayoutTabId()));
 		}
 	}
@@ -681,8 +679,8 @@ public class ObjectLayoutLocalServiceImpl
 	@Reference
 	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
 
-	private final Map<String, List<ServiceRegistration<?>>>
-		_serviceRegistrationsMap = new ConcurrentHashMap<>();
+	private final Map<String, ServiceRegistration<?>> _serviceRegistrationMap =
+		new ConcurrentHashMap<>();
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -15,15 +15,22 @@
 package com.liferay.object.internal.layout.tab.screen.navigation;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.model.ObjectLayoutTab;
 
+import java.io.IOException;
+
 import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Feliphe Marinho
  */
 public class ObjectLayoutTabScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<ObjectLayoutTab> {
 
 	public ObjectLayoutTabScreenNavigationCategory(
 		ObjectLayoutTab objectLayoutTab) {
@@ -37,6 +44,11 @@ public class ObjectLayoutTabScreenNavigationCategory
 	}
 
 	@Override
+	public String getEntryKey() {
+		return String.valueOf(_objectLayoutTab.getObjectLayoutTabId());
+	}
+
+	@Override
 	public String getLabel(Locale locale) {
 		return _objectLayoutTab.getName(locale);
 	}
@@ -44,6 +56,13 @@ public class ObjectLayoutTabScreenNavigationCategory
 	@Override
 	public String getScreenNavigationKey() {
 		return String.valueOf(_objectLayoutTab.getObjectLayoutId());
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
 	}
 
 	private final ObjectLayoutTab _objectLayoutTab;
