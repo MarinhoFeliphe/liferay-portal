@@ -39,6 +39,7 @@ import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -226,14 +227,12 @@ public class ObjectLayoutLocalServiceImpl
 				_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
 					objectLayout.getObjectLayoutId());
 
-			for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
-				try {
-					_registryObjectLayoutTabScreenNavigationCategory(
-						objectLayoutTab);
-				}
-				catch (PortalException portalException) {
-					_log.error(portalException);
-				}
+			try {
+				registryObjectLayoutTabScreenNavigationCategory(
+					objectLayoutTabs);
+			}
+			catch (PortalException portalException) {
+				_log.error(portalException);
 			}
 		}
 	}
@@ -439,13 +438,7 @@ public class ObjectLayoutLocalServiceImpl
 				objectLayoutTab.getNameMap(), objectLayoutTab.getPriority(),
 				objectLayoutTab.getObjectLayoutBoxes()));
 
-		Iterator<ObjectLayoutTab> objectLayoutTabIterator =
-			ListUtil.reverseIterator(objectLayoutTabs);
-
-		while (objectLayoutTabIterator.hasNext()) {
-			_registryObjectLayoutTabScreenNavigationCategory(
-				objectLayoutTabIterator.next());
-		}
+		registryObjectLayoutTabScreenNavigationCategory(objectLayoutTabs);
 
 		return objectLayoutTabs;
 	}
@@ -561,32 +554,41 @@ public class ObjectLayoutLocalServiceImpl
 		ObjectLayoutTab objectLayoutTab) {
 
 		return StringBundler.concat(
-			objectLayoutTab.getCompanyId(), "#",
+			objectLayoutTab.getCompanyId(), StringPool.POUND,
 			objectLayoutTab.getObjectLayoutTabId());
 	}
 
-	private void _registryObjectLayoutTabScreenNavigationCategory(
-			ObjectLayoutTab objectLayoutTab)
+	@Override
+	public void registryObjectLayoutTabScreenNavigationCategory(
+			ObjectDefinition objectDefinition,
+			List<ObjectLayoutTab> objectLayoutTabs)
 		throws PortalException {
 
-		ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
+		Iterator<ObjectLayoutTab> objectLayoutTabIterator =
+			ListUtil.reverseIterator(objectLayoutTabs);
 
-		_serviceRegistrationMap.put(
-			_getServiceRegistrationMapKey(objectLayoutTab),
-			_bundleContext.registerService(
-				new String[] {
-					ScreenNavigationCategory.class.getName(),
-					ScreenNavigationEntry.class.getName()
-				},
-				new ObjectLayoutTabScreenNavigationCategory(
-					objectLayout.getObjectDefinition(), objectLayoutTab),
-				HashMapDictionaryBuilder.<String, Object>put(
-					"screen.navigation.category.order:Integer",
-					objectLayoutTab.getObjectLayoutTabId()
-				).put(
-					"screen.navigation.entry.order:Integer",
-					objectLayout.getObjectLayoutId()
-				).build()));
+		while (objectLayoutTabIterator.hasNext()) {
+			ObjectLayoutTab objectLayoutTab = objectLayoutTabIterator.next();
+
+			ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
+
+			_serviceRegistrationMap.put(
+				_getServiceRegistrationMapKey(objectLayoutTab),
+				_bundleContext.registerService(
+					new String[] {
+						ScreenNavigationCategory.class.getName(),
+						ScreenNavigationEntry.class.getName()
+					},
+					new ObjectLayoutTabScreenNavigationCategory(
+						objectLayout.getObjectDefinitionId(), objectLayoutTab),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"screen.navigation.category.order:Integer",
+						objectLayoutTab.getObjectLayoutTabId()
+					).put(
+						"screen.navigation.entry.order:Integer",
+						objectLayoutTab.getObjectLayoutId()
+					).build()));
+		}
 	}
 
 	private void _validate(

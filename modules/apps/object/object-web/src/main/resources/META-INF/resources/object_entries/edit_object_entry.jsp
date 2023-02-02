@@ -25,16 +25,8 @@ ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab()
 %>
 
 <c:if test="<%= (objectEntryDisplayContext.getObjectEntry() != null) && (objectLayoutTab != null) %>">
-
-	<%
-	ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
-
-	ObjectDefinition objectDefinition = objectLayout.getObjectDefinition();
-	%>
-
 	<liferay-frontend:screen-navigation
-		inverted="<%= false %>"
-		key="<%= StringBundler.concat(objectDefinition.getClassName(), StringPool.POUND, objectDefinition.getCompanyId(), StringPool.POUND, objectLayout.getObjectLayoutId()) %>"
+		key="<%= StringBundler.concat("object.layout.tab", StringPool.POUND, objectLayoutTab.getCompanyId(), StringPool.POUND, objectLayoutTab.getObjectLayoutId()) %>"
 		portletURL="<%= currentURLObj %>"
 	/>
 </c:if>

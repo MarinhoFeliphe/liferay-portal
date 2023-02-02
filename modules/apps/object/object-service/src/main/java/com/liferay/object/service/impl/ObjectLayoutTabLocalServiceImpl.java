@@ -14,7 +14,9 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectLayoutTab;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.base.ObjectLayoutTabLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.model.User;
@@ -24,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
@@ -35,6 +38,7 @@ import org.osgi.service.component.annotations.Component;
 public class ObjectLayoutTabLocalServiceImpl
 	extends ObjectLayoutTabLocalServiceBaseImpl {
 
+	@Override
 	public ObjectLayoutTab addObjectLayoutTab(
 		User user, long objectLayoutId, long objectRelationshipId,
 		Map<Locale, String> nameMap, int priority) {
@@ -53,14 +57,15 @@ public class ObjectLayoutTabLocalServiceImpl
 		return objectLayoutTabPersistence.update(objectLayoutTab);
 	}
 
+	@Override
 	public void deleteObjectLayoutObjectLayoutTabs(long objectLayoutId) {
 		objectLayoutTabPersistence.removeByObjectLayoutId(objectLayoutId);
 	}
 
+	@Override
 	public List<ObjectLayoutTab> getObjectLayoutObjectLayoutTabs(
 		long objectLayoutId) {
 
 		return objectLayoutTabPersistence.findByObjectLayoutId(objectLayoutId);
 	}
-
 }

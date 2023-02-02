@@ -36,9 +36,9 @@ public class ObjectLayoutTabScreenNavigationCategory
 			   ScreenNavigationEntry<ObjectLayoutTab> {
 
 	public ObjectLayoutTabScreenNavigationCategory(
-		ObjectDefinition objectDefinition, ObjectLayoutTab objectLayoutTab) {
+		long objectDefinitionId, ObjectLayoutTab objectLayoutTab) {
 
-		_objectDefinition = objectDefinition;
+		_objectDefinitionId = objectDefinitionId;
 		_objectLayoutTab = objectLayoutTab;
 	}
 
@@ -50,8 +50,8 @@ public class ObjectLayoutTabScreenNavigationCategory
 	@Override
 	public String getEntryKey() {
 		return StringBundler.concat(
-			_objectDefinition.getClassName(), StringPool.POUND,
-			_objectDefinition.getCompanyId(), StringPool.POUND,
+			_objectDefinitionId, StringPool.POUND,
+			_objectLayoutTab.getCompanyId(), StringPool.POUND,
 			_objectLayoutTab.getObjectLayoutTabId());
 	}
 
@@ -63,8 +63,8 @@ public class ObjectLayoutTabScreenNavigationCategory
 	@Override
 	public String getScreenNavigationKey() {
 		return StringBundler.concat(
-			_objectDefinition.getClassName(), StringPool.POUND,
-			_objectDefinition.getCompanyId(), StringPool.POUND,
+			_objectDefinitionId, StringPool.POUND,
+			_objectLayoutTab.getCompanyId(), StringPool.POUND,
 			_objectLayoutTab.getObjectLayoutId());
 	}
 
@@ -75,7 +75,7 @@ public class ObjectLayoutTabScreenNavigationCategory
 		throws IOException {
 	}
 
-	private final ObjectDefinition _objectDefinition;
+	private final long _objectDefinitionId;
 	private final ObjectLayoutTab _objectLayoutTab;
 
 }

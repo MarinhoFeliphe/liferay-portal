@@ -19,12 +19,15 @@ import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.notification.handler.NotificationHandler;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.internal.info.collection.provider.ObjectEntrySingleFormVariationInfoCollectionProvider;
+import com.liferay.object.internal.layout.tab.screen.navigation.ObjectLayoutTabScreenNavigationCategory;
 import com.liferay.object.internal.notification.handler.ObjectDefinitionNotificationHandler;
 import com.liferay.object.internal.notification.term.contributor.ObjectDefinitionNotificationTermEvaluator;
 import com.liferay.object.internal.persistence.ObjectDefinitionTableArgumentsResolver;
@@ -44,6 +47,8 @@ import com.liferay.object.internal.security.permission.resource.ObjectEntryPortl
 import com.liferay.object.internal.security.permission.resource.util.ObjectDefinitionResourcePermissionUtil;
 import com.liferay.object.internal.workflow.ObjectEntryWorkflowHandler;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectLayout;
+import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.related.models.ObjectRelatedModelsPredicateProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.rest.context.path.RESTContextPathResolver;
@@ -55,9 +60,12 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
+import com.liferay.object.service.ObjectLayoutTabLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -85,6 +93,7 @@ import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContr
 import com.liferay.portal.search.spi.model.registrar.ModelSearchRegistrarHelper;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -117,6 +126,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ObjectEntryService objectEntryService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
+		ObjectLayoutTabLocalService objectLayoutTabLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		ObjectViewLocalService objectViewLocalService,
@@ -148,6 +158,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_objectEntryService = objectEntryService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
+		_objectLayoutTabLocalService = objectLayoutTabLocalService;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_objectViewLocalService = objectViewLocalService;
@@ -369,6 +380,39 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			return ReflectionUtil.throwException(portalException);
 		}
 
+		List<ObjectLayout> objectLayouts =
+			_objectLayoutLocalService.getObjectLayouts(
+				objectDefinition.getObjectDefinitionId());
+
+		for (ObjectLayout objectLayout : objectLayouts) {
+			Iterator<ObjectLayoutTab> objectLayoutTabIterator =
+				ListUtil.reverseIterator(
+					_objectLayoutTabLocalService.
+						getObjectLayoutObjectLayoutTabs(
+							objectLayout.getObjectLayoutId()));
+
+			while (objectLayoutTabIterator.hasNext()) {
+				ObjectLayoutTab objectLayoutTab = objectLayoutTabIterator.next();
+
+				_serviceRegistrationMap.put(
+					_getServiceRegistrationMapKey(objectLayoutTab),
+					_bundleContext.registerService(
+						new String[] {
+							ScreenNavigationCategory.class.getName(),
+							ScreenNavigationEntry.class.getName()
+						},
+						new ObjectLayoutTabScreenNavigationCategory(
+							objectLayout.getObjectDefinitionId(), objectLayoutTab),
+						HashMapDictionaryBuilder.<String, Object>put(
+							"screen.navigation.category.order:Integer",
+							objectLayoutTab.getObjectLayoutTabId()
+						).put(
+							"screen.navigation.entry.order:Integer",
+							objectLayoutTab.getObjectLayoutId()
+						).build()));
+			}
+		}
+
 		return serviceRegistrations;
 	}
 
@@ -405,6 +449,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private final ObjectEntryService _objectEntryService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectLayoutLocalService _objectLayoutLocalService;
+	private final ObjectLayoutTabLocalService _objectLayoutTabLocalService;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
