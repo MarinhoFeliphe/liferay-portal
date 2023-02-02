@@ -407,6 +407,18 @@ public class ObjectLayoutLocalServiceWrapper
 	}
 
 	@Override
+	public void registryObjectLayoutTabScreenNavigationCategory(
+			com.liferay.object.model.ObjectDefinition objectDefinition,
+			java.util.List<com.liferay.object.model.ObjectLayoutTab>
+				objectLayoutTabs)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_objectLayoutLocalService.
+			registryObjectLayoutTabScreenNavigationCategory(
+				objectDefinition, objectLayoutTabs);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectLayout updateObjectLayout(
 			long objectLayoutId, boolean defaultObjectLayout,
 			java.util.Map<java.util.Locale, String> nameMap,

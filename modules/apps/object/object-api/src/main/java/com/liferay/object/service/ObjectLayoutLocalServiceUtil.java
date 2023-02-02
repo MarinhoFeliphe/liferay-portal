@@ -354,6 +354,15 @@ public class ObjectLayoutLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static void registryObjectLayoutTabScreenNavigationCategory(
+			com.liferay.object.model.ObjectDefinition objectDefinition,
+			List<com.liferay.object.model.ObjectLayoutTab> objectLayoutTabs)
+		throws PortalException {
+
+		getService().registryObjectLayoutTabScreenNavigationCategory(
+			objectDefinition, objectLayoutTabs);
+	}
+
 	public static ObjectLayout updateObjectLayout(
 			long objectLayoutId, boolean defaultObjectLayout,
 			Map<java.util.Locale, String> nameMap,
