@@ -29,8 +29,7 @@ public class ObjectLayoutImpl extends ObjectLayoutBaseImpl {
 
 	@Override
 	public ObjectDefinition getObjectDefinition() throws PortalException {
-		return ObjectDefinitionLocalServiceUtil.getObjectDefinition(
-			getObjectDefinitionId());
+		return _objectDefinition;
 	}
 
 	@Override
@@ -39,10 +38,16 @@ public class ObjectLayoutImpl extends ObjectLayoutBaseImpl {
 	}
 
 	@Override
+	public void setObjectDefinition(ObjectDefinition objectDefinition) {
+		_objectDefinition = objectDefinition;
+	}
+
+	@Override
 	public void setObjectLayoutTabs(List<ObjectLayoutTab> objectLayoutTabs) {
 		_objectLayoutTabs = objectLayoutTabs;
 	}
 
 	private List<ObjectLayoutTab> _objectLayoutTabs;
+	private ObjectDefinition _objectDefinition;
 
 }

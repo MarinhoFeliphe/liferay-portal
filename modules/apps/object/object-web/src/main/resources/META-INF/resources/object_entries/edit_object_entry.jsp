@@ -25,8 +25,12 @@ ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab()
 %>
 
 <c:if test="<%= (objectEntryDisplayContext.getObjectEntry() != null) && (objectLayoutTab != null) %>">
+	<%
+		ObjectDefinition objectDefinition = objectEntryDisplayContext.getObjectDefinition();
+	%>
+
 	<liferay-frontend:screen-navigation
-		key="<%= StringBundler.concat("object.layout.tab", StringPool.POUND, objectLayoutTab.getCompanyId(), StringPool.POUND, objectLayoutTab.getObjectLayoutId()) %>"
+		key="<%= objectDefinition.getExternalReferenceCode() %>"
 		portletURL="<%= currentURLObj %>"
 	/>
 </c:if>
