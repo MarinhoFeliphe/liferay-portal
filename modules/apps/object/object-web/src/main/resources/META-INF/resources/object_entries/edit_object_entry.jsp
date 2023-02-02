@@ -24,7 +24,7 @@ ObjectEntryDisplayContext objectEntryDisplayContext = (ObjectEntryDisplayContext
 ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab();
 %>
 
-<c:if test="<%= objectEntryDisplayContext.getObjectEntry() != null %>">
+<c:if test="<%= (objectEntryDisplayContext.getObjectEntry() != null) && (objectLayoutTab != null) %>">
 
 	<%
 	ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
