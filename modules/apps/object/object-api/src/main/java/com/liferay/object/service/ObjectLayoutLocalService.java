@@ -316,9 +316,8 @@ public interface ObjectLayoutLocalService
 		throws PortalException;
 
 	public void registryObjectLayoutTabScreenNavigationCategory(
-			ObjectDefinition objectDefinition,
-			List<ObjectLayoutTab> objectLayoutTabs)
-		throws PortalException;
+		ObjectDefinition objectDefinition,
+		List<ObjectLayoutTab> objectLayoutTabs);
 
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectLayout updateObjectLayout(

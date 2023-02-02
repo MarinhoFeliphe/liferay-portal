@@ -355,9 +355,8 @@ public class ObjectLayoutLocalServiceUtil {
 	}
 
 	public static void registryObjectLayoutTabScreenNavigationCategory(
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			List<com.liferay.object.model.ObjectLayoutTab> objectLayoutTabs)
-		throws PortalException {
+		com.liferay.object.model.ObjectDefinition objectDefinition,
+		List<com.liferay.object.model.ObjectLayoutTab> objectLayoutTabs) {
 
 		getService().registryObjectLayoutTabScreenNavigationCategory(
 			objectDefinition, objectLayoutTabs);
