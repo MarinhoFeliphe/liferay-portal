@@ -214,29 +214,6 @@ public class ObjectLayoutLocalServiceImpl
 			objectDefinitionId);
 	}
 
-	@Override
-	public void setAopProxy(Object aopProxy) {
-		super.setAopProxy(aopProxy);
-
-		List<ObjectLayout> objectLayouts =
-			objectLayoutLocalService.getObjectLayouts(
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		for (ObjectLayout objectLayout : objectLayouts) {
-			List<ObjectLayoutTab> objectLayoutTabs =
-				_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
-					objectLayout.getObjectLayoutId());
-
-			try {
-				registryObjectLayoutTabScreenNavigationCategory(
-					objectLayoutTabs);
-			}
-			catch (PortalException portalException) {
-				_log.error(portalException);
-			}
-		}
-	}
-
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectLayout updateObjectLayout(
@@ -438,7 +415,9 @@ public class ObjectLayoutLocalServiceImpl
 				objectLayoutTab.getNameMap(), objectLayoutTab.getPriority(),
 				objectLayoutTab.getObjectLayoutBoxes()));
 
-		registryObjectLayoutTabScreenNavigationCategory(objectLayoutTabs);
+		registryObjectLayoutTabScreenNavigationCategory(
+			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId),
+			objectLayoutTabs);
 
 		return objectLayoutTabs;
 	}
@@ -561,16 +540,13 @@ public class ObjectLayoutLocalServiceImpl
 	@Override
 	public void registryObjectLayoutTabScreenNavigationCategory(
 			ObjectDefinition objectDefinition,
-			List<ObjectLayoutTab> objectLayoutTabs)
-		throws PortalException {
+			List<ObjectLayoutTab> objectLayoutTabs) {
 
 		Iterator<ObjectLayoutTab> objectLayoutTabIterator =
 			ListUtil.reverseIterator(objectLayoutTabs);
 
 		while (objectLayoutTabIterator.hasNext()) {
 			ObjectLayoutTab objectLayoutTab = objectLayoutTabIterator.next();
-
-			ObjectLayout objectLayout = objectLayoutTab.getObjectLayout();
 
 			_serviceRegistrationMap.put(
 				_getServiceRegistrationMapKey(objectLayoutTab),
@@ -580,7 +556,7 @@ public class ObjectLayoutLocalServiceImpl
 						ScreenNavigationEntry.class.getName()
 					},
 					new ObjectLayoutTabScreenNavigationCategory(
-						objectLayout.getObjectDefinitionId(), objectLayoutTab),
+						objectDefinition, objectLayoutTab),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"screen.navigation.category.order:Integer",
 						objectLayoutTab.getObjectLayoutTabId()
