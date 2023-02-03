@@ -59,6 +59,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
+import com.liferay.object.service.ObjectLayoutTabLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
@@ -605,7 +606,7 @@ public class ObjectDefinitionLocalServiceImpl
 				_listTypeEntryLocalService, _modelSearchRegistrarHelper,
 				_objectActionLocalService, this, _objectEntryLocalService,
 				_objectEntryManagerRegistry, _objectEntryService,
-				_objectFieldLocalService, _objectLayoutLocalService,
+				_objectFieldLocalService, _objectLayoutLocalService, _objectLayoutTabLocalService,
 				_objectRelationshipLocalService, _objectScopeProviderRegistry,
 				_objectViewLocalService, _organizationLocalService,
 				_persistedModelLocalServiceRegistry, _ploEntryLocalService,
@@ -1680,6 +1681,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private ObjectLayoutLocalService _objectLayoutLocalService;
+
+	@Reference
+	private ObjectLayoutTabLocalService _objectLayoutTabLocalService;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;

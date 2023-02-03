@@ -14,7 +14,10 @@
 
 package com.liferay.object.model.impl;
 
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectLayoutTab;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
 
@@ -25,8 +28,18 @@ import java.util.List;
 public class ObjectLayoutImpl extends ObjectLayoutBaseImpl {
 
 	@Override
+	public ObjectDefinition getObjectDefinition() throws PortalException {
+		return _objectDefinition;
+	}
+
+	@Override
 	public List<ObjectLayoutTab> getObjectLayoutTabs() {
 		return _objectLayoutTabs;
+	}
+
+	@Override
+	public void setObjectDefinition(ObjectDefinition objectDefinition) {
+		_objectDefinition = objectDefinition;
 	}
 
 	@Override
@@ -35,5 +48,6 @@ public class ObjectLayoutImpl extends ObjectLayoutBaseImpl {
 	}
 
 	private List<ObjectLayoutTab> _objectLayoutTabs;
+	private ObjectDefinition _objectDefinition;
 
 }
