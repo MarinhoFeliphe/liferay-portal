@@ -522,6 +522,14 @@ public class ObjectEntryDisplayContext {
 		return false;
 	}
 
+	public boolean isRegularObjectLayoutTab() {
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
+
+		return GetterUtil.getBoolean(
+			httpServletRequest.getAttribute("regularObjectLayoutTab"));
+	}
+
 	public String renderDDMForm(PageContext pageContext)
 		throws PortalException {
 
