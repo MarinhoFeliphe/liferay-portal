@@ -2628,6 +2628,16 @@ components:
                     description:
                         The message's main content.
                     type: string
+                classNameId:
+                    description:
+                        The ID of the Class Name to which this message is scoped.
+                    format: int64
+                    type: integer
+                classPK:
+                    description:
+                        The ID of the Class PK.
+                    format: int64
+                    type: integer
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
