@@ -67,7 +67,7 @@ public class MessageBoardMessageDTOConverter
 	public MessageBoardMessage toDTO(DTOConverterContext dtoConverterContext)
 		throws Exception {
 
-		MBMessage mbMessage = _mbMessageService.getMessage(
+		MBMessage mbMessage = _mbMessageLocalService.getMessage(
 			(Long)dtoConverterContext.getId());
 
 		Company company = _companyLocalService.getCompany(

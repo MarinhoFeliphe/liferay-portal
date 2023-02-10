@@ -638,6 +638,7 @@ public class MessageBoardMessageResourceImpl
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
+				searchContext.setAttribute("discussion", Boolean.TRUE);
 				searchContext.addVulcanAggregation(aggregation);
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 
@@ -654,7 +655,7 @@ public class MessageBoardMessageResourceImpl
 			},
 			sorts,
 			document -> _toMessageBoardMessage(
-				_mbMessageService.getMessage(
+				_mbMessageLocalService.getMessage(
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
@@ -698,42 +699,7 @@ public class MessageBoardMessageResourceImpl
 		return _messageBoardMessageDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
 				false,
-				HashMapBuilder.put(
-					"delete",
-					addAction(
-						ActionKeys.DELETE, mbMessage,
-						"deleteMessageBoardMessage")
-				).put(
-					"get",
-					addAction(
-						ActionKeys.VIEW, mbMessage, "getMessageBoardMessage")
-				).put(
-					"replace",
-					addAction(
-						ActionKeys.UPDATE, mbMessage, "putMessageBoardMessage")
-				).put(
-					"reply-to-message",
-					addAction(
-						ActionKeys.REPLY_TO_MESSAGE, mbMessage.getMessageId(),
-						"postMessageBoardMessageMessageBoardMessage",
-						mbMessage.getUserId(), MBConstants.RESOURCE_NAME,
-						mbMessage.getGroupId())
-				).put(
-					"subscribe",
-					addAction(
-						ActionKeys.SUBSCRIBE, mbMessage,
-						"putMessageBoardMessageSubscribe")
-				).put(
-					"unsubscribe",
-					addAction(
-						ActionKeys.SUBSCRIBE, mbMessage,
-						"putMessageBoardMessageSubscribe")
-				).put(
-					"update",
-					addAction(
-						ActionKeys.UPDATE, mbMessage,
-						"patchMessageBoardMessage")
-				).build(),
+				Collections.emptyMap(),
 				_dtoConverterRegistry, mbMessage.getPrimaryKey(),
 				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
 				contextUser));
