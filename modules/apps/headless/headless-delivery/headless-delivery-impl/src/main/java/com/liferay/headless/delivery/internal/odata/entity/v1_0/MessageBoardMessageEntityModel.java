@@ -67,6 +67,10 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 				locale -> Field.getSortableFieldName("answer_String"),
 				locale -> "answer", String::valueOf),
 			new IntegerEntityField(
+				"classNameId", locale -> "classNameId"),
+			new IntegerEntityField(
+				"classPK", locale -> "classPK"),
+			new IntegerEntityField(
 				"childMessagesCount", locale -> "childMessagesCount"),
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID),
 			new IntegerEntityField(
