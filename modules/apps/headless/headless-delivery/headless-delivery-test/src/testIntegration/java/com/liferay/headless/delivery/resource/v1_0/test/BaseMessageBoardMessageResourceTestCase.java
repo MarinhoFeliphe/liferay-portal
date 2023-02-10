@@ -2449,6 +2449,22 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("classNameId", additionalAssertFieldName)) {
+				if (messageBoardMessage.getClassNameId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("classPK", additionalAssertFieldName)) {
+				if (messageBoardMessage.getClassPK() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (messageBoardMessage.getCreator() == null) {
 					valid = false;
@@ -2842,6 +2858,28 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 				if (!Objects.deepEquals(
 						messageBoardMessage1.getArticleBody(),
 						messageBoardMessage2.getArticleBody())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("classNameId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						messageBoardMessage1.getClassNameId(),
+						messageBoardMessage2.getClassNameId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("classPK", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						messageBoardMessage1.getClassPK(),
+						messageBoardMessage2.getClassPK())) {
 
 					return false;
 				}
@@ -3337,6 +3375,16 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("classNameId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("classPK")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("creator")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -3584,6 +3632,8 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 				anonymous = RandomTestUtil.randomBoolean();
 				articleBody = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				classNameId = RandomTestUtil.randomLong();
+				classPK = RandomTestUtil.randomLong();
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				encodingFormat = StringUtil.toLowerCase(

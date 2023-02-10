@@ -192,6 +192,66 @@ public class MessageBoardMessage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String articleBody;
 
+	@Schema(
+		description = "The ID of the Class Name to which this message is scoped."
+	)
+	public Long getClassNameId() {
+		return classNameId;
+	}
+
+	public void setClassNameId(Long classNameId) {
+		this.classNameId = classNameId;
+	}
+
+	@JsonIgnore
+	public void setClassNameId(
+		UnsafeSupplier<Long, Exception> classNameIdUnsafeSupplier) {
+
+		try {
+			classNameId = classNameIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "The ID of the Class Name to which this message is scoped."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long classNameId;
+
+	@Schema(description = "The ID of the Class PK.")
+	public Long getClassPK() {
+		return classPK;
+	}
+
+	public void setClassPK(Long classPK) {
+		this.classPK = classPK;
+	}
+
+	@JsonIgnore
+	public void setClassPK(
+		UnsafeSupplier<Long, Exception> classPKUnsafeSupplier) {
+
+		try {
+			classPK = classPKUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The ID of the Class PK.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long classPK;
+
 	@Schema(description = "The message's author.")
 	@Valid
 	public Creator getCreator() {
@@ -1000,6 +1060,26 @@ public class MessageBoardMessage implements Serializable {
 			sb.append(_escape(articleBody));
 
 			sb.append("\"");
+		}
+
+		if (classNameId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"classNameId\": ");
+
+			sb.append(classNameId);
+		}
+
+		if (classPK != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"classPK\": ");
+
+			sb.append(classPK);
 		}
 
 		if (creator != null) {

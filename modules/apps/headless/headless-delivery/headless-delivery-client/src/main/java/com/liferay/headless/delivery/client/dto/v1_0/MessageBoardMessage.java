@@ -122,6 +122,48 @@ public class MessageBoardMessage implements Cloneable, Serializable {
 
 	protected String articleBody;
 
+	public Long getClassNameId() {
+		return classNameId;
+	}
+
+	public void setClassNameId(Long classNameId) {
+		this.classNameId = classNameId;
+	}
+
+	public void setClassNameId(
+		UnsafeSupplier<Long, Exception> classNameIdUnsafeSupplier) {
+
+		try {
+			classNameId = classNameIdUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Long classNameId;
+
+	public Long getClassPK() {
+		return classPK;
+	}
+
+	public void setClassPK(Long classPK) {
+		this.classPK = classPK;
+	}
+
+	public void setClassPK(
+		UnsafeSupplier<Long, Exception> classPKUnsafeSupplier) {
+
+		try {
+			classPK = classPKUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Long classPK;
+
 	public Creator getCreator() {
 		return creator;
 	}
