@@ -19,6 +19,11 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
+import com.liferay.object.constants.ObjectActionKeys;
+import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -26,6 +31,8 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectEntryServiceUtil;
+import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -39,9 +46,13 @@ import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -52,6 +63,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.WindowState;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -89,8 +101,74 @@ public class CustomTabDisplayContext {
 			"0%27", getObjectEntryId(), "%27");
 	}
 
-	public CreationMenu getCreationMenu() {
+	public CreationMenu getCreationMenu() throws PortalException {
 		CreationMenu creationMenu = new CreationMenu();
+
+		ObjectRelationship objectRelationship = getObjectRelationship();
+
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(
+				_objectDefinition2.getScope());
+
+		if (!_objectDefinition1.isSystem() && !_objectDefinition2.isSystem() &&
+			ObjectEntryServiceUtil.hasPortletResourcePermission(
+				objectScopeProvider.getGroupId(
+					_customTabRequestHelper.getRequest()),
+				_objectDefinition2.getObjectDefinitionId(),
+				ObjectActionKeys.ADD_OBJECT_ENTRY) &&
+			!(StringUtil.equals(
+				_objectDefinition1.getScope(),
+				ObjectDefinitionConstants.SCOPE_COMPANY) &&
+			  StringUtil.equals(
+				  _objectDefinition2.getScope(),
+				  ObjectDefinitionConstants.SCOPE_SITE)) &&
+			StringUtil.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
+
+			creationMenu.addDropdownItem(
+				dropdownItem -> {
+					dropdownItem.setHref(
+						PortletURLBuilder.create(
+							PortalUtil.getControlPanelPortletURL(
+								_customTabRequestHelper.getRequest(),
+								serviceContext.getScopeGroup(),
+								_objectDefinition2.getPortletId(), 0, 0,
+								PortletRequest.RENDER_PHASE)
+						).setMVCRenderCommandName(
+							"/object_entries/edit_object_entry"
+						).setBackURL(
+							_customTabRequestHelper.getCurrentURL()
+						).setParameter(
+							ObjectFieldSettingConstants.
+								NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+							ObjectFieldSettingUtil.getValue(
+								ObjectFieldSettingConstants.
+									NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+								ObjectFieldLocalServiceUtil.getObjectField(
+									objectRelationship.getObjectFieldId2()))
+						).setParameter(
+							"objectDefinitionId",
+							_objectDefinition2.getObjectDefinitionId()
+						).setParameter(
+							"parentObjectEntryERC",
+							() -> {
+								ObjectEntry objectEntry = getObjectEntry();
+
+								return objectEntry.getExternalReferenceCode();
+							}
+						).setWindowState(
+							WindowState.MAXIMIZED
+						).buildString());
+					dropdownItem.setLabel(
+						LanguageUtil.get(
+							_customTabRequestHelper.getRequest(),
+							"create-new"));
+				});
+		}
 
 		LiferayPortletResponse liferayPortletResponse =
 			_customTabRequestHelper.getLiferayPortletResponse();
@@ -122,7 +200,7 @@ public class CustomTabDisplayContext {
 				"post", "replace", "async"));
 	}
 
-	public long getObjectEntryId() {
+	public ObjectEntry getObjectEntry() {
 		String externalReferenceCode = ParamUtil.getString(
 			_customTabRequestHelper.getRequest(), "externalReferenceCode");
 
@@ -153,6 +231,12 @@ public class CustomTabDisplayContext {
 				_log.warn(exception);
 			}
 		}
+
+		return objectEntry;
+	}
+
+	public long getObjectEntryId() {
+		ObjectEntry objectEntry = getObjectEntry();
 
 		return objectEntry.getId();
 	}
