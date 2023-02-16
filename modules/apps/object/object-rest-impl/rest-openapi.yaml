@@ -569,6 +569,65 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["ObjectEntry"]
+    "/{objectEntryId}/comments":
+        get:
+            operationId: getObjectEntriesCommentsPage
+            parameters:
+                - in: path
+                  name: objectEntryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectEntry"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectEntry"
+                                type: array
+            tags: [ "ObjectEntry" ]
+        put:
+            operationId: putObjectEntryComment
+            parameters:
+                - in: path
+                  name: objectEntryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                204:
+                    content:
+                        application/json: { }
+                        application/xml: { }
+            tags: [ "ObjectEntry" ]
     /scopes/{scopeKey}:
         get:
             operationId: getScopeScopeKeyPage
