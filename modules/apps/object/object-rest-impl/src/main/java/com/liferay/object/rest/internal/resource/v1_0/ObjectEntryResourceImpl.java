@@ -221,6 +221,26 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_getDTOConverterContext(null), pagination, predicate, search,
 			sorts);
 	}
+	@Override
+	public Page<ObjectEntry> getObjectEntriesCommentsPage(
+		Long objectEntryId, String search, Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition.getStorageType());
+
+		Predicate predicate = null;
+
+		if (contextHttpServletRequest != null) {
+			predicate = _filterPredicateFactory.create(
+				getEntityModel(new MultivaluedHashMap<String, Object>()),
+				ParamUtil.getString(contextHttpServletRequest, "filter"),
+				_objectDefinition.getObjectDefinitionId());
+		}
+
+		return null;
+	}
 
 	@Override
 	public ObjectEntry getObjectEntry(Long objectEntryId) throws Exception {

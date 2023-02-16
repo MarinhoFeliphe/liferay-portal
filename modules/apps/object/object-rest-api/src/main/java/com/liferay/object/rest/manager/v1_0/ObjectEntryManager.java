@@ -95,6 +95,10 @@ public interface ObjectEntryManager {
 			Sort[] sorts)
 		throws Exception;
 
+	public Page<ObjectEntry> getObjectEntriesCommentsPage(
+		Long objectEntryId, String search, Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
