@@ -147,6 +147,13 @@ public interface ObjectEntryResource {
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
+	public Page<ObjectEntry> getObjectEntriesCommentsPage(
+			Long objectEntryId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception;
+
+	public void putObjectEntryComment(Long objectEntryId) throws Exception;
+
 	public Page<ObjectEntry> getScopeScopeKeyPage(
 			String scopeKey, Boolean flatten, String search,
 			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
