@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
@@ -60,6 +61,10 @@ public class CustomTabDisplayContext {
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems(
 			ObjectEntry objectEntry)
 		throws Exception {
+
+		if ((Boolean)_httpServletRequest.getAttribute("readOnly")) {
+			return Collections.emptyList();
+		}
 
 		return Arrays.asList(
 			new FDSActionDropdownItem(
