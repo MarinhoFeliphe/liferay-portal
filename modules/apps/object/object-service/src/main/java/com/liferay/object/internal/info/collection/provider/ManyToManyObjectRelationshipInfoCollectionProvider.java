@@ -31,9 +31,9 @@ public class ManyToManyObjectRelationshipInfoCollectionProvider
 
 	public ManyToManyObjectRelationshipInfoCollectionProvider(
 			ObjectDefinition objectDefinition,
-			ObjectRelationship objectRelationship,
 			ObjectDefinitionLocalService objectDefinitionLocalService,
-			ObjectEntryLocalService objectEntryLocalService)
+			ObjectEntryLocalService objectEntryLocalService,
+			ObjectRelationship objectRelationship)
 		throws PortalException {
 
 		super(
