@@ -14,7 +14,6 @@
 
 package com.liferay.object.internal.petra.sql.dsl;
 
-import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.petra.sql.dsl.Column;

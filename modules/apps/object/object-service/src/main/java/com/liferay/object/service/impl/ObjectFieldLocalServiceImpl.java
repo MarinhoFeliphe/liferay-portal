@@ -32,6 +32,7 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorRegistry;
+import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -126,6 +127,14 @@ public class ObjectFieldLocalServiceImpl
 			objectDefinitionId, businessType, name + StringPool.UNDERLINE,
 			dbTableName, dbType, indexed, indexedAsKeyword, indexedLanguageId,
 			labelMap, localized, name, required, state, false);
+
+		if (localized && objectDefinition.isApproved()) {
+			runSQL(
+				DynamicObjectDefinitionLocalizationTable.
+					getAlterTableAddColumnSQL(
+						objectDefinition.getDBTableName(),
+						objectField.getDBColumnName(), dbType));
+		}
 
 		if (objectDefinition.isApproved() &&
 			!objectField.compareBusinessType(
@@ -899,6 +908,15 @@ public class ObjectFieldLocalServiceImpl
 
 			_alterTableDropColumn(
 				objectField.getDBTableName(), objectField.getDBColumnName());
+		}
+
+		if (objectDefinition.isEnableLocalization() &&
+			objectField.isLocalized() && objectDefinition.isApproved()) {
+
+			_alterTableDropColumn(
+				DynamicObjectDefinitionLocalizationTable.getTableName(
+					objectField.getDBTableName()),
+				objectField.getDBColumnName());
 		}
 
 		return objectField;
