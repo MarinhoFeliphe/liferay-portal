@@ -36,6 +36,7 @@ public class ObjectDefinitionModelDocumentContributor
 		Document document, ObjectDefinition objectDefinition) {
 
 		document.addText(Field.NAME, objectDefinition.getShortName());
+		document.addText("storageType", objectDefinition.getStorageType());
 		document.remove(Field.USER_NAME);
 	}
 
