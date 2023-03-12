@@ -73,7 +73,8 @@ public class DynamicObjectDefinitionTable
 			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
 				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
+				objectField.isLocalized()) {
 
 				continue;
 			}
@@ -103,7 +104,8 @@ public class DynamicObjectDefinitionTable
 			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
 				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
+				objectField.isLocalized()) {
 
 				continue;
 			}
