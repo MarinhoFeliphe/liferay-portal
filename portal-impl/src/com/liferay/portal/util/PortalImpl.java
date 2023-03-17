@@ -5875,6 +5875,10 @@ public class PortalImpl implements Portal {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
+		if (httpSession == null) {
+			return 0;
+		}
+
 		userIdObj = (Long)httpSession.getAttribute(WebKeys.USER_ID);
 
 		if (userIdObj != null) {
