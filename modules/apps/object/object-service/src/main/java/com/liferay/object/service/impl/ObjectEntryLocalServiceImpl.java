@@ -1674,7 +1674,7 @@ public class ObjectEntryLocalServiceImpl
 			objectEntryPersistence.getDataSource());
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
-			insertIntoStatement)) {
+				insertIntoStatement)) {
 
 			String languageId = LocaleUtil.toLanguageId(locale);
 
@@ -1696,7 +1696,7 @@ public class ObjectEntryLocalServiceImpl
 				Map<String, String> localizedValues =
 					(Map<String, String>)values.get(
 						objectField.getName() +
-						ObjectFieldConstants.I18N_SUFFIX);
+							ObjectFieldConstants.I18N_SUFFIX);
 
 				if (localizedValues == null) {
 					_setColumn(
