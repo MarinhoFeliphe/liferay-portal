@@ -38,6 +38,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 			2,
 			Arrays.asList(
 				createNotificationRecipientSetting("term", getTerm("creator")),
-				createNotificationRecipientSetting("term", "test")),
+				createNotificationRecipientSetting("term", user1.getScreenName())),
 			NotificationRecipientConstants.TYPE_TERM);
 	}
 
@@ -96,7 +97,8 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 		_testSendNotification(
 			1,
 			Arrays.asList(
-				createNotificationRecipientSetting("userScreenName", "test")),
+				createNotificationRecipientSetting(
+					"userScreenName", user1.getScreenName())),
 			NotificationRecipientConstants.TYPE_USER);
 	}
 
@@ -158,6 +160,12 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 			_userNotificationEventLocalService.getUserNotificationEventsCount(
 				user1.getUserId()));
 
+		List<String> termNames = new ArrayList<>();
+
+		termNames.addAll(objectEntryTermNames());
+		termNames.addAll(getAuthorTermValues().keySet());
+		termNames.addAll(getCurrentUserTermValues().keySet());
+
 		sendNotification(
 			new NotificationContextBuilder(
 			).className(
@@ -168,7 +176,7 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 				notificationTemplateLocalService.addNotificationTemplate(
 					_createNotificationContext(
 						notificationRecipientSettings, recipientType,
-						objectEntryTermNames()))
+						termNames))
 			).termValues(
 				HashMapBuilder.<String, Object>put(
 					"creator", user1.getUserId()
@@ -200,17 +208,18 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 
 		notificationQueueEntry = notificationQueueEntries.get(0);
 
+		List<Object> termValues = new ArrayList<>();
+
+		termValues.addAll(ListUtil.fromMapValues(objectEntryValues));
+		termValues.addAll(ListUtil.fromMapValues(getAuthorTermValues()));
+		termValues.addAll(ListUtil.fromMapValues(getCurrentUserTermValues()));
+
 		assertTerms(
-			ListUtil.fromMapValues(objectEntryValues),
-			ListUtil.fromString(
+			termValues, ListUtil.fromString(
 				notificationQueueEntry.getSubject(), StringPool.COMMA));
 
 		NotificationRecipient notificationRecipient =
 			notificationQueueEntry.getNotificationRecipient();
-
-		notificationQueueEntries =
-			notificationQueueEntryLocalService.getNotificationQueueEntries(
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (NotificationRecipientSetting notificationRecipientSetting :
 				notificationRecipient.getNotificationRecipientSettings()) {
@@ -220,59 +229,6 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 			Assert.assertEquals(
 				"Test Test", notificationRecipientSetting.getValue());
 		}
-
-		_testUserTermValues(
-			notificationQueueEntries, notificationRecipientSettings,
-			recipientType, getAuthorTermValues());
-
-		_testUserTermValues(
-			notificationQueueEntries, notificationRecipientSettings,
-			recipientType, getCurrentUserTermValues());
-	}
-
-	private void _testUserTermValues(
-			List<NotificationQueueEntry> notificationQueueEntries,
-			List<NotificationRecipientSetting> notificationRecipientSettings,
-			String recipientType, HashMap<String, Object> values)
-		throws Exception {
-
-		ObjectEntry objectEntry = objectEntryLocalService.addObjectEntry(
-			user2.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
-			Collections.emptyMap(), ServiceContextTestUtil.getServiceContext());
-
-		sendNotification(
-			new NotificationContextBuilder(
-			).className(
-				objectDefinition.getClassName()
-			).classPK(
-				objectEntry.getObjectEntryId()
-			).notificationTemplate(
-				notificationTemplateLocalService.addNotificationTemplate(
-					_createNotificationContext(
-						notificationRecipientSettings, recipientType,
-						ListUtil.fromMapKeys(values)))
-			).termValues(
-				HashMapBuilder.<String, Object>put(
-					"creator", String.valueOf(user2.getUserId())
-				).put(
-					"currentUserId", String.valueOf(user2.getUserId())
-				).build()
-			).userId(
-				user2.getUserId()
-			).build(),
-			NotificationConstants.TYPE_USER_NOTIFICATION);
-
-		notificationQueueEntries =
-			notificationQueueEntryLocalService.getNotificationQueueEntries(
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		notificationQueueEntry = notificationQueueEntries.get(
-			notificationQueueEntries.size() - 1);
-
-		assertTerms(
-			ListUtil.fromMapValues(values),
-			ListUtil.fromString(
-				notificationQueueEntry.getSubject(), StringPool.BLANK));
 	}
 
 	@Inject
