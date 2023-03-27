@@ -40,18 +40,29 @@ public abstract class BaseKaleoTaskAssignmentSelector
 
 		List<KaleoTaskAssignment> kaleoTaskAssignments = new ArrayList<>();
 
-		User user = (User)results.get(USER_ASSIGNMENT);
+		User assigneeUser = (User)results.get(USER_ASSIGNMENT);
 
-		if (user != null) {
+		if (assigneeUser != null) {
 			KaleoTaskAssignment kaleoTaskAssignment =
-				getUserKaleoTaskAssignment(user);
+				getUserKaleoTaskAssignment(assigneeUser);
 
 			kaleoTaskAssignments.add(kaleoTaskAssignment);
-		}
-		else {
-			List<Role> roles = (List<Role>)results.get(ROLES_ASSIGNMENT);
 
+			return kaleoTaskAssignments;
+		}
+
+		List<Role> roles = (List<Role>)results.get(ROLES_ASSIGNMENT);
+
+		if (roles != null) {
 			getRoleKaleoTaskAssignments(roles, kaleoTaskAssignments);
+
+			return kaleoTaskAssignments;
+		}
+
+		List<User> users = (List<User>)results.get(USERS_ASSIGNMENT);
+
+		for (User user : users) {
+			kaleoTaskAssignments.add(getUserKaleoTaskAssignment(user));
 		}
 
 		return kaleoTaskAssignments;
@@ -88,6 +99,8 @@ public abstract class BaseKaleoTaskAssignmentSelector
 	protected static final String ROLES_ASSIGNMENT = "roles";
 
 	protected static final String USER_ASSIGNMENT = "user";
+
+	protected static final String USERS_ASSIGNMENT = "users";
 
 	@Reference
 	protected KaleoTaskAssignmentFactory kaleoTaskAssignmentFactory;
