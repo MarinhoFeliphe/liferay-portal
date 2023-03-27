@@ -33,6 +33,7 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorRegistry;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable;
+import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionLocalizationTableFactory;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -535,6 +536,11 @@ public class ObjectFieldLocalServiceImpl
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId);
+
+		if (objectField.isLocalized()) {
+			return _dynamicObjectDefinitionLocalizationTableFactory.create(
+				objectDefinition);
+		}
 
 		if (Objects.equals(
 				objectField.getDBTableName(),
@@ -1171,6 +1177,10 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+
+	@Reference
+	private DynamicObjectDefinitionLocalizationTableFactory
+		_dynamicObjectDefinitionLocalizationTableFactory;
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
