@@ -399,7 +399,7 @@ public class DefaultObjectEntryManagerImplTest {
 	@Test
 	public void testAddObjectEntry() throws Exception {
 
-		// Aggregation field without filters
+		// Aggregation field with filter (date range with date and time)
 
 		ObjectEntry parentObjectEntry1 = _objectEntryManager.addObjectEntry(
 			_simpleDTOConverterContext, _objectDefinition1,
@@ -446,92 +446,6 @@ public class DefaultObjectEntryManagerImplTest {
 				).build();
 			}
 		};
-
-		_assertEquals(
-			childObjectEntry1,
-			_objectEntryManager.addObjectEntry(
-				_dtoConverterContext, _objectDefinition2, childObjectEntry1,
-				ObjectDefinitionConstants.SCOPE_COMPANY));
-
-		_assertEquals(
-			new ObjectEntry() {
-				{
-					properties = HashMapBuilder.<String, Object>put(
-						"averageAggregationObjectFieldName",
-						"0.12345678912345670000"
-					).put(
-						"countAggregationObjectFieldName", "1"
-					).put(
-						"maxAggregationObjectFieldName", "10"
-					).put(
-						"minAggregationObjectFieldName", "50000"
-					).put(
-						"sumAggregationObjectFieldName", "15.5"
-					).put(
-						"textObjectFieldName",
-						MapUtil.getString(
-							parentObjectEntry1.getProperties(),
-							"textObjectFieldName")
-					).build();
-				}
-			},
-			_objectEntryManager.getObjectEntry(
-				_simpleDTOConverterContext, _objectDefinition1,
-				parentObjectEntry1.getId()));
-
-		_objectEntryManager.addObjectEntry(
-			_dtoConverterContext, _objectDefinition2,
-			new ObjectEntry() {
-				{
-					properties = HashMapBuilder.<String, Object>put(
-						_objectRelationshipERCObjectFieldName,
-						"newExternalReferenceCode"
-					).put(
-						"dateObjectFieldName", "2020-01-02"
-					).put(
-						"decimalObjectFieldName", 15.7
-					).put(
-						"integerObjectFieldName", 15
-					).put(
-						"longIntegerObjectFieldName", 100L
-					).put(
-						"picklistObjectFieldName", _addListTypeEntry()
-					).put(
-						"precisionDecimalObjectFieldName",
-						new BigDecimal(
-							0.9876543217654321, MathContext.DECIMAL64)
-					).build();
-				}
-			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
-
-		_assertEquals(
-			new ObjectEntry() {
-				{
-					properties = HashMapBuilder.<String, Object>put(
-						"averageAggregationObjectFieldName",
-						"0.55555555544444440000"
-					).put(
-						"countAggregationObjectFieldName", "2"
-					).put(
-						"maxAggregationObjectFieldName", "15"
-					).put(
-						"minAggregationObjectFieldName", "100"
-					).put(
-						"sumAggregationObjectFieldName", "31.2"
-					).put(
-						"textObjectFieldName",
-						MapUtil.getString(
-							parentObjectEntry1.getProperties(),
-							"textObjectFieldName")
-					).build();
-				}
-			},
-			_objectEntryManager.getObjectEntry(
-				_simpleDTOConverterContext, _objectDefinition1,
-				parentObjectEntry1.getId()));
-
-		// Aggregation field with filter (date range with date and time)
 
 		ObjectField objectField = _objectFieldLocalService.getObjectField(
 			_objectDefinition1.getObjectDefinitionId(),
@@ -626,7 +540,93 @@ public class DefaultObjectEntryManagerImplTest {
 		_objectFilterLocalService.deleteObjectFieldObjectFilter(
 			objectField.getObjectFieldId());
 
-		// Make sure ListEntry key will be accepted as a property for Picklist
+		// Aggregation field without filters
+
+		_assertEquals(
+			childObjectEntry1,
+			_objectEntryManager.addObjectEntry(
+				_dtoConverterContext, _objectDefinition2, childObjectEntry1,
+				ObjectDefinitionConstants.SCOPE_COMPANY));
+
+		_assertEquals(
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"averageAggregationObjectFieldName",
+						"0.12345678912345670000"
+					).put(
+						"countAggregationObjectFieldName", "1"
+					).put(
+						"maxAggregationObjectFieldName", "10"
+					).put(
+						"minAggregationObjectFieldName", "50000"
+					).put(
+						"sumAggregationObjectFieldName", "15.5"
+					).put(
+						"textObjectFieldName",
+						MapUtil.getString(
+							parentObjectEntry1.getProperties(),
+							"textObjectFieldName")
+					).build();
+				}
+			},
+			_objectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition1,
+				parentObjectEntry1.getId()));
+
+		_objectEntryManager.addObjectEntry(
+			_dtoConverterContext, _objectDefinition2,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipERCObjectFieldName,
+						"newExternalReferenceCode"
+					).put(
+						"dateObjectFieldName", "2020-01-02"
+					).put(
+						"decimalObjectFieldName", 15.7
+					).put(
+						"integerObjectFieldName", 15
+					).put(
+						"longIntegerObjectFieldName", 100L
+					).put(
+						"picklistObjectFieldName", _addListTypeEntry()
+					).put(
+						"precisionDecimalObjectFieldName",
+						new BigDecimal(
+							0.9876543217654321, MathContext.DECIMAL64)
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_assertEquals(
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"averageAggregationObjectFieldName",
+						"0.55555555544444440000"
+					).put(
+						"countAggregationObjectFieldName", "2"
+					).put(
+						"maxAggregationObjectFieldName", "15"
+					).put(
+						"minAggregationObjectFieldName", "100"
+					).put(
+						"sumAggregationObjectFieldName", "31.2"
+					).put(
+						"textObjectFieldName",
+						MapUtil.getString(
+							parentObjectEntry1.getProperties(),
+							"textObjectFieldName")
+					).build();
+				}
+			},
+			_objectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition1,
+				parentObjectEntry1.getId()));
+
+		// List type entry by DTO
 
 		ListTypeEntry listTypeEntry =
 			_listTypeEntryLocalService.addListTypeEntry(
@@ -643,13 +643,13 @@ public class DefaultObjectEntryManagerImplTest {
 			}
 		};
 
-		_assertPicklistOjectField(listEntry, listTypeEntry.getKey());
-
-		// Make sure ListEntry DTO will be accepted as a property for Picklist
-
 		_assertPicklistOjectField(listEntry, listEntry);
 
-		// Make sure Map will be accepted as a property for Picklist
+		// List type entry by key
+
+		_assertPicklistOjectField(listEntry, listTypeEntry.getKey());
+
+		// List type entry by map
 
 		_assertPicklistOjectField(
 			listEntry,
