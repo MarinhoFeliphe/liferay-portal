@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -95,6 +97,27 @@ public class ObjectFieldSettingUtil {
 		}
 
 		return null;
+	}
+
+	public static Map<String, Object> toMap(
+		List<ObjectFieldSetting> objectFieldSettings) {
+
+		Map<String, Object> objectFieldSettingsValues = new HashMap<>();
+
+		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+			if (StringUtil.equals(objectFieldSetting.getName(), "filters")) {
+				objectFieldSettingsValues.put(
+					objectFieldSetting.getName(),
+					objectFieldSetting.getObjectFilters());
+			}
+			else {
+				objectFieldSettingsValues.put(
+					objectFieldSetting.getName(),
+					objectFieldSetting.getValue());
+			}
+		}
+
+		return objectFieldSettingsValues;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
