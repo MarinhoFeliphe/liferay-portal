@@ -2336,27 +2336,11 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
-			Map<String, Object> objectFieldSettingsValues = new HashMap<>();
-
-			List<ObjectFieldSetting> objectFieldSettings =
-				_objectFieldSettingLocalService.
-					getObjectFieldObjectFieldSettings(
-						objectField.getObjectFieldId());
-
-			for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
-				if (StringUtil.equals(
-						objectFieldSetting.getName(), "filters")) {
-
-					objectFieldSettingsValues.put(
-						objectFieldSetting.getName(),
-						objectFieldSetting.getObjectFilters());
-				}
-				else {
-					objectFieldSettingsValues.put(
-						objectFieldSetting.getName(),
-						objectFieldSetting.getValue());
-				}
-			}
+			Map<String, Object> objectFieldSettingsValues =
+				ObjectFieldSettingUtil.toMap(
+					_objectFieldSettingLocalService.
+						getObjectFieldObjectFieldSettings(
+							objectField.getObjectFieldId()));
 
 			ObjectDefinition objectDefinition =
 				dynamicObjectDefinitionTable.getObjectDefinition();

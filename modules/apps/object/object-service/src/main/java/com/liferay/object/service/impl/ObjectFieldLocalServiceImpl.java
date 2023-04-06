@@ -30,8 +30,10 @@ import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorRegistry;
+import com.liferay.object.internal.field.util.AggregationObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
@@ -127,8 +129,13 @@ public class ObjectFieldLocalServiceImpl
 			dbTableName, dbType, indexed, indexedAsKeyword, indexedLanguageId,
 			labelMap, localized, name, required, state, false);
 
-		if (objectDefinition.isApproved() &&
-			!objectField.compareBusinessType(
+		_addOrUpdateObjectFieldSettings(objectField, null, objectFieldSettings);
+
+		if (!objectDefinition.isApproved()) {
+			return objectField;
+		}
+
+		if (!objectField.compareBusinessType(
 				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
 			!objectField.compareBusinessType(
 				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
@@ -137,8 +144,17 @@ public class ObjectFieldLocalServiceImpl
 				DynamicObjectDefinitionTable.getAlterTableAddColumnSQL(
 					dbTableName, objectField.getDBColumnName(), dbType));
 		}
+		else if (objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
 
-		_addOrUpdateObjectFieldSettings(objectField, null, objectFieldSettings);
+			ObjectFieldUtil.createIndex(
+				_currentConnection, objectFieldPersistence.getDataSource(),
+				AggregationObjectFieldUtil.getRelatedObjectField(
+					objectDefinition, _objectDefinitionPersistence,
+					objectFieldPersistence, objectFieldSettings,
+					_objectRelationshipPersistence),
+				objectFieldLocalService, this::runSQL);
+		}
 
 		return objectField;
 	}
