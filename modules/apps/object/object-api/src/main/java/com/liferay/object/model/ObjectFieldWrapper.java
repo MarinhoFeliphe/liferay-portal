@@ -233,11 +233,6 @@ public class ObjectFieldWrapper
 	}
 
 	@Override
-	public boolean compareBusinessType(String businessType) {
-		return model.compareBusinessType(businessType);
-	}
-
-	@Override
 	public String[] getAvailableLanguageIds() {
 		return model.getAvailableLanguageIds();
 	}
@@ -595,6 +590,16 @@ public class ObjectFieldWrapper
 		return model.getUuid();
 	}
 
+	@Override
+	public boolean isAggregation() {
+		return model.isAggregation();
+	}
+
+	@Override
+	public boolean isFormula() {
+		return model.isFormula();
+	}
+
 	/**
 	 * Returns <code>true</code> if this object field is indexed.
 	 *
@@ -623,6 +628,16 @@ public class ObjectFieldWrapper
 	@Override
 	public boolean isLocalized() {
 		return model.isLocalized();
+	}
+
+	@Override
+	public boolean isMultiselectPicklist() {
+		return model.isMultiselectPicklist();
+	}
+
+	@Override
+	public boolean isRelationship() {
+		return model.isRelationship();
 	}
 
 	/**
