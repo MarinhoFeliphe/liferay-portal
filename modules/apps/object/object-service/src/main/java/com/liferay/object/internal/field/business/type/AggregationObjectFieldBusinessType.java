@@ -281,11 +281,8 @@ public class AggregationObjectFieldBusinessType
 				objectDefinition.getObjectDefinitionId(),
 				GetterUtil.getString(objectFilter.getFilterBy()));
 
-			if ((objectField == null) ||
-				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+			if ((objectField == null) || objectField.isAggregation() ||
+				objectField.isFormula()) {
 
 				throw new ObjectFieldSettingValueException.InvalidValue(
 					objectFieldName, "filterBy",

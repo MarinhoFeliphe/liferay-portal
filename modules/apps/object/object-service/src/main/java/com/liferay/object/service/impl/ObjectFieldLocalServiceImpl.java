@@ -135,18 +135,12 @@ public class ObjectFieldLocalServiceImpl
 			return objectField;
 		}
 
-		if (!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
-			!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
-
+		if (!objectField.isAggregation() && !objectField.isFormula()) {
 			runSQL(
 				DynamicObjectDefinitionTable.getAlterTableAddColumnSQL(
 					dbTableName, objectField.getDBColumnName(), dbType));
 		}
-		else if (objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
-
+		else if (objectField.isAggregation()) {
 			ObjectFieldUtil.createIndex(
 				_currentConnection, objectFieldPersistence.getDataSource(),
 				AggregationObjectFieldUtil.getRelatedObjectField(
@@ -910,14 +904,8 @@ public class ObjectFieldLocalServiceImpl
 		if ((Objects.equals(
 				objectDefinition.getExtensionDBTableName(),
 				objectField.getDBTableName()) ||
-			 (objectDefinition.isApproved() &&
-			  Objects.equals(
-				  objectField.getBusinessType(),
-				  ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP))) &&
-			!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
-			!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+			 (objectDefinition.isApproved() && objectField.isRelationship())) &&
+			!objectField.isAggregation() && !objectField.isFormula()) {
 
 			_alterTableDropColumn(
 				objectField.getDBTableName(), objectField.getDBColumnName());

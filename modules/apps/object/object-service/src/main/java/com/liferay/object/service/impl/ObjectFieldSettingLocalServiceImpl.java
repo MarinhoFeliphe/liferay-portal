@@ -14,7 +14,6 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
@@ -75,9 +74,7 @@ public class ObjectFieldSettingLocalServiceImpl
 		objectFieldSettingPersistence.removeByObjectFieldId(
 			objectField.getObjectFieldId());
 
-		if (objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
-
+		if (objectField.isAggregation()) {
 			_objectFilterLocalService.deleteObjectFieldObjectFilter(
 				objectField.getObjectFieldId());
 		}
@@ -104,9 +101,7 @@ public class ObjectFieldSettingLocalServiceImpl
 		List<ObjectFieldSetting> objectFieldSettings =
 			objectFieldSettingPersistence.findByObjectFieldId(objectFieldId);
 
-		if (!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
-
+		if (!objectField.isAggregation()) {
 			return objectFieldSettings;
 		}
 

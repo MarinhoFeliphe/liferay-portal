@@ -23,7 +23,6 @@ import com.liferay.object.action.trigger.ObjectActionTrigger;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
-import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectWebKeys;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
@@ -107,8 +106,7 @@ public class ObjectDefinitionsActionsDisplayContext
 		return ObjectCodeEditorUtil.getCodeEditorElements(
 			true, true, objectRequestHelper.getLocale(),
 			getObjectDefinitionId(),
-			objectField -> !objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION));
+			objectField -> !objectField.isAggregation());
 	}
 
 	public ObjectActionExecutor getObjectActionExecutor() {

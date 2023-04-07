@@ -249,8 +249,7 @@ public class ObjectEntryInfoItemFormProvider
 
 			finalStep.attribute(
 				SelectInfoFieldType.MULTIPLE,
-				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)
+				objectField.isMultiselectPicklist()
 			).attribute(
 				SelectInfoFieldType.OPTIONS, _getOptions(objectField)
 			);
