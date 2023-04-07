@@ -671,11 +671,7 @@ public class ObjectEntryDisplayContextImpl
 					continue;
 				}
 
-				if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-					objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
-
+				if (objectField.isAggregation() || objectField.isFormula()) {
 					ddmForm.addDDMFormField(
 						_getDDMFormField(objectEntry, objectField, true));
 				}
@@ -987,10 +983,8 @@ public class ObjectEntryDisplayContextImpl
 					objectLayoutColumn.getObjectFieldId(),
 					currentObjectField.getName());
 
-				if (currentObjectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-					currentObjectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+				if (currentObjectField.isAggregation() ||
+					currentObjectField.isFormula()) {
 
 					nestedDDMFormFields.add(
 						_getDDMFormField(

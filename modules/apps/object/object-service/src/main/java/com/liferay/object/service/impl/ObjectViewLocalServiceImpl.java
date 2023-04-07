@@ -14,7 +14,6 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.exception.DefaultObjectViewException;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectViewColumnFieldNameException;
@@ -48,7 +47,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -431,13 +429,8 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 			ObjectField objectField = _objectFieldPersistence.findByODI_N(
 				objectDefinitionId, objectViewSortColumn.getObjectFieldName());
 
-			if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
-				Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+			if (objectField.isAggregation() || objectField.isFormula() ||
+				objectField.isRelationship()) {
 
 				throw new ObjectViewSortColumnObjectFieldNameException(
 					"Object field " +

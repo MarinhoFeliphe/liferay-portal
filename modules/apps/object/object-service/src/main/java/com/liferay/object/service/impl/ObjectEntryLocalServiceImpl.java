@@ -2328,11 +2328,7 @@ public class ObjectEntryLocalServiceImpl
 		for (ObjectField objectField :
 				dynamicObjectDefinitionTable.getObjectFields()) {
 
-			if (!objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
-				!objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
-
+			if (!objectField.isAggregation() && !objectField.isFormula()) {
 				continue;
 			}
 
@@ -2345,9 +2341,7 @@ public class ObjectEntryLocalServiceImpl
 			ObjectDefinition objectDefinition =
 				dynamicObjectDefinitionTable.getObjectDefinition();
 
-			if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
-
+			if (objectField.isAggregation()) {
 				ObjectRelationship objectRelationship =
 					ObjectRelationshipUtil.getObjectRelationship(
 						_objectRelationshipPersistence.findByODI1_N(
@@ -2493,9 +2487,7 @@ public class ObjectEntryLocalServiceImpl
 						DynamicObjectDefinitionTable.getSQLType(
 							objectField.getDBType())));
 			}
-			else if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
-
+			else if (objectField.isFormula()) {
 				Object script = objectFieldSettingsValues.get("script");
 
 				if (script == null) {
@@ -2687,10 +2679,7 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
+			if (objectField.isAggregation() || objectField.isFormula() ||
 				!values.containsKey(objectField.getName())) {
 
 				if (objectField.isRequired()) {
@@ -2748,10 +2737,7 @@ public class ObjectEntryLocalServiceImpl
 			_setColumn(preparedStatement, index++, Types.BIGINT, objectEntryId);
 
 			for (ObjectField objectField : objectFields) {
-				if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-					objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
+				if (objectField.isAggregation() || objectField.isFormula() ||
 					!values.containsKey(objectField.getName())) {
 
 					continue;
@@ -3131,11 +3117,7 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-				objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
-
+			if (objectField.isAggregation() || objectField.isFormula()) {
 				continue;
 			}
 
@@ -3203,10 +3185,7 @@ public class ObjectEntryLocalServiceImpl
 			int index = 1;
 
 			for (ObjectField objectField : objectFields) {
-				if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-					objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
+				if (objectField.isAggregation() || objectField.isFormula() ||
 					!values.containsKey(objectField.getName())) {
 
 					continue;
