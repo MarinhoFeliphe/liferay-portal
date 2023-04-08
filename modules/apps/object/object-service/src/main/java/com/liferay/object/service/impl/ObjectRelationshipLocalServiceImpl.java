@@ -24,6 +24,7 @@ import com.liferay.object.exception.ObjectRelationshipNameException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
 import com.liferay.object.exception.ObjectRelationshipReverseException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -49,6 +50,7 @@ import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -782,6 +784,11 @@ public class ObjectRelationshipLocalServiceImpl
 				_objectDefinitionLocalService.deployObjectDefinition(
 					objectDefinition2);
 			}
+
+			ObjectFieldUtil.createIndex(
+				_currentConnection,
+				objectRelationshipPersistence.getDataSource(), objectField,
+				_objectFieldLocalService, this::runSQL);
 		}
 
 		return objectField;
@@ -1141,6 +1148,9 @@ public class ObjectRelationshipLocalServiceImpl
 		ObjectRelationshipLocalServiceImpl.class);
 
 	private BundleContext _bundleContext;
+
+	@Reference
+	private CurrentConnection _currentConnection;
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
