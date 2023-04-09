@@ -16,16 +16,52 @@ package com.liferay.object.field.util;
 
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
+import com.liferay.petra.sql.dsl.Column;
+import com.liferay.portal.kernel.dao.db.DBInspector;
+import com.liferay.portal.kernel.dao.db.IndexMetadata;
+import com.liferay.portal.kernel.dao.db.IndexMetadataFactoryUtil;
+import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+
+import javax.sql.DataSource;
 
 /**
  * @author Guilherme Camacho
  */
 public class ObjectFieldUtil {
+
+	public static void createIndex(
+		CurrentConnection currentConnection, DataSource dataSource,
+		ObjectField objectField,
+		ObjectFieldLocalService objectFieldLocalService,
+		Consumer<String> runSQLConsumer) {
+
+		Column<?, ?> column = objectFieldLocalService.getColumn(
+			objectField.getObjectDefinitionId(), objectField.getName());
+
+		if (column.isPrimaryKey()) {
+			return;
+		}
+
+		IndexMetadata indexMetadata =
+			IndexMetadataFactoryUtil.createIndexMetadata(
+				false, objectField.getDBTableName(),
+				objectField.getDBColumnName());
+
+		if (!_hasIndex(
+				currentConnection, dataSource, objectField.getDBTableName(),
+				indexMetadata)) {
+
+			runSQLConsumer.accept(indexMetadata.getCreateSQL(null));
+		}
+	}
 
 	public static ObjectField createObjectField(
 		long listTypeDefinitionId, String businessType, String dbColumnName,
@@ -124,6 +160,26 @@ public class ObjectFieldUtil {
 		return createObjectField(
 			businessType, null, dbType, false, false, null, label, 0, name,
 			objectFieldSettings, false, false);
+	}
+
+	private static boolean _hasIndex(
+		CurrentConnection currentConnection, DataSource dataSource,
+		String dbTableName, IndexMetadata indexMetadata) {
+
+		DBInspector dbInspector = new DBInspector(
+			currentConnection.getConnection(dataSource));
+
+		boolean hasIndex = false;
+
+		try {
+			hasIndex = dbInspector.hasIndex(
+				dbTableName, indexMetadata.getIndexName());
+		}
+		catch (Exception exception) {
+			throw new SystemException(exception);
+		}
+
+		return hasIndex;
 	}
 
 }
