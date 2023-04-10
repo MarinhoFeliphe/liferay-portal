@@ -30,10 +30,10 @@ import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorRegistry;
-import com.liferay.object.internal.field.util.AggregationObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
@@ -41,6 +41,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
+import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
@@ -141,12 +142,27 @@ public class ObjectFieldLocalServiceImpl
 					dbTableName, objectField.getDBColumnName(), dbType));
 		}
 		else if (objectField.isAggregation()) {
+			Map<String, Object> objectFieldSettingsValues =
+				ObjectFieldSettingUtil.toMap(objectFieldSettings);
+
+			ObjectRelationship objectRelationship =
+				ObjectRelationshipUtil.getObjectRelationship(
+					_objectRelationshipPersistence.findByODI1_N(
+						objectDefinition.getObjectDefinitionId(),
+						GetterUtil.getString(
+							objectFieldSettingsValues.get(
+								"objectRelationshipName"))));
+
+			ObjectDefinition relatedObjectDefinition =
+				_objectDefinitionPersistence.findByPrimaryKey(
+					objectRelationship.getObjectDefinitionId2());
+
 			ObjectFieldUtil.createIndex(
 				_currentConnection, objectFieldPersistence.getDataSource(),
-				AggregationObjectFieldUtil.getRelatedObjectField(
-					objectDefinition, _objectDefinitionPersistence,
-					objectFieldPersistence, objectFieldSettings,
-					_objectRelationshipPersistence),
+				objectFieldPersistence.fetchByODI_N(
+					relatedObjectDefinition.getObjectDefinitionId(),
+					String.valueOf(
+						objectFieldSettingsValues.get("objectFieldName"))),
 				objectFieldLocalService, this::runSQL);
 		}
 
