@@ -15,6 +15,7 @@
 package com.liferay.object.action.executor;
 
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import java.util.List;
@@ -42,6 +43,22 @@ public interface ObjectActionExecutor {
 
 	public default List<String> getObjectDefinitionNames() {
 		return UNRESTRICTED_BY_OBJECT_DEFINITIONS;
+	}
+
+	public default boolean isAvailable(String objectDefinitionName) {
+		if ((getCompanyId() != UNRESTRICTED_BY_COMPANY) &&
+			(CompanyThreadLocal.getCompanyId() != getCompanyId())) {
+
+			return false;
+		}
+
+		List<String> objectDefinitionNames = getObjectDefinitionNames();
+
+		if (objectDefinitionNames == UNRESTRICTED_BY_OBJECT_DEFINITIONS) {
+			return true;
+		}
+
+		return objectDefinitionNames.contains(objectDefinitionName);
 	}
 
 }
