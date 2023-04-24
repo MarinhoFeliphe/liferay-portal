@@ -108,7 +108,7 @@ public class ObjectActionExecutorRegistryImplTest {
 
 		ObjectActionExecutor objectActionExecutor1 =
 			_registerObjectActionExecutor(
-				ObjectActionExecutor.COMPANY_ID_ALL, "_objectActionExecutor1",
+				0, "_objectActionExecutor1",
 				Arrays.asList("Account", "Address"));
 
 		_assertObjectActionExecutors(
@@ -140,8 +140,7 @@ public class ObjectActionExecutorRegistryImplTest {
 
 		ObjectActionExecutor objectActionExecutor2 =
 			_registerObjectActionExecutor(
-				_companyId1, "_objectActionExecutor2",
-				ObjectActionExecutor.OBJECT_DEFINITION_NAMES_ALL);
+				_companyId1, "_objectActionExecutor2", Collections.emptyList());
 
 		_assertObjectActionExecutors(
 			_objectActionExecutorRegistry.getObjectActionExecutors(

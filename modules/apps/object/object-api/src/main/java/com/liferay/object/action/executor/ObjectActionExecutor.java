@@ -26,24 +26,19 @@ import java.util.List;
  */
 public interface ObjectActionExecutor {
 
-	public static int COMPANY_ID_ALL = 0;
-
-	public static List<String> OBJECT_DEFINITION_NAMES_ALL =
-		Collections.emptyList();
-
 	public void execute(
 			long companyId, UnicodeProperties parametersUnicodeProperties,
 			JSONObject payloadJSONObject, long userId)
 		throws Exception;
 
 	public default long getCompanyId() {
-		return COMPANY_ID_ALL;
+		return 0;
 	}
 
 	public String getKey();
 
 	public default List<String> getObjectDefinitionNames() {
-		return OBJECT_DEFINITION_NAMES_ALL;
+		return Collections.emptyList();
 	}
 
 }
