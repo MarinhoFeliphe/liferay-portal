@@ -461,7 +461,7 @@ public class ObjectActionLocalServiceImpl
 				StringBundler.concat(
 					"The object action executor key ", objectActionExecutorKey,
 					" is not allowed for company ",
-					String.valueOf(CompanyThreadLocal.getCompanyId())));
+					objectDefinition.getCompanyId()));
 		}
 
 		if (!ObjectActionExecutorUtil.isAllowedObjectDefinition(
