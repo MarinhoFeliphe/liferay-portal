@@ -611,6 +611,11 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	@Override
+	public String getStorageType() {
+		return ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT;
+	}
+
+	@Override
 	public ObjectEntry updateObjectEntry(
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, long objectEntryId,
