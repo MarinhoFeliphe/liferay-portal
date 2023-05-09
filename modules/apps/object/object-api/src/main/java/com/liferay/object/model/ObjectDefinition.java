@@ -61,6 +61,8 @@ public interface ObjectDefinition
 
 	public String getExtensionDBTableName();
 
+	public String getL10nDBTableName();
+
 	public String getOSGiJaxRsName();
 
 	public String getOSGiJaxRsName(String className);

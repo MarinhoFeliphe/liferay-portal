@@ -457,6 +457,11 @@ public class ObjectDefinitionWrapper
 		return model.getExternalReferenceCode();
 	}
 
+	@Override
+	public String getL10nDBTableName() {
+		return model.getL10nDBTableName();
+	}
+
 	/**
 	 * Returns the label of this object definition.
 	 *
