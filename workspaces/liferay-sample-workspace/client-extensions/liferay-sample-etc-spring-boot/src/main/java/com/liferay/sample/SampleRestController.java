@@ -140,6 +140,116 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
+	@PostMapping("/object/entry/manager/1/delete")
+	public ResponseEntity<String> postSampleObjectEntryManager1Delete(
+		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info("JWT Claims: " + jwt.getClaims());
+			_log.info("JWT ID: " + jwt.getId());
+			_log.info("JWT Subject: " + jwt.getSubject());
+
+			try {
+				JSONObject jsonObject = new JSONObject(json);
+
+				_log.info("\n\n" + jsonObject.toString(4) + "\n");
+			}
+			catch (Exception exception) {
+				_log.error("JSON: " + json, exception);
+			}
+		}
+
+		return new ResponseEntity<>(json, HttpStatus.CREATED);
+	}
+
+	@PostMapping("/object/entry/manager/1/get")
+	public ResponseEntity<String> postSampleObjectEntryManager1Get(
+		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info("JWT Claims: " + jwt.getClaims());
+			_log.info("JWT ID: " + jwt.getId());
+			_log.info("JWT Subject: " + jwt.getSubject());
+
+			try {
+				JSONObject jsonObject = new JSONObject(json);
+
+				_log.info("\n\n" + jsonObject.toString(4) + "\n");
+			}
+			catch (Exception exception) {
+				_log.error("JSON: " + json, exception);
+			}
+		}
+
+		return new ResponseEntity<>(json, HttpStatus.CREATED);
+	}
+
+	@PostMapping("/object/entry/manager/1/get-one")
+	public ResponseEntity<String> postSampleObjectEntryManager1GetOne(
+		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info("JWT Claims: " + jwt.getClaims());
+			_log.info("JWT ID: " + jwt.getId());
+			_log.info("JWT Subject: " + jwt.getSubject());
+
+			try {
+				JSONObject jsonObject = new JSONObject(json);
+
+				_log.info("\n\n" + jsonObject.toString(4) + "\n");
+			}
+			catch (Exception exception) {
+				_log.error("JSON: " + json, exception);
+			}
+		}
+
+		return new ResponseEntity<>(json, HttpStatus.CREATED);
+	}
+
+	@PostMapping("/object/entry/manager/1/patch")
+	public ResponseEntity<String> postSampleObjectEntryManager1Patch(
+		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info("JWT Claims: " + jwt.getClaims());
+			_log.info("JWT ID: " + jwt.getId());
+			_log.info("JWT Subject: " + jwt.getSubject());
+
+			try {
+				JSONObject jsonObject = new JSONObject(json);
+
+				_log.info("\n\n" + jsonObject.toString(4) + "\n");
+			}
+			catch (Exception exception) {
+				_log.error("JSON: " + json, exception);
+			}
+		}
+
+		return new ResponseEntity<>(json, HttpStatus.CREATED);
+	}
+
+	@PostMapping("/object/entry/manager/1/post")
+	public ResponseEntity<String> postSampleObjectEntryManager1Post(
+		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info("JWT Claims: " + jwt.getClaims());
+			_log.info("JWT ID: " + jwt.getId());
+			_log.info("JWT Subject: " + jwt.getSubject());
+
+			try {
+				JSONObject jsonObject = new JSONObject(json);
+
+				_log.info("\n\n" + jsonObject.toString(4) + "\n");
+			}
+			catch (Exception exception) {
+				_log.error("JSON: " + json, exception);
+			}
+		}
+
+		return new ResponseEntity<>(json, HttpStatus.CREATED);
+	}
+
 	@PostMapping("/workflow/action/1")
 	public ResponseEntity<String> postSampleWorkflowAction1(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
