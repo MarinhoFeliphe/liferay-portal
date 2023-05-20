@@ -14,10 +14,12 @@
 
 package com.liferay.object.rest.internal.manager.v1_0;
 
+import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.internal.configuration.FunctionObjectEntryManagerConfiguration;
+import com.liferay.object.rest.manager.v1_0.BaseObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.osgi.util.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.catapult.PortalCatapult;
@@ -26,7 +28,9 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -36,7 +40,6 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -52,7 +55,8 @@ import org.osgi.service.component.annotations.Reference;
 	factory = "com.liferay.object.rest.internal.manager.v1_0.FunctionObjectEntryManager",
 	service = ObjectEntryManager.class
 )
-public class FunctionObjectEntryManager implements ObjectEntryManager {
+public class FunctionObjectEntryManager
+	extends BaseObjectEntryManager implements ObjectEntryManager {
 
 	@Override
 	public ObjectEntry addObjectEntry(
@@ -60,6 +64,10 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
 			String scopeKey)
 		throws Exception {
+
+		checkPortletResourcePermission(
+			objectDefinition, scopeKey, dtoConverterContext.getUser(),
+			ObjectActionKeys.ADD_OBJECT_ENTRY);
 
 		return _toObjectEntry(
 			_launch(
@@ -78,7 +86,8 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 					dtoConverterContext.getUserId()
 				).buildJSONObject(),
 				_functionObjectEntryManagerConfiguration.postResourcePath(),
-				dtoConverterContext.getUserId()));
+				dtoConverterContext.getUserId()),
+			objectDefinition, scopeKey, dtoConverterContext.getUser());
 	}
 
 	@Override
@@ -87,6 +96,10 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			String scopeKey)
 		throws Exception {
+
+		checkPortletResourcePermission(
+			objectDefinition, scopeKey, dtoConverterContext.getUser(),
+			ActionKeys.DELETE);
 
 		_launch(
 			new RequestBodyBuilder(
@@ -117,6 +130,10 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 			Sort[] sorts)
 		throws Exception {
 
+		checkPortletResourcePermission(
+			objectDefinition, scopeKey, dtoConverterContext.getUser(),
+			ActionKeys.VIEW);
+
 		return _toObjectEntries(
 			_launch(
 				new RequestBodyBuilder(
@@ -145,7 +162,8 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 				).buildJSONObject(),
 				_functionObjectEntryManagerConfiguration.getResourcePath(),
 				dtoConverterContext.getUserId()),
-			pagination);
+			objectDefinition, pagination, scopeKey,
+			dtoConverterContext.getUser());
 	}
 
 	@Override
@@ -154,6 +172,10 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			String scopeKey)
 		throws Exception {
+
+		checkPortletResourcePermission(
+			objectDefinition, scopeKey, dtoConverterContext.getUser(),
+			ActionKeys.VIEW);
 
 		return _toObjectEntry(
 			_launch(
@@ -174,7 +196,8 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 					dtoConverterContext.getUserId()
 				).buildJSONObject(),
 				_functionObjectEntryManagerConfiguration.getOneResourcePath(),
-				dtoConverterContext.getUserId()));
+				dtoConverterContext.getUserId()),
+			objectDefinition, scopeKey, dtoConverterContext.getUser());
 	}
 
 	@Override
@@ -193,6 +216,10 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception {
+
+		checkPortletResourcePermission(
+			objectDefinition, scopeKey, dtoConverterContext.getUser(),
+			ActionKeys.UPDATE);
 
 		return _toObjectEntry(
 			_launch(
@@ -215,7 +242,8 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 					dtoConverterContext.getUserId()
 				).buildJSONObject(),
 				_functionObjectEntryManagerConfiguration.patchResourcePath(),
-				dtoConverterContext.getUserId()));
+				dtoConverterContext.getUserId()),
+			objectDefinition, scopeKey, dtoConverterContext.getUser());
 	}
 
 	@Activate
@@ -241,7 +269,8 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 	}
 
 	private Page<ObjectEntry> _toObjectEntries(
-			byte[] bytes, Pagination pagination)
+			byte[] bytes, ObjectDefinition objectDefinition,
+			Pagination pagination, String scopeKey, User user)
 		throws Exception {
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject(
@@ -250,20 +279,29 @@ public class FunctionObjectEntryManager implements ObjectEntryManager {
 		return Page.of(
 			JSONUtil.toList(
 				(JSONArray)jsonObject.get("items"),
-				itemJSONObject -> _toObjectEntry(itemJSONObject.toString())),
+				itemJSONObject -> _toObjectEntry(
+					itemJSONObject.toString(), objectDefinition, scopeKey,
+					user)),
 			pagination, (Integer)jsonObject.get("totalCount"));
 	}
 
-	private ObjectEntry _toObjectEntry(byte[] bytes) {
-		return _toObjectEntry(new String(bytes));
+	private ObjectEntry _toObjectEntry(
+		byte[] bytes, ObjectDefinition objectDefinition, String scopeKey,
+		User user) {
+
+		return _toObjectEntry(
+			new String(bytes), objectDefinition, scopeKey, user);
 	}
 
-	private ObjectEntry _toObjectEntry(String json) {
+	private ObjectEntry _toObjectEntry(
+		String json, ObjectDefinition objectDefinition, String scopeKey,
+		User user) {
+
 		ObjectEntry objectEntry = ObjectEntry.unsafeToDTO(json);
 
 		objectEntry.setActions(
 			HashMapBuilder.put(
-				"delete", Collections.<String, String>emptyMap()
+				"delete", addDeleteAction(objectDefinition, scopeKey, user)
 			).build());
 
 		objectEntry.setExternalReferenceCode(
