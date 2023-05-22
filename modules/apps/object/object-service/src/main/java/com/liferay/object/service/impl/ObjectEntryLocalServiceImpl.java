@@ -2984,7 +2984,12 @@ public class ObjectEntryLocalServiceImpl
 				(Map<String, String>)values.get(
 					objectField.getI18nObjectFieldName());
 
-			if (localizedValues == null) {
+			if ((localizedValues == null) || localizedValues.isEmpty()) {
+				if (objectField.isRequired()) {
+					throw new ObjectEntryValuesException.Required(
+						objectField.getName());
+				}
+
 				continue;
 			}
 
@@ -3085,6 +3090,12 @@ public class ObjectEntryLocalServiceImpl
 						return (Serializable)value;
 					});
 			}
+		}
+
+		if ((newI18nObjectFieldValues == null) ||
+			newI18nObjectFieldValues.isEmpty()) {
+
+			return;
 		}
 
 		_insertIntoLocalizationTable(
