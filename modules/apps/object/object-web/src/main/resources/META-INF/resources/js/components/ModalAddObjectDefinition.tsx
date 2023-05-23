@@ -47,13 +47,13 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 	apiURL,
 	observer,
 	onClose,
-	storageTypes,
+	storages,
 }) => {
 	const initialValues: TInitialValues = {
 		label: '',
 		name: undefined,
 		pluralLabel: '',
-		storageType: storageTypes[0],
+		storage: storages[0],
 	};
 	const [error, setError] = useState<string>('');
 
@@ -61,7 +61,7 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 		label,
 		name,
 		pluralLabel,
-		storageType,
+		storage,
 	}: TInitialValues) => {
 		const objectDefinition: ObjectDefinition = {
 			label: {
@@ -76,7 +76,7 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 		};
 
 		if (Liferay.FeatureFlags['LPS-135430']) {
-			objectDefinition.storageType = storageType.toLowerCase();
+			objectDefinition.storageType = storage.type;
 		}
 		try {
 			await API.save(apiURL, objectDefinition, 'POST');
@@ -111,10 +111,12 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 		validate,
 	});
 
-	const selectedStorageType = (storageType: string) => {
-		return storageTypes.find(
-			(item) => item?.toLowerCase() === storageType?.toLowerCase()
+	const selectedStorage = (storageLabel: string) => {
+		const chooseStorage = storages.find(
+			(item) => item.label[defaultLanguageId]?.toLowerCase() === storageLabel.toLowerCase()
 		);
+
+		return (chooseStorage as Storage).label[defaultLanguageId];
 	};
 
 	return (
@@ -166,18 +168,18 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 							onChange={({target: {value}}) => {
 								setValues({
 									...values,
-									storageType: storageTypes.find(
-										(storageType) => storageType === value
+									storage: storages.find(
+										(storage) => storage.label === value
 									),
 								});
 							}}
-							options={storageTypes.map((storageType) => {
-								return {label: storageType};
+							options={storages.map((storage) => {
+								return {label: storage.label[defaultLanguageId]};
 							})}
 							tooltip={Liferay.Language.get(
 								'object-definition-storage-type-tooltip'
 							)}
-							value={selectedStorageType(values.storageType)}
+							value={selectedStorage(values.storage.label[defaultLanguageId] as string)}
 						/>
 					)}
 				</ClayModal.Body>
@@ -207,14 +209,19 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
 	observer: Observer;
 	onClose: () => void;
-	storageTypes: string[];
+	storages: Storage[];
+}
+
+type Storage = {
+	label: LocalizedValue<string>;
+	type: string;
 }
 
 type TInitialValues = {
 	label: string;
 	name?: string;
 	pluralLabel: string;
-	storageType: string;
+	storage: Storage;
 };
 
 type ObjectDefinition = {
@@ -228,7 +235,7 @@ type ObjectDefinition = {
 
 type TNormalizeName = (str: string) => string;
 
-const ModalWithProvider: React.FC<IProps> = ({apiURL, storageTypes}) => {
+const ModalWithProvider: React.FC<IProps> = ({apiURL, storages}) => {
 	const [visibleModal, setVisibleModal] = useState<boolean>(false);
 	const {observer, onClose} = useModal({
 		onClose: () => setVisibleModal(false),
@@ -249,7 +256,7 @@ const ModalWithProvider: React.FC<IProps> = ({apiURL, storageTypes}) => {
 					apiURL={apiURL}
 					observer={observer}
 					onClose={onClose}
-					storageTypes={storageTypes}
+					storages={storages}
 				/>
 			)}
 		</ClayModalProvider>
