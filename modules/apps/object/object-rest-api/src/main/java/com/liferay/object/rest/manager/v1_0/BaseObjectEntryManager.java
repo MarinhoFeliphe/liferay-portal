@@ -107,10 +107,10 @@ public abstract class BaseObjectEntryManager {
 	protected GroupLocalService groupLocalService;
 
 	@Reference
-	protected Language language;
+	protected ObjectScopeProviderRegistry objectScopeProviderRegistry;
 
 	@Reference
-	protected ObjectScopeProviderRegistry objectScopeProviderRegistry;
+	protected Language language;
 
 	@Reference
 	protected PermissionCheckerFactory permissionCheckerFactory;

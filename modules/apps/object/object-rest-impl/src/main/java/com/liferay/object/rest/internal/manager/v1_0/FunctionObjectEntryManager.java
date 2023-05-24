@@ -14,6 +14,7 @@
 
 package com.liferay.object.rest.internal.manager.v1_0;
 
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
