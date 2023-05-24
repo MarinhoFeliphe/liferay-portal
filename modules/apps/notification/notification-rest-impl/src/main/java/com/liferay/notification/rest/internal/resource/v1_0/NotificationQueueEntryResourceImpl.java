@@ -247,7 +247,7 @@ public class NotificationQueueEntryResourceImpl
 								getClassNameId();
 
 						if (classNameId == 0) {
-							return null;
+							return "Added via API";
 						}
 
 						NotificationHandler notificationHandler =
