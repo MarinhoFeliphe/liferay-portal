@@ -21,7 +21,7 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
 	storages: Storage[];
 }
 declare type Storage = {
-	label: LocalizedValue<string>;
+	label: string;
 	type: string;
 };
 declare const ModalWithProvider: React.FC<IProps>;
