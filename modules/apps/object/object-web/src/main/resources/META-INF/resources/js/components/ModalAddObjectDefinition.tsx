@@ -113,7 +113,9 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 
 	const selectedStorage = (storageLabel: string) => {
 		const chooseStorage = storages.find(
-			(item) => item.label[defaultLanguageId]?.toLowerCase() === storageLabel.toLowerCase()
+			(item) =>
+				item.label[defaultLanguageId]?.toLowerCase() ===
+				storageLabel.toLowerCase()
 		);
 
 		return (chooseStorage as Storage).label[defaultLanguageId];
@@ -174,12 +176,18 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 								});
 							}}
 							options={storages.map((storage) => {
-								return {label: storage.label[defaultLanguageId]};
+								return {
+									label: storage.label[defaultLanguageId],
+								};
 							})}
 							tooltip={Liferay.Language.get(
 								'object-definition-storage-type-tooltip'
 							)}
-							value={selectedStorage(values.storage.label[defaultLanguageId] as string)}
+							value={selectedStorage(
+								values.storage.label[
+									defaultLanguageId
+								] as string
+							)}
 						/>
 					)}
 				</ClayModal.Body>
@@ -215,7 +223,7 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
 type Storage = {
 	label: LocalizedValue<string>;
 	type: string;
-}
+};
 
 type TInitialValues = {
 	label: string;
