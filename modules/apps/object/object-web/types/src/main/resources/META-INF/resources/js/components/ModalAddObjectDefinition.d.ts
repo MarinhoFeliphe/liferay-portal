@@ -18,7 +18,11 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
 	observer: Observer;
 	onClose: () => void;
-	storageTypes: string[];
+	storages: Storage[];
 }
+declare type Storage = {
+	label: string;
+	type: string;
+};
 declare const ModalWithProvider: React.FC<IProps>;
 export default ModalWithProvider;
