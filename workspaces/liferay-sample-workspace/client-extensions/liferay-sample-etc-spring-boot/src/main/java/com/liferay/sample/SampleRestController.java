@@ -145,7 +145,7 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/delete")
+	@PostMapping("/object/entry/manager/1/delete/object/entry")
 	public ResponseEntity<String> postSampleObjectEntryManager1Delete(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -164,7 +164,7 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/get")
+	@PostMapping("/object/entry/manager/1/get/object/entries")
 	public ResponseEntity<String> postSampleObjectEntryManager1Get(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -193,7 +193,7 @@ public class SampleRestController {
 			HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/get-one")
+	@PostMapping("/object/entry/manager/1/get/object/entry")
 	public ResponseEntity<String> postSampleObjectEntryManager1GetOne(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -213,7 +213,7 @@ public class SampleRestController {
 			objectEntryJSONObject.toString(), HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/patch")
+	@PostMapping("/object/entry/manager/1/put/object/entry")
 	public ResponseEntity<String> postSampleObjectEntryManager1Patch(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -239,7 +239,7 @@ public class SampleRestController {
 			objectEntryJSONObject.toString(), HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/post")
+	@PostMapping("/object/entry/manager/1/post/object/entry")
 	public ResponseEntity<String> postSampleObjectEntryManager1Post(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
