@@ -111,7 +111,7 @@ public class BaseNotificationTypeTest {
 				Collections.singletonList(listTypeEntry));
 
 		parentObjectEntryValues = LinkedHashMapBuilder.<String, Object>put(
-			"parentTextObjectField", RandomTestUtil.randomString()
+			"textObjectField", RandomTestUtil.randomString()
 		).build();
 
 		randomObjectEntryValues = LinkedHashMapBuilder.<String, Object>put(
@@ -239,7 +239,7 @@ public class BaseNotificationTypeTest {
 						LocalizedMapUtil.getLocalizedMap(
 							RandomTestUtil.randomString())
 					).name(
-						"parentTextObjectField"
+						"textObjectField"
 					).objectFieldSettings(
 						Collections.emptyList()
 					).build()));
@@ -377,7 +377,7 @@ public class BaseNotificationTypeTest {
 				getTermName("integerObjectField"),
 				getTermName("picklistObjectField"),
 				getTermName("textObjectField"),
-				getRelationshipTermName("parentTextObjectField"),
+				getRelationshipTermName("textObjectField"),
 				getRelationshipTermName("AUTHOR_FIRST_NAME")));
 	}
 
