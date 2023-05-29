@@ -259,7 +259,7 @@ public class BaseNotificationTypeTest {
 				StringUtil.randomId(),
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
-		_authorTermValues = HashMapBuilder.<String, Object>put(
+		_childAuthorTermValues = HashMapBuilder.<String, Object>put(
 			getTermName("AUTHOR_EMAIL_ADDRESS"), user2.getEmailAddress()
 		).put(
 			getTermName("AUTHOR_FIRST_NAME"), user2.getFirstName()
@@ -376,7 +376,7 @@ public class BaseNotificationTypeTest {
 
 	protected List<String> getTermNames() {
 		return ListUtil.concat(
-			ListUtil.fromMapKeys(_authorTermValues),
+			ListUtil.fromMapKeys(_childAuthorTermValues),
 			ListUtil.fromMapKeys(_currentUserTermValues),
 			Arrays.asList(
 				getTermName("booleanObjectField"),
@@ -390,7 +390,7 @@ public class BaseNotificationTypeTest {
 
 	protected List<Object> getTermValues() {
 		return ListUtil.concat(
-			ListUtil.fromMapValues(_authorTermValues),
+			ListUtil.fromMapValues(_childAuthorTermValues),
 			ListUtil.fromMapValues(_currentUserTermValues),
 			ListUtil.fromMapValues(childObjectEntryValues),
 			ListUtil.fromMapValues(parentObjectEntryValues),
@@ -487,7 +487,7 @@ public class BaseNotificationTypeTest {
 	@Inject
 	private static UserLocalService _userLocalService;
 
-	private Map<String, Object> _authorTermValues;
+	private Map<String, Object> _childAuthorTermValues;
 	private Map<String, Object> _currentUserTermValues;
 
 	@Inject
