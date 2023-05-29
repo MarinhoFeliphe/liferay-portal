@@ -142,7 +142,7 @@ public class SampleRestController {
 			}
 		}
 
-		return new ResponseEntity<>(json, HttpStatus.CREATED);
+		return new ResponseEntity<>(json, HttpStatus.OK);
 	}
 
 	@PostMapping("/object/entry/manager/1/delete/object/entry")
@@ -161,7 +161,7 @@ public class SampleRestController {
 		_objectEntryJSONObjects.remove(
 			String.valueOf(jsonObject.get("externalReferenceCode")));
 
-		return new ResponseEntity<>(json, HttpStatus.CREATED);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@PostMapping("/object/entry/manager/1/get/object/entries")
@@ -190,7 +190,7 @@ public class SampleRestController {
 			).put(
 				"totalCount", _objectEntryJSONObjects.size()
 			).toString(),
-			HttpStatus.CREATED);
+			HttpStatus.OK);
 	}
 
 	@PostMapping("/object/entry/manager/1/get/object/entry")
@@ -210,7 +210,7 @@ public class SampleRestController {
 			String.valueOf(jsonObject.get("externalReferenceCode")));
 
 		return new ResponseEntity<>(
-			objectEntryJSONObject.toString(), HttpStatus.CREATED);
+			objectEntryJSONObject.toString(), HttpStatus.OK);
 	}
 
 	@PostMapping("/object/entry/manager/1/put/object/entry")
@@ -236,7 +236,7 @@ public class SampleRestController {
 			objectEntryJSONObject);
 
 		return new ResponseEntity<>(
-			objectEntryJSONObject.toString(), HttpStatus.CREATED);
+			objectEntryJSONObject.toString(), HttpStatus.OK);
 	}
 
 	@PostMapping("/object/entry/manager/1/post/object/entry")
