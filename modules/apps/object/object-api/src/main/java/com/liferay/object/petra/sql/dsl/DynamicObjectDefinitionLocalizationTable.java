@@ -44,14 +44,12 @@ public class DynamicObjectDefinitionLocalizationTable
 		_objectFields = objectFields;
 
 		String primaryKeyColumnName = TextFormatter.format(
-			objectDefinition.getShortName() + "_l10nId", TextFormatter.I);
+			objectDefinition.getShortName() + "L10nId", TextFormatter.I);
 
 		_primaryKeyColumnName = "c_" + primaryKeyColumnName;
 
-		_foreignKeyColumnName = objectDefinition.getPKObjectFieldDBColumnName();
-
 		createColumn(
-			_foreignKeyColumnName, Long.class, Types.BIGINT,
+			objectDefinition.getPKObjectFieldDBColumnName(), Long.class, Types.BIGINT,
 			Column.FLAG_DEFAULT);
 
 		createColumn(
@@ -91,9 +89,7 @@ public class DynamicObjectDefinitionLocalizationTable
 		sb.append("create table ");
 		sb.append(_objectDefinition.getLocalizationDBTableName());
 		sb.append(" (");
-		sb.append(_primaryKeyColumnName);
-		sb.append(" LONG not null primary key, ");
-		sb.append(_foreignKeyColumnName);
+		sb.append(_objectDefinition.getPKObjectFieldDBColumnName());
 		sb.append(" LONG not null, languageId VARCHAR(10) not null");
 
 		for (ObjectField objectField : _objectFields) {
@@ -105,7 +101,9 @@ public class DynamicObjectDefinitionLocalizationTable
 					objectField.getDBType()));
 		}
 
-		sb.append(")");
+		sb.append("primary key (");
+		sb.append(_objectDefinition.getPKObjectFieldDBColumnName());
+		sb.append(", languageId))");
 
 		String sql = sb.toString();
 
@@ -120,7 +118,7 @@ public class DynamicObjectDefinitionLocalizationTable
 		getForeignKeyColumn() {
 
 		return (Column<DynamicObjectDefinitionLocalizationTable, Long>)
-			getColumn(_foreignKeyColumnName);
+			getColumn(objectDefinition.getPKObjectFieldDBColumnName());
 	}
 
 	public String getForeignKeyColumnName() {
@@ -168,7 +166,6 @@ public class DynamicObjectDefinitionLocalizationTable
 	private static final Log _log = LogFactoryUtil.getLog(
 		DynamicObjectDefinitionLocalizationTable.class);
 
-	private final String _foreignKeyColumnName;
 	private final ObjectDefinition _objectDefinition;
 	private final List<Column<DynamicObjectDefinitionLocalizationTable, ?>>
 		_objectFieldColumns;
