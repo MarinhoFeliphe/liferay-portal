@@ -2955,7 +2955,9 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
-		List<String> objectEntryPersistedLanguageIds = new ArrayList<>(
+		Map<String, Serializable> insertValues = new HashMap<>();
+
+		List<String> languageIds = new ArrayList<>(
 			objectEntryPersistence.dslQuery(
 				DSLQueryFactoryUtil.select(
 					dynamicObjectDefinitionLocalizationTable.
@@ -2970,8 +2972,6 @@ public class ObjectEntryLocalServiceImpl
 						)
 				)));
 
-		Map<String, Serializable> newI18nObjectFieldValues = new HashMap<>();
-
 		for (ObjectField objectField :
 				dynamicObjectDefinitionLocalizationTable.getObjectFields()) {
 
@@ -2984,7 +2984,7 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getI18nObjectFieldName());
 
 			for (Map.Entry<String, String> entry : localizedValues.entrySet()) {
-				if (objectEntryPersistedLanguageIds.contains(entry.getKey())) {
+				if (languageIds.contains(entry.getKey())) {
 					_updateLocalizationTable(
 						dynamicObjectDefinitionLocalizationTable,
 						entry.getKey(), objectEntryId,
@@ -2998,7 +2998,7 @@ public class ObjectEntryLocalServiceImpl
 					continue;
 				}
 
-				newI18nObjectFieldValues.compute(
+				insertValues.compute(
 					objectField.getI18nObjectFieldName(),
 					(key, value) -> {
 						if (value == null) {
@@ -3018,14 +3018,12 @@ public class ObjectEntryLocalServiceImpl
 			}
 		}
 
-		if ((newI18nObjectFieldValues == null) ||
-			newI18nObjectFieldValues.isEmpty()) {
-
+		if ((insertValues == null) || insertValues.isEmpty()) {
 			return;
 		}
 
 		_insertIntoLocalizationTable(
-			objectDefinition, objectEntryId, newI18nObjectFieldValues);
+			objectDefinition, objectEntryId, insertValues);
 	}
 
 	private void _insertIntoTable(
