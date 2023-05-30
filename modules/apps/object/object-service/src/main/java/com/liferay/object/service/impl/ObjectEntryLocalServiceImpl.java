@@ -2914,11 +2914,11 @@ public class ObjectEntryLocalServiceImpl
 						dynamicObjectDefinitionLocalizationTable.getColumn(
 							objectField.getDBColumnName());
 
+					String value = StringPool.BLANK;
+
 					Map<String, String> localizedValues =
 						(Map<String, String>)values.get(
 							objectField.getI18nObjectFieldName());
-
-					String value = StringPool.BLANK;
 
 					if (localizedValues != null) {
 						value = Objects.toString(
