@@ -146,8 +146,9 @@ public class SampleRestController {
 	}
 
 	@PostMapping("/object/entry/manager/1/delete/object/entry")
-	public ResponseEntity<String> postSampleObjectEntryManager1DeleteObjectEntry(
-		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
+	public ResponseEntity<String>
+		postSampleObjectEntryManager1DeleteObjectEntry(
+			@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
 		JSONObject jsonObject = new JSONObject(json);
 
