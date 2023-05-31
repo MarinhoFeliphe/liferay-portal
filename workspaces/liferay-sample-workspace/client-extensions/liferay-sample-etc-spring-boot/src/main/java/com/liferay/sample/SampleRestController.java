@@ -167,7 +167,7 @@ public class SampleRestController {
 			).uri(
 				jsonObject.getString("transitionURL")
 			).bodyValue(
-				"{transitionName: \"approve\"}"
+				"{\"transitionName\": \"approve\"}"
 			).header(
 				HttpHeaders.AUTHORIZATION, "Bearer " + jwt.getTokenValue()
 			).exchangeToMono(
