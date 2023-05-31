@@ -145,8 +145,8 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/delete")
-	public ResponseEntity<String> postSampleObjectEntryManager1Delete(
+	@PostMapping("/object/entry/manager/1/delete/object/entry")
+	public ResponseEntity<String> postSampleObjectEntryManager1DeleteObjectEntry(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
 		JSONObject jsonObject = new JSONObject(json);
@@ -164,8 +164,8 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/get")
-	public ResponseEntity<String> postSampleObjectEntryManager1Get(
+	@PostMapping("/object/entry/manager/1/get/object/entries")
+	public ResponseEntity<String> postSampleObjectEntryManager1GetObjectEntries(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
 		if (_log.isInfoEnabled()) {
@@ -193,8 +193,8 @@ public class SampleRestController {
 			HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/get-one")
-	public ResponseEntity<String> postSampleObjectEntryManager1GetOne(
+	@PostMapping("/object/entry/manager/1/get/object/entry")
+	public ResponseEntity<String> postSampleObjectEntryManager1GetObjectEntry(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
 		JSONObject jsonObject = new JSONObject(json);
@@ -213,8 +213,8 @@ public class SampleRestController {
 			objectEntryJSONObject.toString(), HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/patch")
-	public ResponseEntity<String> postSampleObjectEntryManager1Patch(
+	@PostMapping("/object/entry/manager/1/post/object/entry")
+	public ResponseEntity<String> postSampleObjectEntryManager1PostObjectEntry(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
 		JSONObject jsonObject = new JSONObject(json);
@@ -239,8 +239,8 @@ public class SampleRestController {
 			objectEntryJSONObject.toString(), HttpStatus.CREATED);
 	}
 
-	@PostMapping("/object/entry/manager/1/post")
-	public ResponseEntity<String> postSampleObjectEntryManager1Post(
+	@PostMapping("/object/entry/manager/1/put/object/entry")
+	public ResponseEntity<String> postSampleObjectEntryManager1PuttObjectEntry(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
 		JSONObject jsonObject = new JSONObject(json);

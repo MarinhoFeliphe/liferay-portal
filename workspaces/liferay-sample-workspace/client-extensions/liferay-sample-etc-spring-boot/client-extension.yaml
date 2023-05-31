@@ -21,13 +21,13 @@ liferay-sample-etc-spring-boot-object-action-2:
     resourcePath: /object/action/2
     type: objectAction
 liferay-sample-etc-spring-boot-object-entry-manager-1:
-    deleteResourcePath: /object/entry/manager/1/delete
-    getOneResourcePath: /object/entry/manager/1/get-one
-    getResourcePath: /object/entry/manager/1/get
+    deleteObjectEntryResourcePath: /object/entry/manager/1/delete/object/entry
+    getObjectEntriesResourcePath: /object/entry/manager/1/get/object/entries
+    getObjectEntryResourcePath: /object/entry/manager/1/get/object/entry
     name: Liferay Sample Etc Spring Boot Spring Boot Object Entry Manager 1
     oAuth2ApplicationExternalReferenceCode: liferay-sample-etc-spring-boot-oauth-application-user-agent
-    patchResourcePath: /object/entry/manager/1/patch
-    postResourcePath: /object/entry/manager/1/post
+    postObjectEntryResourcePath: /object/entry/manager/1/post/object/entry
+    putObjectEntryResourcePath: /object/entry/manager/1/put/object/entry
     type: objectEntryManager
 liferay-sample-etc-spring-boot-workflow-action-1:
     name: Liferay Sample Etc Spring Boot Spring Boot Workflow Action 1
