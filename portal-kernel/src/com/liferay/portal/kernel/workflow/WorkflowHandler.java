@@ -16,8 +16,10 @@ package com.liferay.portal.kernel.workflow;
 
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -44,6 +46,12 @@ import javax.servlet.http.HttpServletResponse;
  * @author Julio Camarero
  */
 public interface WorkflowHandler<T> {
+
+	public JSONObject getAssetObjectDTOJSONObject(
+			long classPK,
+			UnsafeBiFunction<String, Serializable, JSONObject, Exception>
+				unsafeBiFunction)
+		throws Exception;
 
 	public AssetRenderer<T> getAssetRenderer(long classPK)
 		throws PortalException;
