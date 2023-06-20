@@ -14,12 +14,15 @@
 
 package com.liferay.object.internal.workflow;
 
+import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -47,6 +50,37 @@ public class ObjectEntryWorkflowHandler
 
 		_objectDefinition = objectDefinition;
 		_objectEntryLocalService = objectEntryLocalService;
+	}
+
+	@Override
+	public JSONObject getAssetObjectDTOJSONObject(
+			long classPK,
+			UnsafeBiFunction<String, Serializable, JSONObject, Exception>
+				unsafeBiFunction)
+		throws Exception {
+
+		AssetRenderer<ObjectEntry> assetRenderer = getAssetRenderer(classPK);
+
+		if ((assetRenderer == null) ||
+			(assetRenderer.getAssetObject() == null)) {
+
+			return null;
+		}
+
+		ObjectEntry objectEntry = assetRenderer.getAssetObject();
+
+		JSONObject jsonObject = unsafeBiFunction.apply(
+			ObjectEntry.class.getName(), objectEntry);
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		for (Map.Entry<String, Serializable> entry : values.entrySet()) {
+			jsonObject.put(entry.getKey(), entry.getValue());
+		}
+
+		jsonObject.remove("properties");
+
+		return jsonObject;
 	}
 
 	@Override
