@@ -34,6 +34,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 /**
  * @author Raymond Augé
  * @author Gregory Amerson
@@ -49,6 +51,18 @@ public class WorkflowAction1RestController extends BaseRestController {
 
 		log(jwt, _log, json);
 
+		String transition = "approve";
+
+		JSONObject payload = new JSONObject(json);
+
+		JSONObject entryDTO = payload.getJSONObject("entryDTO");
+
+		String state = entryDTO.getString("state");
+
+		if (Objects.equals("inReview", state)) {
+			transition = "review";
+		}
+
 		try {
 			WebClient.Builder builder = WebClient.builder();
 
@@ -60,13 +74,11 @@ public class WorkflowAction1RestController extends BaseRestController {
 				HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
 			).build();
 
-			JSONObject jsonObject = new JSONObject(json);
-
 			webClient.post(
 			).uri(
-				jsonObject.getString("transitionURL")
+				payload.getString("transitionURL")
 			).bodyValue(
-				"{\"transitionName\": \"approve\"}"
+				"{\"transitionName\": \"" + transition + "\"}"
 			).header(
 				HttpHeaders.AUTHORIZATION, "Bearer " + jwt.getTokenValue()
 			).exchangeToMono(

@@ -196,7 +196,7 @@ public class FunctionActionExecutorImpl implements ActionExecutor {
 					WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME));
 
 		payloadJSONObject.put(
-			"assetObjectDTO",
+			"entryDTO",
 			workflowHandler.getAssetObjectDTOJSONObject(
 				GetterUtil.getLong(
 					inputObjects.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK)),
