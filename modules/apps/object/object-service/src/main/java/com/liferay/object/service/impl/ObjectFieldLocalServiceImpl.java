@@ -277,16 +277,10 @@ public class ObjectFieldLocalServiceImpl
 			dbColumnName = name;
 		}
 
-		String readOnly = ObjectFieldConstants.READ_ONLY_FALSE;
-
-		if (_readOnlyObjectFieldNames.contains(name)) {
-			readOnly = ObjectFieldConstants.READ_ONLY_TRUE;
-		}
-
 		return _addObjectField(
 			null, userId, 0, objectDefinitionId, businessType, dbColumnName,
 			dbTableName, dbType, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, false, name, readOnly, null, required, state, true);
+			labelMap, false, name, ObjectFieldConstants.READ_ONLY_FALSE, null, required, state, true);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -1081,7 +1075,18 @@ public class ObjectFieldLocalServiceImpl
 		return null;
 	}
 
-	private String _getReadOnly(String businessType, String readOnly) {
+	private String _getReadOnly(
+		String businessType, boolean defaultStorageType, String name,
+		String readOnly, boolean system) {
+
+		if (_readOnlyObjectFieldNames.contains(name)) {
+			readOnly = ObjectFieldConstants.READ_ONLY_TRUE;
+		}
+
+		if (!defaultStorageType && !system) {
+			return ObjectFieldConstants.READ_ONLY_FALSE;
+		}
+
 		if (Objects.equals(
 				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
 			Objects.equals(

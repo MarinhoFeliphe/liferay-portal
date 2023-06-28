@@ -19,6 +19,8 @@ import com.liferay.frontend.data.set.sample.web.internal.constants.FDSSampleWebK
 import com.liferay.frontend.data.set.sample.web.internal.display.context.FDSSampleDisplayContext;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.field.builder.ObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
