@@ -17,6 +17,7 @@ package com.liferay.notification.service.impl;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationQueueEntryStatusException;
+import com.liferay.notification.exception.NotificationQueueEntrySubjectException;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.util.Portal;
 import java.util.Date;
 import java.util.List;
 
+import com.liferay.portal.kernel.util.Validator;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -65,6 +67,10 @@ public class NotificationQueueEntryLocalServiceImpl
 		NotificationType notificationType =
 			_notificationTypeServiceTracker.getNotificationType(
 				notificationQueueEntry.getType());
+
+		if (Validator.isNull(notificationQueueEntry.getSubject())) {
+			throw new NotificationQueueEntrySubjectException("Subject is null");
+		}
 
 		notificationType.validateNotificationQueueEntry(notificationContext);
 
