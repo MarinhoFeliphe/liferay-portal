@@ -17,10 +17,10 @@ package com.liferay.message.boards.internal.workflow;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.workflow.WorkflowHandler;
 
 import java.util.Locale;
 
+import com.liferay.portal.workflow.handler.WorkflowHandler;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 

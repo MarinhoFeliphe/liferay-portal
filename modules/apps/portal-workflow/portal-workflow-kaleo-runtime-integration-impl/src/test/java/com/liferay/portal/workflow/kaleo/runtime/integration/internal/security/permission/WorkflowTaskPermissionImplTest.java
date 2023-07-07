@@ -25,14 +25,14 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.DefaultWorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskAssignee;
 import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.workflow.handler.BaseWorkflowHandler;
+import com.liferay.portal.workflow.handler.WorkflowHandler;
 import com.liferay.portal.workflow.kaleo.runtime.integration.internal.WorkflowTaskManagerImpl;
 import com.liferay.portal.workflow.security.permission.WorkflowTaskPermission;
 

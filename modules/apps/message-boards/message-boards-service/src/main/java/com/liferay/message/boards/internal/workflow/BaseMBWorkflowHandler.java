@@ -19,8 +19,8 @@ import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.workflow.handler.BaseWorkflowHandler;
 
 import java.io.Serializable;
 

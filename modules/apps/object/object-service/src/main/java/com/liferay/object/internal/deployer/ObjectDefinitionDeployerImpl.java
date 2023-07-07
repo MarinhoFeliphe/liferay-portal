@@ -75,7 +75,6 @@ import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.language.override.service.PLOEntryLocalService;
 import com.liferay.portal.search.batch.DynamicQueryBatchIndexingActionableFactory;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
@@ -83,6 +82,7 @@ import com.liferay.portal.search.spi.model.index.contributor.ModelIndexerWriterC
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchRegistrarHelper;
+import com.liferay.portal.workflow.handler.WorkflowHandler;
 import com.liferay.user.associated.data.anonymizer.UADAnonymizer;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.user.associated.data.exporter.UADExporter;
