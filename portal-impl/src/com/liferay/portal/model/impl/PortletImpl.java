@@ -70,7 +70,6 @@ import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
-import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xml.QName;
 import com.liferay.portal.kernel.xmlrpc.Method;
 import com.liferay.portal.util.PropsValues;
@@ -2244,22 +2243,6 @@ public class PortletImpl extends PortletBaseImpl {
 	@Override
 	public List<String> getWorkflowHandlerClasses() {
 		return _workflowHandlerClasses;
-	}
-
-	/**
-	 * Returns the workflow handler instances of the portlet.
-	 *
-	 * @return the workflow handler instances of the portlet
-	 */
-	@Override
-	public List<WorkflowHandler<?>> getWorkflowHandlerInstances() {
-		if (_workflowHandlerClasses.isEmpty()) {
-			return null;
-		}
-
-		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
-
-		return portletBag.getWorkflowHandlerInstances();
 	}
 
 	/**

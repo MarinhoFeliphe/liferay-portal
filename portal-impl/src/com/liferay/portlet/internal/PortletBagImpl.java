@@ -42,7 +42,6 @@ import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
-import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xmlrpc.Method;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.social.kernel.model.SocialActivityInterpreter;
@@ -281,11 +280,6 @@ public class PortletBagImpl implements PortletBag {
 	@Override
 	public List<WebDAVStorage> getWebDAVStorageInstances() {
 		return _getList(WebDAVStorage.class);
-	}
-
-	@Override
-	public List<WorkflowHandler<?>> getWorkflowHandlerInstances() {
-		return _getList(WorkflowHandler.class);
 	}
 
 	@Override

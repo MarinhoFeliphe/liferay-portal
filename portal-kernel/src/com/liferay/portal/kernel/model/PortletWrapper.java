@@ -1817,18 +1817,6 @@ public class PortletWrapper
 	}
 
 	/**
-	 * Returns the workflow handler instances of the portlet.
-	 *
-	 * @return the workflow handler instances of the portlet
-	 */
-	@Override
-	public java.util.List<com.liferay.portal.kernel.workflow.WorkflowHandler<?>>
-		getWorkflowHandlerInstances() {
-
-		return model.getWorkflowHandlerInstances();
-	}
-
-	/**
 	 * Returns the name of the XML-RPC method class of the portlet.
 	 *
 	 * @return the name of the XML-RPC method class of the portlet

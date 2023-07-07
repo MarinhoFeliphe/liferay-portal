@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.servlet.URLEncoder;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
-import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xmlrpc.Method;
 import com.liferay.social.kernel.model.SocialActivityInterpreter;
 import com.liferay.social.kernel.model.SocialRequestInterpreter;
@@ -111,8 +110,6 @@ public interface PortletBag extends Cloneable {
 	public List<UserNotificationHandler> getUserNotificationHandlerInstances();
 
 	public List<WebDAVStorage> getWebDAVStorageInstances();
-
-	public List<WorkflowHandler<?>> getWorkflowHandlerInstances();
 
 	public List<Method> getXmlRpcMethodInstances();
 
