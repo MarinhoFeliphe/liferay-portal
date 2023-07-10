@@ -30,6 +30,8 @@ public interface PortalInstanceLifecycleManager {
 
 	public void registerCompany(Company company);
 
+	public void undoPreregisteredChanges(Company company);
+
 	public void unregisterCompany(Company company);
 
 }

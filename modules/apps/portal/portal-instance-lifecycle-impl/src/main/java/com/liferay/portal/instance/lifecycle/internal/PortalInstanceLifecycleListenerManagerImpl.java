@@ -110,6 +110,16 @@ public class PortalInstanceLifecycleListenerManagerImpl
 
 	@Clusterable
 	@Override
+	public void undoPreregisteredChanges(Company company) {
+		for (PortalInstanceLifecycleListener portalInstanceLifecycleListener :
+				_serviceTrackerList) {
+
+			undoPreregisteredChanges(portalInstanceLifecycleListener, company);
+		}
+	}
+
+	@Clusterable
+	@Override
 	public void unregisterCompany(Company company) {
 		_companies.remove(company);
 
@@ -212,6 +222,24 @@ public class PortalInstanceLifecycleListenerManagerImpl
 					LocaleThreadLocal.setSiteDefaultLocale(siteDefaultLocale);
 				}
 			});
+	}
+
+	protected void undoPreregisteredChanges(
+		PortalInstanceLifecycleListener portalInstanceLifecycleListener,
+		Company company) {
+
+		try {
+			portalInstanceLifecycleListener.portalInstanceNotRegistered(
+				company);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to undo pre registered portal instance changes " +
+						company,
+					exception);
+			}
+		}
 	}
 
 	protected void unregisterCompany(
