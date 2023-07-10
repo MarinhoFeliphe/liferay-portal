@@ -38,6 +38,10 @@ public interface PortalInstanceLifecycleListener {
 		return clazz.getName();
 	}
 
+	public default void portalInstanceNotRegistered(Company company)
+		throws Exception {
+	}
+
 	public default void portalInstancePreregistered(Company company)
 		throws Exception {
 	}
