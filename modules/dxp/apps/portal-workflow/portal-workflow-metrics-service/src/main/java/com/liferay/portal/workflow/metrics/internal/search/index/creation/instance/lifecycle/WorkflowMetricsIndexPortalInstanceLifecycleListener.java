@@ -30,6 +30,11 @@ public class WorkflowMetricsIndexPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
 	@Override
+	public void portalInstanceNotRegistered(Company company) throws Exception {
+		_workflowMetricsIndexCreator.removeIndex(company);
+	}
+
+	@Override
 	public void portalInstancePreregistered(Company company) throws Exception {
 		_workflowMetricsIndexCreator.createIndex(company);
 	}
