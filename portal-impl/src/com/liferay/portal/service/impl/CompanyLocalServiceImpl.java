@@ -1453,6 +1453,15 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
+	protected void undoCompanyPreregisteredChanges(Company company) {
+		PortalInstanceLifecycleManager portalInstanceLifecycleManager =
+			_serviceTracker.getService();
+
+		if (portalInstanceLifecycleManager != null) {
+			portalInstanceLifecycleManager.undoPreregisteredChanges(company);
+		}
+	}
+
 	protected void unregisterCompany(Company company) {
 		PortalInstanceLifecycleManager portalInstanceLifecycleManager =
 			_serviceTracker.getService();
@@ -2079,6 +2088,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			_portalPreferencesLocalService.getPreferences(
 				company.getCompanyId(), PortletKeys.PREFS_OWNER_TYPE_COMPANY);
+		}
+		catch (Exception exception) {
+			undoCompanyPreregisteredChanges(company);
+
+			throw exception;
 		}
 		finally {
 			LocaleThreadLocal.setDefaultLocale(localeThreadLocalDefaultLocale);
