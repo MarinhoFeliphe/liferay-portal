@@ -12,22 +12,24 @@
  * details.
  */
 
-package com.liferay.object.action.executor;
+package com.liferay.object.scope;
 
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.util.UnicodeProperties;
+import java.util.List;
 
 /**
- * @author Marco Leo
- * @author Brian Wing Shun Chan
+ * @author Feliphe Marinho
  */
-public interface ObjectActionExecutor {
+public interface ObjectDefinitionsScoped {
 
-	public void execute(
-			long companyId, UnicodeProperties parametersUnicodeProperties,
-			JSONObject payloadJSONObject, long userId)
-		throws Exception;
+	public List<String> getAllowedObjectDefinitionNames();
 
-	public String getKey();
+	public default boolean isAllowedObjectDefinition(
+		String objectDefinitionName) {
+
+		List<String> allowedObjectDefinitionNames =
+			getAllowedObjectDefinitionNames();
+
+		return allowedObjectDefinitionNames.contains(objectDefinitionName);
+	}
 
 }
