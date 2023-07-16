@@ -20,8 +20,8 @@ import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationRecipientLocalServiceUtil;
+import com.liferay.notification.service.NotificationRecipientSettingLocalService;
 import com.liferay.notification.service.NotificationTemplateLocalServiceUtil;
-import com.liferay.notification.type.NotificationType;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -36,7 +36,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Feliphe Marinho
@@ -115,11 +117,44 @@ public class NotificationUtil {
 
 	public static List<NotificationRecipientSetting>
 		toNotificationRecipientSetting(
-			long notificationRecipientId, NotificationType notificationType,
+			long notificationRecipientId,
+			NotificationRecipientSettingLocalService
+				notificationRecipientSettingLocalService,
 			Object[] recipients, User user) {
 
-		return notificationType.createNotificationRecipientSettings(
-			notificationRecipientId, recipients, user);
+		List<NotificationRecipientSetting> notificationRecipientSettings =
+			new ArrayList<>();
+
+		for (Object recipient : recipients) {
+			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
+
+			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
+				NotificationRecipientSetting notificationRecipientSetting =
+					notificationRecipientSettingLocalService.
+						createNotificationRecipientSetting(0);
+
+				notificationRecipientSetting.setCompanyId(user.getCompanyId());
+				notificationRecipientSetting.setUserId(user.getUserId());
+				notificationRecipientSetting.setUserName(user.getFullName());
+				notificationRecipientSetting.setNotificationRecipientId(
+					notificationRecipientId);
+				notificationRecipientSetting.setName(entry.getKey());
+
+				if (entry.getValue() instanceof String) {
+					notificationRecipientSetting.setValue(
+						String.valueOf(entry.getValue()));
+				}
+				else {
+					notificationRecipientSetting.setValueMap(
+						LocalizedMapUtil.getLocalizedMap(
+							(LinkedHashMap)entry.getValue()));
+				}
+
+				notificationRecipientSettings.add(notificationRecipientSetting);
+			}
+		}
+
+		return notificationRecipientSettings;
 	}
 
 	public static NotificationTemplate toNotificationTemplate(

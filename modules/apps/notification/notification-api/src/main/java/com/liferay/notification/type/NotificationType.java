@@ -46,10 +46,6 @@ public interface NotificationType {
 		User user, String body, NotificationContext notificationContext,
 		String subject);
 
-	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user);
-
 	public default String getFromName(
 		NotificationQueueEntry notificationQueueEntry) {
 

@@ -33,10 +33,8 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,46 +80,6 @@ public abstract class BaseNotificationType implements NotificationType {
 			NotificationQueueEntryConstants.STATUS_UNSENT);
 
 		return notificationQueueEntry;
-	}
-
-	@Override
-	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user) {
-
-		List<NotificationRecipientSetting> notificationRecipientSettings =
-			new ArrayList<>();
-
-		for (Object recipient : recipients) {
-			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
-
-			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
-				NotificationRecipientSetting notificationRecipientSetting =
-					notificationRecipientSettingLocalService.
-						createNotificationRecipientSetting(0);
-
-				notificationRecipientSetting.setCompanyId(user.getCompanyId());
-				notificationRecipientSetting.setUserId(user.getUserId());
-				notificationRecipientSetting.setUserName(user.getFullName());
-				notificationRecipientSetting.setNotificationRecipientId(
-					notificationRecipientId);
-				notificationRecipientSetting.setName(entry.getKey());
-
-				if (entry.getValue() instanceof String) {
-					notificationRecipientSetting.setValue(
-						String.valueOf(entry.getValue()));
-				}
-				else {
-					notificationRecipientSetting.setValueMap(
-						LocalizedMapUtil.getLocalizedMap(
-							(LinkedHashMap)entry.getValue()));
-				}
-
-				notificationRecipientSettings.add(notificationRecipientSetting);
-			}
-		}
-
-		return notificationRecipientSettings;
 	}
 
 	@Override

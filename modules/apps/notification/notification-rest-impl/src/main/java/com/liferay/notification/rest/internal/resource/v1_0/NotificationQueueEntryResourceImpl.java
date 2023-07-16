@@ -26,6 +26,7 @@ import com.liferay.notification.rest.dto.v1_0.NotificationQueueEntry;
 import com.liferay.notification.rest.dto.v1_0.util.NotificationUtil;
 import com.liferay.notification.rest.resource.v1_0.NotificationQueueEntryResource;
 import com.liferay.notification.service.NotificationQueueEntryService;
+import com.liferay.notification.service.NotificationRecipientSettingLocalService;
 import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -141,8 +142,8 @@ public class NotificationQueueEntryResourceImpl
 			NotificationUtil.toNotificationRecipient(contextUser, 0L));
 		notificationContext.setNotificationRecipientSettings(
 			NotificationUtil.toNotificationRecipientSetting(
-				0L, notificationType, notificationQueueEntry.getRecipients(),
-				contextUser));
+				0L, _notificationRecipientSettingLocalService,
+				notificationQueueEntry.getRecipients(), contextUser));
 		notificationContext.setType(NotificationConstants.TYPE_EMAIL);
 
 		return _toNotificationQueueEntry(
@@ -267,6 +268,10 @@ public class NotificationQueueEntryResourceImpl
 
 	@Reference
 	private NotificationQueueEntryService _notificationQueueEntryService;
+
+	@Reference
+	private NotificationRecipientSettingLocalService
+		_notificationRecipientSettingLocalService;
 
 	@Reference
 	private NotificationTypeServiceTracker _notificationTypeServiceTracker;
