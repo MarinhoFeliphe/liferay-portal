@@ -83,20 +83,8 @@ public abstract class BaseNotificationType implements NotificationType {
 	}
 
 	@Override
-	public String getType() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String getTypeLanguageKey() {
 		return getType();
-	}
-
-	@Override
-	public void sendNotification(NotificationContext notificationContext)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -110,22 +98,6 @@ public abstract class BaseNotificationType implements NotificationType {
 				notificationRecipientSetting.getValue()
 			).build(),
 			Object.class);
-	}
-
-	protected NotificationRecipient createNotificationRecipient(
-		User user, long notificationQueueEntryId) {
-
-		NotificationRecipient notificationRecipient =
-			notificationRecipientLocalService.createNotificationRecipient(0L);
-
-		notificationRecipient.setCompanyId(user.getCompanyId());
-		notificationRecipient.setUserId(user.getUserId());
-		notificationRecipient.setUserName(user.getFullName());
-		notificationRecipient.setClassName(
-			NotificationQueueEntry.class.getName());
-		notificationRecipient.setClassPK(notificationQueueEntryId);
-
-		return notificationRecipient;
 	}
 
 	protected List<NotificationRecipientSetting>
@@ -236,19 +208,23 @@ public abstract class BaseNotificationType implements NotificationType {
 
 		notificationContext.setNotificationQueueEntry(notificationQueueEntry);
 
-		NotificationRecipient notificationQueueEntryRecipient =
-			createNotificationRecipient(
-				user, notificationQueueEntry.getNotificationQueueEntryId());
+		NotificationRecipient notificationRecipient =
+			notificationRecipientLocalService.createNotificationRecipient(0L);
 
-		notificationContext.setNotificationRecipient(
-			notificationQueueEntryRecipient);
+		notificationRecipient.setCompanyId(user.getCompanyId());
+		notificationRecipient.setUserId(user.getUserId());
+		notificationRecipient.setUserName(user.getFullName());
+		notificationRecipient.setClassName(
+			NotificationQueueEntry.class.getName());
+		notificationRecipient.setClassPK(
+			notificationQueueEntry.getNotificationQueueEntryId());
+
+		notificationContext.setNotificationRecipient(notificationRecipient);
 
 		if (evaluatedNotificationRecipientSettings instanceof Map) {
 			notificationContext.setNotificationRecipientSettings(
 				createNotificationRecipientSettings(
-					user,
-					notificationQueueEntryRecipient.
-						getNotificationRecipientId(),
+					user, notificationRecipient.getNotificationRecipientId(),
 					(Map<String, String>)
 						evaluatedNotificationRecipientSettings));
 		}
@@ -263,8 +239,7 @@ public abstract class BaseNotificationType implements NotificationType {
 				notificationRecipientSettings.addAll(
 					createNotificationRecipientSettings(
 						user,
-						notificationQueueEntryRecipient.
-							getNotificationRecipientId(),
+						notificationRecipient.getNotificationRecipientId(),
 						evaluatedNotificationRecipientSetting));
 			}
 
