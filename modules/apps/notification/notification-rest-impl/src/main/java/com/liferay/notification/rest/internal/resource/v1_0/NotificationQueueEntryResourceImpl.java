@@ -27,9 +27,11 @@ import com.liferay.notification.rest.dto.v1_0.util.NotificationUtil;
 import com.liferay.notification.rest.resource.v1_0.NotificationQueueEntryResource;
 import com.liferay.notification.service.NotificationQueueEntryService;
 import com.liferay.notification.service.NotificationRecipientSettingLocalService;
+import com.liferay.notification.type.DTOContributor;
 import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -168,96 +170,121 @@ public class NotificationQueueEntryResourceImpl
 	}
 
 	private NotificationQueueEntry _toNotificationQueueEntry(
-			com.liferay.notification.model.NotificationQueueEntry
-				serviceBuilderNotificationQueueEntry)
-		throws PortalException {
+		com.liferay.notification.model.NotificationQueueEntry
+			serviceBuilderNotificationQueueEntry) {
 
-		NotificationRecipient notificationRecipient =
-			serviceBuilderNotificationQueueEntry.getNotificationRecipient();
 		NotificationType notificationType =
 			_notificationTypeServiceTracker.getNotificationType(
 				serviceBuilderNotificationQueueEntry.getType());
 
-		return new NotificationQueueEntry() {
-			{
-				actions = HashMapBuilder.put(
-					"delete",
-					addAction(
-						ActionKeys.DELETE, "deleteNotificationQueueEntry",
-						com.liferay.notification.model.NotificationQueueEntry.
-							class.getName(),
-						serviceBuilderNotificationQueueEntry.
-							getNotificationQueueEntryId())
-				).put(
-					"get",
-					addAction(
-						ActionKeys.VIEW, "getNotificationQueueEntry",
-						com.liferay.notification.model.NotificationQueueEntry.
-							class.getName(),
-						serviceBuilderNotificationQueueEntry.
-							getNotificationQueueEntryId())
-				).put(
-					"update",
-					() -> {
-						if (serviceBuilderNotificationQueueEntry.getStatus() ==
-								NotificationQueueEntryConstants.STATUS_SENT) {
-
-							return null;
-						}
-
-						return addAction(
-							ActionKeys.UPDATE,
-							"putNotificationQueueEntryResend",
+		NotificationQueueEntry notificationQueueEntry =
+			new NotificationQueueEntry() {
+				{
+					actions = HashMapBuilder.put(
+						"delete",
+						addAction(
+							ActionKeys.DELETE, "deleteNotificationQueueEntry",
 							com.liferay.notification.model.
 								NotificationQueueEntry.class.getName(),
 							serviceBuilderNotificationQueueEntry.
-								getNotificationQueueEntryId());
-					}
-				).build();
-				body = serviceBuilderNotificationQueueEntry.getBody();
-				fromName = notificationType.getFromName(
-					serviceBuilderNotificationQueueEntry);
-				id =
-					serviceBuilderNotificationQueueEntry.
-						getNotificationQueueEntryId();
-				recipients = notificationType.toRecipients(
-					notificationRecipient.getNotificationRecipientSettings());
-				recipientsSummary = notificationType.getRecipientSummary(
-					serviceBuilderNotificationQueueEntry);
-				sentDate = serviceBuilderNotificationQueueEntry.getSentDate();
-				status = serviceBuilderNotificationQueueEntry.getStatus();
-				subject = serviceBuilderNotificationQueueEntry.getSubject();
-				type = serviceBuilderNotificationQueueEntry.getType();
-				typeLabel = _language.get(
-					_getLocale(), notificationType.getTypeLanguageKey());
-
-				setTriggerBy(
-					() -> {
-						long classNameId =
+								getNotificationQueueEntryId())
+					).put(
+						"get",
+						addAction(
+							ActionKeys.VIEW, "getNotificationQueueEntry",
+							com.liferay.notification.model.
+								NotificationQueueEntry.class.getName(),
 							serviceBuilderNotificationQueueEntry.
-								getClassNameId();
+								getNotificationQueueEntryId())
+					).put(
+						"update",
+						() -> {
+							int status =
+								serviceBuilderNotificationQueueEntry.
+									getStatus();
 
-						if (classNameId == 0) {
+							if (status == NotificationQueueEntryConstants.STATUS_SENT) {
+								return null;
+							}
+
+							return addAction(
+								ActionKeys.UPDATE,
+								"putNotificationQueueEntryResend",
+								com.liferay.notification.model.
+									NotificationQueueEntry.class.getName(),
+								serviceBuilderNotificationQueueEntry.
+									getNotificationQueueEntryId());
+						}
+					).build();
+					body = serviceBuilderNotificationQueueEntry.getBody();
+					fromName = StringPool.DASH;
+					id =
+						serviceBuilderNotificationQueueEntry.
+							getNotificationQueueEntryId();
+
+					recipientsSummary = StringPool.DASH;
+					sentDate =
+						serviceBuilderNotificationQueueEntry.getSentDate();
+					status = serviceBuilderNotificationQueueEntry.getStatus();
+					subject = serviceBuilderNotificationQueueEntry.getSubject();
+					type = serviceBuilderNotificationQueueEntry.getType();
+					typeLabel = _language.get(
+						_getLocale(), notificationType.getTypeLanguageKey());
+
+					setRecipients(
+						() -> {
+							NotificationRecipient notificationRecipient =
+								serviceBuilderNotificationQueueEntry.
+									getNotificationRecipient();
+
+							return transformToArray(
+								notificationRecipient.
+									getNotificationRecipientSettings(),
+								notificationRecipientSetting ->
+									HashMapBuilder.put(
+										notificationRecipientSetting.getName(),
+										notificationRecipientSetting.getValue()
+									).build(),
+								Object.class);
+						});
+					setTriggerBy(
+						() -> {
+							long classNameId =
+								serviceBuilderNotificationQueueEntry.
+									getClassNameId();
+
+							if (classNameId == 0) {
+								return _language.get(
+									contextAcceptLanguage.getPreferredLocale(),
+									"added-via-api");
+							}
+
+							NotificationHandler notificationHandler =
+								_notificationHandlerTracker.
+									getNotificationHandler(
+										_portal.getClassName(classNameId));
+
+							if (notificationHandler != null) {
+								return notificationHandler.getTriggerBy(
+									contextAcceptLanguage.getPreferredLocale());
+							}
+
 							return _language.get(
 								contextAcceptLanguage.getPreferredLocale(),
-								"added-via-api");
-						}
+								"missing-object-definition");
+						});
+				}
+			};
 
-						NotificationHandler notificationHandler =
-							_notificationHandlerTracker.getNotificationHandler(
-								_portal.getClassName(classNameId));
+		if (notificationType instanceof DTOContributor) {
+			DTOContributor notificationTypeDTOContributor =
+				(DTOContributor)notificationType;
 
-						if (notificationHandler != null) {
-							return notificationHandler.getTriggerBy(
-								contextAcceptLanguage.getPreferredLocale());
-						}
+			notificationTypeDTOContributor.contribute(
+				serviceBuilderNotificationQueueEntry, notificationQueueEntry);
+		}
 
-						return _language.get(
-							contextAcceptLanguage.getPreferredLocale(),
-							"missing-object-definition");
-					});
-			}
-		};
+		return notificationQueueEntry;
 	}
 
 	@Reference

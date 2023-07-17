@@ -37,6 +37,7 @@ import com.liferay.notification.model.NotificationTemplateAttachment;
 import com.liferay.notification.service.NotificationQueueEntryAttachmentLocalService;
 import com.liferay.notification.service.NotificationTemplateAttachmentLocalService;
 import com.liferay.notification.type.BaseNotificationType;
+import com.liferay.notification.type.DTOContributor;
 import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.util.NotificationRecipientSettingUtil;
 import com.liferay.object.model.ObjectField;
@@ -75,6 +76,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.template.transformer.TemplateNodeFactory;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 
 import java.util.ArrayList;
@@ -96,32 +98,53 @@ import org.osgi.service.component.annotations.Reference;
  * @author Feliphe Marinho
  */
 @Component(service = NotificationType.class)
-public class EmailNotificationType extends BaseNotificationType {
+public class EmailNotificationType
+	extends BaseNotificationType implements DTOContributor {
 
 	@Override
-	public String getFromName(NotificationQueueEntry notificationQueueEntry) {
+	public void contribute(
+		NotificationQueueEntry serviceBuilderNotificationQueueEntry,
+		Serializable serializable) {
+
+		com.liferay.notification.rest.dto.v1_0.NotificationQueueEntry
+			notificationQueueEntry =
+				(com.liferay.notification.rest.dto.v1_0.NotificationQueueEntry)
+					serializable;
+
 		NotificationRecipient notificationRecipient =
-			notificationQueueEntry.getNotificationRecipient();
+			serviceBuilderNotificationQueueEntry.getNotificationRecipient();
 
 		Map<String, Object> notificationRecipientSettingsMap =
 			NotificationRecipientSettingUtil.toMap(
 				notificationRecipient.getNotificationRecipientSettings());
 
-		return String.valueOf(notificationRecipientSettingsMap.get("fromName"));
+		notificationQueueEntry.setFromName(
+			String.valueOf(notificationRecipientSettingsMap.get("fromName")));
+		notificationQueueEntry.setRecipientsSummary(
+			String.valueOf(notificationRecipientSettingsMap.get("to")));
+		notificationQueueEntry.setRecipients(
+			new Object[] {notificationRecipientSettingsMap});
 	}
 
 	@Override
-	public String getRecipientSummary(
-		NotificationQueueEntry notificationQueueEntry) {
+	public void contribute(
+		NotificationTemplate serviceBuilderNotificationTemplate,
+		Serializable serializable) {
+
+		com.liferay.notification.rest.dto.v1_0.NotificationTemplate
+			notificationTemplate =
+				(com.liferay.notification.rest.dto.v1_0.NotificationTemplate)
+					serializable;
 
 		NotificationRecipient notificationRecipient =
-			notificationQueueEntry.getNotificationRecipient();
+			serviceBuilderNotificationTemplate.getNotificationRecipient();
 
 		Map<String, Object> notificationRecipientSettingsMap =
 			NotificationRecipientSettingUtil.toMap(
 				notificationRecipient.getNotificationRecipientSettings());
 
-		return String.valueOf(notificationRecipientSettingsMap.get("to"));
+		notificationTemplate.setRecipients(
+			new Object[] {notificationRecipientSettingsMap});
 	}
 
 	@Override

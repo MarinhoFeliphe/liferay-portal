@@ -46,18 +46,6 @@ public interface NotificationType {
 		User user, String body, NotificationContext notificationContext,
 		String subject);
 
-	public default String getFromName(
-		NotificationQueueEntry notificationQueueEntry) {
-
-		return "-";
-	}
-
-	public default String getRecipientSummary(
-		NotificationQueueEntry notificationQueueEntry) {
-
-		return "-";
-	}
-
 	public String getType();
 
 	public String getTypeLanguageKey();
