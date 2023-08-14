@@ -163,10 +163,8 @@ String randomNamespace = StringUtil.randomId() + StringPool.UNDERLINE;
 				</div>
 
 				<div class="sidebar-body">
-					<liferay-ui:tabs
-						cssClass="navigation-bar component-navigation-bar navbar-no-collapse"
-						names="details,revision-history"
-						refresh="<%= false %>"
+					<clay:tabs
+						tabsItems="<%= kaleoDesignerDisplayContext.getTabsItems() %>"
 					>
 						<div class="tab-content">
 							<c:if test="<%= kaleoDefinitionVersion != null %>">
@@ -226,7 +224,7 @@ String randomNamespace = StringUtil.randomId() + StringPool.UNDERLINE;
 								</liferay-ui:section>
 							</c:if>
 						</div>
-					</liferay-ui:tabs>
+					</clay:tabs>
 				</div>
 			</div>
 		</div>

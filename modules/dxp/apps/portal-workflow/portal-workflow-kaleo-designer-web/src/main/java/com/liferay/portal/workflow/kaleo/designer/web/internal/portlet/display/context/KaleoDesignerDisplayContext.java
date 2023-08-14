@@ -8,6 +8,8 @@ package com.liferay.portal.workflow.kaleo.designer.web.internal.portlet.display.
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPCreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -566,6 +568,25 @@ public class KaleoDesignerDisplayContext {
 			).put(
 				"value", WorkflowConstants.STATUS_SCHEDULED
 			));
+	}
+
+	public List<TabsItem> getTabsItems() {
+		return TabsItemListBuilder.add(
+			tabsItem -> {
+				tabsItem.setActive(true);
+				tabsItem.setLabel(
+					LanguageUtil.get(
+						_kaleoDesignerRequestHelper.getRequest(), "details"));
+			}
+		).add(
+			tabsItem -> {
+				tabsItem.setActive(true);
+				tabsItem.setLabel(
+					LanguageUtil.get(
+						_kaleoDesignerRequestHelper.getRequest(),
+						"revision-history"));
+			}
+		).build();
 	}
 
 	public String getTitle(KaleoDefinitionVersion kaleoDefinitionVersion) {
