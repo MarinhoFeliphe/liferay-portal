@@ -15,6 +15,7 @@ interface ViewObjectDefinitionsProps extends IFDSTableProps {
 export declare type ViewObjectDefinitionsModals = {
 	addFolder: boolean;
 	addObjectDefinition: boolean;
+	bindToRootObject: boolean;
 	deleteFolder: boolean;
 	deleteObjectDefinition: boolean;
 	editFolder: boolean;

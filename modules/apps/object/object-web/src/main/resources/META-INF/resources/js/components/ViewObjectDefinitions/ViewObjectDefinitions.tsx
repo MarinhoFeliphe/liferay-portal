@@ -31,6 +31,7 @@ import {ModalEditFolder} from './ModalEditFolder';
 import {deleteObjectDefinition, getFolderActions} from './objectDefinitionUtil';
 
 import './ViewObjectDefinitions.scss';
+import {ModalBindToRootObject} from './ModalBindToRootObject';
 import {ModalDeleteFolder} from './ModalDeleteFolder';
 import {ModalMoveObjectDefinition} from './ModalMoveObjectDefinition';
 
@@ -43,6 +44,7 @@ interface ViewObjectDefinitionsProps extends IFDSTableProps {
 export type ViewObjectDefinitionsModals = {
 	addFolder: boolean;
 	addObjectDefinition: boolean;
+	bindToRootObject: boolean;
 	deleteFolder: boolean;
 	deleteObjectDefinition: boolean;
 	editFolder: boolean;
@@ -76,6 +78,7 @@ export default function ViewObjectDefinitions({
 	const [showModal, setShowModal] = useState<ViewObjectDefinitionsModals>({
 		addFolder: false,
 		addObjectDefinition: false,
+		bindToRootObject: false,
 		deleteFolder: false,
 		deleteObjectDefinition: false,
 		editFolder: false,
@@ -96,7 +99,9 @@ export default function ViewObjectDefinitions({
 		moveObjectDefinition,
 		setMoveObjectDefinition,
 	] = useState<ObjectDefinition | null>();
-
+	const [selectedObjectToBind, setSelectedObjectToBind] = useState<
+		ObjectDefinition
+	>();
 	const [loading, setLoading] = useState(true);
 
 	function objectDefinitionLabelDataRenderer({
@@ -167,6 +172,15 @@ export default function ViewObjectDefinitions({
 			action: {data: {id: string}};
 			itemData: ObjectDefinition;
 		}) {
+			if (action.data.id === 'bind') {
+				setSelectedObjectToBind(itemData);
+
+				setShowModal((previousState: ViewObjectDefinitionsModals) => ({
+					...previousState,
+					bindToRootObject: true,
+				}));
+			}
+
 			if (action.data.id === 'deleteObjectDefinition') {
 				const getDeleteObjectDefinition = async () => {
 					const url = createResourceURL(baseResourceURL, {
@@ -446,6 +460,21 @@ export default function ViewObjectDefinitions({
 					objectDefinition={moveObjectDefinition as ObjectDefinition}
 					selectedFolder={selectedFolder}
 					setMoveObjectDefinition={setMoveObjectDefinition}
+				/>
+			)}
+
+			{showModal.bindToRootObject && Liferay.FeatureFlags['LPS-187142'] && (
+				<ModalBindToRootObject
+					baseResourceURL={baseResourceURL}
+					onvisibilityChange={() => {
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								bindToRootObject: false,
+							})
+						);
+					}}
+					selectedObjectToBind={selectedObjectToBind}
 				/>
 			)}
 		</>
