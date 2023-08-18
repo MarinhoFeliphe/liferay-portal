@@ -102,6 +102,30 @@ public class ViewObjectDefinitionsDisplayContext {
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
 				"get", null, null),
 			new FDSActionDropdownItem(
+				PortletURLBuilder.create(
+					getPortletURL()
+				).setMVCRenderCommandName(
+					"/object_definitions/bind_object_definition"
+				).setParameter(
+					"objectDefinitionId", "{id}"
+				).setWindowState(
+					LiferayWindowState.POP_UP
+				).buildString(),
+				"hierarchy", "bind",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "bind"),
+				"bind", null, "modal"),
+			new FDSActionDropdownItem(
+				ResourceURLBuilder.createResourceURL(
+					_objectRequestHelper.getLiferayPortletResponse()
+				).setParameter(
+					"objectDefinitionId", "{id}"
+				).setResourceID(
+					"/object_definitions/unbind_object_definition"
+				).buildString(),
+				"hierarchy", "unbind",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "unbind"),
+				"unbind", null, "async"),
+			new FDSActionDropdownItem(
 				ResourceURLBuilder.createResourceURL(
 					_objectRequestHelper.getLiferayPortletResponse()
 				).setParameter(
