@@ -1,3 +1,4 @@
 Bundle-Name: Liferay Message Boards Moderation
 Bundle-SymbolicName: com.liferay.message.boards.moderation
 Bundle-Version: 1.0.27
+Liferay-Client-Extension-Batch: com/liferay/message/boards/moderation/internal/batch

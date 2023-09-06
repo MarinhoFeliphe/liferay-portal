@@ -1,0 +1,46 @@
+{
+	"actions": {
+		"createBatch": {
+			"href": "/o/headless-batch-engine/v1.0/import-task/com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition",
+			"method": "POST"
+		}
+	},
+	"configuration": {
+		"className": "com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition",
+		"companyId": 0,
+		"parameters": {
+			"containsHeaders": "true",
+			"createStrategy": "INSERT",
+			"importStrategy": "ON_ERROR_FAIL",
+			"taskItemDelegateName": "DEFAULT",
+			"updateStrategy": "UPDATE"
+		},
+		"userId": 0,
+		"version": "v1.0"
+	},
+	"items": [
+		{
+			"active": true,
+			"content": "<?xml version=\"1.0\"?>\n\n<workflow-definition xmlns=\"urn:liferay.com:liferay-workflow_7.4.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd\">\n\t<name>Message Board Threads and Comments Reputation Approver</name>\n\t<description>Users with a reputation over the threshold get their threads and comments approved automatically.</description>\n\t<version>1</version>\n\t<condition>\n\t\t<name>check-reputation</name>\n\t\t<metadata> <![CDATA[\n\t\t\t\t{\n\t\t\t\t\t\"xy\": [\n\t\t\t\t\t\t199,\n\t\t\t\t\t\t43\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t]]> </metadata>\n\t\t<script> <![CDATA[com.liferay.message.boards.moderation.internal.kaleo.runtime.condition.MBModerationConditionEvaluator]]> </script>\n\t\t<script-language>java</script-language>\n\t\t<transitions>\n\t\t\t<transition>\n\t\t\t\t<name>approve</name>\n\t\t\t\t<target>approved</target>\n\t\t\t\t<default>true</default>\n\t\t\t</transition>\n\t\t\t<transition>\n\t\t\t\t<name>review</name>\n\t\t\t\t<target>review</target>\n\t\t\t\t<default>false</default>\n\t\t\t</transition>\n\t\t</transitions>\n\t</condition>\n\t<state>\n\t\t<name>created</name>\n\t\t<metadata> <![CDATA[\n\t\t\t\t{\n\t\t\t\t\t\"xy\": [\n\t\t\t\t\t\t36,\n\t\t\t\t\t\t51\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t]]> </metadata>\n\t\t<initial>true</initial>\n\t\t<transitions>\n\t\t\t<transition>\n\t\t\t\t<name>check-reputation</name>\n\t\t\t\t<target>check-reputation</target>\n\t\t\t\t<default>true</default>\n\t\t\t</transition>\n\t\t</transitions>\n\t</state>\n\t<state>\n\t\t<name>approved</name>\n\t\t<metadata> <![CDATA[\n\t\t\t\t{\n\t\t\t\t\t\"terminal\": true,\n\t\t\t\t\t\"xy\": [\n\t\t\t\t\t\t648,\n\t\t\t\t\t\t50\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t]]> </metadata>\n\t\t<actions>\n\t\t\t<action>\n\t\t\t\t<name>approve</name>\n\t\t\t\t<status>0</status>\n\t\t\t\t<execution-type>onEntry</execution-type>\n\t\t\t</action>\n\t\t</actions>\n\t</state>\n\t<task>\n\t\t<name>update</name>\n\t\t<metadata> <![CDATA[\n\t\t\t\t{\n\t\t\t\t\t\"transitions\": {\n\t\t\t\t\t\t\"resubmit\": {\n\t\t\t\t\t\t\t\"bendpoints\": [\n\t\t\t\t\t\t\t\t[\n\t\t\t\t\t\t\t\t\t303,\n\t\t\t\t\t\t\t\t\t140\n\t\t\t\t\t\t\t\t]\n\t\t\t\t\t\t\t]\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t\"xy\": [\n\t\t\t\t\t\t636,\n\t\t\t\t\t\t245\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t]]> </metadata>\n\t\t<actions>\n\t\t\t<action>\n\t\t\t\t<name>deny</name>\n\t\t\t\t<status>4</status>\n\t\t\t\t<priority>1</priority>\n\t\t\t\t<execution-type>onAssignment</execution-type>\n\t\t\t</action>\n\t\t\t<action>\n\t\t\t\t<name>pending</name>\n\t\t\t\t<status>1</status>\n\t\t\t\t<priority>2</priority>\n\t\t\t\t<execution-type>onAssignment</execution-type>\n\t\t\t</action>\n\t\t\t<notification>\n\t\t\t\t<name>Creator Modification Notification</name>\n\t\t\t\t<description> <![CDATA[Your submission was rejected by ${userName}.]]> </description>\n\t\t\t\t<template> <![CDATA[Your submission was rejected by ${userName}, please modify and resubmit.]]> </template>\n\t\t\t\t<template-language>freemarker</template-language>\n\t\t\t\t<notification-type>email</notification-type>\n\t\t\t\t<notification-type>user-notification</notification-type>\n\t\t\t\t<recipients receptionType=\"to\">\n\t\t\t\t\t<user/>\n\t\t\t\t</recipients>\n\t\t\t\t<execution-type>onAssignment</execution-type>\n\t\t\t</notification>\n\t\t</actions>\n\t\t<assignments>\n\t\t\t<user/>\n\t\t</assignments>\n\t\t<transitions>\n\t\t\t<transition>\n\t\t\t\t<name>resubmit</name>\n\t\t\t\t<target>review</target>\n\t\t\t\t<default>true</default>\n\t\t\t</transition>\n\t\t</transitions>\n\t</task>\n\t<task>\n\t\t<name>review</name>\n\t\t<metadata> <![CDATA[\n\t\t\t\t{\n\t\t\t\t\t\"xy\": [\n\t\t\t\t\t\t285,\n\t\t\t\t\t\t186\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t]]> </metadata>\n\t\t<actions>\n\t\t\t<notification>\n\t\t\t\t<name>Review Notification</name>\n\t\t\t\t<description> <![CDATA[${userName} has sent you a ${entryType} for review]]> </description>\n\t\t\t\t<template> <![CDATA[${userName} has sent you a ${entryType} for review in the workflow.]]> </template>\n\t\t\t\t<template-language>freemarker</template-language>\n\t\t\t\t<notification-type>email</notification-type>\n\t\t\t\t<notification-type>user-notification</notification-type>\n\t\t\t\t<recipients receptionType=\"to\">\n\t\t\t\t\t<assignees/>\n\t\t\t\t</recipients>\n\t\t\t\t<execution-type>onAssignment</execution-type>\n\t\t\t</notification>\n\t\t\t<notification>\n\t\t\t\t<name>Review Completion Notification</name>\n\t\t\t\t<description> <![CDATA[Your submission was reviewed by ${userName}.]]> </description>\n\t\t\t\t<template> <![CDATA[Your submission was reviewed by ${userName}<#if taskComments?has_content> with the following comments: \"${taskComments}\"</#if>.]]> </template>\n\t\t\t\t<template-language>freemarker</template-language>\n\t\t\t\t<notification-type>email</notification-type>\n\t\t\t\t<recipients receptionType=\"to\">\n\t\t\t\t\t<user/>\n\t\t\t\t</recipients>\n\t\t\t\t<execution-type>onExit</execution-type>\n\t\t\t</notification>\n\t\t</actions>\n\t\t<assignments>\n\t\t\t<roles>\n\t\t\t\t<role>\n\t\t\t\t\t<role-type>depot</role-type>\n\t\t\t\t\t<name>Asset Library Content Reviewer</name>\n\t\t\t\t</role>\n\t\t\t\t<role>\n\t\t\t\t\t<role-type>organization</role-type>\n\t\t\t\t\t<name>Organization Content Reviewer</name>\n\t\t\t\t</role>\n\t\t\t\t<role>\n\t\t\t\t\t<role-type>regular</role-type>\n\t\t\t\t\t<name>Portal Content Reviewer</name>\n\t\t\t\t</role>\n\t\t\t\t<role>\n\t\t\t\t\t<role-type>site</role-type>\n\t\t\t\t\t<name>Site Content Reviewer</name>\n\t\t\t\t</role>\n\t\t\t</roles>\n\t\t</assignments>\n\t\t<transitions>\n\t\t\t<transition>\n\t\t\t\t<name>approve</name>\n\t\t\t\t<target>approved</target>\n\t\t\t\t<default>true</default>\n\t\t\t</transition>\n\t\t\t<transition>\n\t\t\t\t<name>reject</name>\n\t\t\t\t<target>update</target>\n\t\t\t\t<default>false</default>\n\t\t\t</transition>\n\t\t</transitions>\n\t</task>\n</workflow-definition>",
+			"description": "Users with a reputation over the threshold get their threads and comments approved automatically.",
+			"name": "message-boards-user-stats-moderation",
+			"title": "Message Boards User Stats Moderation",
+			"title_i18n": {
+				"ar_SA": "الإشراف على إحصاءات مستخدم لوحات الرسائل",
+				"ca_ES": "Moderació de les estadístiques d'usuari dels taulers de missatges",
+				"de_DE": "Moderation der Foren-Benutzerstatistiken",
+				"en_US": "Message Boards User Stats Moderation",
+				"es_ES": "Moderación de estadísticas de usuario de los foros de discusión",
+				"fi_FI": "Keskustelualueiden käyttäjätilastojen moderointi",
+				"fr_FR": "Modération sur statistiques utilisateur des forums de discussion",
+				"hu_HU": "Fórumok felhasználói statisztikáinak a moderálása",
+				"ja_JP": "掲示板ユーザー統計の承認",
+				"nl_NL": "Moderatiestatistieken forumgebruiker",
+				"pt_BR": "Moderação de estatísticas de usuário do fórum",
+				"sv_SE": "Moderering av användarstatistik för diskussionsforum",
+				"zh_CN": "留言板用户统计审核"
+			},
+			"version": "1"
+		}
+	]
+}
