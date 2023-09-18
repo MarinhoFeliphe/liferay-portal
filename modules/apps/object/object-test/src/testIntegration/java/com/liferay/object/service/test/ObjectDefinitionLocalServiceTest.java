@@ -288,7 +288,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService, _objectRelationshipLocalService,
 			_treeFactory);
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> {
 				Assert.assertFalse(
@@ -319,7 +319,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> {
 				Assert.assertEquals(
@@ -349,7 +349,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_DRAFT, objectDefinition.getStatus());
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> Assert.assertEquals(
 				WorkflowConstants.STATUS_DRAFT,
@@ -376,7 +376,7 @@ public class ObjectDefinitionLocalServiceTest {
 				true
 			).build());
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> {
 				if (nodeObjectDefinition.isRootNode()) {
@@ -424,7 +424,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(
 			_hasTable(objectDefinition.getExtensionDBTableName()));
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> {
 				Assert.assertFalse(
@@ -455,7 +455,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> {
 				Assert.assertEquals(
@@ -485,7 +485,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_APPROVED, objectDefinition.getStatus());
 
-		TreeTestUtil.unsafeForEachRemaining(
+		TreeTestUtil.unsafeForEach(
 			_objectDefinitionLocalService, tree,
 			nodeObjectDefinition -> Assert.assertEquals(
 				WorkflowConstants.STATUS_APPROVED,
