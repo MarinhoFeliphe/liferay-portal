@@ -27,7 +27,12 @@ public class KaleoDefinitionModelListener
 	public void onAfterCreate(KaleoDefinition kaleoDefinition)
 		throws ModelListenerException {
 
-		if (!_workflowMetricsIndex.exists(kaleoDefinition.getCompanyId())) {
+		long companyId = kaleoDefinition.getCompanyId();
+
+		if (!_instanceWorkflowMetricsIndex.exists(companyId) ||
+			!_processWorkflowMetricsIndex.exists(companyId) ||
+			!_slaInstanceResultWorkflowMetricsIndex.exists(companyId)) {
+
 			return;
 		}
 
@@ -41,7 +46,7 @@ public class KaleoDefinitionModelListener
 			KaleoDefinition kaleoDefinition)
 		throws ModelListenerException {
 
-		if (!_workflowMetricsIndex.exists(
+		if (!_processWorkflowMetricsIndex.exists(
 				originalKaleoDefinition.getCompanyId())) {
 
 			return;
@@ -55,7 +60,9 @@ public class KaleoDefinitionModelListener
 	public void onBeforeRemove(KaleoDefinition kaleoDefinition)
 		throws ModelListenerException {
 
-		if (!_workflowMetricsIndex.exists(kaleoDefinition.getCompanyId())) {
+		if (!_processWorkflowMetricsIndex.exists(
+				kaleoDefinition.getCompanyId())) {
+
 			return;
 		}
 
@@ -66,10 +73,18 @@ public class KaleoDefinitionModelListener
 	@Reference
 	private IndexerHelper _indexerHelper;
 
+	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
+	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=process)")
+	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
+
 	@Reference
 	private ProcessWorkflowMetricsIndexer _processWorkflowMetricsIndexer;
 
-	@Reference(target = "(workflow.metrics.index.entity.name=process)")
-	private WorkflowMetricsIndex _workflowMetricsIndex;
+	@Reference(
+		target = "(workflow.metrics.index.entity.name=sla-instance-result)"
+	)
+	private WorkflowMetricsIndex _slaInstanceResultWorkflowMetricsIndex;
 
 }
