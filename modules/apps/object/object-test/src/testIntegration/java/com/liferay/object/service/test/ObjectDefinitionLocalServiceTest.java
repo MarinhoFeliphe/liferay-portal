@@ -289,7 +289,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_treeFactory);
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> {
 				Assert.assertFalse(
 					_hasTable(nodeObjectDefinition.getDBTableName()));
@@ -320,7 +320,7 @@ public class ObjectDefinitionLocalServiceTest {
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> {
 				Assert.assertEquals(
 					0,
@@ -350,7 +350,7 @@ public class ObjectDefinitionLocalServiceTest {
 			WorkflowConstants.STATUS_DRAFT, objectDefinition.getStatus());
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> Assert.assertEquals(
 				WorkflowConstants.STATUS_DRAFT,
 				nodeObjectDefinition.getStatus()));
@@ -377,7 +377,7 @@ public class ObjectDefinitionLocalServiceTest {
 			).build());
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> {
 				if (nodeObjectDefinition.isRootNode()) {
 					return;
@@ -425,7 +425,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_hasTable(objectDefinition.getExtensionDBTableName()));
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> {
 				Assert.assertFalse(
 					_hasColumn(nodeObjectDefinition.getDBTableName(), "able"));
@@ -456,7 +456,7 @@ public class ObjectDefinitionLocalServiceTest {
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> {
 				Assert.assertEquals(
 					4,
@@ -486,7 +486,7 @@ public class ObjectDefinitionLocalServiceTest {
 			WorkflowConstants.STATUS_APPROVED, objectDefinition.getStatus());
 
 		TreeTestUtil.forEachNodeObjectDefinition(
-			_objectDefinitionLocalService, tree,
+			tree.iterator(), _objectDefinitionLocalService,
 			nodeObjectDefinition -> Assert.assertEquals(
 				WorkflowConstants.STATUS_APPROVED,
 				nodeObjectDefinition.getStatus()));
