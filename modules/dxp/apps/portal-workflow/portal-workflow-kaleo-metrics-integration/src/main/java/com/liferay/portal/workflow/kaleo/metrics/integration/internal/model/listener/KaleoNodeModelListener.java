@@ -32,7 +32,10 @@ public class KaleoNodeModelListener extends BaseKaleoModelListener<KaleoNode> {
 
 		if (!Objects.equals(kaleoNode.getType(), NodeType.STATE.name()) ||
 			Objects.isNull(kaleoDefinitionVersion) ||
-			!_workflowMetricsIndex.exists(kaleoNode.getCompanyId())) {
+			!_nodeWorkflowMetricsIndex.exists(kaleoNode.getCompanyId()) ||
+			!_slaTaskResultWorkflowMetricsIndex.exists(
+				kaleoNode.getCompanyId()) ||
+			!_taskWorkflowMetricsIndex.exists(kaleoNode.getCompanyId())) {
 
 			return;
 		}
@@ -45,7 +48,7 @@ public class KaleoNodeModelListener extends BaseKaleoModelListener<KaleoNode> {
 	@Override
 	public void onAfterRemove(KaleoNode kaleoNode) {
 		if (!Objects.equals(kaleoNode.getType(), NodeType.STATE.name()) ||
-			!_workflowMetricsIndex.exists(kaleoNode.getCompanyId())) {
+			!_nodeWorkflowMetricsIndex.exists(kaleoNode.getCompanyId())) {
 
 			return;
 		}
@@ -63,10 +66,16 @@ public class KaleoNodeModelListener extends BaseKaleoModelListener<KaleoNode> {
 	@Reference
 	private IndexerHelper _indexerHelper;
 
+	@Reference(target = "(workflow.metrics.index.entity.name=node)")
+	private WorkflowMetricsIndex _nodeWorkflowMetricsIndex;
+
 	@Reference
 	private NodeWorkflowMetricsIndexer _nodeWorkflowMetricsIndexer;
 
-	@Reference(target = "(workflow.metrics.index.entity.name=node)")
-	private WorkflowMetricsIndex _workflowMetricsIndex;
+	@Reference(target = "(workflow.metrics.index.entity.name=sla-task-result)")
+	private WorkflowMetricsIndex _slaTaskResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=task)")
+	private WorkflowMetricsIndex _taskWorkflowMetricsIndex;
 
 }
