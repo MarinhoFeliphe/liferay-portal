@@ -39,6 +39,15 @@ public class ProcessWorkflowMetricsIndexerImpl
 			return;
 		}
 
+		long companyId = document.getLong("companyId");
+
+		if (!_processWorkflowMetricsIndex.exists(companyId) ||
+			!_instanceWorkflowMetricsIndex.exists(companyId) ||
+			!_slaInstanceResultWorkflowMetricsIndex.exists(companyId)) {
+
+			return;
+		}
+
 		BulkDocumentRequest bulkDocumentRequest = new BulkDocumentRequest();
 
 		bulkDocumentRequest.addBulkableDocumentRequest(
@@ -69,6 +78,17 @@ public class ProcessWorkflowMetricsIndexerImpl
 
 		searchEngineAdapter.execute(bulkDocumentRequest);
 	}
+
+	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
+	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=process)")
+	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
+
+	@Reference(
+		target = "(workflow.metrics.index.entity.name=sla-instance-result)"
+	)
+	private WorkflowMetricsIndex _slaInstanceResultWorkflowMetricsIndex;
 
 	@Override
 	public Document addProcess(AddProcessRequest addProcessRequest) {
@@ -251,12 +271,6 @@ public class ProcessWorkflowMetricsIndexerImpl
 
 		return documentBuilder.build();
 	}
-
-	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
-	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
-
-	@Reference(target = "(workflow.metrics.index.entity.name=process)")
-	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
 
 	@Reference
 	private SLAInstanceResultWorkflowMetricsIndexer

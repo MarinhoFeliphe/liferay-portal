@@ -87,6 +87,8 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 			indexNames.add(getIndexName(companyId));
 
 			portalCache.put(companyId, indexNames);
+
+			_log.debug("Index " + getIndexName(companyId) + " is created");
 		}
 
 		return indicesExistsIndexResponse.isExists();

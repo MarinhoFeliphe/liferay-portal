@@ -25,6 +25,7 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.workflow.metrics.internal.background.task.WorkflowMetricsSLAProcessBackgroundTaskHelper;
 import com.liferay.portal.workflow.metrics.internal.search.index.SLAInstanceResultWorkflowMetricsIndexer;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndex;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
 
@@ -49,11 +50,45 @@ public class SLAInstanceResultWorkflowMetricsReindexer
 			workflowMetricsSLAProcessBackgroundTaskHelper =
 				_workflowMetricsSLAProcessBackgroundTaskHelperSnapshot.get();
 
+		if (!_processWorkflowMetricsIndex.exists(companyId) ||
+			!_instanceWorkflowMetricsIndex.exists(companyId) ||
+			!_slaInstanceResultWorkflowMetricsIndex.exists(companyId) ||
+			!_nodeWorkflowMetricsIndex.exists(companyId) ||
+			!_taskWorkflowMetricsIndex.exists(companyId) ||
+			!_slaTaskResultWorkflowMetricsIndex.exists(companyId) ||
+			!_transitionWorkflowMetricsIndex.exists(companyId)) {
+
+			return;
+		}
+
 		if (workflowMetricsSLAProcessBackgroundTaskHelper != null) {
 			workflowMetricsSLAProcessBackgroundTaskHelper.addBackgroundTasks(
 				true);
 		}
 	}
+
+	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
+	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=process)")
+	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
+
+	@Reference(
+		target = "(workflow.metrics.index.entity.name=sla-instance-result)"
+	)
+	private WorkflowMetricsIndex _slaInstanceResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=node)")
+	private WorkflowMetricsIndex _nodeWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=sla-task-result)")
+	private WorkflowMetricsIndex _slaTaskResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=task)")
+	private WorkflowMetricsIndex _taskWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=transition)")
+	private WorkflowMetricsIndex _transitionWorkflowMetricsIndex;
 
 	@Reference
 	protected SearchEngineAdapter searchEngineAdapter;

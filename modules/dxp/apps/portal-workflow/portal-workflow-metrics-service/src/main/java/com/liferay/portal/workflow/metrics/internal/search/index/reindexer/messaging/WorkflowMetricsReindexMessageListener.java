@@ -62,7 +62,14 @@ public class WorkflowMetricsReindexMessageListener extends BaseMessageListener {
 	protected void doReceive(Message message) throws Exception {
 		long companyId = message.getLong("companyId");
 
-		if (!_workflowMetricsIndex.exists(companyId)) {
+		if (!_processWorkflowMetricsIndex.exists(companyId) ||
+			!_instanceWorkflowMetricsIndex.exists(companyId) ||
+			!_slaInstanceResultWorkflowMetricsIndex.exists(companyId) ||
+			!_nodeWorkflowMetricsIndex.exists(companyId) ||
+			!_taskWorkflowMetricsIndex.exists(companyId) ||
+			!_slaTaskResultWorkflowMetricsIndex.exists(companyId) ||
+			!_transitionWorkflowMetricsIndex.exists(companyId)) {
+
 			return;
 		}
 
@@ -87,8 +94,28 @@ public class WorkflowMetricsReindexMessageListener extends BaseMessageListener {
 
 	private ServiceRegistration<Destination> _serviceRegistration;
 
+	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
+	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
+
 	@Reference(target = "(workflow.metrics.index.entity.name=process)")
-	private WorkflowMetricsIndex _workflowMetricsIndex;
+	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
+
+	@Reference(
+		target = "(workflow.metrics.index.entity.name=sla-instance-result)"
+	)
+	private WorkflowMetricsIndex _slaInstanceResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=node)")
+	private WorkflowMetricsIndex _nodeWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=sla-task-result)")
+	private WorkflowMetricsIndex _slaTaskResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=task)")
+	private WorkflowMetricsIndex _taskWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=transition)")
+	private WorkflowMetricsIndex _transitionWorkflowMetricsIndex;
 
 	@Reference
 	private WorkflowMetricsIndexCreator _workflowMetricsIndexCreator;

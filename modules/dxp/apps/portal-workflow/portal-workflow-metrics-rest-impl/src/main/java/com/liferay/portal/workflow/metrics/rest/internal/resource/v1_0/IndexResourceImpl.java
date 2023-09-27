@@ -25,6 +25,7 @@ import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.IndexUtil
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.IndexKeyException;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.IndexResource;
 import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsBackgroundTaskExecutorNames;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndex;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexerRegistry;
 
@@ -101,6 +102,19 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 			throw new IndexKeyException();
 		}
 
+		long companyId = contextCompany.getCompanyId();
+
+		if (!_processWorkflowMetricsIndex.exists(companyId) ||
+			!_instanceWorkflowMetricsIndex.exists(companyId) ||
+			!_slaInstanceResultWorkflowMetricsIndex.exists(companyId) ||
+			!_nodeWorkflowMetricsIndex.exists(companyId) ||
+			!_taskWorkflowMetricsIndex.exists(companyId) ||
+			!_slaTaskResultWorkflowMetricsIndex.exists(companyId) ||
+			!_transitionWorkflowMetricsIndex.exists(companyId)) {
+
+			return;
+		}
+
 		_backgroundTaskLocalService.addBackgroundTask(
 			contextUser.getUserId(), contextCompany.getGroupId(),
 			_getBackgroundTaskName(index),
@@ -115,6 +129,29 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 			).build(),
 			new ServiceContext());
 	}
+
+	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
+	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=process)")
+	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
+
+	@Reference(
+		target = "(workflow.metrics.index.entity.name=sla-instance-result)"
+	)
+	private WorkflowMetricsIndex _slaInstanceResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=node)")
+	private WorkflowMetricsIndex _nodeWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=sla-task-result)")
+	private WorkflowMetricsIndex _slaTaskResultWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=task)")
+	private WorkflowMetricsIndex _taskWorkflowMetricsIndex;
+
+	@Reference(target = "(workflow.metrics.index.entity.name=transition)")
+	private WorkflowMetricsIndex _transitionWorkflowMetricsIndex;
 
 	private String _getBackgroundTaskName(Index index) {
 		return StringBundler.concat(
