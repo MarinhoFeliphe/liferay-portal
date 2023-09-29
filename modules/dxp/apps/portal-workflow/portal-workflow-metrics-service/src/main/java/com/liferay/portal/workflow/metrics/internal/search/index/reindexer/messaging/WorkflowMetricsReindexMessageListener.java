@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.workflow.metrics.internal.search.index.creation.helper.WorkflowMetricsIndexCreator;
-import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndex;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -62,7 +62,7 @@ public class WorkflowMetricsReindexMessageListener extends BaseMessageListener {
 	protected void doReceive(Message message) throws Exception {
 		long companyId = message.getLong("companyId");
 
-		if (!_workflowMetricsIndex.exists(companyId)) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(companyId)) {
 			return;
 		}
 
@@ -87,10 +87,11 @@ public class WorkflowMetricsReindexMessageListener extends BaseMessageListener {
 
 	private ServiceRegistration<Destination> _serviceRegistration;
 
-	@Reference(target = "(workflow.metrics.index.entity.name=process)")
-	private WorkflowMetricsIndex _workflowMetricsIndex;
-
 	@Reference
 	private WorkflowMetricsIndexCreator _workflowMetricsIndexCreator;
+
+	@Reference
+	private WorkflowMetricsIndicesAvailabilityChecker
+		_workflowMetricsIndicesAvailabilityChecker;
 
 }

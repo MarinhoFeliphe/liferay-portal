@@ -12,7 +12,6 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
@@ -30,6 +29,7 @@ import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.script.Scripts;
 import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetricsPortalExecutor;
 import com.liferay.portal.workflow.metrics.internal.search.index.util.WorkflowMetricsIndexerUtil;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
 import java.io.Serializable;
 
@@ -48,8 +48,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseWorkflowMetricsIndexer {
 
-	public void addDocuments(List<Document> documents) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+	public void addDocuments(long companyId, List<Document> documents) {
+		if (!workflowMetricsIndicesAvailabilityChecker.check(companyId)) {
 			return;
 		}
 
@@ -87,7 +87,9 @@ public abstract class BaseWorkflowMetricsIndexer {
 	}
 
 	protected void addDocument(Document document) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!workflowMetricsIndicesAvailabilityChecker.check(
+				document.getLong("companyId"))) {
+
 			return;
 		}
 
@@ -142,7 +144,7 @@ public abstract class BaseWorkflowMetricsIndexer {
 	protected void updateDocuments(
 		long companyId, Map<String, Object> fieldsMap, Query filterQuery) {
 
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!workflowMetricsIndicesAvailabilityChecker.check(companyId)) {
 			return;
 		}
 
@@ -209,16 +211,19 @@ public abstract class BaseWorkflowMetricsIndexer {
 	protected Scripts scripts;
 
 	@Reference
-	protected SearchCapabilities searchCapabilities;
+	protected SearchEngineAdapter searchEngineAdapter;
 
 	@Reference
-	protected SearchEngineAdapter searchEngineAdapter;
+	protected WorkflowMetricsIndicesAvailabilityChecker
+		workflowMetricsIndicesAvailabilityChecker;
 
 	@Reference
 	protected WorkflowMetricsPortalExecutor workflowMetricsPortalExecutor;
 
 	private void _updateDocument(Document document) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!workflowMetricsIndicesAvailabilityChecker.check(
+				document.getLong("companyId"))) {
+
 			return;
 		}
 

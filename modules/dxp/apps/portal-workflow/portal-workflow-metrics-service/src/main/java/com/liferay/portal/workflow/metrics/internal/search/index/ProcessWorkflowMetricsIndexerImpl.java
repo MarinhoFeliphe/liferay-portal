@@ -21,6 +21,7 @@ import com.liferay.portal.workflow.metrics.model.DeleteProcessRequest;
 import com.liferay.portal.workflow.metrics.model.UpdateProcessRequest;
 import com.liferay.portal.workflow.metrics.search.index.ProcessWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndex;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,7 +36,9 @@ public class ProcessWorkflowMetricsIndexerImpl
 
 	@Override
 	public void addDocument(Document document) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(
+				document.getLong("companyId"))) {
+
 			return;
 		}
 
@@ -146,7 +149,9 @@ public class ProcessWorkflowMetricsIndexerImpl
 	public Document updateProcess(UpdateProcessRequest updateProcessRequest) {
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(
+				updateProcessRequest.getCompanyId())) {
+
 			return documentBuilder.build();
 		}
 
@@ -261,5 +266,9 @@ public class ProcessWorkflowMetricsIndexerImpl
 	@Reference
 	private SLAInstanceResultWorkflowMetricsIndexer
 		_slaInstanceResultWorkflowMetricsIndexer;
+
+	@Reference
+	private WorkflowMetricsIndicesAvailabilityChecker
+		_workflowMetricsIndicesAvailabilityChecker;
 
 }

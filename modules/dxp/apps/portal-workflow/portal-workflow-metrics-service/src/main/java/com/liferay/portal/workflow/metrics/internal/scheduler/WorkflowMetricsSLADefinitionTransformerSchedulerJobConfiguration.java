@@ -15,7 +15,6 @@ import com.liferay.portal.kernel.scheduler.SchedulerJobConfiguration;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.TriggerConfiguration;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
@@ -29,6 +28,7 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.workflow.metrics.internal.configuration.WorkflowMetricsConfiguration;
 import com.liferay.portal.workflow.metrics.internal.sla.transformer.WorkflowMetricsSLADefinitionTransformer;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 
 import java.util.Map;
@@ -83,7 +83,7 @@ public class WorkflowMetricsSLADefinitionTransformerSchedulerJobConfiguration
 	}
 
 	private boolean _hasIndex(long companyId) {
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(companyId)) {
 			return false;
 		}
 
@@ -149,12 +149,13 @@ public class WorkflowMetricsSLADefinitionTransformerSchedulerJobConfiguration
 	private Queries _queries;
 
 	@Reference
-	private SearchCapabilities _searchCapabilities;
-
-	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
 
 	private volatile WorkflowMetricsConfiguration _workflowMetricsConfiguration;
+
+	@Reference
+	private WorkflowMetricsIndicesAvailabilityChecker
+		_workflowMetricsIndicesAvailabilityChecker;
 
 	@Reference
 	private WorkflowMetricsSLADefinitionTransformer
