@@ -225,6 +225,19 @@ public class ObjectEntryOpenAPIResourceImpl
 			return dtoProperty;
 		}
 
+		if (Objects.equals(
+				objectField.getDBType(), ObjectFieldConstants.DB_TYPE_CLOB)) {
+
+			return new DTOProperty(
+				Collections.singletonMap("x-parent-map", "properties"),
+				objectField.getName(), "String") {
+
+				{
+					setRequired(objectField.isRequired());
+				}
+			};
+		}
+
 		return new DTOProperty(
 			Collections.singletonMap("x-parent-map", "properties"),
 			objectField.getName(), objectField.getDBType()) {
