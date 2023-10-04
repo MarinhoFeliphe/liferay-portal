@@ -58,6 +58,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 	@Test
 	public void testSendNotification() throws Exception {
+		// Multiple recipients
+
 		_executeNotificationObjectAction(_addNotificationTemplate(false));
 
 		List<NotificationQueueEntry> notificationQueueEntries =
@@ -78,6 +80,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 		notificationQueueEntryLocalService.deleteNotificationQueueEntry(
 			notificationQueueEntries.get(0));
+
+		// Single recipient
 
 		_executeNotificationObjectAction(_addNotificationTemplate(true));
 
