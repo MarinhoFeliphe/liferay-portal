@@ -58,7 +58,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 	@Test
 	public void testSendNotification() throws Exception {
-		// Multiple recipients
+		// Multiple recipients, comma separator
 
 		_executeNotificationObjectAction(_addNotificationTemplate(false));
 
@@ -68,13 +68,59 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				NotificationQueueEntryConstants.STATUS_SENT);
 
 		Assert.assertEquals(
-			notificationQueueEntries.toString(), 1,
+			notificationQueueEntries.toString(), 2,
 			notificationQueueEntries.size());
 
 		_assertNotificationQueueEntry(
 			false,
 			StringBundler.concat(
 				user1.getEmailAddress(), StringPool.COMMA,
+				user2.getEmailAddress()),
+			notificationQueueEntries.get(0));
+
+		notificationQueueEntryLocalService.deleteNotificationQueueEntry(
+			notificationQueueEntries.get(0));
+
+		// Multiple recipients, comma and space separator
+
+		_executeNotificationObjectAction(_addNotificationTemplate(false));
+
+		notificationQueueEntries =
+			notificationQueueEntryLocalService.getNotificationEntries(
+				NotificationConstants.TYPE_EMAIL,
+				NotificationQueueEntryConstants.STATUS_SENT);
+
+		Assert.assertEquals(
+			notificationQueueEntries.toString(), 2,
+			notificationQueueEntries.size());
+
+		_assertNotificationQueueEntry(
+			false,
+			StringBundler.concat(
+				user1.getEmailAddress(), StringPool.COMMA_AND_SPACE,
+				user2.getEmailAddress()),
+			notificationQueueEntries.get(0));
+
+		notificationQueueEntryLocalService.deleteNotificationQueueEntry(
+			notificationQueueEntries.get(0));
+
+		// Multiple recipients, semicolon separator
+
+		_executeNotificationObjectAction(_addNotificationTemplate(false));
+
+		notificationQueueEntries =
+			notificationQueueEntryLocalService.getNotificationEntries(
+				NotificationConstants.TYPE_EMAIL,
+				NotificationQueueEntryConstants.STATUS_SENT);
+
+		Assert.assertEquals(
+			notificationQueueEntries.toString(), 2,
+			notificationQueueEntries.size());
+
+		_assertNotificationQueueEntry(
+			false,
+			StringBundler.concat(
+				user1.getEmailAddress(), StringPool.SEMICOLON,
 				user2.getEmailAddress()),
 			notificationQueueEntries.get(0));
 
