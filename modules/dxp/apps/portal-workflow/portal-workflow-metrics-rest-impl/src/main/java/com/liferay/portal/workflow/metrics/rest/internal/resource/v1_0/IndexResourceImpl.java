@@ -25,6 +25,7 @@ import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.IndexUtil
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.IndexKeyException;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.IndexResource;
 import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsBackgroundTaskExecutorNames;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexerRegistry;
 
@@ -61,7 +62,9 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 
 	@Override
 	public void patchIndexRefresh(Index index) throws Exception {
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(
+				contextCompany.getCompanyId())) {
+
 			return;
 		}
 
@@ -181,6 +184,10 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
+
+	@Reference
+	private WorkflowMetricsIndicesAvailabilityChecker
+		_workflowMetricsIndicesAvailabilityChecker;
 
 	@Reference
 	private WorkflowMetricsReindexerRegistry _workflowMetricsReindexerRegistry;

@@ -20,6 +20,7 @@ import com.liferay.portal.search.engine.adapter.search.CountSearchResponse;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.workflow.metrics.internal.background.task.WorkflowMetricsReindexBackgroundTaskExecutor;
 import com.liferay.portal.workflow.metrics.internal.search.index.WorkflowMetricsIndex;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
 import java.io.Serializable;
 
@@ -50,7 +51,9 @@ public class WorkflowMetricsIndexCreator {
 	}
 
 	public void reindex(Company company) {
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(
+				company.getCompanyId())) {
+
 			return;
 		}
 
@@ -146,5 +149,9 @@ public class WorkflowMetricsIndexCreator {
 
 	@Reference(target = "(workflow.metrics.index.entity.name=transition)")
 	private WorkflowMetricsIndex _transitionWorkflowMetricsIndex;
+
+	@Reference
+	private WorkflowMetricsIndicesAvailabilityChecker
+		_workflowMetricsIndicesAvailabilityChecker;
 
 }
