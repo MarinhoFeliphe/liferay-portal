@@ -5,13 +5,18 @@
 
 package com.liferay.portal.workflow.metrics.internal.search.index;
 
+import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.SingleVMPool;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexResponse;
 import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -27,6 +32,10 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 			return false;
 		}
 
+		if (GetterUtil.getBoolean(portalCache.get(companyId))) {
+			return true;
+		}
+
 		IndicesExistsIndexRequest indicesExistsIndexRequest =
 			new IndicesExistsIndexRequest(
 				_instanceWorkflowMetricsIndex.getIndexName(companyId),
@@ -40,11 +49,34 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 		IndicesExistsIndexResponse indicesExistsIndexResponse =
 			searchEngineAdapter.execute(indicesExistsIndexRequest);
 
+		portalCache.put(companyId, indicesExistsIndexResponse.isExists());
+
 		return indicesExistsIndexResponse.isExists();
 	}
 
+	@Activate
+	protected void activate() {
+		if (portalCache != null) {
+			return;
+		}
+
+		portalCache = (PortalCache<Long, Boolean>)singleVMPool.getPortalCache(
+			WorkflowMetricsIndicesAvailabilityChecker.class.getName());
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		singleVMPool.removePortalCache(
+			WorkflowMetricsIndicesAvailabilityChecker.class.getName());
+	}
+
+	protected PortalCache<Long, Boolean> portalCache;
+
 	@Reference
 	protected SearchEngineAdapter searchEngineAdapter;
+
+	@Reference
+	protected SingleVMPool singleVMPool;
 
 	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
 	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
