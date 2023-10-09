@@ -12,7 +12,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.document.UpdateByQueryDocumentRequest;
 import com.liferay.portal.search.query.BooleanQuery;
@@ -111,9 +110,6 @@ public class UserModelListener extends BaseModelListener<User> {
 
 	@Reference
 	private Scripts _scripts;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
 
 	@Reference
 	private UserLocalService _userLocalService;
