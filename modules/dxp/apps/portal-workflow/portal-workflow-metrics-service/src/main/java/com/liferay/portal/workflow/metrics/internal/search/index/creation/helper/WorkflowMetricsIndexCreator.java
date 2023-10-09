@@ -13,7 +13,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.CountSearchResponse;
@@ -132,9 +131,6 @@ public class WorkflowMetricsIndexCreator {
 
 	@Reference
 	private Queries _queries;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
