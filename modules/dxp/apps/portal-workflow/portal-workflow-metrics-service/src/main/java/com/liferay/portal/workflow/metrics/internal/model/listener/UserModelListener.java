@@ -23,6 +23,7 @@ import com.liferay.portal.search.script.ScriptType;
 import com.liferay.portal.search.script.Scripts;
 import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetricsPortalExecutor;
 import com.liferay.portal.workflow.metrics.internal.search.index.WorkflowMetricsIndex;
+import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
 import java.util.Objects;
 
@@ -39,7 +40,9 @@ public class UserModelListener extends BaseModelListener<User> {
 	public void onBeforeUpdate(User originalUser, User user)
 		throws ModelListenerException {
 
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
+		if (!_workflowMetricsIndicesAvailabilityChecker.check(
+				originalUser.getCompanyId())) {
+
 			return;
 		}
 
@@ -114,6 +117,10 @@ public class UserModelListener extends BaseModelListener<User> {
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	@Reference
+	private WorkflowMetricsIndicesAvailabilityChecker
+		_workflowMetricsIndicesAvailabilityChecker;
 
 	@Reference
 	private WorkflowMetricsPortalExecutor _workflowMetricsPortalExecutor;
