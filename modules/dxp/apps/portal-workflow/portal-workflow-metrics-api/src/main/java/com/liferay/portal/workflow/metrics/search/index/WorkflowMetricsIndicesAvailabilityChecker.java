@@ -12,4 +12,6 @@ public interface WorkflowMetricsIndicesAvailabilityChecker {
 
 	public boolean check(long companyId);
 
+	public void clearCache(long company);
+
 }
