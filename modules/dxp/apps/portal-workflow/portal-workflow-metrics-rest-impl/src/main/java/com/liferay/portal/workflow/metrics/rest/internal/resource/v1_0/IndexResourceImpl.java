@@ -15,7 +15,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.RefreshIndexRequest;
 import com.liferay.portal.search.index.IndexNameBuilder;
@@ -178,9 +177,6 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 
 	@Reference
 	private Language _language;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
