@@ -113,6 +113,9 @@ public class WorkflowMetricsIndexCreator {
 		_slaTaskResultWorkflowMetricsIndex.removeIndex(company.getCompanyId());
 		_taskWorkflowMetricsIndex.removeIndex(company.getCompanyId());
 		_transitionWorkflowMetricsIndex.removeIndex(company.getCompanyId());
+
+		_workflowMetricsIndicesAvailabilityChecker.clearCache(
+			company.getCompanyId());
 	}
 
 	@Reference

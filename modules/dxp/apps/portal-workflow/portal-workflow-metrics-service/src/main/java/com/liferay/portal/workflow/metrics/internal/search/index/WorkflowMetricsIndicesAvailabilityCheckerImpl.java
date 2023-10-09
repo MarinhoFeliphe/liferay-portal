@@ -54,6 +54,11 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 		return indicesExistsIndexResponse.isExists();
 	}
 
+	@Override
+	public void clearCache(long company) {
+		portalCache.remove(company);
+	}
+
 	@Activate
 	protected void activate() {
 		if (portalCache != null) {
