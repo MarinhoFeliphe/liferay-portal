@@ -434,7 +434,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			long rootObjectDefinitionId)
 		throws PortalException {
 
-		Tree tree = _treeFactory.create(rootObjectDefinitionId);
+		Tree tree = _treeFactory.createObjectDefinitionTree(
+			rootObjectDefinitionId);
 
 		Iterator<Node> iterator = tree.iterator();
 
