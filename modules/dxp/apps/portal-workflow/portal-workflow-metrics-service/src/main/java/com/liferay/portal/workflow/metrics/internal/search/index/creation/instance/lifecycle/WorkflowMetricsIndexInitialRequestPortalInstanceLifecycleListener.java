@@ -42,7 +42,7 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 
 		SchedulerResponse schedulerResponse =
 			_schedulerEngineHelper.getScheduledJob(
-				jobName, jobName, StorageType.MEMORY);
+				jobName, jobName, StorageType.PERSISTED);
 
 		if (schedulerResponse != null) {
 			return;
@@ -55,7 +55,7 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 		_schedulerEngineHelper.schedule(
 			_triggerFactory.createTrigger(
 				jobName, jobName, new Date(), null, 5, TimeUnit.SECOND),
-			StorageType.MEMORY, null, DestinationNames.WORKFLOW_METRICS_REINDEX,
+			StorageType.PERSISTED, null, DestinationNames.WORKFLOW_METRICS_REINDEX,
 			message);
 	}
 

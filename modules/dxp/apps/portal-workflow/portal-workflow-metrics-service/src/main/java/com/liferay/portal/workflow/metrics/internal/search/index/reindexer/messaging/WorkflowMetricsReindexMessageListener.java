@@ -73,7 +73,7 @@ public class WorkflowMetricsReindexMessageListener extends BaseMessageListener {
 			StringBundler.concat(
 				DestinationNames.WORKFLOW_METRICS_REINDEX, StringPool.SLASH,
 				companyId),
-			StorageType.MEMORY);
+			StorageType.PERSISTED);
 	}
 
 	@Reference
