@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	enabled = false,
 	property = "service.ranking:Integer=100",
 	service = PortalInstanceLifecycleListener.class
 )
