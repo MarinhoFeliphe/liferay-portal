@@ -145,6 +145,7 @@ public class FaviconServlet extends HttpServlet {
 		}
 		else {
 			pos = groupFriendlyURL.indexOf(CharPool.SLASH, 1);
+
 			if (pos > 0) {
 				groupFriendlyURL = groupFriendlyURL.substring(0, pos);
 			}
