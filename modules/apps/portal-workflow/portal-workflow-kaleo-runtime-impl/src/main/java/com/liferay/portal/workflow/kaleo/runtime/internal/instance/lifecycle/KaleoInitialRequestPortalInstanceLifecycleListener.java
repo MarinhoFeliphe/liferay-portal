@@ -17,7 +17,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(
+	enabled = false,
+	service = PortalInstanceLifecycleListener.class
+)
 public class KaleoInitialRequestPortalInstanceLifecycleListener
 	extends InitialRequestPortalInstanceLifecycleListener {
 
