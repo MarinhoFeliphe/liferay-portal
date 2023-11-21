@@ -20,6 +20,7 @@ import {
 	fdsItem,
 	formatActionURL,
 } from '../../utils/fds';
+import LabelRenderer from '../LabelRenderer';
 import ModalDeletionNotAllowed from '../ModalDeletionNotAllowed';
 import objectDefinitionModifiedDateDataRenderer from './FDSDataRenderers/ObjectDefinitionModifiedDateDataRenderer';
 import objectDefinitionStatusDataRenderer from './FDSDataRenderers/ObjectDefinitionStatusDataRenderer';
@@ -137,19 +138,16 @@ export default function ViewObjectDefinitions({
 		itemData,
 		value,
 	}: fdsItem<ObjectDefinition>) {
-		const handleEditObjectDefinition = () => {
-			window.location.href = formatActionURL(
-				editObjectDefinitionURL,
-				itemData.id
-			);
-		};
-
 		return (
-			<div className="table-list-title">
-				<a href="#" onClick={handleEditObjectDefinition}>
-					{value}
-				</a>
-			</div>
+			<LabelRenderer
+				onClick={() => {
+					window.location.href = formatActionURL(
+						editObjectDefinitionURL,
+						itemData.id
+					);
+				}}
+				value={value}
+			/>
 		);
 	}
 	const getURL = () => {
