@@ -33,7 +33,9 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 	extends InitialRequestPortalInstanceLifecycleListener {
 
 	@Override
-	public void portalInstanceRegistered(Company company) throws Exception {
+	public void doPortalInstanceRegistered(long companyId) throws Exception {
+		Company company = _companyLocalService.getCompany(companyId);
+
 		_workflowMetricsIndexCreator.createIndex(company);
 
 		String jobName = StringBundler.concat(
@@ -64,12 +66,6 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 		_workflowMetricsIndexCreator.removeIndex(company);
 	}
 
-	@Override
-	protected void doPortalInstanceRegistered(long companyId) throws Exception {
-		_workflowMetricsIndexCreator.reindex(
-			_companyLocalService.getCompany(companyId));
-	}
-
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
@@ -81,5 +77,4 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 
 	@Reference
 	private WorkflowMetricsIndexCreator _workflowMetricsIndexCreator;
-
 }
