@@ -5,11 +5,6 @@
 
 package com.liferay.portal.kernel.workflow;
 
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-
 import java.util.Locale;
 import java.util.Map;
 
@@ -20,22 +15,7 @@ public class DefaultWorkflowTransition implements WorkflowTransition {
 
 	@Override
 	public String getLabel(Locale locale) {
-		String label = _labelMap.get(locale);
-
-		if (label != null) {
-			return HtmlUtil.escape(label);
-		}
-
-		label = _labelMap.get(LocaleUtil.getSiteDefault());
-
-		if (label != null) {
-			return HtmlUtil.escape(label);
-		}
-
-		Language language = LanguageUtil.getLanguage();
-
-		return HtmlUtil.escape(
-			language.get(locale, (_name != null) ? _name : "proceed"));
+		return WorkflowLabelUtil.getLabel(_labelMap, locale, _name);
 	}
 
 	@Override
