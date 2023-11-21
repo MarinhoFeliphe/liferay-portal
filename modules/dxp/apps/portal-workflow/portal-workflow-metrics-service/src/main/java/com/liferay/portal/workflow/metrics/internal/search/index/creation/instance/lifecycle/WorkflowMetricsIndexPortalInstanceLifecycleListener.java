@@ -8,6 +8,7 @@ package com.liferay.portal.workflow.metrics.internal.search.index.creation.insta
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
+import com.liferay.portal.instance.lifecycle.InitialRequestPortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
@@ -17,6 +18,7 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.workflow.metrics.internal.search.index.creation.helper.WorkflowMetricsIndexCreator;
 
 import java.util.Date;
@@ -29,10 +31,12 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(service = PortalInstanceLifecycleListener.class)
 public class WorkflowMetricsIndexPortalInstanceLifecycleListener
-	extends BasePortalInstanceLifecycleListener {
+	extends InitialRequestPortalInstanceLifecycleListener {
 
 	@Override
-	public void portalInstanceRegistered(Company company) throws Exception {
+	public void doPortalInstanceRegistered(long companyId) throws Exception {
+		Company company = _companyLocalService.getCompany(companyId);
+
 		_workflowMetricsIndexCreator.createIndex(company);
 
 		String jobName = StringBundler.concat(
@@ -72,4 +76,6 @@ public class WorkflowMetricsIndexPortalInstanceLifecycleListener
 	@Reference
 	private WorkflowMetricsIndexCreator _workflowMetricsIndexCreator;
 
+	@Reference
+	private CompanyLocalService _companyLocalService;
 }
