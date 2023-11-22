@@ -220,7 +220,7 @@ public class DefaultPortalKaleoManager
 	@Override
 	public void deployKaleoDefaults() throws Exception {
 		deployDefaultRoles();
-		deployDefaultDefinitions();
+		//deployDefaultDefinitions();
 		deployDefaultDefinitionLinks();
 	}
 
