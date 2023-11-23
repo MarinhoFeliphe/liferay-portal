@@ -33,7 +33,9 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 
 	@Override
 	public boolean check(long companyId) {
-		_log.error("Checking if WM indices exist for company: " + companyId);
+		_log.info("Checking if WM indices exist for company: " + companyId);
+		_log.warn("Checking if WM indices exist for company: " + companyId);
+		//_log.error("Checking if WM indices exist for company: " + companyId);
 
 		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
 			return false;
