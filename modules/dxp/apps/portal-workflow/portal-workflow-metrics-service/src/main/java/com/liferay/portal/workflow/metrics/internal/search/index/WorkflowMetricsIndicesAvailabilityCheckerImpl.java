@@ -7,6 +7,8 @@ package com.liferay.portal.workflow.metrics.internal.search.index;
 
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
@@ -26,8 +28,13 @@ import org.osgi.service.component.annotations.Reference;
 public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 	implements WorkflowMetricsIndicesAvailabilityChecker {
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		WorkflowMetricsIndicesAvailabilityCheckerImpl.class);
+
 	@Override
 	public boolean check(long companyId) {
+		_log.error("Checking if WM indices exist for company: " + companyId);
+
 		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
 			return false;
 		}

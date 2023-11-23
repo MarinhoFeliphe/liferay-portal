@@ -39,6 +39,8 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 		Company company = _companyLocalService.getCompany(companyId);
 
 		_log.info("Creating workflow metrics indices for company " + companyId);
+		_log.error("Creating workflow metrics indices for company " + companyId);
+		_log.warn("Creating workflow metrics indices for company " + companyId);
 
 		_workflowMetricsIndexCreator.createIndex(company);
 
