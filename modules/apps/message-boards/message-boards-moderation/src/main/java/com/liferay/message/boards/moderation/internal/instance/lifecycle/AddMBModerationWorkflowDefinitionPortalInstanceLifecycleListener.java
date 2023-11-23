@@ -37,7 +37,7 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
-		_log.error("Creating MBModeration workflow definition for company " + company.getCompanyId());
+		//_log.error("Creating MBModeration workflow definition for company " + company.getCompanyId());
 		_log.info("Creating MBModeration workflow definition for company " + company.getCompanyId());
 		_log.warn("Creating MBModeration workflow definition for company " + company.getCompanyId());
 
