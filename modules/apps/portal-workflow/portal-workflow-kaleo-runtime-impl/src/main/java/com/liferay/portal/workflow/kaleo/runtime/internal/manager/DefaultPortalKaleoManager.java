@@ -227,7 +227,7 @@ public class DefaultPortalKaleoManager
 	@Override
 	public void deployKaleoDefaults(long companyId) throws Exception {
 		deployDefaultRoles(companyId);
-		deployDefaultDefinitions(companyId);
+		//deployDefaultDefinitions(companyId);
 		deployDefaultDefinitionLinks(companyId);
 	}
 

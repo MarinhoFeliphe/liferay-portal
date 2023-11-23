@@ -10,6 +10,8 @@ import com.liferay.message.boards.moderation.internal.constants.MBModerationCons
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Localization;
@@ -35,6 +37,8 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
+		_log.info("Creating MBModeration workflow definition for company " + company.getCompanyId());
+
 		int workflowDefinitionsCount =
 			_workflowDefinitionManager.getWorkflowDefinitionsCount(
 				company.getCompanyId(),
@@ -60,6 +64,9 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 			MBModerationConstants.WORKFLOW_DEFINITION_NAME,
 			MBMessage.class.getName(), content.getBytes());
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener.class);
 
 	private Map<String, String> _getTitleMap(long companyId) {
 		Map<String, String> titleMap = new HashMap<>();

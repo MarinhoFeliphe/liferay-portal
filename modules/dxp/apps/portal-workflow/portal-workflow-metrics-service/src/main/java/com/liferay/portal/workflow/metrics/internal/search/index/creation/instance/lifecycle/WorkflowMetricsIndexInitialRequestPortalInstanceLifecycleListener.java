@@ -9,6 +9,8 @@ import com.liferay.portal.instance.lifecycle.InitialRequestPortalInstanceLifecyc
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.model.Company;
@@ -36,6 +38,8 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 	public void doPortalInstanceRegistered(long companyId) throws Exception {
 		Company company = _companyLocalService.getCompany(companyId);
 
+		_log.info("Creating workflow metrics indices for company " + companyId);
+
 		_workflowMetricsIndexCreator.createIndex(company);
 
 		String jobName = StringBundler.concat(
@@ -60,6 +64,9 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 			StorageType.PERSISTED, null, DestinationNames.WORKFLOW_METRICS_REINDEX,
 			message);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener.class);
 
 	@Override
 	public void portalInstanceUnregistered(Company company) throws Exception {

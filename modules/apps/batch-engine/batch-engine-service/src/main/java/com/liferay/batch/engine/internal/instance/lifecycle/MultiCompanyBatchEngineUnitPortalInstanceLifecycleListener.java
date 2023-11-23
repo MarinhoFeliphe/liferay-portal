@@ -8,6 +8,8 @@ package com.liferay.batch.engine.internal.instance.lifecycle;
 import com.liferay.batch.engine.internal.unit.MultiCompanyBatchEngineUnitProcessor;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +29,8 @@ public class MultiCompanyBatchEngineUnitPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
+		_log.info("Creating MBModeration workflow definition for company " + company.getCompanyId());
+
 		CompletableFuture<Void> completableFuture =
 			_multiCompanyBatchEngineUnitProcessor.processBatchEngineUnits(
 				company);
@@ -38,6 +42,9 @@ public class MultiCompanyBatchEngineUnitPortalInstanceLifecycleListener
 	public void portalInstanceUnregistered(Company company) {
 		_multiCompanyBatchEngineUnitProcessor.unregister(company);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		MultiCompanyBatchEngineUnitPortalInstanceLifecycleListener.class);
 
 	@Reference
 	private MultiCompanyBatchEngineUnitProcessor
