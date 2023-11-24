@@ -40,7 +40,7 @@ public class WorkflowMetricsIndexInitialRequestPortalInstanceLifecycleListener
 
 		_log.info("Creating workflow metrics indices for company " + companyId);
 		//_log.error("Creating workflow metrics indices for company " + companyId);
-		_log.warn("Creating workflow metrics indices for company " + companyId);
+		_log.debug("Creating workflow metrics indices for company " + companyId);
 
 		_workflowMetricsIndexCreator.createIndex(company);
 

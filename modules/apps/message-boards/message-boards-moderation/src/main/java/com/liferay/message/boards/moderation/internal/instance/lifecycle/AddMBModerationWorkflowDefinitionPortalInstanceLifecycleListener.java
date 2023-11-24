@@ -39,7 +39,7 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 	public void portalInstanceRegistered(Company company) throws Exception {
 		//_log.error("Creating MBModeration workflow definition for company " + company.getCompanyId());
 		_log.info("Creating MBModeration workflow definition for company " + company.getCompanyId());
-		_log.warn("Creating MBModeration workflow definition for company " + company.getCompanyId());
+		_log.debug("Creating MBModeration workflow definition for company " + company.getCompanyId());
 
 		int workflowDefinitionsCount =
 			_workflowDefinitionManager.getWorkflowDefinitionsCount(
