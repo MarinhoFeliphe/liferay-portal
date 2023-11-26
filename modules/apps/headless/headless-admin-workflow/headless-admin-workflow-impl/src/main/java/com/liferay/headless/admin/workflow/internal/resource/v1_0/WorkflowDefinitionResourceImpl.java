@@ -207,6 +207,9 @@ public class WorkflowDefinitionResourceImpl
 			WorkflowDefinition workflowDefinition)
 		throws Exception {
 
+		System.out.println(
+			"Creating workflow definition " + workflowDefinition.getName() + " for company " + contextCompany.getCompanyId());
+
 		String content = workflowDefinition.getContent();
 
 		return _toWorkflowDefinition(
