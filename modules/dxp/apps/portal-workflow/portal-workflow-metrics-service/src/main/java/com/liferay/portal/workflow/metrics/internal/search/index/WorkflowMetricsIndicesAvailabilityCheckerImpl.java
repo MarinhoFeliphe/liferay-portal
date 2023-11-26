@@ -33,15 +33,17 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 
 	@Override
 	public boolean check(long companyId) {
-		_log.info("Checking if WM indices exist for company: " + companyId);
-		_log.debug("Checking if WM indices exist for company: " + companyId);
-		//_log.error("Checking if WM indices exist for company: " + companyId);
+		System.out.println("Checking if WM indices exist for company: " + companyId);
 
 		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
+			System.out.println("WM indices don't exist!");
+
 			return false;
 		}
 
 		if (GetterUtil.getBoolean(portalCache.get(companyId))) {
+			System.out.println("WM indices exists!");
+
 			return true;
 		}
 
@@ -59,6 +61,8 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 			searchEngineAdapter.execute(indicesExistsIndexRequest);
 
 		portalCache.put(companyId, indicesExistsIndexResponse.isExists());
+
+		System.out.println("WM indices " + (indicesExistsIndexResponse.isExists() ? "exists!" : "don't exist!"));
 
 		return indicesExistsIndexResponse.isExists();
 	}

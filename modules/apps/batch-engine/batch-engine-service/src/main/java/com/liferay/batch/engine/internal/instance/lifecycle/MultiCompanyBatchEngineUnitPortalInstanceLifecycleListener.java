@@ -32,6 +32,7 @@ public class MultiCompanyBatchEngineUnitPortalInstanceLifecycleListener
 		//_log.error("Creating MBModeration workflow definition for company " + company.getCompanyId());
 		_log.debug("Creating Single Approver workflow definition for company " + company.getCompanyId());
 		//_log.warn("Creating Single Approver workflow definition for company " + company.getCompanyId());
+		System.out.println("Creating Single Approver workflow definition for company " + company.getCompanyId());
 
 		CompletableFuture<Void> completableFuture =
 			_multiCompanyBatchEngineUnitProcessor.processBatchEngineUnits(
