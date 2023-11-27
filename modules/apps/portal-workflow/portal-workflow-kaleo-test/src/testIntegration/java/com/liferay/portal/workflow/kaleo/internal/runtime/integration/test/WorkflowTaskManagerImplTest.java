@@ -47,6 +47,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -108,7 +109,16 @@ import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.workflow.comparator.WorkflowComparatorFactory;
+import com.liferay.portal.workflow.kaleo.definition.export.builder.DefinitionBuilder;
 import com.liferay.portal.workflow.kaleo.definition.util.WorkflowDefinitionContentUtil;
+import com.liferay.portal.workflow.kaleo.model.KaleoNode;
+import com.liferay.portal.workflow.kaleo.model.KaleoTask;
+import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
+import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalServiceUtil;
+import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import java.util.ArrayList;
@@ -800,6 +810,75 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 				user.getCompanyId(), user.getUserId(), false));
 
 		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testLabelTranslation() throws Exception {
+		_activateSingleApproverWorkflow(DLFolder.class.getName(), 0, -1);
+
+		Folder folder = _addFolder();
+
+		FileVersion fileVersion = _addFileVersion(folder.getFolderId());
+
+		// Label must be the translation from selected language
+
+		WorkflowTask workflowTask = _getWorkflowTask(
+			_adminUser, _REVIEW, false, DLFileEntry.class.getName(),
+			fileVersion.getFileVersionId());
+
+		Assert.assertEquals(
+			LanguageUtil.get(LocaleUtil.BRAZIL, _REVIEW),
+			workflowTask.getLabel(LocaleUtil.BRAZIL));
+
+		// Label must be the name
+
+		Assert.assertEquals(
+			_REVIEW, workflowTask.getLabel(new Locale("aa", "AA")));
+
+		// Label must be the labelMap value from default language
+
+		KaleoTaskInstanceToken kaleoTaskInstanceToken =
+			KaleoTaskInstanceTokenLocalServiceUtil.getKaleoTaskInstanceToken(
+				workflowTask.getWorkflowTaskId());
+
+		KaleoTask kaleoTask = kaleoTaskInstanceToken.getKaleoTask();
+
+		KaleoNode kaleoNode = kaleoTask.getKaleoNode();
+
+		kaleoNode.setLabelMap(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), "Able"
+			).build());
+
+		kaleoNode = _kaleoNodeLocalService.updateKaleoNode(kaleoNode);
+
+		fileVersion = _addFileVersion(folder.getFolderId());
+
+		workflowTask = _getWorkflowTask(
+			_adminUser, _REVIEW, false, DLFileEntry.class.getName(),
+			fileVersion.getFileVersionId());
+
+		Assert.assertEquals(
+			"Able", workflowTask.getLabel(new Locale("aa", "AA")));
+
+		// Label must be the labelMap value from selected language
+
+		kaleoNode.setLabelMap(
+			HashMapBuilder.put(
+				LocaleUtil.BRAZIL, "Bravo"
+			).build());
+
+		_kaleoNodeLocalService.updateKaleoNode(kaleoNode);
+
+		fileVersion = _addFileVersion(folder.getFolderId());
+
+		workflowTask = _getWorkflowTask(
+			_adminUser, _REVIEW, false, DLFileEntry.class.getName(),
+			fileVersion.getFileVersionId());
+
+		Assert.assertEquals("Bravo", workflowTask.getLabel(LocaleUtil.BRAZIL));
+
+		_deactivateWorkflow(DLFolder.class.getName(), 0, -1);
 	}
 
 	@Test
@@ -1998,6 +2077,9 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
 
 	@Inject
+	private DefinitionBuilder _definitionBuilder;
+
+	@Inject
 	private DLAppLocalService _dlAppLocalService;
 
 	@Inject
@@ -2020,6 +2102,19 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 
 	@Inject
 	private JournalFolderLocalService _journalFolderLocalService;
+
+	@Inject
+	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;
+
+	@Inject
+	private KaleoDefinitionVersionLocalService
+		_kaleoDefinitionVersionLocalService;
+
+	@Inject
+	private KaleoNodeLocalService _kaleoNodeLocalService;
+
+	@Inject
+	private KaleoTaskLocalService _kaleoTaskLocalService;
 
 	private String _name;
 
