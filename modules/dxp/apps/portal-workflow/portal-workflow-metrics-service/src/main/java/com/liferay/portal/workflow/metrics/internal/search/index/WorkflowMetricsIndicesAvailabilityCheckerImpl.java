@@ -9,11 +9,15 @@ import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
-import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
-import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexResponse;
+import com.liferay.portal.search.engine.adapter.index.GetIndexIndexRequest;
+import com.liferay.portal.search.engine.adapter.index.GetIndexIndexResponse;
+import com.liferay.portal.search.index.IndexInformation;
+import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.workflow.metrics.search.index.WorkflowMetricsIndicesAvailabilityChecker;
 
 import org.osgi.service.component.annotations.Activate;
@@ -42,29 +46,40 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 		}
 
 		if (GetterUtil.getBoolean(portalCache.get(companyId))) {
-			System.out.println("WM indices exists!");
+			System.out.println("WM indices exists! - Cache");
 
 			return true;
 		}
 
-		IndicesExistsIndexRequest indicesExistsIndexRequest =
-			new IndicesExistsIndexRequest(
-				_instanceWorkflowMetricsIndex.getIndexName(companyId),
-				_nodeWorkflowMetricsIndex.getIndexName(companyId),
-				_processWorkflowMetricsIndex.getIndexName(companyId),
-				_slaInstanceResultWorkflowMetricsIndex.getIndexName(companyId),
-				_slaTaskResultWorkflowMetricsIndex.getIndexName(companyId),
-				_taskWorkflowMetricsIndex.getIndexName(companyId),
-				_transitionWorkflowMetricsIndex.getIndexName(companyId));
+		boolean exists = true;
 
-		IndicesExistsIndexResponse indicesExistsIndexResponse =
-			searchEngineAdapter.execute(indicesExistsIndexRequest);
+		String[] indexNames = _indexInformation.getIndexNames();
 
-		portalCache.put(companyId, indicesExistsIndexResponse.isExists());
+		String[] workflowMetricsIndexNames = new String[] {
+			_instanceWorkflowMetricsIndex.getIndexName(companyId),
+			_nodeWorkflowMetricsIndex.getIndexName(companyId),
+			_processWorkflowMetricsIndex.getIndexName(companyId),
+			_slaInstanceResultWorkflowMetricsIndex.getIndexName(companyId),
+			_slaTaskResultWorkflowMetricsIndex.getIndexName(companyId),
+			_taskWorkflowMetricsIndex.getIndexName(companyId),
+			_transitionWorkflowMetricsIndex.getIndexName(companyId),
+		};
 
-		System.out.println("WM indices " + (indicesExistsIndexResponse.isExists() ? "exists!" : "don't exist!"));
+		for (String workflowMetricsIndexName : workflowMetricsIndexNames) {
+			if (ArrayUtil.contains(indexNames, workflowMetricsIndexName)) {
+				continue;
+			}
 
-		return indicesExistsIndexResponse.isExists();
+			exists = false;
+
+			break;
+		}
+
+		portalCache.put(companyId, exists);
+
+		System.out.println("WM indices " + (exists ? "exists!" : "don't exist!"));
+
+		return exists;
 	}
 
 	@Override
@@ -121,5 +136,8 @@ public class WorkflowMetricsIndicesAvailabilityCheckerImpl
 
 	@Reference(target = "(workflow.metrics.index.entity.name=transition)")
 	private WorkflowMetricsIndex _transitionWorkflowMetricsIndex;
+
+	@Reference
+	private IndexInformation _indexInformation;
 
 }
