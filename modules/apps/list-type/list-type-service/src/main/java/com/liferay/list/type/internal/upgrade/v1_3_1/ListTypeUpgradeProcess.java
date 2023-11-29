@@ -20,18 +20,18 @@ public class ListTypeUpgradeProcess extends UpgradeProcess {
 			StringBundler.concat(
 				"update Contact_ set prefixListTypeId = 0 where ",
 				"prefixListTypeId in (select listTypeId from ListType where ",
-				"(name IS NULL or name = '') and (type_ = '",
+				"(name is null or name = '') and (type_ = '",
 				ListTypeConstants.CONTACT_PREFIX, "'))"));
 		runSQL(
 			StringBundler.concat(
 				"update Contact_ set suffixListTypeId = 0 where ",
 				"suffixListTypeId in (select listTypeId from ListType where ",
-				"(name IS NULL or name = '') and (type_ = '",
+				"(name is null or name = '') and (type_ = '",
 				ListTypeConstants.CONTACT_SUFFIX, "'))"));
 
 		runSQL(
 			StringBundler.concat(
-				"delete from ListType where (name IS NULL or name = '') and ",
+				"delete from ListType where (name is null or name = '') and ",
 				"(type_ = '", ListTypeConstants.CONTACT_PREFIX, "' or type_ = ",
 				"'", ListTypeConstants.CONTACT_SUFFIX, "')"));
 	}
