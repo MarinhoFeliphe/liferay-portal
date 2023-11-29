@@ -101,7 +101,7 @@ public class EditAccountUserMVCActionCommand
 		String parameterValue = ParamUtil.getString(
 			portletRequest, parameterName);
 
-		if (Validator.isBlank(parameterValue)) {
+		if (Validator.isNull(parameterValue)) {
 			return 0;
 		}
 

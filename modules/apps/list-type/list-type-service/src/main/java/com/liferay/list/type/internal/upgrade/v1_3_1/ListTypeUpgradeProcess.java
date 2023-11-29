@@ -22,7 +22,6 @@ public class ListTypeUpgradeProcess extends UpgradeProcess {
 				"prefixListTypeId in (select listTypeId from ListType where ",
 				"(name IS NULL or name = '') and (type_ = '",
 				ListTypeConstants.CONTACT_PREFIX, "'))"));
-
 		runSQL(
 			StringBundler.concat(
 				"update Contact_ set suffixListTypeId = 0 where ",
