@@ -137,7 +137,6 @@ export default function LeftSidebar({setShowModal}: LeftSidebarProps) {
 							!!leftSidebarItems.length && (
 								<>
 									<LeftSidebarTreeView
-
 										expandedKeys={expandedKeys}
 										leftSidebarOtherObjectFoldersItems={
 											leftSidebarOtherObjectFoldersItems
