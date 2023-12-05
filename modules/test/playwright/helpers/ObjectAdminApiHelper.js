@@ -46,7 +46,8 @@ export class ObjectAdminApiHelper {
 					en_US: objectDefinitionExternalReferenceCode,
 				},
 				scope: 'company',
-			}
+			},
+			(payload) => this.deleteObjectDefinition(payload.id)
 		);
 	}
 
@@ -62,7 +63,8 @@ export class ObjectAdminApiHelper {
 					en_US: objectFolderExternalReferenceCode,
 				},
 				name: objectFolderExternalReferenceCode,
-			}
+			},
+			(payload) => this.deleteObjectFolder(payload.id)
 		);
 	}
 }

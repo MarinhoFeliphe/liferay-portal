@@ -6,11 +6,12 @@
 import {expect, mergeTests} from '@playwright/test';
 
 import {test as apiHelpersTest} from '../../fixtures/apiHelpers.fixture';
+import {test as homePageTest} from '../../fixtures/homePage.fixture';
 import {test as objectsPagesTest} from '../../fixtures/objectsPages.fixture';
 import {getRandomInt} from '../../utils/util';
 import teardown from './modelBuilder.teardown';
 
-export const test = mergeTests(apiHelpersTest, objectsPagesTest);
+export const test = mergeTests(apiHelpersTest, homePageTest, objectsPagesTest);
 
 test('created object folders are on the left side bar', async ({
 	_objectDefinitionsPage,
@@ -46,10 +47,13 @@ test('uncategorized folder does not contains delete and edit options', async ({
 
 test('can create relationship by dragging node handles', async ({
 	_api,
+	_homePage,
 	_modelBuilderPage,
 	_objectDefinitionsPage,
 	page,
 }) => {
+	await _homePage.goto();
+
 	const objectFolder = await _api.objectAdmin.postRandomObjectFolder();
 	const objectDefinition1 = await _api.objectAdmin.postRandomObjectDefinition(
 		objectFolder.externalReferenceCode

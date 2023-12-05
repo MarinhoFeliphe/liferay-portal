@@ -8,7 +8,15 @@ import {test} from '@playwright/test';
 import {ApiHelpers} from '../helpers/ApiHelpers';
 
 exports.test = test.extend({
-	_api: async ({page}, use) => {
-		await use(new ApiHelpers(page));
+	_api: async ({_cleanUpLeftOvers, page}, use) => {
+		await use(new ApiHelpers(_cleanUpLeftOvers, page));
+	},
+	_cleanUpLeftOvers: async ({page}, use) => {
+		const leftOvers = [];
+		await use(leftOvers);
+		while (leftOvers.length !== 0) {
+			const leftOver = leftOvers.pop();
+			await leftOver.cleanUpFunction(leftOver.payload);
+		}
 	},
 });

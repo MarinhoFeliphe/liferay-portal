@@ -7,8 +7,9 @@ import {liferayConfig} from '../liferay.config';
 import {ObjectAdminApiHelper} from './ObjectAdminApiHelper';
 
 export class ApiHelpers {
-	constructor(page) {
+	constructor(leftOvers, page) {
 		this.baseUrl = liferayConfig.environment.baseUrl;
+		this.leftOvers = leftOvers;
 		this.page = page;
 		this.objectAdmin = new ObjectAdminApiHelper(this);
 	}
@@ -26,8 +27,10 @@ export class ApiHelpers {
 		});
 	}
 
-	async post(url, data) {
-		const authToken = await this.page.evaluate(() => Liferay.authToken);
+	async post(url, data, cleanUpFunction) {
+		const authToken = await this.page.evaluate(
+			() => window.Liferay.authToken
+		);
 
 		const headers = {
 			'Content-Type': 'application/json',
@@ -39,6 +42,15 @@ export class ApiHelpers {
 			headers,
 		});
 
-		return await response.json();
+		const payload = await response.json();
+
+		if (response.ok()) {
+			this.leftOvers.push({
+				cleanUpFunction,
+				payload,
+			});
+		}
+
+		return payload;
 	}
 }
