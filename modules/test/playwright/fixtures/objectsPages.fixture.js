@@ -9,10 +9,18 @@ import {ModelBuilderPage} from '../pages/objects/modelBuilder.page';
 import {ObjectDefinitionsPage} from '../pages/objects/objectDefinitions.page';
 
 exports.test = test.extend({
+	_cleanUpLeftOvers: async ({page}, use) => {
+		const leftOvers = [];
+		await use(leftOvers);
+		while (leftOvers.length !== 0) {
+			const leftOver = leftOvers.pop();
+			await leftOver.cleanUpFunction(leftOver.payload);
+		}
+	},
 	_modelBuilderPage: async ({page}, use) => {
 		await use(new ModelBuilderPage(page));
 	},
-	_objectDefinitionsPage: async ({page}, use) => {
-		await use(new ObjectDefinitionsPage(page));
+	_objectDefinitionsPage: async ({_cleanUpLeftOvers, page}, use) => {
+		await use(new ObjectDefinitionsPage(_cleanUpLeftOvers, page));
 	},
 });

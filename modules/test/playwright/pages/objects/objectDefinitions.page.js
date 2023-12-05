@@ -51,7 +51,11 @@ export class ObjectDefinitionsPage {
 		await this.addObjectFolderButton.click();
 		await this.objectFolderLabel.click();
 		await this.objectFolderLabel.fill(objectFolderLabel);
+		const responsePromise = this.page.waitForResponse('http://localhost:8080/o/object-admin/v1.0/object-folders');
 		await this.createObjectFolderButton.click();
+		const response = await responsePromise;
+		const payload = await response.json();
+		console.log(`${payload}`);
 	}
 
 	async clickUncategorizedObjectFolder() {
