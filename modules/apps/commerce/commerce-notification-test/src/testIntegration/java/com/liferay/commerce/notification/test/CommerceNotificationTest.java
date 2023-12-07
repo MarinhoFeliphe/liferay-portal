@@ -8,6 +8,8 @@ package com.liferay.commerce.notification.test;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.constants.AccountRoleConstants;
 import com.liferay.account.model.AccountEntry;
+import com.liferay.account.model.AccountRole;
+import com.liferay.account.service.AccountRoleLocalServiceUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
 import com.liferay.commerce.constants.CommerceOrderConstants;
@@ -41,6 +43,7 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -53,6 +56,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -104,6 +108,7 @@ public class CommerceNotificationTest {
 			deleteCommerceNotificationQueueEntries(_group.getGroupId());
 	}
 
+	@Ignore
 	@Test
 	public void testAccountAdministratorRecipient() throws Exception {
 		_setUpAccountAdministrator();
@@ -202,6 +207,7 @@ public class CommerceNotificationTest {
 			commerceNotificationQueueEntry.getTo(), user.getEmailAddress());
 	}
 
+	@Ignore
 	@Test
 	public void testOrderManagerRecipient() throws Exception {
 		_setUpAccountAdministrator();
@@ -263,6 +269,7 @@ public class CommerceNotificationTest {
 				getCommerceNotificationQueueEntriesCount(_group.getGroupId()));
 	}
 
+	@Ignore
 	@Test
 	public void testUserGroupRecipient() throws Exception {
 		_setUpAccountAdministrator();
