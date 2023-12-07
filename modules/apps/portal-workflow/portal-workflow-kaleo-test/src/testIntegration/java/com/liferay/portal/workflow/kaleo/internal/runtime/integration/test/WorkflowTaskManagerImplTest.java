@@ -814,17 +814,15 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testLabelTranslation() throws Exception {
-		_activateSingleApproverWorkflow(DLFolder.class.getName(), 0, -1);
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
 
-		Folder folder = _addFolder();
-
-		FileVersion fileVersion = _addFileVersion(folder.getFolderId());
+		BlogsEntry blogsEntry = _addBlogsEntry();
 
 		// Label must be the translation from selected language
 
 		WorkflowTask workflowTask = _getWorkflowTask(
 			_adminUser, _REVIEW, false, DLFileEntry.class.getName(),
-			fileVersion.getFileVersionId());
+			blogsEntry.getEntryId());
 
 		Assert.assertEquals(
 			LanguageUtil.get(LocaleUtil.BRAZIL, _REVIEW),
@@ -852,11 +850,11 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 
 		kaleoNode = _kaleoNodeLocalService.updateKaleoNode(kaleoNode);
 
-		fileVersion = _addFileVersion(folder.getFolderId());
+		blogsEntry = _addBlogsEntry();
 
 		workflowTask = _getWorkflowTask(
 			_adminUser, _REVIEW, false, DLFileEntry.class.getName(),
-			fileVersion.getFileVersionId());
+			blogsEntry.getEntryId());
 
 		Assert.assertEquals(
 			"Able", workflowTask.getLabel(new Locale("aa", "AA")));
@@ -870,11 +868,11 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 
 		_kaleoNodeLocalService.updateKaleoNode(kaleoNode);
 
-		fileVersion = _addFileVersion(folder.getFolderId());
+		blogsEntry = _addBlogsEntry();
 
 		workflowTask = _getWorkflowTask(
 			_adminUser, _REVIEW, false, DLFileEntry.class.getName(),
-			fileVersion.getFileVersionId());
+			blogsEntry.getEntryId());
 
 		Assert.assertEquals("Bravo", workflowTask.getLabel(LocaleUtil.BRAZIL));
 
