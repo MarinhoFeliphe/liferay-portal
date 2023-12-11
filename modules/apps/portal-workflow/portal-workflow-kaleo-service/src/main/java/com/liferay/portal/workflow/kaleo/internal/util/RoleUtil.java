@@ -75,6 +75,10 @@ public class RoleUtil {
 			System.out.println("role: " + role);
 			System.out.println("roleType: " + roleType);
 
+			if (role.getName().equals("Account Administrator") && (role.getType() != 6)) {
+				return role;
+			}
+
 			throw new DuplicateRoleException(
 				"Role already exists with name " + name);
 		}
