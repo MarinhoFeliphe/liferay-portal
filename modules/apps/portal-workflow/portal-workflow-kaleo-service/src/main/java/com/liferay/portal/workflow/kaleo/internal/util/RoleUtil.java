@@ -72,6 +72,9 @@ public class RoleUtil {
 			}
 		}
 		else if (role.getType() != roleType) {
+			System.out.println("role: " + role);
+			System.out.println("roleType: " + roleType);
+
 			throw new DuplicateRoleException(
 				"Role already exists with name " + name);
 		}

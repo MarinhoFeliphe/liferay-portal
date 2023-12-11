@@ -44,6 +44,8 @@ public class AddDefaultAccountRolesPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
+		System.out.println("LOG - AddDefaultAccountRolesPortalInstanceLifecycleListener");
+
 		if (_checkAccountRole(
 				company,
 				AccountRoleConstants.

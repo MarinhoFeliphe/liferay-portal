@@ -26,6 +26,8 @@ public class KaleoInitialRequestPortalInstanceLifecycleListener
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
+		System.out.println("LOG - KaleoInitialRequestPortalInstanceLifecycleListener");
+
 		PermissionThreadLocal.setPermissionChecker(null);
 
 		try {
