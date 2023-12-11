@@ -21,6 +21,7 @@ import com.liferay.layout.type.controller.display.page.internal.constants.Displa
 import com.liferay.layout.type.controller.display.page.internal.display.context.DisplayPageLayoutTypeControllerDisplayContext;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -157,6 +158,12 @@ public class DisplayPageLayoutTypeController
 			DisplayPageLayoutTypeControllerWebKeys.
 				DISPLAY_PAGE_LAYOUT_TYPE_CONTROLLER_DISPLAY_CONTEXT,
 			displayPageLayoutTypeControllerDisplayContext);
+
+		if (!displayPageLayoutTypeControllerDisplayContext.hasInfoItem() &&
+			!themeDisplay.isSignedIn()) {
+
+			throw new NoSuchLayoutException();
+		}
 
 		String page = getViewPage();
 
