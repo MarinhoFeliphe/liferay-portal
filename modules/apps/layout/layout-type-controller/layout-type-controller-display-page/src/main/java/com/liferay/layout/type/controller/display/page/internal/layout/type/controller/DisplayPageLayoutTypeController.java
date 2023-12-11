@@ -121,6 +121,10 @@ public class DisplayPageLayoutTypeController
 				WebKeys.THEME_DISPLAY);
 
 		if (layout.isDraftLayout()) {
+			if (!themeDisplay.isSignedIn()) {
+				throw new NoSuchLayoutException();
+			}
+
 			Layout curLayout = _layoutLocalService.fetchLayout(
 				layout.getClassPK());
 
