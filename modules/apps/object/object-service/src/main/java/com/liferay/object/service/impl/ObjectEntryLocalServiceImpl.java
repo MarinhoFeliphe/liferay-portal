@@ -2459,8 +2459,8 @@ public class ObjectEntryLocalServiceImpl
 				}
 			).and(
 				ObjectEntrySearchUtil.getRelatedModelsPredicate(
-					dynamicObjectDefinitionTable, objectDefinition2,
-					_objectFieldLocalService, search)
+					objectDefinition2, _objectFieldLocalService, search,
+					dynamicObjectDefinitionTable)
 			)
 		);
 	}
@@ -2628,10 +2628,10 @@ public class ObjectEntryLocalServiceImpl
 				}
 			).and(
 				ObjectEntrySearchUtil.getRelatedModelsPredicate(
-					dynamicObjectDefinitionTable,
 					_objectDefinitionPersistence.fetchByPrimaryKey(
 						objectRelationship.getObjectDefinitionId2()),
-					_objectFieldLocalService, search)
+					_objectFieldLocalService, search,
+					dynamicObjectDefinitionTable)
 			)
 		);
 	}
@@ -2713,25 +2713,9 @@ public class ObjectEntryLocalServiceImpl
 				(Column<?, Object>)column, objectField.getDBType(), search);
 		}
 
-		DynamicObjectDefinitionTable dynamicObjectDefinitionTable = null;
-
-		if (Objects.equals(
-				titleObjectField.getDBTableName(),
-				objectDefinition.getDBTableName())) {
-
-			dynamicObjectDefinitionTable = _getDynamicObjectDefinitionTable(
-				objectDefinition.getObjectDefinitionId());
-		}
-		else {
-			dynamicObjectDefinitionTable =
-				_getExtensionDynamicObjectDefinitionTable(
-					objectDefinition.getObjectDefinitionId());
-		}
-
 		Predicate relatedModelsPredicate =
 			ObjectEntrySearchUtil.getRelatedModelsPredicate(
-				dynamicObjectDefinitionTable, objectDefinition,
-				_objectFieldLocalService, search);
+				objectDefinition, _objectFieldLocalService, search, table);
 
 		if (relatedModelsPredicate == null) {
 			return null;
@@ -2739,9 +2723,9 @@ public class ObjectEntryLocalServiceImpl
 
 		return column.in(
 			DSLQueryFactoryUtil.select(
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn()
+				table.getColumn(objectDefinition.getPKObjectFieldDBColumnName())
 			).from(
-				dynamicObjectDefinitionTable
+				table
 			).where(
 				relatedModelsPredicate
 			));
