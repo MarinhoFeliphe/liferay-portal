@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -46,7 +47,9 @@ public class RoleUtil {
 			serviceContext.getCompanyId(), name);
 
 		if (role != null) {
-			if (role.getType() != roleType) {
+			if (role.getType() != roleType &&
+				!Objects.equals(role.getName(), "Account Administrator")) {
+
 				throw new DuplicateRoleException(
 					"Role already exists with name " + name);
 			}
