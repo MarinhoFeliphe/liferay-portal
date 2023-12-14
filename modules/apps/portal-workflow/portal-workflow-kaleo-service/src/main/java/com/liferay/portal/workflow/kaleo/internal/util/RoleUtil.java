@@ -8,17 +8,22 @@ package com.liferay.portal.workflow.kaleo.internal.util;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountRoleLocalService;
+import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.DuplicateRoleException;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleTable;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.persistence.RolePersistence;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 import com.liferay.roles.admin.role.type.contributor.provider.RoleTypeContributorProvider;
 
@@ -38,17 +43,44 @@ import org.osgi.util.tracker.ServiceTracker;
 public class RoleUtil {
 
 	public static Role getRole(
-			AccountRoleLocalService accountRoleLocalService, String name,
-			RoleLocalService roleLocalService, int roleType, boolean autoCreate,
-			ServiceContext serviceContext)
+		AccountRoleLocalService accountRoleLocalService, String name,
+		RoleLocalService roleLocalService, RolePersistence rolePersistence,
+		int roleType, boolean autoCreate, ServiceContext serviceContext)
 		throws PortalException {
 
 		Role role = roleLocalService.fetchRole(
 			serviceContext.getCompanyId(), name);
 
 		if (role != null) {
-			if (role.getType() != roleType &&
-				!Objects.equals(role.getName(), "Account Administrator")) {
+			if (role.getType() != roleType) {
+
+				int count = rolePersistence.dslQueryCount(
+					DSLQueryFactoryUtil.count(
+					).from(
+						RoleTable.INSTANCE
+					).where(
+						RoleTable.INSTANCE.companyId.eq(
+							serviceContext.getCompanyId()
+						).and(
+							DSLFunctionFactoryUtil.lower(
+								RoleTable.INSTANCE.name
+							).eq(
+								StringUtil.lowerCase(name)
+							)
+						)
+					));
+
+				System.out.println("Role: " + role);
+				System.out.println("Count: " + count);
+
+				rolePersistence.clearCache();
+
+				System.out.println("Cache cleared");
+
+				role = roleLocalService.fetchRole(
+					serviceContext.getCompanyId(), name);
+
+				System.out.println("Role: " + role);
 
 				throw new DuplicateRoleException(
 					"Role already exists with name " + name);

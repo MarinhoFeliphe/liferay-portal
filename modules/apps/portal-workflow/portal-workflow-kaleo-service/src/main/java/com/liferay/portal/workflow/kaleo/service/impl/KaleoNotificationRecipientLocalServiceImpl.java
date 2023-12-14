@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.persistence.RolePersistence;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.definition.AddressRecipient;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
@@ -130,8 +131,8 @@ public class KaleoNotificationRecipientLocalServiceImpl
 
 				role = RoleUtil.getRole(
 					_accountRoleLocalService, roleRecipient.getRoleName(),
-					_roleLocalService, roleType, roleRecipient.isAutoCreate(),
-					serviceContext);
+					_roleLocalService, _rolePersistence, roleType,
+					roleRecipient.isAutoCreate(), serviceContext);
 			}
 			else {
 				role = _roleLocalService.getRole(roleRecipient.getRoleId());
@@ -187,6 +188,9 @@ public class KaleoNotificationRecipientLocalServiceImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private RolePersistence _rolePersistence;
 
 	@Reference
 	private UserLocalService _userLocalService;

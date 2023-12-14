@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.persistence.RolePersistence;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.definition.Assignment;
 import com.liferay.portal.workflow.kaleo.definition.AssignmentType;
@@ -153,7 +154,7 @@ public class KaleoTaskAssignmentLocalServiceImpl
 			if (Validator.isNotNull(roleAssignment.getRoleName())) {
 				role = RoleUtil.getRole(
 					_accountRoleLocalService, roleAssignment.getRoleName(),
-					_roleLocalService,
+					_roleLocalService, _rolePersistence,
 					RoleUtil.getRoleType(roleAssignment.getRoleType()),
 					roleAssignment.isAutoCreate(), serviceContext);
 			}
@@ -215,6 +216,9 @@ public class KaleoTaskAssignmentLocalServiceImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private RolePersistence _rolePersistence;
 
 	@Reference
 	private UserLocalService _userLocalService;
