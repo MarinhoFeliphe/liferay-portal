@@ -212,6 +212,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			}
 		}
 
+		System.out.println("Adding role: " + role);
+
 		return role;
 	}
 
