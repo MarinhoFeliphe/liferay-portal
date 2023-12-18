@@ -104,7 +104,8 @@ public class RoleModelListener extends BaseModelListener<Role> {
 		}
 
 		if (ArrayUtil.contains(
-				AccountRoleConstants.REQUIRED_ROLE_NAMES, role.getName())) {
+				AccountRoleConstants.REQUIRED_ROLE_NAMES, role.getName())
+			&& role.getType() != 2) {
 
 			throw new ModelListenerException(
 				new RequiredRoleException(

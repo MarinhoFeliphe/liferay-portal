@@ -15,6 +15,8 @@ import com.liferay.portal.kernel.service.TeamLocalServiceUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Objects;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
@@ -99,6 +101,12 @@ public class RoleImpl extends RoleBaseImpl {
 
 	@Override
 	public boolean isSystem() {
+		if (Objects.equals(getName(), "Account Administrator")
+			&& getType() == 2) {
+
+			return false;
+		}
+
 		return PortalUtil.isSystemRole(getName());
 	}
 

@@ -51,37 +51,20 @@ public class RoleUtil {
 		Role role = roleLocalService.fetchRole(
 			serviceContext.getCompanyId(), name);
 
+		if (name.equals("Account Administrator")
+			&& (role != null) && (role.getType() == 2)) {
+
+			System.out.println("Role: " + role);
+
+			accountRoleLocalService.deleteAccountRole(
+				accountRoleLocalService.getAccountRoleByRoleId(
+					role.getRoleId()));
+
+			role = null;
+		}
+
 		if (role != null) {
 			if (role.getType() != roleType) {
-
-				int count = rolePersistence.dslQueryCount(
-					DSLQueryFactoryUtil.count(
-					).from(
-						RoleTable.INSTANCE
-					).where(
-						RoleTable.INSTANCE.companyId.eq(
-							serviceContext.getCompanyId()
-						).and(
-							DSLFunctionFactoryUtil.lower(
-								RoleTable.INSTANCE.name
-							).eq(
-								StringUtil.lowerCase(name)
-							)
-						)
-					));
-
-				System.out.println("Role: " + role);
-				System.out.println("Count: " + count);
-
-				rolePersistence.clearCache();
-
-				System.out.println("Cache cleared");
-
-				role = roleLocalService.fetchRole(
-					serviceContext.getCompanyId(), name);
-
-				System.out.println("Role: " + role);
-
 				throw new DuplicateRoleException(
 					"Role already exists with name " + name);
 			}
