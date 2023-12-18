@@ -56,9 +56,7 @@ public class RoleUtil {
 
 			System.out.println("Role: " + role);
 
-			accountRoleLocalService.deleteAccountRole(
-				accountRoleLocalService.getAccountRoleByRoleId(
-					role.getRoleId()));
+			roleLocalService.deleteRole(role.getRoleId());
 
 			role = null;
 		}
