@@ -3042,7 +3042,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.security.antisamy.jar!antisamy.jar</file-name>
-				<version>1.7.2</version>
+				<version>1.7.4</version>
 				<project-name>OWASP AntiSamy</project-name>
 				<project-url>https://github.com/nahsra/antisamy</project-url>
 				<licenses>
@@ -3131,9 +3131,9 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.security.antisamy.jar!neko-htmlunit.jar</file-name>
-				<version>2.66.0</version>
+				<version>3.6.0</version>
 				<project-name>HtmlUnit NekoHtml</project-name>
-				<project-url>http://htmlunit.sourceforge.net</project-url>
+				<project-url>https://www.htmlunit.org</project-url>
 				<licenses>
 					<license>
 						<license-name>Apache License, Version 2.0</license-name>
@@ -6502,7 +6502,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/mysql.jar</file-name>
-				<version>8.0.32</version>
+				<version>8.0.33</version>
 				<project-name>MySQL Connector/J</project-name>
 				<project-url>http://www.mysql.com/products/connector/j</project-url>
 				<licenses>
