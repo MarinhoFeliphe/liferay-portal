@@ -44,6 +44,7 @@ import com.liferay.portal.workflow.kaleo.internal.upgrade.v3_1_1.KaleoNotificati
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v3_2_0.KaleoInstanceUpgradeProcess;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v4_0_0.KaleoDefinitionContentUpgradeProcess;
 
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v4_1_0.RoleProcess;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -172,6 +173,9 @@ public class KaleoServiceUpgradeStepRegistrator
 
 		registry.register(
 			"3.5.2", "4.0.0", new KaleoDefinitionContentUpgradeProcess());
+
+		registry.register(
+			"4.0.0", "4.1.0", new RoleProcess());
 	}
 
 }
