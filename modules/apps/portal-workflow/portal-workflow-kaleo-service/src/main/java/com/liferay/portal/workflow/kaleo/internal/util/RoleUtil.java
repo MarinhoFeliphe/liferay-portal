@@ -45,13 +45,6 @@ public class RoleUtil {
 			serviceContext.getCompanyId(), name);
 
 		if (role != null) {
-			if (role.getType() != roleType) {
-				System.out.println("Already existing role: " + role);
-
-				throw new DuplicateRoleException(
-					"Role already exists with name " + name);
-			}
-
 			return role;
 		}
 
