@@ -5,12 +5,18 @@
 
 package com.liferay.portal.xmlrpc;
 
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.xmlrpc.Response;
 import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsValues;
+
+import java.io.IOException;
+
+import java.lang.reflect.Field;
 
 import java.util.Arrays;
 
@@ -87,7 +93,7 @@ public class XmlRpcUtilTest {
 	@Test
 	public void testMethodParser() throws Exception {
 		Tuple parameterizedMethodTuple = XmlRpcUtil.parseMethod(
-			_PARAMETERIZED_METHOD);
+			_PARAMETERIZED_METHOD_1);
 
 		Assert.assertEquals("params", parameterizedMethodTuple.getObject(0));
 
@@ -113,6 +119,43 @@ public class XmlRpcUtilTest {
 			Assert.assertEquals(
 				Arrays.toString(nonparameterizedMethodArguments), 0,
 				nonparameterizedMethodArguments.length);
+		}
+	}
+
+	@Test
+	public void testParseMethodWithLimitation() throws Exception {
+		Field field = ReflectionUtil.getDeclaredField(
+			PropsValues.class, "XML_RPC_MAX_PARAMETERS");
+
+		Object originalValue = field.get(null);
+
+		try {
+			field.set(null, 3);
+
+			Tuple parameterizedMethodTuple = XmlRpcUtil.parseMethod(
+				_PARAMETERIZED_METHOD_1);
+
+			Object[] parameterizedMethodArguments =
+				(Object[])parameterizedMethodTuple.getObject(1);
+
+			Assert.assertEquals(
+				Arrays.toString(parameterizedMethodArguments), 3,
+				parameterizedMethodArguments.length);
+
+			try {
+				XmlRpcUtil.parseMethod(_PARAMETERIZED_METHOD_2);
+
+				Assert.fail();
+			}
+			catch (IOException ioException) {
+				Throwable throwable = ioException.getCause();
+
+				Assert.assertEquals(
+					"Too many XML-RPC parameters", throwable.getMessage());
+			}
+		}
+		finally {
+			field.set(null, originalValue);
 		}
 	}
 
@@ -199,7 +242,7 @@ public class XmlRpcUtilTest {
 
 	// Skip JavaParser
 
-	private static final String _PARAMETERIZED_METHOD =
+	private static final String _PARAMETERIZED_METHOD_1 =
 		StringBundler.concat(
 			"<?xml version=\"1.0\"?>",
 			"<methodCall>",
@@ -208,6 +251,21 @@ public class XmlRpcUtilTest {
 			"<param><value><i4>1024</i4></value></param>",
 			"<param><value>hello</value></param>",
 			"<param><value><string>world</string></value></param>",
+			"</params>",
+			"</methodCall>");
+
+	// Skip JavaParser
+
+	private static final String _PARAMETERIZED_METHOD_2 =
+		StringBundler.concat(
+			"<?xml version=\"1.0\"?>",
+			"<methodCall>",
+			"<methodName>params</methodName>",
+			"<params>",
+			"<param><value><i4>1024</i4></value></param>",
+			"<param><value>hello</value></param>",
+			"<param><value><string>world</string></value></param>",
+			"<param><value><string>!</string></value></param>",
 			"</params>",
 			"</methodCall>");
 
