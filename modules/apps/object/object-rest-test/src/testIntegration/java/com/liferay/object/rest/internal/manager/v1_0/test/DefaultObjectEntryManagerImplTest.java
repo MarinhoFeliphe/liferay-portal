@@ -78,6 +78,7 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -2299,6 +2300,121 @@ public class DefaultObjectEntryManagerImplTest
 		TreeTestUtil.forEachNodeObjectDefinition(
 			_tree.iterator(), objectDefinitionLocalService,
 			objectDefinition -> _assertObjectEntriesSize(objectDefinition, 2));
+	}
+
+	@Test
+	public void testGetObjectEntriesWithAccountEntryRestricted3()
+		throws Exception {
+
+		// Regular roles permissions should not be restricted by account entry
+
+		AccountEntry accountEntry1 = _addAccountEntry();
+
+		ObjectEntry objectEntry1 = _addObjectEntry(accountEntry1);
+
+		AccountEntry accountEntry2 = _addAccountEntry();
+
+		_addObjectEntry(accountEntry2);
+
+		_user = _addUser();
+
+		Page<ObjectEntry> page = _defaultObjectEntryManager.getObjectEntries(
+			companyId, _objectDefinition3, null, null,
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, _user),
+			(Filter)null, null, StringPool.BLANK, null);
+
+		Collection<ObjectEntry> objectEntries = page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 0, objectEntries.size());
+
+		Role role = _addRoleUser(
+			new String[] {ActionKeys.VIEW}, _objectDefinition3, _user);
+
+		page = _defaultObjectEntryManager.getObjectEntries(
+			companyId, _objectDefinition3, null, null,
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, _user),
+			(Filter)null, null, StringPool.BLANK, null);
+
+		objectEntries = page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 2, objectEntries.size());
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			companyId, _objectDefinition3.getClassName(),
+			ResourceConstants.SCOPE_COMPANY, String.valueOf(companyId),
+			role.getRoleId(), ActionKeys.VIEW);
+
+		// Regular roles' individual permissions should not be restricted by
+		// account entry
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			companyId, _objectDefinition3.getClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectEntry1.getId()), role.getRoleId(),
+			new String[] {ActionKeys.VIEW});
+
+		page = _defaultObjectEntryManager.getObjectEntries(
+			companyId, _objectDefinition3, null, null,
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, _user),
+			(Filter)null, null, StringPool.BLANK, null);
+
+		objectEntries = page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
+
+		_userLocalService.deleteRoleUser(role.getRoleId(), _user);
+
+		page = _defaultObjectEntryManager.getObjectEntries(
+			companyId, _objectDefinition3, null, null,
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, _user),
+			(Filter)null, null, StringPool.BLANK, null);
+
+		objectEntries = page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 0, objectEntries.size());
+
+		// User should be able to view object entries for account entry 1
+		// because he is a member of account entry 1
+
+		Assert.assertTrue(
+			AccountRoleConstants.isSharedRole(_accountAdministratorRole));
+
+		AccountEntryUserRel accountEntryUserRel =
+			_accountEntryUserRelLocalService.addAccountEntryUserRel(
+				accountEntry1.getAccountEntryId(), _user.getUserId());
+
+		page = _defaultObjectEntryManager.getObjectEntries(
+			companyId, _objectDefinition3, null, null,
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, _user),
+			(Filter)null, null, StringPool.BLANK, null);
+
+		objectEntries = page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
+
+		_accountEntryUserRelLocalService.deleteAccountEntryUserRel(
+			accountEntryUserRel);
+
+		page = _defaultObjectEntryManager.getObjectEntries(
+			companyId, _objectDefinition3, null, null,
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, _user),
+			(Filter)null, null, StringPool.BLANK, null);
+
+		objectEntries = page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 0, objectEntries.size());
 	}
 
 	@Test
