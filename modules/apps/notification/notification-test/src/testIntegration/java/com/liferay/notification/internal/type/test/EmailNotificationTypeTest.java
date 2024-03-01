@@ -241,6 +241,42 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 	}
 
 	@Test
+	public void testFreeMarkerNotificationSiteScope() throws Exception {
+		String body = LocalizationUtil.updateLocalization(
+			LocalizedMapUtil.getLocalizedMap(
+				HashMapBuilder.put(
+					LanguageUtil.getLanguageId(LocaleUtil.US),
+					StringUtil.merge(
+						_freeMarkerTermValues.keySet(), StringPool.COMMA)
+				).build()),
+			null, "Body", LanguageUtil.getLanguageId(LocaleUtil.US));
+
+		_executeNotificationObjectActionOnSiteScope(
+			_addNotificationTemplate(
+				body, NotificationTemplateConstants.EDITOR_TYPE_FREEMARKER,
+				false,
+				Collections.singletonMap(
+					LocaleUtil.US, user1.getEmailAddress())));
+
+		List<NotificationQueueEntry> notificationQueueEntries =
+			notificationQueueEntryLocalService.getNotificationEntries(
+				NotificationConstants.TYPE_EMAIL,
+				NotificationQueueEntryConstants.STATUS_SENT);
+
+		Assert.assertEquals(
+			notificationQueueEntries.toString(), 1,
+			notificationQueueEntries.size());
+
+		notificationQueueEntry = notificationQueueEntries.get(0);
+
+		assertTermValues(
+			new ArrayList<>(_freeMarkerTermValues.values()),
+			Arrays.asList(
+				StringUtil.split(
+					notificationQueueEntry.getBody(), StringPool.COMMA)));
+	}
+
+	@Test
 	public void testSendNotification() throws Exception {
 
 		// Multiples emails for each main recipient with a "," separator
@@ -483,6 +519,38 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				}
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		objectActionLocalService.deleteObjectAction(
+			objectAction.getObjectActionId());
+	}
+
+	private void _executeNotificationObjectActionOnSiteScope(
+			NotificationTemplate notificationTemplate)
+		throws Exception {
+
+		ObjectAction objectAction = objectActionLocalService.addObjectAction(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			siteScopeObjectDefinition.getObjectDefinitionId(), true,
+			StringPool.BLANK, RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_NOTIFICATION,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"notificationTemplateId",
+				notificationTemplate.getNotificationTemplateId()
+			).build(),
+			false);
+
+		objectEntryManager.addObjectEntry(
+			dtoConverterContext, siteScopeObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = siteScopeObjectEntryValues;
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_SITE);
 
 		objectActionLocalService.deleteObjectAction(
 			objectAction.getObjectActionId());
