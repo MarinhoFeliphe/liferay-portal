@@ -150,6 +150,38 @@ public class BaseNotificationTypeTest {
 		).build();
 
 		siteScopeObjectEntryValues = LinkedHashMapBuilder.<String, Object>put(
+			"booleanObjectField", RandomTestUtil.randomBoolean()
+		).put(
+			"dateObjectField",
+			() -> {
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+					"yyyy-MM-dd");
+
+				return simpleDateFormat.format(RandomTestUtil.nextDate());
+			}
+		).put(
+			"dateTimeObjectField",
+			() -> {
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+					"yyyy-MM-dd 00:00:00.0");
+
+				return simpleDateFormat.format(RandomTestUtil.nextDate());
+			}
+		).put(
+			"emailTextObjectField",
+			StringUtil.toLowerCase(RandomTestUtil.randomString()) +
+			"@liferay.com"
+		).put(
+			"integerObjectField", RandomTestUtil.nextInt()
+		).put(
+			"picklistObjectField",
+			new ListEntry() {
+				{
+					key = listTypeEntry.getKey();
+					name = listTypeEntry.getName(LocaleUtil.US);
+				}
+			}
+		).put(
 			"textObjectField", RandomTestUtil.randomString()
 		).build();
 
@@ -395,14 +427,93 @@ public class BaseNotificationTypeTest {
 				true, ObjectDefinitionConstants.SCOPE_SITE,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Arrays.asList(
+					new AttachmentObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"attachmentObjectField"
+					).objectFieldSettings(
+						Arrays.asList(
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.
+									NAME_ACCEPTED_FILE_EXTENSIONS
+							).value(
+								"txt"
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_FILE_SOURCE
+							).value(
+								ObjectFieldSettingConstants.VALUE_USER_COMPUTER
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+							).value(
+								"100"
+							).build())
+					).build(),
+					new BooleanObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"booleanObjectField"
+					).build(),
+					new DateObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"dateObjectField"
+					).build(),
+					new DateTimeObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"dateTimeObjectField"
+					).objectFieldSettings(
+						Collections.singletonList(
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_TIME_STORAGE
+							).value(
+								ObjectFieldSettingConstants.
+									VALUE_USE_INPUT_AS_ENTERED
+							).build())
+					).build(),
+					new IntegerObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"integerObjectField"
+					).build(),
+					new PicklistObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"picklistObjectField"
+					).listTypeDefinitionId(
+						_listTypeDefinition.getListTypeDefinitionId()
+					).build(),
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"emailTextObjectField"
+					).build(),
 					new TextObjectFieldBuilder(
 					).labelMap(
 						LocalizedMapUtil.getLocalizedMap(
 							RandomTestUtil.randomString())
 					).name(
 						"textObjectField"
-					).objectFieldSettings(
-						Collections.emptyList()
 					).build()));
 
 		siteScopeObjectDefinition =

@@ -29,6 +29,7 @@ import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -96,6 +98,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		BaseNotificationTypeTest.setUpClass();
+
+		_siteGroup = GroupTestUtil.addGroup();
 
 		_freeMarkerTermValues = LinkedHashMapBuilder.<String, Object>put(
 			"${ObjectField_booleanObjectField.getData()}",
@@ -157,9 +161,10 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 	}
 
 	@AfterClass
-	public static void tearDownClass() {
+	public static void tearDownClass() throws PortalException {
 		ObjectActionThreadLocal.setHttpServletRequest(
 			_originalHttpServletRequest);
+		_groupLocalService.deleteGroup(_siteGroup);
 	}
 
 	@Test
@@ -406,6 +411,40 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				Collections.singletonList(objectField.getObjectFieldId())));
 	}
 
+	private NotificationTemplate _addNotificationTemplateOnSiteScope(
+		String body, String editorType, boolean singleRecipient,
+		Map<Locale, String> to)
+		throws Exception {
+
+		ObjectField objectField = objectFieldLocalService.getObjectField(
+			siteScopeObjectDefinition.getObjectDefinitionId(),
+			"ObjectField");
+
+		return notificationTemplateLocalService.addNotificationTemplate(
+			NotificationTemplateUtil.createNotificationContext(
+				TestPropsValues.getUser(),
+				siteScopeObjectDefinition.getObjectDefinitionId(), body,
+				RandomTestUtil.randomString(), editorType,
+				Arrays.asList(
+					createNotificationRecipientSetting(
+						"bcc",
+						"[%CURRENT_USER_EMAIL_ADDRESS%],bcc@liferay.com"),
+					createNotificationRecipientSetting(
+						"cc", "[%CURRENT_USER_EMAIL_ADDRESS%],cc@liferay.com"),
+					createNotificationRecipientSetting(
+						"from", "[%CURRENT_USER_EMAIL_ADDRESS%]"),
+					createNotificationRecipientSetting(
+						"fromName",
+						Collections.singletonMap(
+							LocaleUtil.US, "[%CURRENT_USER_FIRST_NAME%]")),
+					createNotificationRecipientSetting(
+						"singleRecipient", String.valueOf(singleRecipient)),
+					createNotificationRecipientSetting("to", to)),
+				ListUtil.toString(getTermNames(), StringPool.BLANK),
+				NotificationConstants.TYPE_EMAIL,
+				Collections.singletonList(objectField.getObjectFieldId())));
+	}
+
 	private void _assertNotificationQueueEntry(
 			String expectedFileName, boolean expectedSingleRecipient,
 			String expectedToEmailAddress,
@@ -550,7 +589,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 					properties = siteScopeObjectEntryValues;
 				}
 			},
-			ObjectDefinitionConstants.SCOPE_SITE);
+			StringBundler.concat(_siteGroup.getGroupId()));
 
 		objectActionLocalService.deleteObjectAction(
 			objectAction.getObjectActionId());
@@ -656,13 +695,16 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 	private static CompanyLocalService _companyLocalService;
 
 	private static Map<String, Object> _freeMarkerTermValues;
+
+	@Inject
+	private static GroupLocalService _groupLocalService;
+
 	private static HttpServletRequest _originalHttpServletRequest;
 
 	@Inject
 	private static Portal _portal;
 
-	@Inject
-	private GroupLocalService _groupLocalService;
+	private static Group _siteGroup;
 
 	@Inject
 	private NotificationQueueEntryAttachmentLocalService
