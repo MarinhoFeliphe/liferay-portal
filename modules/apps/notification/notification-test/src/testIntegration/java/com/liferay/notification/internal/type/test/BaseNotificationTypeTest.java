@@ -170,7 +170,7 @@ public class BaseNotificationTypeTest {
 		).put(
 			"emailTextObjectField",
 			StringUtil.toLowerCase(RandomTestUtil.randomString()) +
-			"@liferay.com"
+				"@liferay.com"
 		).put(
 			"integerObjectField", RandomTestUtil.nextInt()
 		).put(
