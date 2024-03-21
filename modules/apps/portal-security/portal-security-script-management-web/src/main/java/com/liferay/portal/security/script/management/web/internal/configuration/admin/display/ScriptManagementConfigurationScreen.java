@@ -72,6 +72,9 @@ public class ScriptManagementConfigurationScreen
 				new ScriptManagementConfigurationDisplayContext(
 					_scriptManagementConfigurationHelper));
 
+			_scriptManagementConfigurationHelper.
+				isScriptManagementConfigurationDefined();
+
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}
 		catch (Exception exception) {
