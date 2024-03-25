@@ -492,6 +492,13 @@ public class KaleoDesignerDisplayContext {
 			isAllowScriptContentBeExecutedOrIncluded();
 	}
 
+	public String getScriptManagementConfigurationPortletURL()
+		throws PortalException {
+
+		return _scriptManagementConfigurationHelper.
+			getScriptManagementConfigurationPortletURL();
+	}
+
 	public boolean isDefinitionInputDisabled(
 		boolean previewBeforeRestore,
 		KaleoDefinitionVersion kaleoDefinitionVersion,

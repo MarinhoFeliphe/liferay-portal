@@ -5,6 +5,7 @@
 
 package com.liferay.portal.security.script.management.configuration.helper;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 
 /**
@@ -16,5 +17,8 @@ public interface ScriptManagementConfigurationHelper {
 
 	public boolean isScriptManagementConfigurationDefined()
 		throws ConfigurationException;
+
+	public String getScriptManagementConfigurationPortletURL() throws
+		PortalException;
 
 }

@@ -144,6 +144,13 @@ public class ObjectDefinitionsValidationsDisplayContext
 			isAllowScriptContentBeExecutedOrIncluded();
 	}
 
+	public String getScriptManagementConfigurationPortletURL()
+		throws PortalException {
+
+		return _scriptManagementConfigurationHelper.
+			getScriptManagementConfigurationPortletURL();
+	}
+
 	@Override
 	protected String getAPIURI() {
 		return "/object-validation-rules";
