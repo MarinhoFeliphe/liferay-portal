@@ -1,15 +1,16 @@
 assemble:
     - fromTask: bootJar
-liferay-sample-etc-spring-boot-notification-type-1:
-    name: Liferay Sample Etc Spring Boot Notification Type 1
+liferay-sample-etc-spring-boot-notification-type-telegram:
+    name: Notification Service Telegram Bot
     oAuth2ApplicationExternalReferenceCode: liferay-sample-etc-spring-boot-oauth-application-user-agent
-    resourcePath: /notification/type/1
+    resourcePath: /notification-service/telegram-bot/send-message
     type: notificationType
 liferay-sample-etc-spring-boot-oauth-application-user-agent:
     .serviceAddress: localhost:58081
     .serviceScheme: http
     name: Liferay Sample Etc Spring Boot OAuth Application User Agent
     scopes:
+        - Liferay.Headless.Commerce.Admin.Order.everything.read
         - Liferay.Headless.Admin.Workflow.everything
     type: oAuthApplicationUserAgent
 liferay-sample-etc-spring-boot-object-action-1:
