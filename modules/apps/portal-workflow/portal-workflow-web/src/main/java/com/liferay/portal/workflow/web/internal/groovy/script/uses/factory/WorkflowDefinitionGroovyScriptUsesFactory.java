@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.portlet.ResourceRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -35,9 +33,7 @@ public class WorkflowDefinitionGroovyScriptUsesFactory
 	implements GroovyScriptUsesFactory {
 
 	@Override
-	public List<GroovyScriptUse> create(ResourceRequest resourceRequest)
-		throws Exception {
-
+	public List<GroovyScriptUse> create(Locale locale) throws Exception {
 		return TransformUtil.transform(
 			_workflowDefinitionManager.getActiveWorkflowDefinitions(
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS),
@@ -53,8 +49,6 @@ public class WorkflowDefinitionGroovyScriptUsesFactory
 
 				Company company = _companyLocalService.getCompany(
 					workflowDefinition.getCompanyId());
-
-				Locale locale = resourceRequest.getLocale();
 
 				return new GroovyScriptUse(
 					company.getWebId(),

@@ -17,8 +17,7 @@ import com.liferay.portal.security.script.management.groovy.script.use.GroovyScr
 import com.liferay.portal.security.script.management.groovy.script.uses.factory.GroovyScriptUsesFactory;
 
 import java.util.List;
-
-import javax.portlet.ResourceRequest;
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -31,7 +30,7 @@ public class ObjectValidationRuleGroovyScriptUsesFactory
 	implements GroovyScriptUsesFactory {
 
 	@Override
-	public List<GroovyScriptUse> create(ResourceRequest resourceRequest) {
+	public List<GroovyScriptUse> create(Locale locale) {
 		return TransformUtil.transform(
 			_objectValidationRuleLocalService.getObjectValidationRules(
 				true, ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY),
@@ -40,8 +39,7 @@ public class ObjectValidationRuleGroovyScriptUsesFactory
 					objectValidationRule.getCompanyId());
 
 				return new GroovyScriptUse(
-					company.getWebId(),
-					objectValidationRule.getName(resourceRequest.getLocale()),
+					company.getWebId(), objectValidationRule.getName(locale),
 					ObjectDefinitionGroovyScriptUseSourceURLFactory.create(
 						company, objectValidationRule.getObjectDefinitionId(),
 						_portal,

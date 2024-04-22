@@ -111,7 +111,7 @@ public class GetGroovyScriptUsesMVCResourceCommand
 			GroovyScriptUsesFactory groovyScriptUsesFactory = iterator.next();
 
 			groovyScriptUses.addAll(
-				groovyScriptUsesFactory.create(resourceRequest));
+				groovyScriptUsesFactory.create(resourceRequest.getLocale()));
 		}
 	}
 
