@@ -13,7 +13,7 @@ import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.security.script.management.groovy.script.use.GroovyScriptUse;
-import com.liferay.portal.security.script.management.web.internal.groovy.script.uses.factory.GroovyScriptUsesFactoryRegistry;
+import com.liferay.portal.security.script.management.groovy.script.uses.factory.GroovyScriptUsesFactoryRegistry;
 
 import java.util.List;
 

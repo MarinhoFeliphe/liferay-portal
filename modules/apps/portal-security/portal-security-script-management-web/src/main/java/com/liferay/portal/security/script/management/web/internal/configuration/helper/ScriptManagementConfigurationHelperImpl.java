@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.security.script.management.configuration.ScriptManagementConfiguration;
 import com.liferay.portal.security.script.management.configuration.helper.ScriptManagementConfigurationHelper;
 import com.liferay.portal.security.script.management.groovy.script.use.GroovyScriptUse;
-import com.liferay.portal.security.script.management.web.internal.groovy.script.uses.factory.GroovyScriptUsesFactoryRegistry;
+import com.liferay.portal.security.script.management.groovy.script.uses.factory.GroovyScriptUsesFactoryRegistry;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;

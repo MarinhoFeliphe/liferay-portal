@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.script.management.groovy.script.use.GroovyScriptUse;
 import com.liferay.portal.security.script.management.groovy.script.uses.factory.GroovyScriptUsesFactory;
+import com.liferay.portal.security.script.management.groovy.script.uses.factory.GroovyScriptUsesFactoryRegistry;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,8 +30,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Feliphe Marinho
  */
 @Component(service = GroovyScriptUsesFactoryRegistry.class)
-public class GroovyScriptUsesFactoryRegistry {
+public class GroovyScriptUsesFactoryRegistryImpl
+	implements GroovyScriptUsesFactoryRegistry {
 
+	@Override
 	public List<GroovyScriptUse> getGroovyScriptUses(Locale locale)
 		throws Exception {
 
