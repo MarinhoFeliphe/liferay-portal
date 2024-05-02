@@ -9,7 +9,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.rule.ExpectedLogMethodTestRule;
 import com.liferay.portal.search.test.util.logging.ExpectedLog;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;

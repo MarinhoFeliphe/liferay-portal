@@ -5,11 +5,11 @@
 
 package com.liferay.portal.search.opensearch2.internal.background.task;
 
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.connection.OpenSearchConnectionManager;
 import com.liferay.portal.search.opensearch2.internal.connection.TestOpenSearchConnectionManager;
 import com.liferay.portal.search.opensearch2.internal.index.FieldMappingAssert;
 import com.liferay.portal.search.opensearch2.internal.search.engine.OpenSearchSearchEngineFixture;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.background.task.BaseReindexSingleIndexerBackgroundTaskExecutorTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 

@@ -19,9 +19,9 @@ import com.liferay.portal.search.engine.adapter.cluster.StateClusterResponse;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterResponse;
 import com.liferay.portal.search.opensearch2.internal.BaseOpenSearchTestCase;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.connection.OpenSearchConnectionManager;
 import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.cluster.ClusterRequestExecutorFixture;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;

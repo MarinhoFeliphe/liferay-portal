@@ -13,7 +13,7 @@ import com.liferay.portal.search.internal.query.MoreLikeThisQueryImpl;
 import com.liferay.portal.search.internal.query.MultiMatchQueryImpl;
 import com.liferay.portal.search.internal.query.TermQueryImpl;
 import com.liferay.portal.search.internal.query.WildcardQueryImpl;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.util.JsonpUtil;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Query;

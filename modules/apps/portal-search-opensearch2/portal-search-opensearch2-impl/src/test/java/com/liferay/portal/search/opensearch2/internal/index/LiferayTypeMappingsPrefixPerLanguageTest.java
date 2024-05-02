@@ -5,10 +5,10 @@
 
 package com.liferay.portal.search.opensearch2.internal.index;
 
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.connection.IndexName;
 import com.liferay.portal.search.opensearch2.internal.document.SingleFieldFixture;
 import com.liferay.portal.search.opensearch2.internal.query.QueryFactories;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.After;

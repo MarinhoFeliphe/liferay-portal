@@ -6,8 +6,8 @@
 package com.liferay.portal.search.opensearch2.internal.suggest;
 
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.indexing.LiferayOpenSearchIndexingFixtureFactory;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.suggest.BaseSuggestTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;

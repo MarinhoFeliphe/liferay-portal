@@ -5,8 +5,8 @@
 
 package com.liferay.portal.search.opensearch2.internal.query.string;
 
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.indexing.OpenSearchIndexingFixtureFactory;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.query.string.BaseQueryStringTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;

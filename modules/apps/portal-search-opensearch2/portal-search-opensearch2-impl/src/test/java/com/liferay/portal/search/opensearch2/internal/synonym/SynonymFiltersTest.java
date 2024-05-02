@@ -10,11 +10,11 @@ import com.liferay.portal.search.engine.adapter.index.CreateIndexResponse;
 import com.liferay.portal.search.engine.adapter.index.DeleteIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.DeleteIndexResponse;
 import com.liferay.portal.search.opensearch2.internal.BaseOpenSearchTestCase;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.connection.IndexName;
 import com.liferay.portal.search.opensearch2.internal.document.SingleFieldFixture;
 import com.liferay.portal.search.opensearch2.internal.query.QueryFactories;
 import com.liferay.portal.search.opensearch2.internal.query.SearchAssert;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.util.ResourceUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 

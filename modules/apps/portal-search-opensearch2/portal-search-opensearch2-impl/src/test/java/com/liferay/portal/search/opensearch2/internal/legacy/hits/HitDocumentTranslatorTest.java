@@ -7,7 +7,7 @@ package com.liferay.portal.search.opensearch2.internal.legacy.hits;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;

@@ -12,8 +12,8 @@ import com.liferay.portal.search.engine.adapter.document.IndexDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
 import com.liferay.portal.search.internal.document.DocumentBuilderImpl;
 import com.liferay.portal.search.opensearch2.internal.BaseOpenSearchTestCase;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.test.util.RequestExecutorFixture;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.After;

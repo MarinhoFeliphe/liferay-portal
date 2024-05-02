@@ -6,7 +6,7 @@
 package com.liferay.portal.search.opensearch2.internal.connection;
 
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Objects;

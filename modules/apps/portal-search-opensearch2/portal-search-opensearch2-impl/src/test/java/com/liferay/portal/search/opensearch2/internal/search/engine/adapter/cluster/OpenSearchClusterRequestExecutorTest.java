@@ -11,7 +11,7 @@ import com.liferay.portal.search.engine.adapter.cluster.ClusterRequestExecutor;
 import com.liferay.portal.search.engine.adapter.cluster.HealthClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StateClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Before;

@@ -7,8 +7,8 @@ package com.liferay.portal.search.opensearch2.internal.facet;
 
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.indexing.LiferayOpenSearchIndexingFixtureFactory;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.facet.BaseNestedFieldsFacetTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;

@@ -6,8 +6,8 @@
 package com.liferay.portal.search.opensearch2.internal.sort;
 
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.indexing.LiferayOpenSearchIndexingFixtureFactory;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.sort.BaseMultiLanguageSortTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;

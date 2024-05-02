@@ -14,9 +14,9 @@ import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.internal.highlight.FieldConfigImpl;
 import com.liferay.portal.search.internal.highlight.HighlightImpl;
 import com.liferay.portal.search.internal.query.StringQueryImpl;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.query.OpenSearchQueryTranslator;
 import com.liferay.portal.search.opensearch2.internal.query.OpenSearchQueryTranslatorFixture;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 

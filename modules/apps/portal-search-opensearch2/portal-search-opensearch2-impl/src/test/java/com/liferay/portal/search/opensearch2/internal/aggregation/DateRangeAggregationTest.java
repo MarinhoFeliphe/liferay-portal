@@ -6,8 +6,8 @@
 package com.liferay.portal.search.opensearch2.internal.aggregation;
 
 import com.liferay.portal.search.aggregation.bucket.DateRangeAggregation;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.indexing.LiferayOpenSearchIndexingFixtureFactory;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.aggregation.AggregationAssert;
 import com.liferay.portal.search.test.util.aggregation.bucket.BaseDateRangeAggregationTestCase;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;

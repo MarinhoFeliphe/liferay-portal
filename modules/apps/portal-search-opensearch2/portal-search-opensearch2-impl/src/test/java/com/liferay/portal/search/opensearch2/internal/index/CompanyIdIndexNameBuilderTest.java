@@ -17,9 +17,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.opensearch2.configuration.OpenSearchConfiguration;
 import com.liferay.portal.search.opensearch2.internal.BaseOpenSearchTestCase;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.configuration.OpenSearchConfigurationWrapper;
 import com.liferay.portal.search.opensearch2.internal.configuration.OpenSearchConfigurationWrapperImpl;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;

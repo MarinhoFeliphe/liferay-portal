@@ -5,8 +5,8 @@
 
 package com.liferay.portal.search.opensearch2.internal.query;
 
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.query.function.score.OpenSearchScoreFunctionTranslator;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.util.JsonpUtil;
 import com.liferay.portal.search.query.FunctionScoreQuery.FilterQueryScoreFunctionHolder;
 import com.liferay.portal.search.query.Query;

@@ -16,6 +16,7 @@ import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFa
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.opensearch2.constants.OpenSearchSearchContextAttributes;
 import com.liferay.portal.search.opensearch2.internal.configuration.OpenSearchConfigurationWrapperImpl;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;

@@ -6,9 +6,9 @@
 package com.liferay.portal.search.opensearch2.internal.connection;
 
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.configuration.OpenSearchConfigurationWrapper;
 import com.liferay.portal.search.opensearch2.internal.configuration.OpenSearchConfigurationWrapperImpl;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.hamcrest.CoreMatchers;

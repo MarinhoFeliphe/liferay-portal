@@ -6,8 +6,8 @@
 package com.liferay.portal.search.opensearch2.internal.aggregation;
 
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.indexing.LiferayOpenSearchIndexingFixtureFactory;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.test.util.aggregation.pipeline.BasePercentilesPipelineAggregationTestCase;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;

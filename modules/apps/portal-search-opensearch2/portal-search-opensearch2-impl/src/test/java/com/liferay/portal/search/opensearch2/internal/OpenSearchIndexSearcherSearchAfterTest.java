@@ -27,6 +27,7 @@ import com.liferay.portal.search.internal.sort.ScoreSortImpl;
 import com.liferay.portal.search.opensearch2.internal.connection.TestOpenSearchConnectionManager;
 import com.liferay.portal.search.opensearch2.internal.deep.pagination.configuration.DeepPaginationConfigurationWrapper;
 import com.liferay.portal.search.opensearch2.internal.indexing.OpenSearchIndexingFixture;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;

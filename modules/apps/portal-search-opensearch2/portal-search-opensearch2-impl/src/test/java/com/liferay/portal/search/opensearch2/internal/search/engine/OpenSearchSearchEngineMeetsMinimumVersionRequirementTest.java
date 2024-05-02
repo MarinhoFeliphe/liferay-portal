@@ -8,7 +8,7 @@ package com.liferay.portal.search.opensearch2.internal.search.engine;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.search.opensearch2.internal.OpenSearchSearchEngine;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.AfterClass;

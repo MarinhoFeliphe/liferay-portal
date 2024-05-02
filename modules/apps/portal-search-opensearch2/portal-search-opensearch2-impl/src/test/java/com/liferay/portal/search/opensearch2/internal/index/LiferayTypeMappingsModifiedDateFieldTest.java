@@ -6,8 +6,8 @@
 package com.liferay.portal.search.opensearch2.internal.index;
 
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
 import com.liferay.portal.search.opensearch2.internal.connection.IndexName;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Collections;

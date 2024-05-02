@@ -7,7 +7,7 @@ package com.liferay.portal.search.opensearch2.internal.cluster;
 
 import com.liferay.portal.kernel.cluster.ClusterEvent;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.search.opensearch2.internal.OpenSearchTestRule;
+import com.liferay.portal.search.opensearch2.internal.test.rule.OpenSearchTestRule;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
