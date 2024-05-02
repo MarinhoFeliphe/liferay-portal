@@ -6,6 +6,7 @@
 package com.liferay.site.initializer.extender.internal.test;
 
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
+import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestRule;
 import com.liferay.account.service.AccountGroupRelLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetCategory;
@@ -245,7 +246,8 @@ public class BundleSiteInitializerTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
-			PermissionCheckerMethodTestRule.INSTANCE);
+			PermissionCheckerMethodTestRule.INSTANCE,
+			ScriptManagementConfigurationTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
