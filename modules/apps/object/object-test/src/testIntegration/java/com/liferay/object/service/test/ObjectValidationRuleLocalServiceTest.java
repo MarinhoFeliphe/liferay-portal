@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestRule;
 import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestUtil;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -74,9 +73,7 @@ public class ObjectValidationRuleLocalServiceTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(),
-			ScriptManagementConfigurationTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -165,12 +162,17 @@ public class ObjectValidationRuleLocalServiceTest {
 			() -> _addObjectValidationRule(
 				ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
 				StringPool.BLANK));
-		AssertUtils.assertFailure(
-			ObjectValidationRuleScriptException.class,
-			"The script syntax is invalid",
-			() -> _addObjectValidationRule(
-				ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
-				"import;\ninvalidFields = false;"));
+
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			AssertUtils.assertFailure(
+				ObjectValidationRuleScriptException.class,
+				"The script syntax is invalid",
+				() -> _addObjectValidationRule(
+					ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+					"import;\ninvalidFields = false;"));
+		}
 
 		AssertUtils.assertFailure(
 			ObjectValidationRuleSettingNameException.MissingRequiredName.class,
@@ -409,13 +411,19 @@ public class ObjectValidationRuleLocalServiceTest {
 			"import com.liferay.commerce.service.CommerceOrderLocalService;\n" +
 				"invalidFields = false;";
 
-		_assertObjectValidationRule(
-			true, ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
-			errorLabelMap, externalReferenceCode, nameLabelMap, null,
-			ObjectValidationRuleConstants.OUTPUT_TYPE_FULL_VALIDATION, script,
-			_addObjectValidationRule(
-				ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY, errorLabelMap,
-				externalReferenceCode, nameLabelMap, script));
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			_assertObjectValidationRule(
+				true, ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+				errorLabelMap, externalReferenceCode, nameLabelMap, null,
+				ObjectValidationRuleConstants.OUTPUT_TYPE_FULL_VALIDATION,
+				script,
+				_addObjectValidationRule(
+					ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+					errorLabelMap, externalReferenceCode, nameLabelMap,
+					script));
+		}
 
 		externalReferenceCode = RandomTestUtil.randomString();
 
