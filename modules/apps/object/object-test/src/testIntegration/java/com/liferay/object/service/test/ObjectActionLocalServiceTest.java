@@ -99,7 +99,6 @@ import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestRule;
 import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestUtil;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -149,8 +148,7 @@ public class ObjectActionLocalServiceTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
-			PermissionCheckerMethodTestRule.INSTANCE,
-			ScriptManagementConfigurationTestRule.INSTANCE);
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -321,14 +319,21 @@ public class ObjectActionLocalServiceTest {
 				"url", "https://onafterupdate.com"
 			).build(),
 			false);
-		ObjectAction objectAction4 = _addObjectAction(
-			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			ObjectActionTriggerConstants.KEY_STANDALONE,
-			UnicodePropertiesBuilder.put(
-				"script", "println \"Hello World\""
-			).build(),
-			false);
+
+		ObjectAction objectAction4 = null;
+
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			objectAction4 = _addObjectAction(
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				ObjectActionTriggerConstants.KEY_STANDALONE,
+				UnicodePropertiesBuilder.put(
+					"script", "println \"Hello World\""
+				).build(),
+				false);
+		}
 
 		UnicodeProperties unicodeProperties = UnicodePropertiesBuilder.put(
 			"objectDefinitionId", _objectDefinition.getObjectDefinitionId()
@@ -893,10 +898,10 @@ public class ObjectActionLocalServiceTest {
 
 		ObjectAction objectAction1 = _addObjectAction(
 			"equals(firstName, \"João\")", RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
 			UnicodePropertiesBuilder.put(
-				"script", "println \"Hello World\""
+				"url", RandomTestUtil.randomString()
 			).build(),
 			false);
 
@@ -1661,35 +1666,43 @@ public class ObjectActionLocalServiceTest {
 
 		// Add object action to execute Groovy after adding a user
 
-		objectAction5 = _objectActionLocalService.addObjectAction(
-			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-			userObjectDefinition.getObjectDefinitionId(), true,
-			StringPool.BLANK, RandomTestUtil.randomString(),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			UnicodePropertiesBuilder.put(
-				"script", "println \"Hello World 1\""
-			).build(),
-			false);
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			objectAction5 = _objectActionLocalService.addObjectAction(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				userObjectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK, RandomTestUtil.randomString(),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				UnicodePropertiesBuilder.put(
+					"script", "println \"Hello World 1\""
+				).build(),
+				false);
+		}
 
 		// Add object action to execute Groovy after updating a user
 
-		objectAction6 = _objectActionLocalService.addObjectAction(
-			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-			userObjectDefinition.getObjectDefinitionId(), true,
-			StringPool.BLANK, RandomTestUtil.randomString(),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
-			UnicodePropertiesBuilder.put(
-				"script", "println \"Hello World 2\""
-			).build(),
-			false);
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			objectAction6 = _objectActionLocalService.addObjectAction(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				userObjectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK, RandomTestUtil.randomString(),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
+				UnicodePropertiesBuilder.put(
+					"script", "println \"Hello World 2\""
+				).build(),
+				false);
+		}
 
 		// While adding a user, the user is updated and it must not trigger
 		// object actions
@@ -1721,14 +1734,18 @@ public class ObjectActionLocalServiceTest {
 
 	@Test
 	public void testConcurrentObjectActions() throws Exception {
-		_addObjectAction(
-			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			UnicodePropertiesBuilder.put(
-				"script", "println \"Hello World\""
-			).build(),
-			false);
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			_addObjectAction(
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				UnicodePropertiesBuilder.put(
+					"script", "println \"Hello World\""
+				).build(),
+				false);
+		}
 
 		_objectDefinition = _publishCustomObjectDefinition();
 
@@ -1866,18 +1883,22 @@ public class ObjectActionLocalServiceTest {
 			).build(),
 			ObjectActionConstants.STATUS_NEVER_RAN);
 
-		objectAction = _objectActionLocalService.updateObjectAction(
-			externalReferenceCode1, objectAction.getObjectActionId(), false,
-			"equals(firstName, \"João\")", "Baker Description",
-			LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
-			LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
-			UnicodePropertiesBuilder.put(
-				"secret", "30624700"
-			).put(
-				"url", "https://onafterdelete.com"
-			).build());
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			objectAction = _objectActionLocalService.updateObjectAction(
+				externalReferenceCode1, objectAction.getObjectActionId(), false,
+				"equals(firstName, \"João\")", "Baker Description",
+				LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
+				LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+				UnicodePropertiesBuilder.put(
+					"secret", "30624700"
+				).put(
+					"url", "https://onafterdelete.com"
+				).build());
+		}
 
 		_assertObjectAction(
 			false, "equals(firstName, \"João\")", "Baker Description",
@@ -1938,18 +1959,22 @@ public class ObjectActionLocalServiceTest {
 				).build(),
 				true);
 
-		systemObjectAction = _objectActionLocalService.updateObjectAction(
-			externalReferenceCode2, systemObjectAction.getObjectActionId(),
-			false, "equals(firstName, \"João\")", "Baker Description",
-			LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
-			LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
-			UnicodePropertiesBuilder.put(
-				"secret", "30624700"
-			).put(
-				"url", "https://onafterdelete.com"
-			).build());
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			systemObjectAction = _objectActionLocalService.updateObjectAction(
+				externalReferenceCode2, systemObjectAction.getObjectActionId(),
+				false, "equals(firstName, \"João\")", "Baker Description",
+				LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
+				LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+				UnicodePropertiesBuilder.put(
+					"secret", "30624700"
+				).put(
+					"url", "https://onafterdelete.com"
+				).build());
+		}
 
 		_assertObjectAction(
 			false, "equals(firstName, \"João\")", "Baker Description",
@@ -2031,7 +2056,7 @@ public class ObjectActionLocalServiceTest {
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(errorMessage),
 			LocalizedMapUtil.getLocalizedMap(label), name,
-			ObjectActionExecutorConstants.KEY_GROOVY, objectActionTriggerKey,
+			ObjectActionExecutorConstants.KEY_WEBHOOK, objectActionTriggerKey,
 			new UnicodeProperties(), system);
 	}
 
