@@ -59,7 +59,8 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	@Test
 	public void testDeployGroovyWorkflowDefinition() throws Exception {
 		String content = StringUtil.read(
-			getResourceInputStream("single-approver-workflow-definition.xml"));
+			getResourceInputStream(
+				"single-approver-site-member-workflow-definition.xml"));
 
 		try (Closeable closeable =
 				ScriptManagementConfigurationTestUtil.saveWithCloseable(
@@ -509,7 +510,9 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	private String _assertInvalid(InputStream inputStream) throws Exception {
 		byte[] bytes = FileUtil.getBytes(inputStream);
 
-		try {
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
 			_workflowDefinitionManager.validateWorkflowDefinition(bytes);
 
 			Assert.fail();
@@ -522,8 +525,12 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	}
 
 	private void _assertValid(InputStream inputStream) throws Exception {
-		_workflowDefinitionManager.validateWorkflowDefinition(
-			FileUtil.getBytes(inputStream));
+		try (Closeable closeable =
+				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			_workflowDefinitionManager.validateWorkflowDefinition(
+				FileUtil.getBytes(inputStream));
+		}
 	}
 
 	private WorkflowDefinition _saveWorkflowDefinition() throws Exception {
