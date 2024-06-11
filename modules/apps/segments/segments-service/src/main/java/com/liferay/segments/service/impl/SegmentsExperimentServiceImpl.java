@@ -89,7 +89,7 @@ public class SegmentsExperimentServiceImpl
 			segmentsExperimentLocalService.getSegmentsExperiment(
 				segmentsExperimentKey);
 
-		_checkPermissions(segmentsExperiment, ActionKeys.DELETE);
+		_checkPermission(segmentsExperiment, ActionKeys.DELETE);
 
 		return segmentsExperimentLocalService.deleteSegmentsExperiment(
 			segmentsExperiment);
@@ -189,7 +189,7 @@ public class SegmentsExperimentServiceImpl
 			segmentsExperimentLocalService.getSegmentsExperiment(
 				segmentsExperimentKey);
 
-		_checkPermissions(segmentsExperiment, ActionKeys.UPDATE);
+		_checkPermission(segmentsExperiment, ActionKeys.UPDATE);
 
 		Map<Long, Double> segmentsExperienceIdSplitMap = new HashMap<>();
 
@@ -281,7 +281,7 @@ public class SegmentsExperimentServiceImpl
 			segmentsExperimentLocalService.getSegmentsExperiment(
 				segmentsExperimentKey);
 
-		_checkPermissions(segmentsExperiment, ActionKeys.UPDATE);
+		_checkPermission(segmentsExperiment, ActionKeys.UPDATE);
 
 		return segmentsExperimentLocalService.updateSegmentsExperimentStatus(
 			segmentsExperiment.getSegmentsExperimentId(),
@@ -291,7 +291,7 @@ public class SegmentsExperimentServiceImpl
 			status);
 	}
 
-	private void _checkPermissions(
+	private void _checkPermission(
 			SegmentsExperiment segmentsExperiment, String actionId)
 		throws PortalException {
 

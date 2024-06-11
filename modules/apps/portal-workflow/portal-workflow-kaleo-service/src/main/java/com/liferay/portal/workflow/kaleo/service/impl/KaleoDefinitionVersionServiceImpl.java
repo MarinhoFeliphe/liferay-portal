@@ -43,7 +43,7 @@ public class KaleoDefinitionVersionServiceImpl
 			_kaleoDefinitionVersionLocalService.getKaleoDefinitionVersion(
 				companyId, name, version);
 
-		_checkPermissions(kaleoDefinitionVersion.getKaleoDefinition());
+		_checkPermission(kaleoDefinitionVersion.getKaleoDefinition());
 
 		return kaleoDefinitionVersion;
 	}
@@ -64,12 +64,12 @@ public class KaleoDefinitionVersionServiceImpl
 		KaleoDefinitionVersion kaleoDefinitionVersion =
 			kaleoDefinitionVersions.get(0);
 
-		_checkPermissions(kaleoDefinitionVersion.getKaleoDefinition());
+		_checkPermission(kaleoDefinitionVersion.getKaleoDefinition());
 
 		return kaleoDefinitionVersions;
 	}
 
-	private void _checkPermissions(KaleoDefinition kaleoDefinition)
+	private void _checkPermission(KaleoDefinition kaleoDefinition)
 		throws PortalException {
 
 		PermissionChecker permissionChecker =

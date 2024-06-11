@@ -43,7 +43,7 @@ public class AssetDisplayPageEntryServiceImpl
 			ServiceContext serviceContext)
 		throws Exception {
 
-		_checkPermissions(
+		_checkPermission(
 			_portal.getClassName(classNameId), classPK, ActionKeys.UPDATE);
 
 		return assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
@@ -57,7 +57,7 @@ public class AssetDisplayPageEntryServiceImpl
 			long layoutPageTemplateEntryId, ServiceContext serviceContext)
 		throws Exception {
 
-		_checkPermissions(
+		_checkPermission(
 			_portal.getClassName(classNameId), classPK, ActionKeys.UPDATE);
 
 		return assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
@@ -70,7 +70,7 @@ public class AssetDisplayPageEntryServiceImpl
 			long groupId, long classNameId, long classPK)
 		throws Exception {
 
-		_checkPermissions(
+		_checkPermission(
 			_portal.getClassName(classNameId), classPK, ActionKeys.DELETE);
 
 		assetDisplayPageEntryLocalService.deleteAssetDisplayPageEntry(
@@ -82,7 +82,7 @@ public class AssetDisplayPageEntryServiceImpl
 			long groupId, long classNameId, long classPK)
 		throws Exception {
 
-		_checkPermissions(
+		_checkPermission(
 			_portal.getClassName(classNameId), classPK, ActionKeys.VIEW);
 
 		return assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
@@ -151,7 +151,7 @@ public class AssetDisplayPageEntryServiceImpl
 			assetDisplayPageEntryPersistence.fetchByPrimaryKey(
 				assetDisplayPageEntryId);
 
-		_checkPermissions(
+		_checkPermission(
 			assetDisplayPageEntry.getClassName(),
 			assetDisplayPageEntry.getClassPK(), ActionKeys.UPDATE);
 
@@ -159,7 +159,7 @@ public class AssetDisplayPageEntryServiceImpl
 			assetDisplayPageEntryId, layoutPageTemplateEntryId, type);
 	}
 
-	private void _checkPermissions(
+	private void _checkPermission(
 			String className, long classPK, String actionId)
 		throws Exception {
 
