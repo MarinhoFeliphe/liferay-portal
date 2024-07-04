@@ -164,7 +164,8 @@ public class ObjectActionResourceImpl extends BaseObjectActionResourceImpl {
 				objectAction.getObjectActionTriggerKey(),
 				ObjectActionUtil.toParametersUnicodeProperties(
 					objectAction.getParameters()),
-				GetterUtil.getBoolean(objectAction.getSystem())));
+				GetterUtil.getBoolean(objectAction.getSystem()),
+				objectAction.getUsePreferredLocaleForGuests()));
 	}
 
 	@Override
@@ -184,7 +185,8 @@ public class ObjectActionResourceImpl extends BaseObjectActionResourceImpl {
 				objectAction.getObjectActionExecutorKey(),
 				objectAction.getObjectActionTriggerKey(),
 				ObjectActionUtil.toParametersUnicodeProperties(
-					objectAction.getParameters())));
+					objectAction.getParameters()),
+				objectAction.getUsePreferredLocaleForGuests()));
 	}
 
 	private ObjectAction _toObjectAction(
