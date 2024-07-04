@@ -60,14 +60,14 @@ public class ObjectActionLocalServiceUtil {
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties,
-			boolean system)
+			boolean system, Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		return getService().addObjectAction(
 			externalReferenceCode, userId, objectDefinitionId, active,
 			conditionExpression, description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties, system);
+			parametersUnicodeProperties, system, usePreferredLocaleForGuests);
 	}
 
 	public static ObjectAction addOrUpdateObjectAction(
@@ -78,14 +78,14 @@ public class ObjectActionLocalServiceUtil {
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties,
-			boolean system)
+			boolean system, Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		return getService().addOrUpdateObjectAction(
 			externalReferenceCode, objectActionId, userId, objectDefinitionId,
 			active, conditionExpression, description, errorMessageMap, labelMap,
 			name, objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties, system);
+			parametersUnicodeProperties, system, usePreferredLocaleForGuests);
 	}
 
 	/**
@@ -405,14 +405,15 @@ public class ObjectActionLocalServiceUtil {
 			Map<java.util.Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
-				parametersUnicodeProperties)
+				parametersUnicodeProperties,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		return getService().updateObjectAction(
 			externalReferenceCode, objectActionId, active, conditionExpression,
 			description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
+			parametersUnicodeProperties, usePreferredLocaleForGuests);
 	}
 
 	public static ObjectAction updateStatus(long objectActionId, int status)

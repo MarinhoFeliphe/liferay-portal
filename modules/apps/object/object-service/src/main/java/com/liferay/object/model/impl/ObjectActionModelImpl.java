@@ -81,7 +81,9 @@ public class ObjectActionModelImpl
 		{"errorMessage", Types.VARCHAR}, {"label", Types.VARCHAR},
 		{"name", Types.VARCHAR}, {"objectActionExecutorKey", Types.VARCHAR},
 		{"objectActionTriggerKey", Types.VARCHAR}, {"parameters", Types.CLOB},
-		{"system_", Types.BOOLEAN}, {"status", Types.INTEGER}
+		{"system_", Types.BOOLEAN},
+		{"usePreferredLocaleForGuests", Types.BOOLEAN},
+		{"status", Types.INTEGER}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -108,11 +110,12 @@ public class ObjectActionModelImpl
 		TABLE_COLUMNS_MAP.put("objectActionTriggerKey", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("parameters", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("system_", Types.BOOLEAN);
+		TABLE_COLUMNS_MAP.put("usePreferredLocaleForGuests", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("status", Types.INTEGER);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectAction (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectActionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId LONG,active_ BOOLEAN,conditionExpression TEXT null,description VARCHAR(75) null,errorMessage STRING null,label STRING null,name VARCHAR(75) null,objectActionExecutorKey VARCHAR(255) null,objectActionTriggerKey VARCHAR(75) null,parameters TEXT null,system_ BOOLEAN,status INTEGER)";
+		"create table ObjectAction (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectActionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId LONG,active_ BOOLEAN,conditionExpression TEXT null,description VARCHAR(75) null,errorMessage STRING null,label STRING null,name VARCHAR(75) null,objectActionExecutorKey VARCHAR(255) null,objectActionTriggerKey VARCHAR(75) null,parameters TEXT null,system_ BOOLEAN,usePreferredLocaleForGuests BOOLEAN,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectAction";
 
@@ -328,6 +331,9 @@ public class ObjectActionModelImpl
 			attributeGetterFunctions.put(
 				"parameters", ObjectAction::getParameters);
 			attributeGetterFunctions.put("system", ObjectAction::getSystem);
+			attributeGetterFunctions.put(
+				"usePreferredLocaleForGuests",
+				ObjectAction::getUsePreferredLocaleForGuests);
 			attributeGetterFunctions.put("status", ObjectAction::getStatus);
 
 			_attributeGetterFunctions = Collections.unmodifiableMap(
@@ -413,6 +419,10 @@ public class ObjectActionModelImpl
 			attributeSetterBiConsumers.put(
 				"system",
 				(BiConsumer<ObjectAction, Boolean>)ObjectAction::setSystem);
+			attributeSetterBiConsumers.put(
+				"usePreferredLocaleForGuests",
+				(BiConsumer<ObjectAction, Boolean>)
+					ObjectAction::setUsePreferredLocaleForGuests);
 			attributeSetterBiConsumers.put(
 				"status",
 				(BiConsumer<ObjectAction, Integer>)ObjectAction::setStatus);
@@ -1070,6 +1080,29 @@ public class ObjectActionModelImpl
 
 	@JSON
 	@Override
+	public boolean getUsePreferredLocaleForGuests() {
+		return _usePreferredLocaleForGuests;
+	}
+
+	@JSON
+	@Override
+	public boolean isUsePreferredLocaleForGuests() {
+		return _usePreferredLocaleForGuests;
+	}
+
+	@Override
+	public void setUsePreferredLocaleForGuests(
+		boolean usePreferredLocaleForGuests) {
+
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_usePreferredLocaleForGuests = usePreferredLocaleForGuests;
+	}
+
+	@JSON
+	@Override
 	public int getStatus() {
 		return _status;
 	}
@@ -1254,6 +1287,8 @@ public class ObjectActionModelImpl
 		objectActionImpl.setObjectActionTriggerKey(getObjectActionTriggerKey());
 		objectActionImpl.setParameters(getParameters());
 		objectActionImpl.setSystem(isSystem());
+		objectActionImpl.setUsePreferredLocaleForGuests(
+			isUsePreferredLocaleForGuests());
 		objectActionImpl.setStatus(getStatus());
 
 		objectActionImpl.resetOriginalValues();
@@ -1301,6 +1336,9 @@ public class ObjectActionModelImpl
 			this.<String>getColumnOriginalValue("parameters"));
 		objectActionImpl.setSystem(
 			this.<Boolean>getColumnOriginalValue("system_"));
+		objectActionImpl.setUsePreferredLocaleForGuests(
+			this.<Boolean>getColumnOriginalValue(
+				"usePreferredLocaleForGuests"));
 		objectActionImpl.setStatus(
 			this.<Integer>getColumnOriginalValue("status"));
 
@@ -1515,6 +1553,9 @@ public class ObjectActionModelImpl
 
 		objectActionCacheModel.system = isSystem();
 
+		objectActionCacheModel.usePreferredLocaleForGuests =
+			isUsePreferredLocaleForGuests();
+
 		objectActionCacheModel.status = getStatus();
 
 		return objectActionCacheModel;
@@ -1601,6 +1642,7 @@ public class ObjectActionModelImpl
 	private String _objectActionTriggerKey;
 	private String _parameters;
 	private boolean _system;
+	private boolean _usePreferredLocaleForGuests;
 	private int _status;
 
 	public <T> T getColumnValue(String columnName) {
@@ -1656,6 +1698,8 @@ public class ObjectActionModelImpl
 			"objectActionTriggerKey", _objectActionTriggerKey);
 		_columnOriginalValues.put("parameters", _parameters);
 		_columnOriginalValues.put("system_", _system);
+		_columnOriginalValues.put(
+			"usePreferredLocaleForGuests", _usePreferredLocaleForGuests);
 		_columnOriginalValues.put("status", _status);
 	}
 
@@ -1722,7 +1766,9 @@ public class ObjectActionModelImpl
 
 		columnBitmasks.put("system_", 524288L);
 
-		columnBitmasks.put("status", 1048576L);
+		columnBitmasks.put("usePreferredLocaleForGuests", 1048576L);
+
+		columnBitmasks.put("status", 2097152L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -55,14 +55,14 @@ public class ObjectActionLocalServiceWrapper
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties,
-			boolean system)
+			boolean system, Boolean usePreferredLocaleForGuests)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectActionLocalService.addObjectAction(
 			externalReferenceCode, userId, objectDefinitionId, active,
 			conditionExpression, description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties, system);
+			parametersUnicodeProperties, system, usePreferredLocaleForGuests);
 	}
 
 	@Override
@@ -75,14 +75,14 @@ public class ObjectActionLocalServiceWrapper
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties,
-			boolean system)
+			boolean system, Boolean usePreferredLocaleForGuests)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectActionLocalService.addOrUpdateObjectAction(
 			externalReferenceCode, objectActionId, userId, objectDefinitionId,
 			active, conditionExpression, description, errorMessageMap, labelMap,
 			name, objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties, system);
+			parametersUnicodeProperties, system, usePreferredLocaleForGuests);
 	}
 
 	/**
@@ -460,14 +460,15 @@ public class ObjectActionLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
-				parametersUnicodeProperties)
+				parametersUnicodeProperties,
+			Boolean usePreferredLocaleForGuests)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectActionLocalService.updateObjectAction(
 			externalReferenceCode, objectActionId, active, conditionExpression,
 			description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
+			parametersUnicodeProperties, usePreferredLocaleForGuests);
 	}
 
 	@Override

@@ -19,6 +19,7 @@ create table ObjectAction (
 	objectActionTriggerKey VARCHAR(75) null,
 	parameters TEXT null,
 	system_ BOOLEAN,
+	usePreferredLocaleForGuests BOOLEAN,
 	status INTEGER
 );
 

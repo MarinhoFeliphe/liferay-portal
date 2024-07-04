@@ -54,6 +54,8 @@ public class ObjectActionWrapper
 		attributes.put("objectActionTriggerKey", getObjectActionTriggerKey());
 		attributes.put("parameters", getParameters());
 		attributes.put("system", isSystem());
+		attributes.put(
+			"usePreferredLocaleForGuests", isUsePreferredLocaleForGuests());
 		attributes.put("status", getStatus());
 
 		return attributes;
@@ -183,6 +185,13 @@ public class ObjectActionWrapper
 
 		if (system != null) {
 			setSystem(system);
+		}
+
+		Boolean usePreferredLocaleForGuests = (Boolean)attributes.get(
+			"usePreferredLocaleForGuests");
+
+		if (usePreferredLocaleForGuests != null) {
+			setUsePreferredLocaleForGuests(usePreferredLocaleForGuests);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -537,6 +546,16 @@ public class ObjectActionWrapper
 	}
 
 	/**
+	 * Returns the use preferred locale for guests of this object action.
+	 *
+	 * @return the use preferred locale for guests of this object action
+	 */
+	@Override
+	public boolean getUsePreferredLocaleForGuests() {
+		return model.getUsePreferredLocaleForGuests();
+	}
+
+	/**
 	 * Returns the user ID of this object action.
 	 *
 	 * @return the user ID of this object action
@@ -594,6 +613,16 @@ public class ObjectActionWrapper
 	@Override
 	public boolean isSystem() {
 		return model.isSystem();
+	}
+
+	/**
+	 * Returns <code>true</code> if this object action is use preferred locale for guests.
+	 *
+	 * @return <code>true</code> if this object action is use preferred locale for guests; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isUsePreferredLocaleForGuests() {
+		return model.isUsePreferredLocaleForGuests();
 	}
 
 	@Override
@@ -915,6 +944,18 @@ public class ObjectActionWrapper
 	@Override
 	public void setSystem(boolean system) {
 		model.setSystem(system);
+	}
+
+	/**
+	 * Sets whether this object action is use preferred locale for guests.
+	 *
+	 * @param usePreferredLocaleForGuests the use preferred locale for guests of this object action
+	 */
+	@Override
+	public void setUsePreferredLocaleForGuests(
+		boolean usePreferredLocaleForGuests) {
+
+		model.setUsePreferredLocaleForGuests(usePreferredLocaleForGuests);
 	}
 
 	/**

@@ -80,7 +80,8 @@ public interface ObjectActionLocalService
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties, boolean system)
+			UnicodeProperties parametersUnicodeProperties, boolean system,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -90,7 +91,8 @@ public interface ObjectActionLocalService
 			String description, Map<Locale, String> errorMessageMap,
 			Map<Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties, boolean system)
+			UnicodeProperties parametersUnicodeProperties, boolean system,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException;
 
 	/**
@@ -346,7 +348,8 @@ public interface ObjectActionLocalService
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties)
+			UnicodeProperties parametersUnicodeProperties,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)

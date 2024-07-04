@@ -50,7 +50,7 @@ public class ObjectActionServiceHttp {
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties,
-			boolean system)
+			boolean system, Boolean usePreferredLocaleForGuests)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -62,7 +62,8 @@ public class ObjectActionServiceHttp {
 				methodKey, externalReferenceCode, objectDefinitionId, active,
 				conditionExpression, description, errorMessageMap, labelMap,
 				name, objectActionExecutorKey, objectActionTriggerKey,
-				parametersUnicodeProperties, system);
+				parametersUnicodeProperties, system,
+				usePreferredLocaleForGuests);
 
 			Object returnObj = null;
 
@@ -180,7 +181,8 @@ public class ObjectActionServiceHttp {
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
-				parametersUnicodeProperties)
+				parametersUnicodeProperties,
+			Boolean usePreferredLocaleForGuests)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -192,7 +194,7 @@ public class ObjectActionServiceHttp {
 				methodKey, externalReferenceCode, objectActionId, active,
 				conditionExpression, description, errorMessageMap, labelMap,
 				name, objectActionExecutorKey, objectActionTriggerKey,
-				parametersUnicodeProperties);
+				parametersUnicodeProperties, usePreferredLocaleForGuests);
 
 			Object returnObj = null;
 
@@ -231,7 +233,7 @@ public class ObjectActionServiceHttp {
 			java.util.Map.class, java.util.Map.class, String.class,
 			String.class, String.class,
 			com.liferay.portal.kernel.util.UnicodeProperties.class,
-			boolean.class
+			boolean.class, Boolean.class
 		};
 	private static final Class<?>[] _deleteObjectActionParameterTypes1 =
 		new Class[] {long.class};
@@ -242,7 +244,8 @@ public class ObjectActionServiceHttp {
 			String.class, long.class, boolean.class, String.class, String.class,
 			java.util.Map.class, java.util.Map.class, String.class,
 			String.class, String.class,
-			com.liferay.portal.kernel.util.UnicodeProperties.class
+			com.liferay.portal.kernel.util.UnicodeProperties.class,
+			Boolean.class
 		};
 
 }

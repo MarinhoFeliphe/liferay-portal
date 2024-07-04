@@ -73,6 +73,10 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 		"parameters", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, Boolean> system = createColumn(
 		"system_", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
+	public final Column<ObjectActionTable, Boolean>
+		usePreferredLocaleForGuests = createColumn(
+			"usePreferredLocaleForGuests", Boolean.class, Types.BOOLEAN,
+			Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, Integer> status = createColumn(
 		"status", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
 

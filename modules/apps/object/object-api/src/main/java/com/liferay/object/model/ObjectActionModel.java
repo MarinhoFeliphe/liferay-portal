@@ -564,6 +564,28 @@ public interface ObjectActionModel
 	public void setSystem(boolean system);
 
 	/**
+	 * Returns the use preferred locale for guests of this object action.
+	 *
+	 * @return the use preferred locale for guests of this object action
+	 */
+	public boolean getUsePreferredLocaleForGuests();
+
+	/**
+	 * Returns <code>true</code> if this object action is use preferred locale for guests.
+	 *
+	 * @return <code>true</code> if this object action is use preferred locale for guests; <code>false</code> otherwise
+	 */
+	public boolean isUsePreferredLocaleForGuests();
+
+	/**
+	 * Sets whether this object action is use preferred locale for guests.
+	 *
+	 * @param usePreferredLocaleForGuests the use preferred locale for guests of this object action
+	 */
+	public void setUsePreferredLocaleForGuests(
+		boolean usePreferredLocaleForGuests);
+
+	/**
 	 * Returns the status of this object action.
 	 *
 	 * @return the status of this object action

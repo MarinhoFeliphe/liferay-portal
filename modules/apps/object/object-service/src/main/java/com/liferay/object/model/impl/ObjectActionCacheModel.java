@@ -68,7 +68,7 @@ public class ObjectActionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(45);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -110,6 +110,8 @@ public class ObjectActionCacheModel
 		sb.append(parameters);
 		sb.append(", system=");
 		sb.append(system);
+		sb.append(", usePreferredLocaleForGuests=");
+		sb.append(usePreferredLocaleForGuests);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append("}");
@@ -223,6 +225,8 @@ public class ObjectActionCacheModel
 		}
 
 		objectActionImpl.setSystem(system);
+		objectActionImpl.setUsePreferredLocaleForGuests(
+			usePreferredLocaleForGuests);
 		objectActionImpl.setStatus(status);
 
 		objectActionImpl.resetOriginalValues();
@@ -260,6 +264,8 @@ public class ObjectActionCacheModel
 		parameters = (String)objectInput.readObject();
 
 		system = objectInput.readBoolean();
+
+		usePreferredLocaleForGuests = objectInput.readBoolean();
 
 		status = objectInput.readInt();
 	}
@@ -360,6 +366,8 @@ public class ObjectActionCacheModel
 
 		objectOutput.writeBoolean(system);
 
+		objectOutput.writeBoolean(usePreferredLocaleForGuests);
+
 		objectOutput.writeInt(status);
 	}
 
@@ -383,6 +391,7 @@ public class ObjectActionCacheModel
 	public String objectActionTriggerKey;
 	public String parameters;
 	public boolean system;
+	public boolean usePreferredLocaleForGuests;
 	public int status;
 
 }
