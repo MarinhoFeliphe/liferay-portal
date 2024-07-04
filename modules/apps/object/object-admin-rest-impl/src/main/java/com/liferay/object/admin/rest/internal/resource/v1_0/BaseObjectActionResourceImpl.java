@@ -174,7 +174,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___, "usePreferredLocaleForGuests": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -251,6 +251,11 @@ public abstract class BaseObjectActionResourceImpl
 			existingObjectAction.setSystem(objectAction.getSystem());
 		}
 
+		if (objectAction.getUsePreferredLocaleForGuests() != null) {
+			existingObjectAction.setUsePreferredLocaleForGuests(
+				objectAction.getUsePreferredLocaleForGuests());
+		}
+
 		preparePatch(objectAction, existingObjectAction);
 
 		return putObjectAction(objectActionId, existingObjectAction);
@@ -259,7 +264,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___, "usePreferredLocaleForGuests": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -389,7 +394,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___, "usePreferredLocaleForGuests": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -557,7 +562,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___, "system": ___, "usePreferredLocaleForGuests": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {

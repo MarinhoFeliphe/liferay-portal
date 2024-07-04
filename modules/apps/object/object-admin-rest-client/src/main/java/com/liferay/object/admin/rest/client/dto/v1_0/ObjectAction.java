@@ -364,6 +364,31 @@ public class ObjectAction implements Cloneable, Serializable {
 
 	protected Boolean system;
 
+	public Boolean getUsePreferredLocaleForGuests() {
+		return usePreferredLocaleForGuests;
+	}
+
+	public void setUsePreferredLocaleForGuests(
+		Boolean usePreferredLocaleForGuests) {
+
+		this.usePreferredLocaleForGuests = usePreferredLocaleForGuests;
+	}
+
+	public void setUsePreferredLocaleForGuests(
+		UnsafeSupplier<Boolean, Exception>
+			usePreferredLocaleForGuestsUnsafeSupplier) {
+
+		try {
+			usePreferredLocaleForGuests =
+				usePreferredLocaleForGuestsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean usePreferredLocaleForGuests;
+
 	@Override
 	public ObjectAction clone() throws CloneNotSupportedException {
 		return (ObjectAction)super.clone();

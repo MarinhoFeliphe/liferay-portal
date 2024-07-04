@@ -1440,6 +1440,16 @@ public abstract class BaseObjectActionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"usePreferredLocaleForGuests", additionalAssertFieldName)) {
+
+				if (objectAction.getUsePreferredLocaleForGuests() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1731,6 +1741,19 @@ public abstract class BaseObjectActionResourceTestCase {
 			if (Objects.equals("system", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						objectAction1.getSystem(), objectAction2.getSystem())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"usePreferredLocaleForGuests", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectAction1.getUsePreferredLocaleForGuests(),
+						objectAction2.getUsePreferredLocaleForGuests())) {
 
 					return false;
 				}
@@ -2223,6 +2246,11 @@ public abstract class BaseObjectActionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("usePreferredLocaleForGuests")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
@@ -2284,6 +2312,7 @@ public abstract class BaseObjectActionResourceTestCase {
 				objectActionTriggerKey = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				system = RandomTestUtil.randomBoolean();
+				usePreferredLocaleForGuests = RandomTestUtil.randomBoolean();
 			}
 		};
 	}

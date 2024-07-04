@@ -246,6 +246,16 @@ public class ObjectActionSerDes {
 			sb.append(objectAction.getSystem());
 		}
 
+		if (objectAction.getUsePreferredLocaleForGuests() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"usePreferredLocaleForGuests\": ");
+
+			sb.append(objectAction.getUsePreferredLocaleForGuests());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -394,6 +404,15 @@ public class ObjectActionSerDes {
 			map.put("system", String.valueOf(objectAction.getSystem()));
 		}
 
+		if (objectAction.getUsePreferredLocaleForGuests() == null) {
+			map.put("usePreferredLocaleForGuests", null);
+		}
+		else {
+			map.put(
+				"usePreferredLocaleForGuests",
+				String.valueOf(objectAction.getUsePreferredLocaleForGuests()));
+		}
+
 		return map;
 	}
 
@@ -466,6 +485,11 @@ public class ObjectActionSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "system")) {
+				return false;
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "usePreferredLocaleForGuests")) {
+
 				return false;
 			}
 
@@ -575,6 +599,14 @@ public class ObjectActionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "system")) {
 				if (jsonParserFieldValue != null) {
 					objectAction.setSystem((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "usePreferredLocaleForGuests")) {
+
+				if (jsonParserFieldValue != null) {
+					objectAction.setUsePreferredLocaleForGuests(
+						(Boolean)jsonParserFieldValue);
 				}
 			}
 		}

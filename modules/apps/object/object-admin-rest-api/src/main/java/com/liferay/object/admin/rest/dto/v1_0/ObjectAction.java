@@ -715,6 +715,51 @@ public class ObjectAction implements Serializable {
 	@JsonIgnore
 	private Supplier<Boolean> _systemSupplier;
 
+	@Schema
+	public Boolean getUsePreferredLocaleForGuests() {
+		if (_usePreferredLocaleForGuestsSupplier != null) {
+			usePreferredLocaleForGuests =
+				_usePreferredLocaleForGuestsSupplier.get();
+
+			_usePreferredLocaleForGuestsSupplier = null;
+		}
+
+		return usePreferredLocaleForGuests;
+	}
+
+	public void setUsePreferredLocaleForGuests(
+		Boolean usePreferredLocaleForGuests) {
+
+		this.usePreferredLocaleForGuests = usePreferredLocaleForGuests;
+
+		_usePreferredLocaleForGuestsSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setUsePreferredLocaleForGuests(
+		UnsafeSupplier<Boolean, Exception>
+			usePreferredLocaleForGuestsUnsafeSupplier) {
+
+		_usePreferredLocaleForGuestsSupplier = () -> {
+			try {
+				return usePreferredLocaleForGuestsUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean usePreferredLocaleForGuests;
+
+	@JsonIgnore
+	private Supplier<Boolean> _usePreferredLocaleForGuestsSupplier;
+
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -967,6 +1012,18 @@ public class ObjectAction implements Serializable {
 			sb.append("\"system\": ");
 
 			sb.append(system);
+		}
+
+		Boolean usePreferredLocaleForGuests = getUsePreferredLocaleForGuests();
+
+		if (usePreferredLocaleForGuests != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"usePreferredLocaleForGuests\": ");
+
+			sb.append(usePreferredLocaleForGuests);
 		}
 
 		sb.append("}");
