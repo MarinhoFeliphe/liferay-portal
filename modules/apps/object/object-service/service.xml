@@ -35,6 +35,7 @@
 		<column name="objectActionTriggerKey" type="String" />
 		<column name="parameters" type="String" />
 		<column name="system" type="boolean" />
+		<column name="usePreferredLocaleForGuests" type="boolean" />
 		<column name="status" type="int" />
 
 		<!-- Finder methods -->

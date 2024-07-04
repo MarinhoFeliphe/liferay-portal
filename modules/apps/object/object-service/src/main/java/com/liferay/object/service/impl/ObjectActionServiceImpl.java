@@ -39,7 +39,8 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties, boolean system)
+			UnicodeProperties parametersUnicodeProperties, boolean system,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		_objectDefinitionModelResourcePermission.check(
@@ -49,7 +50,7 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			externalReferenceCode, getUserId(), objectDefinitionId, active,
 			conditionExpression, description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties, system);
+			parametersUnicodeProperties, system, usePreferredLocaleForGuests);
 	}
 
 	@Override
@@ -87,7 +88,8 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties)
+			UnicodeProperties parametersUnicodeProperties,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		ObjectAction objectAction = objectActionPersistence.findByPrimaryKey(
@@ -101,7 +103,7 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			externalReferenceCode, objectActionId, active, conditionExpression,
 			description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
+			parametersUnicodeProperties, usePreferredLocaleForGuests);
 	}
 
 	@Reference(

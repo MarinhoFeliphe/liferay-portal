@@ -97,7 +97,8 @@ public class ObjectActionLocalServiceImpl
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties, boolean system)
+			UnicodeProperties parametersUnicodeProperties, boolean system,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		_validateInvokerBundle(
@@ -125,6 +126,10 @@ public class ObjectActionLocalServiceImpl
 			objectActionExecutorKey, objectActionTriggerKey,
 			parametersUnicodeProperties);
 
+		_validateUsePreferredLocaleForGuests(
+			objectActionExecutorKey, objectActionTriggerKey,
+			usePreferredLocaleForGuests);
+
 		ObjectAction objectAction = objectActionPersistence.create(
 			counterLocalService.increment());
 
@@ -148,6 +153,10 @@ public class ObjectActionLocalServiceImpl
 		objectAction.setObjectActionTriggerKey(objectActionTriggerKey);
 		objectAction.setParameters(parametersUnicodeProperties.toString());
 		objectAction.setSystem(system);
+		objectAction.setUsePreferredLocaleForGuests(
+			_isUsePreferredLocaleForGuests(
+				objectActionExecutorKey, objectActionTriggerKey,
+				usePreferredLocaleForGuests));
 		objectAction.setStatus(ObjectActionConstants.STATUS_NEVER_RAN);
 
 		objectAction = objectActionPersistence.update(objectAction);
@@ -185,7 +194,8 @@ public class ObjectActionLocalServiceImpl
 			String description, Map<Locale, String> errorMessageMap,
 			Map<Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties, boolean system)
+			UnicodeProperties parametersUnicodeProperties, boolean system,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		ObjectAction existingObjectAction = null;
@@ -212,14 +222,14 @@ public class ObjectActionLocalServiceImpl
 				externalReferenceCode, existingObjectAction.getObjectActionId(),
 				active, conditionExpression, description, errorMessageMap,
 				labelMap, name, objectActionExecutorKey, objectActionTriggerKey,
-				parametersUnicodeProperties);
+				parametersUnicodeProperties, usePreferredLocaleForGuests);
 		}
 
 		return addObjectAction(
 			externalReferenceCode, userId, objectDefinitionId, active,
 			conditionExpression, description, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties, system);
+			parametersUnicodeProperties, system, usePreferredLocaleForGuests);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -328,7 +338,8 @@ public class ObjectActionLocalServiceImpl
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
-			UnicodeProperties parametersUnicodeProperties)
+			UnicodeProperties parametersUnicodeProperties,
+			Boolean usePreferredLocaleForGuests)
 		throws PortalException {
 
 		ObjectAction objectAction = objectActionPersistence.findByPrimaryKey(
@@ -362,6 +373,9 @@ public class ObjectActionLocalServiceImpl
 			objectAction.getCompanyId(), objectAction.getUserId(),
 			conditionExpression, objectActionExecutorKey,
 			objectActionTriggerKey, parametersUnicodeProperties);
+		_validateUsePreferredLocaleForGuests(
+			objectActionExecutorKey, objectActionTriggerKey,
+			usePreferredLocaleForGuests);
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			objectAction.setExternalReferenceCode(externalReferenceCode);
@@ -375,6 +389,10 @@ public class ObjectActionLocalServiceImpl
 		objectAction.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectAction.setObjectActionExecutorKey(objectActionExecutorKey);
 		objectAction.setParameters(parametersUnicodeProperties.toString());
+		objectAction.setUsePreferredLocaleForGuests(
+			_isUsePreferredLocaleForGuests(
+				objectActionExecutorKey, objectActionTriggerKey,
+				usePreferredLocaleForGuests));
 		objectAction.setStatus(ObjectActionConstants.STATUS_NEVER_RAN);
 
 		if (objectDefinition.isApproved()) {
@@ -425,6 +443,26 @@ public class ObjectActionLocalServiceImpl
 			LockManagerUtil.unlock(
 				ObjectAction.class.getName(), objectActionId);
 		}
+	}
+
+	private boolean _isUsePreferredLocaleForGuests(
+		String objectActionExecutorKey, String objectActionTriggerKey,
+		Boolean usePreferredLocaleForGuests) {
+
+		if (Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_NOTIFICATION) &&
+			(Objects.equals(
+				objectActionTriggerKey,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD) ||
+			 Objects.equals(
+				 objectActionTriggerKey,
+				 ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE))) {
+
+			return GetterUtil.getBoolean(usePreferredLocaleForGuests, true);
+		}
+
+		return false;
 	}
 
 	private void _validateErrorMessage(
@@ -897,6 +935,41 @@ public class ObjectActionLocalServiceImpl
 		if (MapUtil.isNotEmpty(predefinedValuesErrorMessageKeys)) {
 			errorMessageKeys.put(
 				"predefinedValues", predefinedValuesErrorMessageKeys);
+		}
+	}
+
+	private void _validateUsePreferredLocaleForGuests(
+			String objectActionExecutorKey, String objectActionTriggerKey,
+			Boolean usePreferredLocaleForGuests)
+		throws PortalException {
+
+		if (GetterUtil.getBoolean(usePreferredLocaleForGuests)) {
+			if (!Objects.equals(
+					objectActionExecutorKey,
+					ObjectActionExecutorConstants.KEY_NOTIFICATION)) {
+
+				throw new ObjectActionExecutorKeyException(
+					StringBundler.concat(
+						"The object action executor key ",
+						objectActionExecutorKey,
+						" does not support the use of preferred locale for ",
+						"guests."));
+			}
+
+			if (!(Objects.equals(
+					objectActionTriggerKey,
+					ObjectActionTriggerConstants.KEY_ON_AFTER_ADD) ||
+				  Objects.equals(
+					  objectActionTriggerKey,
+					  ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE))) {
+
+				throw new ObjectActionTriggerKeyException(
+					StringBundler.concat(
+						"The object action trigger key ",
+						objectActionTriggerKey,
+						" does not support the use of preferred locale for ",
+						"guests."));
+			}
 		}
 	}
 
