@@ -602,7 +602,7 @@ public class BaseNotificationTypeTest {
 				"notificationTemplateId",
 				notificationTemplate.getNotificationTemplateId()
 			).build(),
-			false);
+			false, false);
 
 		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
 			dtoConverterContext, parentObjectDefinition,

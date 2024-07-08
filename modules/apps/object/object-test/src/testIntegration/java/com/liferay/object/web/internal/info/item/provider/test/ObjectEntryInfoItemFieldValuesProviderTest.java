@@ -222,7 +222,7 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 			UnicodePropertiesBuilder.put(
 				"url", RandomTestUtil.randomString()
 			).build(),
-			false);
+			false, false);
 
 		_testObjectEntryInfoItemFieldValuesProvider(
 			fileEntry, objectAction, objectEntry,

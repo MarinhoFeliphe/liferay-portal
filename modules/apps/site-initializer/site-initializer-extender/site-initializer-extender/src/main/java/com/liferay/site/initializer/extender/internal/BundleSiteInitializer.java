@@ -3089,7 +3089,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				jsonObject.getString("objectActionExecutorKey"),
 				jsonObject.getString("objectActionTriggerKey"),
 				ObjectActionUtil.toParametersUnicodeProperties(parametersMap),
-				jsonObject.getBoolean("system"));
+				jsonObject.getBoolean("system"), false);
 		}
 	}
 
@@ -3163,7 +3163,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 					objectActionJSONObject.getString("objectActionTriggerKey"),
 					ObjectActionUtil.toParametersUnicodeProperties(
 						parametersJSONObject.toMap()),
-					objectActionJSONObject.getBoolean("system"));
+					objectActionJSONObject.getBoolean("system"), false);
 			}
 		}
 	}

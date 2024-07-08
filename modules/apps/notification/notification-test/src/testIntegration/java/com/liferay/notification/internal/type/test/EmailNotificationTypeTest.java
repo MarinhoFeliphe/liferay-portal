@@ -989,7 +989,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				"notificationTemplateId",
 				notificationTemplate.getNotificationTemplateId()
 			).build(),
-			false);
+			false, false);
 	}
 
 	private Role _addRole(int type, User user) throws Exception {
@@ -1266,7 +1266,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				"notificationTemplateId",
 				notificationTemplate.getNotificationTemplateId()
 			).build(),
-			false);
+			false, false);
 
 		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
 			dtoConverterContext, objectDefinition,

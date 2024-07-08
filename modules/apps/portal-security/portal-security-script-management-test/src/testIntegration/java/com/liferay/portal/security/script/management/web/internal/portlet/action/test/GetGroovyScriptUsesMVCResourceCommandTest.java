@@ -243,7 +243,7 @@ public class GetGroovyScriptUsesMVCResourceCommandTest {
 			LocalizedMapUtil.getLocalizedMap(label),
 			RandomTestUtil.randomString(), objectActionExecutorKey,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, unicodeProperties,
-			false);
+			false, false);
 	}
 
 	private void _addObjectValidationRule(

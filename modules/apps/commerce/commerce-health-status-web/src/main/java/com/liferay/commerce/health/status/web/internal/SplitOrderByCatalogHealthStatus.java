@@ -175,7 +175,7 @@ public class SplitOrderByCatalogHealthStatus implements CommerceHealthStatus {
 						"objectDefinitionId",
 						commerceOrderObjectDefinition.getObjectDefinitionId()
 					).build(),
-					false);
+					false, false);
 			}
 
 			return null;

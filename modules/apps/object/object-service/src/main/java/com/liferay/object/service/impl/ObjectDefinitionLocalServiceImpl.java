@@ -1544,7 +1544,8 @@ public class ObjectDefinitionLocalServiceImpl
 				objectAction.getObjectActionExecutorKey(),
 				objectAction.getObjectActionTriggerKey(),
 				objectAction.getParametersUnicodeProperties(),
-				objectAction.isSystem());
+				objectAction.isSystem(),
+				objectAction.isUsePreferredLocaleForGuests());
 		}
 	}
 

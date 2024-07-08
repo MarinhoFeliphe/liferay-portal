@@ -194,7 +194,7 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 				"notificationTemplateId",
 				notificationTemplate.getNotificationTemplateId()
 			).build(),
-			false);
+			false, false);
 
 		PermissionChecker originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -437,7 +437,7 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 				"notificationTemplateId",
 				notificationTemplate.getNotificationTemplateId()
 			).build(),
-			false);
+			false, false);
 
 		PermissionChecker originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();

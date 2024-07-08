@@ -730,7 +730,7 @@ public class ObjectActionLocalServiceTest {
 				).put(
 					"url", "https://onafterrootupdate.com"
 				).build(),
-				false);
+				false, false);
 
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
@@ -1085,7 +1085,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"url", "https://onafteradd.com"
 			).build(),
-			false);
+			false, false);
 
 		Assert.assertEquals(0, _argumentsList.size());
 
@@ -1140,7 +1140,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"url", "https://onafterdelete.com"
 			).build(),
-			false);
+			false, false);
 
 		Assert.assertEquals(0, _argumentsList.size());
 
@@ -1195,7 +1195,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"url", "https://onafterupdate.com"
 			).build(),
-			false);
+			false, false);
 
 		ObjectEntry objectEntry5 = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
@@ -1302,7 +1302,7 @@ public class ObjectActionLocalServiceTest {
 					)
 				).toString()
 			).build(),
-			false);
+			false, false);
 
 		// Add object action to create commerce order after updating order
 		// status to CommerceOrderConstants#ORDER_STATUS_PROCESSING
@@ -1378,7 +1378,7 @@ public class ObjectActionLocalServiceTest {
 					)
 				).toString()
 			).build(),
-			false);
+			false, false);
 
 		PermissionChecker originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -1493,7 +1493,7 @@ public class ObjectActionLocalServiceTest {
 					)
 				).toString()
 			).build(),
-			false);
+			false, false);
 
 		ObjectAction objectAction4 = _addObjectAction(
 			RandomTestUtil.randomString(),
@@ -1687,7 +1687,7 @@ public class ObjectActionLocalServiceTest {
 					)
 				).toString()
 			).build(),
-			false);
+			false, false);
 
 		try {
 			PrincipalThreadLocal.setName(_user.getUserId());
@@ -1743,7 +1743,7 @@ public class ObjectActionLocalServiceTest {
 			UnicodePropertiesBuilder.put(
 				"script", "println \"Hello World 1\""
 			).build(),
-			false);
+			false, false);
 
 		// Add object action to execute Groovy after updating a user
 
@@ -1759,7 +1759,7 @@ public class ObjectActionLocalServiceTest {
 			UnicodePropertiesBuilder.put(
 				"script", "println \"Hello World 2\""
 			).build(),
-			false);
+			false, false);
 
 		// While adding a user, the user is updated and it must not trigger
 		// object actions
@@ -1893,7 +1893,7 @@ public class ObjectActionLocalServiceTest {
 				).put(
 					"url", "https://onafteradd.com"
 				).build(),
-				true);
+				true, false);
 
 		AssertUtils.assertFailure(
 			ObjectActionSystemException.class, false,
@@ -1972,7 +1972,7 @@ public class ObjectActionLocalServiceTest {
 					)
 				).toString()
 			).build(),
-			false);
+			false, false);
 
 		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
@@ -2019,7 +2019,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"url", "https://onafteradd.com"
 			).build(),
-			false);
+			false, false);
 
 		_assertObjectAction(
 			true, "equals(firstName, \"John\")", "Able Description",
@@ -2045,7 +2045,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "30624700"
 			).put(
 				"url", "https://onafterdelete.com"
-			).build());
+			).build(),
+			false);
 
 		_assertObjectAction(
 			false, "equals(firstName, \"João\")", "Baker Description",
@@ -2073,7 +2074,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "0123456789"
 			).put(
 				"url", "https://onafterdelete.com"
-			).build());
+			).build(),
+			false);
 
 		_assertObjectAction(
 			true, "equals(firstName, \"John\")", "Charlie Description",
@@ -2104,7 +2106,7 @@ public class ObjectActionLocalServiceTest {
 				).put(
 					"url", "https://onafteradd.com"
 				).build(),
-				true);
+				true, false);
 
 		systemObjectAction = _objectActionLocalService.updateObjectAction(
 			externalReferenceCode2, systemObjectAction.getObjectActionId(),
@@ -2117,7 +2119,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "30624700"
 			).put(
 				"url", "https://onafterdelete.com"
-			).build());
+			).build(),
+			false);
 
 		_assertObjectAction(
 			false, "equals(firstName, \"João\")", "Baker Description",
@@ -2150,7 +2153,8 @@ public class ObjectActionLocalServiceTest {
 					"secret", "0123456789"
 				).put(
 					"url", "https://onafteradd.com"
-				).build());
+				).build(),
+				false);
 		}
 		finally {
 			SystemProperties.set("liferay.mode", liferayMode);
@@ -2200,7 +2204,7 @@ public class ObjectActionLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(errorMessage),
 			LocalizedMapUtil.getLocalizedMap(label), name,
 			ObjectActionExecutorConstants.KEY_GROOVY, objectActionTriggerKey,
-			new UnicodeProperties(), system);
+			new UnicodeProperties(), system, false);
 	}
 
 	private ObjectAction _addObjectAction(
@@ -2216,7 +2220,7 @@ public class ObjectActionLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			name, objectActionExecutorKey, objectActionTriggerKey,
-			unicodeProperties, system);
+			unicodeProperties, system, false);
 	}
 
 	private ObjectAction _addObjectAction(

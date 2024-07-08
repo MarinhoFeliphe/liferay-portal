@@ -1414,7 +1414,7 @@ public class ExportImportLayoutPageTemplateEntriesTest {
 			).put(
 				"url", "https://standalone.com"
 			).build(),
-			false);
+			false, false);
 	}
 
 	private ObjectEntry _addObjectEntry() throws Exception {

@@ -197,7 +197,7 @@ public class AddCommerceOrderNotificationPortalInstanceLifecycleListener
 			).put(
 				"type", "email"
 			).build(),
-			false);
+			false, false);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

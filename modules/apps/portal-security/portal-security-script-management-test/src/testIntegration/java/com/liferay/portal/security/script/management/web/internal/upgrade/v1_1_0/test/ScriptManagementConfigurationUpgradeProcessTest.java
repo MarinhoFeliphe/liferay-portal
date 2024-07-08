@@ -197,7 +197,7 @@ public class ScriptManagementConfigurationUpgradeProcessTest {
 			LocalizedMapUtil.getLocalizedMap(label),
 			RandomTestUtil.randomString(), objectActionExecutorKey,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, unicodeProperties,
-			false);
+			false, false);
 	}
 
 	private ObjectValidationRule _addObjectValidationRule(

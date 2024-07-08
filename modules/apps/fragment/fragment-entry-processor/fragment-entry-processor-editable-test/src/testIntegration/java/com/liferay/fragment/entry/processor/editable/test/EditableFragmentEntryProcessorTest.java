@@ -729,7 +729,7 @@ public class EditableFragmentEntryProcessorTest {
 			).put(
 				"url", "https://standalone.com"
 			).build(),
-			false);
+			false, false);
 
 		long classNameId = _portal.getClassNameId(
 			ObjectDefinition.class.getName() + "#" +

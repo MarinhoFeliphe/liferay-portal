@@ -119,7 +119,7 @@ public class ObjectEntryInfoItemFormProviderTest {
 			UnicodePropertiesBuilder.put(
 				"url", RandomTestUtil.randomString()
 			).build(),
-			false);
+			false, false);
 
 		InfoItemFormProvider<?> infoItemFormProvider =
 			_infoItemServiceRegistry.getFirstInfoItemService(

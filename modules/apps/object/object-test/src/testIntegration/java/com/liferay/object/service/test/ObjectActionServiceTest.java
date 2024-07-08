@@ -156,7 +156,7 @@ public class ObjectActionServiceTest {
 			UnicodePropertiesBuilder.put(
 				"url", RandomTestUtil.randomString()
 			).build(),
-			false);
+			false, false);
 	}
 
 	private void _setUser(User user) {

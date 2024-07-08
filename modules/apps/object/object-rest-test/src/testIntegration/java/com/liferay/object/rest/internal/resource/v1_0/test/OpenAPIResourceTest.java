@@ -261,7 +261,7 @@ public class OpenAPIResourceTest {
 			).put(
 				"url", "https://standalone.com"
 			).build(),
-			false);
+			false, false);
 
 		_assertOpenAPI(
 			"expected_openapi_actions_object_action.json", _objectDefinition);

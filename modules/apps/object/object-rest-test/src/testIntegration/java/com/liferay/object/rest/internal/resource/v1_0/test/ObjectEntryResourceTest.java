@@ -11058,7 +11058,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"url", "https://standalone.com"
 			).build(),
-			false);
+			false, false);
 	}
 
 	private ObjectRelationship _addObjectRelationshipAndRelateObjectEntries(

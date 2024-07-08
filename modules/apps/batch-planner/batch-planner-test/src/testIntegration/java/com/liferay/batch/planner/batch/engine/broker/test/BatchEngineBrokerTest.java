@@ -1366,7 +1366,7 @@ public class BatchEngineBrokerTest {
 			).put(
 				"url", "https://standalone.com"
 			).build(),
-			false);
+			false, false);
 
 		ObjectFolder objectFolder = _objectFolderLocalService.addObjectFolder(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
