@@ -297,6 +297,42 @@ public class ObjectActionLocalServiceTest {
 				RandomTestUtil.randomString(), "Abl-e",
 				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, false));
 		AssertUtils.assertFailure(
+			ObjectActionExecutorKeyException.class,
+			StringBundler.concat(
+				"The object action executor key ",
+				ObjectActionExecutorConstants.KEY_WEBHOOK,
+				" does not support the use of preferred locale for ",
+				"guests."),
+			() -> _objectActionLocalService.addObjectAction(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				_objectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK, RandomTestUtil.randomString(),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				name, ObjectActionExecutorConstants.KEY_WEBHOOK,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				UnicodePropertiesBuilder.put(
+					"url", RandomTestUtil.randomString()
+				).build(), false, true));
+		AssertUtils.assertFailure(
+			ObjectActionExecutorKeyException.class,
+			StringBundler.concat(
+				"The object action trigger key ",
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+				" does not support the use of preferred locale for ",
+				"guests."),
+			() -> _objectActionLocalService.addObjectAction(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				_objectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK, RandomTestUtil.randomString(),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				name, ObjectActionExecutorConstants.KEY_NOTIFICATION,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+				UnicodePropertiesBuilder.put(
+					"notificationTemplateId", RandomTestUtil.randomLong()
+				).build(), false, true));
+		AssertUtils.assertFailure(
 			ObjectActionTriggerKeyException.class,
 			"The object action trigger key onAfterRootUpdate can only be " +
 				"used by a root object definition",
