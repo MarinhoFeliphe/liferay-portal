@@ -254,8 +254,16 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 					if (expression instanceof Alias) {
 						Alias<?> alias = (Alias<?>)expression;
 
-						sqlQuery.addScalar(
-							alias.getName(), _getType(alias.getExpression()));
+						Type type = null;
+
+						if (alias.getJavaType() != null) {
+							type = _types.get(alias.getJavaType());
+						}
+						else {
+							type = _getType(alias.getExpression());
+						}
+
+						sqlQuery.addScalar(alias.getName(), type);
 					}
 					else if (expression instanceof Column) {
 						Column<?, ?> column = (Column<?, ?>)expression;
