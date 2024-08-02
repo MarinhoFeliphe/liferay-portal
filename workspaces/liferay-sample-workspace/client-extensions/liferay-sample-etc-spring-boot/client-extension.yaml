@@ -21,6 +21,8 @@ liferay-sample-etc-spring-boot-object-action-2:
     name: Liferay Sample Etc Spring Boot Object Action 2
     oAuth2ApplicationExternalReferenceCode: liferay-sample-etc-spring-boot-oauth-application-user-agent
     resourcePath: /object/action/2
+    scopes:
+        - c_book.everything.read
     type: objectAction
 liferay-sample-etc-spring-boot-object-entry-manager-1:
     name: Liferay Sample Etc Spring Boot Object Entry Manager 1
