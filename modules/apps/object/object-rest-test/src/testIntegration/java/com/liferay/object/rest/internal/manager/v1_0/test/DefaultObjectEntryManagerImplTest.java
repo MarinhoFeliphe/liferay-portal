@@ -4551,6 +4551,20 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	private ObjectEntry _addObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			String scope)
+		throws Exception {
+
+		ObjectEntry newObjectEntry = _defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, objectDefinition, objectEntry, scope);
+
+		assertEquals(newObjectEntry, objectEntry);
+
+		return newObjectEntry;
+	}
+
+	private ObjectEntry _addObjectEntry(
 			ObjectDefinition objectDefinition, Map<String, Object> values)
 		throws Exception {
 
