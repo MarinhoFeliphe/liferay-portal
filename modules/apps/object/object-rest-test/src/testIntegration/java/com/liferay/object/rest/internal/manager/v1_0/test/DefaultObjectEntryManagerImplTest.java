@@ -618,68 +618,68 @@ public class DefaultObjectEntryManagerImplTest
 				},
 				ObjectDefinitionConstants.SCOPE_COMPANY);
 
-		ObjectEntry childObjectEntry1 =
-			_defaultObjectEntryManager.addObjectEntry(
-				dtoConverterContext, _objectDefinition2,
-				new ObjectEntry() {
-					{
-						properties = HashMapBuilder.<String, Object>put(
-							_objectRelationshipERCObjectFieldName,
-							"newExternalReferenceCode"
-						).put(
-							"dateObjectFieldName", "2020-01-02"
-						).put(
-							"decimalObjectFieldName", 15.7
-						).put(
-							"integerObjectFieldName", 15
-						).put(
-							"longIntegerObjectFieldName", 100L
-						).put(
-							"picklistObjectFieldName", _addListTypeEntry()
-						).put(
-							"precisionDecimalObjectFieldName",
-							new BigDecimal("0.9876543217654321")
-						).build();
-					}
-				},
-				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectEntry childObjectEntry1 = _addObjectEntry(
+			dtoConverterContext, _objectDefinition2,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipERCObjectFieldName,
+						"newExternalReferenceCode"
+					).put(
+						"dateObjectFieldName", "2020-01-02"
+					).put(
+						"decimalObjectFieldName", 15.7
+					).put(
+						"integerObjectFieldName", 15
+					).put(
+						"longIntegerObjectFieldName", 100L
+					).put(
+						"picklistObjectFieldName", _addListTypeEntry()
+					).put(
+						"precisionDecimalObjectFieldName",
+						new BigDecimal("0.9876543217654321")
+					).putAll(
+						_localizedObjectFieldI18nValues
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		String listTypeEntryKey = _addListTypeEntry();
 
-		ObjectEntry childObjectEntry2 =
-			_defaultObjectEntryManager.addObjectEntry(
-				dtoConverterContext, _objectDefinition2,
-				new ObjectEntry() {
-					{
-						properties = HashMapBuilder.<String, Object>put(
-							_objectRelationshipERCObjectFieldName,
-							"newExternalReferenceCode"
-						).put(
-							"attachmentObjectFieldName",
-							_getAttachmentObjectFieldValue()
-						).put(
-							"dateObjectFieldName", "2022-01-01"
-						).put(
-							"decimalObjectFieldName", 15.5
-						).put(
-							"integerObjectFieldName", 10
-						).put(
-							"longIntegerObjectFieldName", 50000L
-						).put(
-							"picklistObjectFieldName", listTypeEntryKey
-						).put(
-							"precisionDecimalObjectFieldName",
-							new BigDecimal("0.1234567891234567")
-						).put(
-							"richTextObjectFieldName",
-							StringBundler.concat(
-								"<i>", RandomTestUtil.randomString(), "</i>")
-						).put(
-							"textObjectFieldName", RandomTestUtil.randomString()
-						).build();
-					}
-				},
-				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectEntry childObjectEntry2 = _addObjectEntry(
+			dtoConverterContext, _objectDefinition2,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipERCObjectFieldName,
+						"newExternalReferenceCode"
+					).put(
+						"attachmentObjectFieldName",
+						_getAttachmentObjectFieldValue()
+					).put(
+						"dateObjectFieldName", "2022-01-01"
+					).put(
+						"decimalObjectFieldName", 15.5
+					).put(
+						"integerObjectFieldName", 10
+					).put(
+						"longIntegerObjectFieldName", 50000L
+					).put(
+						"picklistObjectFieldName", listTypeEntryKey
+					).put(
+						"precisionDecimalObjectFieldName",
+						new BigDecimal("0.1234567891234567")
+					).put(
+						"richTextObjectFieldName",
+						StringBundler.concat(
+							"<i>", RandomTestUtil.randomString(), "</i>")
+					).put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// Aggregation field with filter (date range with date and time)
 
@@ -874,45 +874,42 @@ public class DefaultObjectEntryManagerImplTest
 			null, "COUNT", _objectDefinition1.getObjectDefinitionId(),
 			"countAggregationObjectFieldName2", objectRelationship.getName());
 
-		ObjectEntry parentObjectEntry2 =
-			_defaultObjectEntryManager.addObjectEntry(
-				_simpleDTOConverterContext, _objectDefinition1,
-				new ObjectEntry() {
-					{
-						properties = HashMapBuilder.<String, Object>put(
-							"textObjectFieldName", RandomTestUtil.randomString()
-						).build();
-					}
-				},
-				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectEntry parentObjectEntry2 = _addObjectEntry(
+			_simpleDTOConverterContext, _objectDefinition1,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
-		ObjectEntry childObjectEntry3 =
-			_defaultObjectEntryManager.addObjectEntry(
-				_simpleDTOConverterContext, _objectDefinition1,
-				new ObjectEntry() {
-					{
-						properties = HashMapBuilder.<String, Object>put(
-							"textObjectFieldName", RandomTestUtil.randomString()
-						).build();
-					}
-				},
-				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectEntry childObjectEntry3 = _addObjectEntry(
+			_simpleDTOConverterContext, _objectDefinition1,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		ObjectRelationshipTestUtil.relateObjectEntries(
 			parentObjectEntry2.getId(), childObjectEntry3.getId(),
 			objectRelationship, adminUser.getUserId());
 
-		ObjectEntry childObjectEntry4 =
-			_defaultObjectEntryManager.addObjectEntry(
-				_simpleDTOConverterContext, _objectDefinition1,
-				new ObjectEntry() {
-					{
-						properties = HashMapBuilder.<String, Object>put(
-							"textObjectFieldName", RandomTestUtil.randomString()
-						).build();
-					}
-				},
-				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectEntry childObjectEntry4 = _addObjectEntry(
+			_simpleDTOConverterContext, _objectDefinition1,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		ObjectRelationshipTestUtil.relateObjectEntries(
 			parentObjectEntry2.getId(), childObjectEntry4.getId(),
@@ -1035,7 +1032,7 @@ public class DefaultObjectEntryManagerImplTest
 		String dateTimeString2 = utcDateTimeFormatter.format(
 			utcLocalDateTime.plusHours(1));
 
-		_objectEntryManager.addObjectEntry(
+		_addObjectEntry(
 			dtoConverterContext, _objectDefinition2,
 			new ObjectEntry() {
 				{
@@ -1075,14 +1072,14 @@ public class DefaultObjectEntryManagerImplTest
 		// Formula field
 
 		assertEquals(
-			_defaultObjectEntryManager.addObjectEntry(
+			_addObjectEntry(
 				dtoConverterContext, _objectDefinition2,
 				new ObjectEntry() {
 					{
 						properties = HashMapBuilder.<String, Object>put(
 							"integerObjectFieldName", 3
 						).put(
-							"longIntegerObjectFieldName", 2
+							"longIntegerObjectFieldName", 2L
 						).build();
 					}
 				},
@@ -1139,7 +1136,7 @@ public class DefaultObjectEntryManagerImplTest
 				"{externalReferenceCode=", newExternalReferenceCode,
 				", companyId=", companyId, ", objectDefinitionId=",
 				_objectDefinition1.getObjectDefinitionId(), "}"),
-			() -> _defaultObjectEntryManager.addObjectEntry(
+			() -> _addObjectEntry(
 				dtoConverterContext, _objectDefinition2,
 				new ObjectEntry() {
 					{
@@ -4490,6 +4487,20 @@ public class DefaultObjectEntryManagerImplTest
 				}
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
+	}
+
+	private ObjectEntry _addObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			String scope)
+		throws Exception {
+
+		ObjectEntry newObjectEntry = _defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, objectDefinition, objectEntry, scope);
+
+		assertEquals(newObjectEntry, objectEntry);
+
+		return newObjectEntry;
 	}
 
 	private ObjectEntry _addObjectEntry(
