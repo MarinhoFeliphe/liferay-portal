@@ -332,12 +332,6 @@ public class ObjectEntryLocalServiceImpl
 		if (dynamicObjectDefinitionStaticValues &&
 			extensionDynamicObjectDefinitionStaticValues) {
 
-			_addLocalizedObjectFieldValues(
-				DynamicObjectDefinitionLocalizationTableFactory.create(
-					_objectDefinitionPersistence.findByPrimaryKey(
-						objectEntry.getObjectDefinitionId()),
-					_objectFieldLocalService),
-				objectEntry.getObjectEntryId(), insertedValues);
 			_addObjectRelationshipERCFieldValue(
 				objectEntry.getObjectDefinitionId(), insertedValues);
 
@@ -1860,13 +1854,9 @@ public class ObjectEntryLocalServiceImpl
 			Column<DynamicObjectDefinitionLocalizationTable, ?>
 				objectFieldColumn = objectFieldColumns.get(i);
 
-			values.put(
-				objectFieldColumn.getName() + "i18n",
-				(Serializable)localizedValues);
-			values.putIfAbsent(
-				StringUtil.removeLast(
-					objectFieldColumn.getName(), StringPool.UNDERLINE),
-				StringPool.BLANK);
+			_putLocalizedValues(
+				objectFieldColumn.getName(), (Serializable)localizedValues,
+				values);
 		}
 	}
 
@@ -3610,6 +3600,13 @@ public class ObjectEntryLocalServiceImpl
 
 			FinderCacheUtil.clearDSLQueryCache(
 				dynamicObjectDefinitionLocalizationTable.getTableName());
+
+			for (ObjectField objectField : objectFields) {
+				_putLocalizedValues(
+					objectField.getDBColumnName(),
+					values.get(objectField.getDBColumnName() + "i18n"),
+					insertedValues);
+			}
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -3841,6 +3838,16 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		insertedValues.put(key, serializable);
+	}
+
+	private void _putLocalizedValues(
+		String columnName, Serializable localizedValues,
+		Map<String, Serializable> values) {
+
+		values.put(columnName + "i18n", localizedValues);
+		values.putIfAbsent(
+			StringUtil.removeLast(columnName, StringPool.UNDERLINE),
+			StringPool.BLANK);
 	}
 
 	private void _putObjectFilterParser(
