@@ -3576,7 +3576,7 @@ public class ObjectEntryLocalServiceImpl
 					columnNames, index++, insertedValues, preparedStatement,
 					Types.BIGINT, objectEntryId);
 				_setColumn(
-					columnNames, index++, insertedValues, preparedStatement,
+					columnNames, index++, new HashMap<>(), preparedStatement,
 					Types.VARCHAR, languageId);
 
 				for (ObjectField objectField : objectFields) {
@@ -3585,8 +3585,8 @@ public class ObjectEntryLocalServiceImpl
 							objectField.getDBColumnName());
 
 					_setColumn(
-						columnNames, index++, insertedValues, preparedStatement,
-						column.getSQLType(),
+						columnNames, index++, new HashMap<>(),
+						preparedStatement, column.getSQLType(),
 						_getLocalizedValue(
 							languageId,
 							(Map<String, String>)values.get(
