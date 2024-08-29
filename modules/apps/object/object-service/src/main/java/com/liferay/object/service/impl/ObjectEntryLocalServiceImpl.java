@@ -35,6 +35,7 @@ import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
+import com.liferay.object.dynamic.data.mapping.expression.ObjectEntryDDMExpressionFieldAccessor;
 import com.liferay.object.entry.ObjectEntryContext;
 import com.liferay.object.entry.contributor.ObjectEntryValuesContributor;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
@@ -3756,6 +3757,40 @@ public class ObjectEntryLocalServiceImpl
 			}
 			else if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+				String script = null;
+
+				for (ObjectFieldSetting objectFieldSetting :
+						objectField.getObjectFieldSettings()) {
+
+					if (Objects.equals(
+							objectFieldSetting.getName(), "script")) {
+
+						script = objectFieldSetting.getValue();
+
+						break;
+					}
+				}
+
+				Map<String, Object> parameters = new HashMap<>();
+
+				for (Map.Entry<String, Serializable> entry :
+						values.entrySet()) {
+
+					parameters.put(entry.getKey(), (Object)entry.getValue());
+				}
+
+				DDMExpression<Serializable> ddmExpression =
+					_ddmExpressionFactory.createExpression(
+						CreateExpressionRequest.Builder.newBuilder(
+							script
+						).withDDMExpressionFieldAccessor(
+							new ObjectEntryDDMExpressionFieldAccessor(
+								parameters)
+						).build());
+
+				insertedValues.put(
+					objectField.getName(), ddmExpression.evaluate());
 
 				staticValues = false;
 			}
