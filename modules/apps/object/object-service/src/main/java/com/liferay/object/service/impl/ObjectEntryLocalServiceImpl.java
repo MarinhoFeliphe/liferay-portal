@@ -313,10 +313,10 @@ public class ObjectEntryLocalServiceImpl
 			insertedValues, objectDefinition, objectEntryId, values,
 			workflowAction);
 
-		boolean dynamicObjectDefinitionStaticValues = _insertIntoTable(
+		_insertIntoTable(
 			_getDynamicObjectDefinitionTable(objectDefinitionId),
 			insertedValues, objectEntryId, values, workflowAction);
-		boolean extensionDynamicObjectDefinitionStaticValues = _insertIntoTable(
+		_insertIntoTable(
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId),
 			insertedValues, objectEntryId, values, workflowAction);
 
@@ -336,14 +336,10 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setStatusByUserId(user.getUserId());
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
 
-		if (dynamicObjectDefinitionStaticValues &&
-			extensionDynamicObjectDefinitionStaticValues) {
+		_addObjectRelationshipERCFieldValue(
+			objectEntry.getObjectDefinitionId(), insertedValues);
 
-			_addObjectRelationshipERCFieldValue(
-				objectEntry.getObjectDefinitionId(), insertedValues);
-
-			objectEntry.setValues(insertedValues);
-		}
+		objectEntry.setValues(insertedValues);
 
 		if (!objectDefinition.isRootDescendantNode()) {
 			_resourcePermissionLocalService.addResourcePermissions(
@@ -3721,7 +3717,7 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
-	private boolean _insertIntoTable(
+	private void _insertIntoTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
 			Map<String, Serializable> insertedValues, long objectEntryId,
 			Map<String, Serializable> values, int workflowAction)
@@ -3745,15 +3741,11 @@ public class ObjectEntryLocalServiceImpl
 		sb.append(" (");
 		sb.append(primaryKeyColumn.getName());
 
-		boolean staticValues = true;
-
 		for (ObjectField objectField : objectFields) {
 			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
 
 				insertedValues.put(objectField.getName(), "0");
-
-				staticValues = false;
 			}
 			else if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
@@ -3791,8 +3783,6 @@ public class ObjectEntryLocalServiceImpl
 
 				insertedValues.put(
 					objectField.getName(), ddmExpression.evaluate());
-
-				staticValues = false;
 			}
 
 			if (!objectField.hasInsertValues() || objectField.isLocalized()) {
@@ -3940,8 +3930,6 @@ public class ObjectEntryLocalServiceImpl
 		catch (Exception exception) {
 			throw new SystemException(exception);
 		}
-
-		return staticValues;
 	}
 
 	private List<Object[]> _list(
