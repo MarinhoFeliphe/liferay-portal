@@ -20,6 +20,7 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionException;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.dynamic.data.mapping.util.NumberUtil;
 import com.liferay.list.type.model.ListTypeEntry;
@@ -3644,6 +3645,7 @@ public class ObjectEntryLocalServiceImpl
 						ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 				String script = null;
+				String outputType = null;
 
 				for (ObjectFieldSetting objectFieldSetting :
 						objectField.getObjectFieldSettings()) {
@@ -3652,8 +3654,9 @@ public class ObjectEntryLocalServiceImpl
 							objectFieldSetting.getName(), "script")) {
 
 						script = objectFieldSetting.getValue();
-
-						break;
+					}
+					else {
+						outputType = objectFieldSetting.getValue();
 					}
 				}
 
@@ -3665,17 +3668,33 @@ public class ObjectEntryLocalServiceImpl
 					parameters.put(entry.getKey(), (Object)entry.getValue());
 				}
 
-				DDMExpression<Serializable> ddmExpression =
-					_ddmExpressionFactory.createExpression(
-						CreateExpressionRequest.Builder.newBuilder(
-							script
-						).withDDMExpressionFieldAccessor(
-							new ObjectEntryDDMExpressionFieldAccessor(
-								parameters)
-						).build());
+				try {
+					DDMExpression<Serializable> ddmExpression =
+						_ddmExpressionFactory.createExpression(
+							CreateExpressionRequest.Builder.newBuilder(
+								script
+							).withDDMExpressionFieldAccessor(
+								new ObjectEntryDDMExpressionFieldAccessor(
+									parameters)
+							).build());
 
-				insertedValues.put(
-					objectField.getName(), ddmExpression.evaluate());
+					BigDecimal bigDecimal =
+						(BigDecimal)ddmExpression.evaluate();
+
+					if (Objects.equals(outputType, "Decimal")) {
+						insertedValues.put(
+							objectField.getName(), bigDecimal.doubleValue());
+					}
+					else {
+						insertedValues.put(
+							objectField.getName(), bigDecimal.longValue());
+					}
+				}
+				catch (DDMExpressionException ddmExpressionException) {
+					_log.error(ddmExpressionException);
+
+					insertedValues.put(objectField.getName(), 0);
+				}
 			}
 
 			if (!objectField.hasInsertValues() || objectField.isLocalized()) {
