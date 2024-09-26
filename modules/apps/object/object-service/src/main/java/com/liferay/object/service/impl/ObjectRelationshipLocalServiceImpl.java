@@ -1295,8 +1295,10 @@ public class ObjectRelationshipLocalServiceImpl
 		String objectDefinition1PreviousRESTContextPath =
 			objectDefinition1.getRESTContextPath();
 
-		objectDefinition1.setRootObjectDefinitionId(
-			objectDefinition1.getObjectDefinitionId());
+		if (objectDefinition1.getRootObjectDefinitionId() == 0) {
+			objectDefinition1.setRootObjectDefinitionId(
+				objectDefinition1.getObjectDefinitionId());
+		}
 
 		ObjectDefinitionLocalService objectDefinitionLocalService =
 			_objectDefinitionLocalServiceSnapshot.get();
