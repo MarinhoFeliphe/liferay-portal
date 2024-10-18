@@ -321,6 +321,7 @@
 			"objectRelationships": [
 				{
 					"deletionType": "cascade",
+					"edge": true,
 					"externalReferenceCode": "L_API_ENDPOINT_TO_API_FILTERS",
 					"label": {
 						"en_US": "API Endpoint to API Filters"
@@ -337,6 +338,7 @@
 				},
 				{
 					"deletionType": "cascade",
+					"edge": true,
 					"externalReferenceCode": "L_API_ENDPOINT_TO_API_SORTS",
 					"label": {
 						"en_US": "API Endpoint API Sorts"
@@ -542,6 +544,7 @@
 			"objectRelationships": [
 				{
 					"deletionType": "cascade",
+					"edge": true,
 					"externalReferenceCode": "L_API_SCHEMA_TO_API_PROPERTIES",
 					"label": {
 						"en_US": "API Schema to API Properties"
@@ -733,6 +736,7 @@
 			"objectRelationships": [
 				{
 					"deletionType": "cascade",
+					"edge": true,
 					"externalReferenceCode": "L_API_APPLICATION_TO_API_ENDPOINTS",
 					"label": {
 						"en_US": "API Application to API Endpoints"
@@ -749,6 +753,7 @@
 				},
 				{
 					"deletionType": "cascade",
+					"edge": true,
 					"externalReferenceCode": "L_API_APPLICATION_TO_API_SCHEMAS",
 					"label": {
 						"en_US": "API Application to API Schemas"
