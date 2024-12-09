@@ -179,10 +179,10 @@ public class GraphWalkerPortalExecutor {
 			ServiceContext serviceContext =
 				executionContext.getServiceContext();
 
-			serviceContext.setAttribute(
+			/*serviceContext.setAttribute(
 				"themeDisplay",
 				_createLigthWeightThemeDisplay(
-					serviceContext.getThemeDisplay()));
+					serviceContext.getThemeDisplay()));*/
 
 			if (PrincipalThreadLocal.getUserId() == 0) {
 				PrincipalThreadLocal.setName(serviceContext.getUserId());

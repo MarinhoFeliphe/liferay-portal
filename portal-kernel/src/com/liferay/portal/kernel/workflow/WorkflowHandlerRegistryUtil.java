@@ -120,6 +120,8 @@ public class WorkflowHandlerRegistryUtil {
 			status = WorkflowConstants.STATUS_APPROVED;
 		}
 
+		workflowHandler.contributeServiceContext(serviceContext);
+
 		workflowContext = HashMapBuilder.create(
 			workflowContext
 		).put(
