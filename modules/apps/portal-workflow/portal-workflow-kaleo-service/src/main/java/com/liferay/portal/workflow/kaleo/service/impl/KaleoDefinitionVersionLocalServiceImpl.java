@@ -364,8 +364,6 @@ public class KaleoDefinitionVersionLocalServiceImpl
 	private List<Long> _getKaleoDefinitionVersionIds(
 		long companyId, String keywords, int status) {
 
-		List<Long> kaleoDefinitionVersionIds = new ArrayList<>();
-
 		KaleoDefinitionVersionTable aliasKaleoDefinitionVersionTable =
 			KaleoDefinitionVersionTable.INSTANCE.as(
 				"aliasKaleoDefinitionVersionTable");
@@ -429,6 +427,8 @@ public class KaleoDefinitionVersionLocalServiceImpl
 					))
 			)
 		);
+
+		List<Long> kaleoDefinitionVersionIds = new ArrayList<>();
 
 		for (Object result :
 				kaleoDefinitionVersionPersistence.dslQuery(dslQuery)) {
