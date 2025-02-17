@@ -113,8 +113,8 @@ create table ObjectEntryVersion (
 	createDate DATE null,
 	modifiedDate DATE null,
 	objectEntryId LONG,
-	content VARCHAR(75) null,
-	version LONG,
+	content TEXT null,
+	version INTEGER,
 	status INTEGER
 );
 

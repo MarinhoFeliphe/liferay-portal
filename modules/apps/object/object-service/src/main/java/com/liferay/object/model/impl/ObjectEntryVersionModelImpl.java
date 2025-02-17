@@ -69,8 +69,8 @@ public class ObjectEntryVersionModelImpl
 		{"objectEntryVersionId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"objectEntryId", Types.BIGINT}, {"content", Types.VARCHAR},
-		{"version", Types.BIGINT}, {"status", Types.INTEGER}
+		{"objectEntryId", Types.BIGINT}, {"content", Types.CLOB},
+		{"version", Types.INTEGER}, {"status", Types.INTEGER}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -86,13 +86,13 @@ public class ObjectEntryVersionModelImpl
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("objectEntryId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("content", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("version", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("content", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("version", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("status", Types.INTEGER);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectEntryVersion (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,objectEntryVersionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectEntryId LONG,content VARCHAR(75) null,version LONG,status INTEGER)";
+		"create table ObjectEntryVersion (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,objectEntryVersionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectEntryId LONG,content TEXT null,version INTEGER,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectEntryVersion";
 
@@ -321,7 +321,7 @@ public class ObjectEntryVersionModelImpl
 					ObjectEntryVersion::setContent);
 			attributeSetterBiConsumers.put(
 				"version",
-				(BiConsumer<ObjectEntryVersion, Long>)
+				(BiConsumer<ObjectEntryVersion, Integer>)
 					ObjectEntryVersion::setVersion);
 			attributeSetterBiConsumers.put(
 				"status",
@@ -542,12 +542,12 @@ public class ObjectEntryVersionModelImpl
 
 	@JSON
 	@Override
-	public long getVersion() {
+	public int getVersion() {
 		return _version;
 	}
 
 	@Override
-	public void setVersion(long version) {
+	public void setVersion(int version) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();
 		}
@@ -703,7 +703,7 @@ public class ObjectEntryVersionModelImpl
 		objectEntryVersionImpl.setContent(
 			this.<String>getColumnOriginalValue("content"));
 		objectEntryVersionImpl.setVersion(
-			this.<Long>getColumnOriginalValue("version"));
+			this.<Integer>getColumnOriginalValue("version"));
 		objectEntryVersionImpl.setStatus(
 			this.<Integer>getColumnOriginalValue("status"));
 
@@ -914,7 +914,7 @@ public class ObjectEntryVersionModelImpl
 	private boolean _setModifiedDate;
 	private long _objectEntryId;
 	private String _content;
-	private long _version;
+	private int _version;
 	private int _status;
 
 	public <T> T getColumnValue(String columnName) {

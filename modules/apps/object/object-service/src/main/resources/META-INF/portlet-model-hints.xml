@@ -137,7 +137,7 @@
 		<field name="content" type="String">
 			<hint-collection name="CLOB" />
 		</field>
-		<field name="version" type="long" />
+		<field name="version" type="int" />
 		<field name="status" type="int" />
 	</model>
 	<model name="com.liferay.object.model.ObjectField">
