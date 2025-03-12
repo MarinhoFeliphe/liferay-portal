@@ -24,6 +24,7 @@ import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
@@ -37,6 +38,7 @@ import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Scope;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.dto.v1_0.TaxonomyCategoryBrief;
+import com.liferay.object.rest.dto.v1_0.Version;
 import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
 import com.liferay.object.rest.dto.v1_0.util.LinkUtil;
 import com.liferay.object.rest.internal.dto.v1_0.util.TaxonomyCategoryBriefUtil;
@@ -106,6 +108,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -172,21 +175,15 @@ public class ObjectEntryDTOConverter
 		ObjectEntry objectEntry = ObjectEntry.unsafeToDTO(
 			(String)dtoConverterContext.getAttribute("payload"));
 
-		User user = dtoConverterContext.getUser();
-
 		objectEntry.setActions(dtoConverterContext::getActions);
 
 		if (objectEntry.getStatus() == null) {
 			objectEntry.setStatus(
-				() -> new Status() {
-					{
-						setCode(() -> WorkflowConstants.STATUS_APPROVED);
-						setLabel(() -> WorkflowConstants.LABEL_APPROVED);
-						setLabel_i18n(
-							() -> _language.get(
-								user.getLocale(),
-								WorkflowConstants.LABEL_APPROVED));
-					}
+				() -> {
+					User user = dtoConverterContext.getUser();
+
+					return _toStatus(
+						user.getLocale(), WorkflowConstants.STATUS_APPROVED);
 				});
 		}
 
@@ -222,40 +219,43 @@ public class ObjectEntryDTOConverter
 	@Override
 	public ObjectEntry toDTO(
 			DTOConverterContext dtoConverterContext,
-			com.liferay.object.model.ObjectEntry objectEntry)
+			com.liferay.object.model.ObjectEntry serviceObjectEntry)
 		throws Exception {
 
 		ObjectDefinition objectDefinition = _getObjectDefinition(
-			dtoConverterContext, objectEntry);
+			dtoConverterContext, serviceObjectEntry);
 
-		return new ObjectEntry() {
+		ObjectEntry objectEntry = new ObjectEntry() {
 			{
 				setActions(dtoConverterContext::getActions);
 				setAuditEvents(
 					() -> _toAuditEvents(
-						dtoConverterContext, objectDefinition, objectEntry));
+						dtoConverterContext, objectDefinition,
+						serviceObjectEntry));
 				setCreator(
 					() -> CreatorUtil.toCreator(
 						_portal, dtoConverterContext.getUriInfo(),
-						_userLocalService.fetchUser(objectEntry.getUserId())));
-				setDateCreated(objectEntry::getCreateDate);
-				setDateModified(objectEntry::getModifiedDate);
+						_userLocalService.fetchUser(
+							serviceObjectEntry.getUserId())));
+				setDateCreated(serviceObjectEntry::getCreateDate);
+				setDateModified(serviceObjectEntry::getModifiedDate);
 				setDefaultLanguageId(
 					() -> {
 						if (FeatureFlagManagerUtil.isEnabled(
 								objectDefinition.getCompanyId(), "LPD-32050")) {
 
-							return objectEntry.getDefaultLanguageId();
+							return serviceObjectEntry.getDefaultLanguageId();
 						}
 
 						return null;
 					});
-				setExternalReferenceCode(objectEntry::getExternalReferenceCode);
+				setExternalReferenceCode(
+					serviceObjectEntry::getExternalReferenceCode);
 				setFriendlyUrlPath(
-					() -> objectEntry.getURLTitle(
+					() -> serviceObjectEntry.getURLTitle(
 						dtoConverterContext.getLocale()));
-				setFriendlyUrlPath_i18n(objectEntry::getURLTitleMap);
-				setId(objectEntry::getObjectEntryId);
+				setFriendlyUrlPath_i18n(serviceObjectEntry::getURLTitleMap);
+				setId(serviceObjectEntry::getObjectEntryId);
 				setKeywords(
 					() -> {
 						if (!objectDefinition.isEnableCategorization()) {
@@ -265,30 +265,21 @@ public class ObjectEntryDTOConverter
 						return ListUtil.toArray(
 							_assetTagLocalService.getTags(
 								objectDefinition.getClassName(),
-								objectEntry.getObjectEntryId()),
+								serviceObjectEntry.getObjectEntryId()),
 							AssetTag.NAME_ACCESSOR);
 					});
 				setPermissions(
-					() -> _toPermissions(objectDefinition, objectEntry));
+					() -> _toPermissions(objectDefinition, serviceObjectEntry));
 				setProperties(
 					() -> _toProperties(
-						dtoConverterContext, objectDefinition, objectEntry));
-				setScopeKey(() -> _getScopeKey(objectDefinition, objectEntry));
+						dtoConverterContext, objectDefinition,
+						serviceObjectEntry));
+				setScopeKey(
+					() -> _getScopeKey(objectDefinition, serviceObjectEntry));
 				setStatus(
-					() -> new Status() {
-						{
-							setCode(objectEntry::getStatus);
-							setLabel(
-								() -> WorkflowConstants.getStatusLabel(
-									objectEntry.getStatus()));
-							setLabel_i18n(
-								() -> _language.get(
-									LanguageResources.getResourceBundle(
-										dtoConverterContext.getLocale()),
-									WorkflowConstants.getStatusLabel(
-										objectEntry.getStatus())));
-						}
-					});
+					() -> _toStatus(
+						dtoConverterContext.getLocale(),
+						serviceObjectEntry.getStatus()));
 				setTaxonomyCategoryBriefs(
 					() -> {
 						if (!objectDefinition.isEnableCategorization()) {
@@ -298,15 +289,67 @@ public class ObjectEntryDTOConverter
 						return TransformUtil.transformToArray(
 							_assetCategoryLocalService.getCategories(
 								objectDefinition.getClassName(),
-								objectEntry.getObjectEntryId()),
+								serviceObjectEntry.getObjectEntryId()),
 							assetCategory ->
 								TaxonomyCategoryBriefUtil.
 									toTaxonomyCategoryBrief(
 										assetCategory, dtoConverterContext),
 							TaxonomyCategoryBrief.class);
 					});
+				setVersion(
+					() -> _toVersion(
+						dtoConverterContext.getLocale(),
+						serviceObjectEntry.getStatus(),
+						serviceObjectEntry.getVersion()));
 			}
 		};
+
+		ObjectEntryVersion objectEntryVersion =
+			(ObjectEntryVersion)dtoConverterContext.getAttribute(
+				"objectEntryVersion");
+
+		if (objectEntryVersion != null) {
+			ObjectEntry contentObjectEntry = ObjectEntry.unsafeToDTO(
+				objectEntryVersion.getContent());
+
+			objectEntry.setCreator(
+				() -> CreatorUtil.toCreator(
+					_portal, dtoConverterContext.getUriInfo(),
+					_userLocalService.fetchUser(
+						objectEntryVersion.getUserId())));
+			objectEntry.setDateCreated(objectEntryVersion::getCreateDate);
+			objectEntry.setDateModified(objectEntryVersion::getModifiedDate);
+			objectEntry.setKeywords(contentObjectEntry::getKeywords);
+			objectEntry.setProperties(
+				() -> {
+					Map<String, Object> properties =
+						contentObjectEntry.getProperties();
+
+					com.liferay.object.model.ObjectEntry
+						serviceObjectEntryClone =
+							(com.liferay.object.model.ObjectEntry)
+								serviceObjectEntry.clone();
+
+					serviceObjectEntryClone.setValues(
+						(Map<String, Serializable>)properties.get(
+							"properties"));
+
+					return _toProperties(
+						dtoConverterContext,
+						_objectDefinitionLocalService.getObjectDefinition(
+							serviceObjectEntryClone.getObjectDefinitionId()),
+						serviceObjectEntryClone);
+				});
+			objectEntry.setTaxonomyCategoryBriefs(
+				contentObjectEntry::getTaxonomyCategoryBriefs);
+			objectEntry.setVersion(
+				() -> _toVersion(
+					dtoConverterContext.getLocale(),
+					objectEntryVersion.getStatus(),
+					objectEntryVersion.getVersion()));
+		}
+
+		return objectEntry;
 	}
 
 	private void _addManyToOneObjectRelationshipNames(
@@ -1113,6 +1156,28 @@ public class ObjectEntryDTOConverter
 		}
 
 		return (Map<String, Object>)(Map)unsafeSuppliers;
+	}
+
+	private Status _toStatus(Locale locale, int statusInt) {
+		return new Status() {
+			{
+				setCode(() -> statusInt);
+				setLabel(() -> WorkflowConstants.getStatusLabel(statusInt));
+				setLabel_i18n(
+					() -> _language.get(
+						LanguageResources.getResourceBundle(locale),
+						WorkflowConstants.getStatusLabel(statusInt)));
+			}
+		};
+	}
+
+	private Version _toVersion(Locale locale, int statusInt, int version) {
+		return new Version() {
+			{
+				setNumber(() -> version);
+				setStatus(() -> _toStatus(locale, statusInt));
+			}
+		};
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
