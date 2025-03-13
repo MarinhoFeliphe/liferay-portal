@@ -657,6 +657,9 @@ public class DefaultObjectEntryManagerImpl
 			Pagination pagination)
 		throws Exception {
 
+		com.liferay.object.model.ObjectEntry objectEntry =
+			objectEntryLocalService.getObjectEntry(objectEntryId);
+
 		return Page.of(
 			TransformUtil.transform(
 				_objectEntryVersionService.getObjectEntryVersions(
@@ -667,9 +670,7 @@ public class DefaultObjectEntryManagerImpl
 						"objectEntryVersion", objectEntryVersion);
 
 					return _objectEntryDTOConverter.toDTO(
-						dtoConverterContext,
-						objectEntryLocalService.getObjectEntry(
-							objectEntryVersion.getObjectEntryId()));
+						dtoConverterContext, objectEntry);
 				}),
 			pagination,
 			_objectEntryVersionService.getObjectEntryVersionsCount(
