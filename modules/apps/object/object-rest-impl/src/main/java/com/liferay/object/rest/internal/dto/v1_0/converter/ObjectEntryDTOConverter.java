@@ -312,49 +312,47 @@ public class ObjectEntryDTOConverter
 			(ObjectEntryVersion)dtoConverterContext.getAttribute(
 				"objectEntryVersion");
 
-		if (objectEntryVersion != null) {
-			ObjectEntry contentObjectEntry = ObjectEntry.unsafeToDTO(
-				objectEntryVersion.getContent());
-
-			objectEntry.setCreator(
-				() -> CreatorUtil.toCreator(
-					_portal, dtoConverterContext.getUriInfo(),
-					_userLocalService.fetchUser(
-						objectEntryVersion.getUserId())));
-			objectEntry.setDateCreated(objectEntryVersion::getCreateDate);
-			objectEntry.setDateModified(objectEntryVersion::getModifiedDate);
-			objectEntry.setExternalReferenceCode(
-				contentObjectEntry::getExternalReferenceCode);
-			objectEntry.setKeywords(contentObjectEntry::getKeywords);
-			objectEntry.setProperties(
-				() -> {
-					Map<String, Object> properties =
-						contentObjectEntry.getProperties();
-
-					com.liferay.object.model.ObjectEntry
-						serviceBuilderObjectEntryClone =
-							(com.liferay.object.model.ObjectEntry)
-								serviceBuilderObjectEntry.clone();
-
-					serviceBuilderObjectEntryClone.setValues(
-						(Map<String, Serializable>)properties.get(
-							"properties"));
-
-					return _toProperties(
-						dtoConverterContext,
-						_objectDefinitionLocalService.getObjectDefinition(
-							serviceBuilderObjectEntryClone.
-								getObjectDefinitionId()),
-						serviceBuilderObjectEntryClone);
-				});
-			objectEntry.setTaxonomyCategoryBriefs(
-				contentObjectEntry::getTaxonomyCategoryBriefs);
-			objectEntry.setVersion(
-				() -> _toVersion(
-					dtoConverterContext.getLocale(),
-					objectEntryVersion.getStatus(),
-					objectEntryVersion.getVersion()));
+		if (objectEntryVersion == null) {
+			return objectEntry;
 		}
+
+		ObjectEntry contentObjectEntry = ObjectEntry.unsafeToDTO(
+			objectEntryVersion.getContent());
+
+		objectEntry.setCreator(
+			() -> CreatorUtil.toCreator(
+				_portal, dtoConverterContext.getUriInfo(),
+				_userLocalService.fetchUser(objectEntryVersion.getUserId())));
+		objectEntry.setDateCreated(objectEntryVersion::getCreateDate);
+		objectEntry.setDateModified(objectEntryVersion::getModifiedDate);
+		objectEntry.setExternalReferenceCode(
+			contentObjectEntry::getExternalReferenceCode);
+		objectEntry.setKeywords(contentObjectEntry::getKeywords);
+		objectEntry.setProperties(
+			() -> {
+				Map<String, Object> properties =
+					contentObjectEntry.getProperties();
+
+				com.liferay.object.model.ObjectEntry
+					serviceBuilderObjectEntryClone =
+						(com.liferay.object.model.ObjectEntry)
+							serviceBuilderObjectEntry.clone();
+
+				serviceBuilderObjectEntryClone.setValues(
+					(Map<String, Serializable>)properties.get("properties"));
+
+				return _toProperties(
+					dtoConverterContext,
+					_objectDefinitionLocalService.getObjectDefinition(
+						serviceBuilderObjectEntryClone.getObjectDefinitionId()),
+					serviceBuilderObjectEntryClone);
+			});
+		objectEntry.setTaxonomyCategoryBriefs(
+			contentObjectEntry::getTaxonomyCategoryBriefs);
+		objectEntry.setVersion(
+			() -> _toVersion(
+				dtoConverterContext.getLocale(), objectEntryVersion.getStatus(),
+				objectEntryVersion.getVersion()));
 
 		return objectEntry;
 	}
