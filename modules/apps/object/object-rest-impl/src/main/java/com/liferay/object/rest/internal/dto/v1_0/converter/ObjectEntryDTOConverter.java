@@ -1179,6 +1179,10 @@ public class ObjectEntryDTOConverter
 	}
 
 	private Version _toVersion(Locale locale, int statusInt, int version) {
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			return null;
+		}
+
 		return new Version() {
 			{
 				setNumber(() -> version);
