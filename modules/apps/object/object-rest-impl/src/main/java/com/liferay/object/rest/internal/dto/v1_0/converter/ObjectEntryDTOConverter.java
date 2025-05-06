@@ -26,7 +26,9 @@ import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryFolder;
+import com.liferay.object.model.ObjectEntryModel;
 import com.liferay.object.model.ObjectEntryVersion;
+import com.liferay.object.model.ObjectEntryVersionModel;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
@@ -117,6 +119,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -251,35 +254,29 @@ public class ObjectEntryDTOConverter
 						dtoConverterContext, objectDefinition,
 						serviceBuilderObjectEntry));
 				setCreator(
-					() -> {
-						if (objectEntryVersion != null) {
-							return CreatorUtil.toCreator(
-								_portal, dtoConverterContext.getUriInfo(),
-								_userLocalService.fetchUser(
-									objectEntryVersion.getUserId()));
-						}
-
-						return CreatorUtil.toCreator(
+					() -> _getAttribute(
+						objectEntryVersion,
+						objectEntryVersion -> CreatorUtil.toCreator(
 							_portal, dtoConverterContext.getUriInfo(),
 							_userLocalService.fetchUser(
-								serviceBuilderObjectEntry.getUserId()));
-					});
+								objectEntryVersion.getUserId())),
+						serviceBuilderObjectEntry,
+						serviceBuilderObjectEntry -> CreatorUtil.toCreator(
+							_portal, dtoConverterContext.getUriInfo(),
+							_userLocalService.fetchUser(
+								serviceBuilderObjectEntry.getUserId()))));
 				setDateCreated(
-					() -> {
-						if (objectEntryVersion != null) {
-							return objectEntryVersion.getCreateDate();
-						}
-
-						return serviceBuilderObjectEntry.getCreateDate();
-					});
+					() -> _getAttribute(
+						objectEntryVersion,
+						ObjectEntryVersionModel::getCreateDate,
+						serviceBuilderObjectEntry,
+						ObjectEntryModel::getCreateDate));
 				setDateModified(
-					() -> {
-						if (objectEntryVersion != null) {
-							return objectEntryVersion.getModifiedDate();
-						}
-
-						return serviceBuilderObjectEntry.getModifiedDate();
-					});
+					() -> _getAttribute(
+						objectEntryVersion,
+						ObjectEntryVersionModel::getModifiedDate,
+						serviceBuilderObjectEntry,
+						ObjectEntryModel::getModifiedDate));
 				setDefaultLanguageId(
 					() -> {
 						if (FeatureFlagManagerUtil.isEnabled(
@@ -372,29 +369,24 @@ public class ObjectEntryDTOConverter
 					() -> _getScopeKey(
 						objectDefinition, serviceBuilderObjectEntry));
 				setStatus(
-					() -> {
-						if (objectEntryVersion != null) {
-							return _toStatus(
-								dtoConverterContext.getLocale(),
-								objectEntryVersion.getStatus());
-						}
-
-						return _toStatus(
+					() -> _getAttribute(
+						objectEntryVersion,
+						objectEntryVersion -> _toStatus(
 							dtoConverterContext.getLocale(),
-							serviceBuilderObjectEntry.getStatus());
-					});
+							objectEntryVersion.getStatus()),
+						serviceBuilderObjectEntry,
+						serviceBuilderObjectEntry -> _toStatus(
+							dtoConverterContext.getLocale(),
+							serviceBuilderObjectEntry.getStatus())));
 				setSystemProperties(
-					() -> {
-						if (objectEntryVersion != null) {
-							return _toSystemProperties(
-								objectDefinition,
-								objectEntryVersion.getVersion());
-						}
-
-						return _toSystemProperties(
+					() -> _getAttribute(
+						objectEntryVersion,
+						objectEntryVersion -> _toSystemProperties(
+							objectDefinition, objectEntryVersion.getVersion()),
+						serviceBuilderObjectEntry,
+						serviceBuilderObjectEntry -> _toSystemProperties(
 							objectDefinition,
-							serviceBuilderObjectEntry.getVersion());
-					});
+							serviceBuilderObjectEntry.getVersion())));
 				setTaxonomyCategoryBriefs(
 					() -> {
 						if (objectEntryVersion != null) {
@@ -583,6 +575,21 @@ public class ObjectEntryDTOConverter
 				unsafeSuppliers.put(manyToOneRelationshipName, entry::getValue);
 			}
 		}
+	}
+
+	private <T> T _getAttribute(
+		ObjectEntryVersion objectEntryVersion,
+		Function<ObjectEntryVersion, T> objectEntryVersionGetterFunction,
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry,
+		Function<com.liferay.object.model.ObjectEntry, T>
+			serviceBuilderObjectEntryGetterFunction) {
+
+		if (objectEntryVersion != null) {
+			return objectEntryVersionGetterFunction.apply(objectEntryVersion);
+		}
+
+		return serviceBuilderObjectEntryGetterFunction.apply(
+			serviceBuilderObjectEntry);
 	}
 
 	private String _getDateString(
