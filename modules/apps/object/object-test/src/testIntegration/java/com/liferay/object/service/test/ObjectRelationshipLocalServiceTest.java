@@ -965,62 +965,7 @@ public class ObjectRelationshipLocalServiceTest {
 		// Bind two non-root draft object definitions from different object
 		// definition trees
 
-		Tree treeA = TreeTestUtil.createObjectDefinitionTree(
-			_objectDefinitionLocalService, _objectRelationshipLocalService,
-			false,
-			LinkedHashMapBuilder.put(
-				"A", new String[] {"AA"}
-			).put(
-				"AA", new String[0]
-			).build());
-		Tree treeB = TreeTestUtil.createObjectDefinitionTree(
-			_objectDefinitionLocalService, _objectRelationshipLocalService,
-			false,
-			LinkedHashMapBuilder.put(
-				"B", new String[] {"BB"}
-			).put(
-				"BB", new String[] {"BBB"}
-			).put(
-				"BBB", new String[0]
-			).build());
-
-		TreeTestUtil.bind(
-			_objectRelationshipLocalService,
-			List.of(
-				ObjectRelationshipTestUtil.addObjectRelationship(
-					_objectRelationshipLocalService,
-					_objectDefinitionLocalService.getObjectDefinition(
-						TestPropsValues.getCompanyId(), "C_AA"),
-					_objectDefinitionLocalService.getObjectDefinition(
-						TestPropsValues.getCompanyId(), "C_BB"))));
-
-		Node rootNodeA = treeA.getRootNode();
-
-		TreeTestUtil.assertObjectDefinitionTree(
-			LinkedHashMapBuilder.put(
-				"A", new String[] {"AA"}
-			).put(
-				"AA", new String[] {"BB"}
-			).put(
-				"BB", new String[] {"BBB"}
-			).put(
-				"BBB", new String[0]
-			).build(),
-			_objectDefinitionTreeFactory.create(rootNodeA.getPrimaryKey()),
-			_objectDefinitionLocalService);
-
-		Node rootNodeB = treeB.getRootNode();
-
-		TreeTestUtil.assertObjectDefinitionTree(
-			LinkedHashMapBuilder.put(
-				"B", new String[] {"BB"}
-			).put(
-				"BB", new String[] {"BBB"}
-			).put(
-				"BBB", new String[0]
-			).build(),
-			_objectDefinitionTreeFactory.create(rootNodeB.getPrimaryKey()),
-			_objectDefinitionLocalService);
+		_testBindDescendantsFromDifferentTrees(false);
 	}
 
 	@Test
@@ -1309,6 +1254,11 @@ public class ObjectRelationshipLocalServiceTest {
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService, new String[] {"C_C", "C_CC"},
 			_objectEntryLocalService, _objectRelationshipLocalService);
+
+		// Bind two non-root published object definitions from different object
+		// definition trees
+
+		_testBindDescendantsFromDifferentTrees(true);
 	}
 
 	@Test
@@ -2850,6 +2800,67 @@ public class ObjectRelationshipLocalServiceTest {
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
+	}
+
+	private void _testBindDescendantsFromDifferentTrees(boolean published)
+		throws Exception {
+
+		Tree treeA = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			published,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[0]
+			).build());
+		Tree treeB = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			published,
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build());
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			List.of(
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_AA"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_BB"))));
+
+		Node rootNodeA = treeA.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeA.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		Node rootNodeB = treeB.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeB.getPrimaryKey()),
+			_objectDefinitionLocalService);
 	}
 
 	private void _testBindObjectDefinitions(

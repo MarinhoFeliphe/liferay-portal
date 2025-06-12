@@ -116,6 +116,7 @@ import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -176,6 +177,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  * @author Marco Leo
  * @author Brian Wing Shun Chan
  */
+@DataGuard(scope = DataGuard.Scope.METHOD)
 @FeatureFlags(
 	featureFlags = {
 		@FeatureFlag(value = "LPD-17564"), @FeatureFlag(value = "LPD-21926"),
@@ -2394,6 +2396,9 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Test
 	public void testPublishNodeWithDraftDescendantNodes() throws Exception {
+
+		// Publish a node with many child descendant nodes
+
 		_testCreateObjectDefinitionTree(
 			true,
 			LinkedHashMapBuilder.put(
@@ -2508,6 +2513,133 @@ public class ObjectDefinitionLocalServiceTest {
 				"C_A", "C_AA", "C_AAA", "C_AAAA", "C_AAAB", "C_AAAAA", "C_AAABA"
 			},
 			_objectEntryLocalService, _objectRelationshipLocalService);
+
+		// Publish a node with draft descendant nodes and published object
+		// definition trees
+
+		Tree treeA = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			true,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[0]
+			).build());
+		Tree treeB = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			true,
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[0]
+			).build());
+		Tree treeC = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"C", new String[] {"CC"}
+			).put(
+				"CC", new String[0]
+			).build());
+		Tree treeD = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"D", new String[] {"DD"}
+			).put(
+				"DD", new String[0]
+			).build());
+
+		ObjectDefinition objectDefinitionDD =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), "C_DD");
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinitionDD.getObjectDefinitionId());
+
+		Node nodeD = treeD.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"D", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(nodeD.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"DD", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(
+				objectDefinitionDD.getObjectDefinitionId()),
+			_objectDefinitionLocalService);
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			List.of(
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_AA"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_D")),
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_BB"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_D")),
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_CC"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_D"))));
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(), nodeD.getPrimaryKey());
+
+		Node nodeA = treeA.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[] {"D"}
+			).put(
+				"D", new String[] {"DD"}
+			).put(
+				"DD", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(nodeA.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		Node nodeB = treeB.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"D"}
+			).put(
+				"D", new String[] {"DD"}
+			).put(
+				"DD", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(nodeB.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		Node nodeC = treeC.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"C", new String[] {"CC"}
+			).put(
+				"CC", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(nodeC.getPrimaryKey()),
+			_objectDefinitionLocalService);
 	}
 
 	@Test
