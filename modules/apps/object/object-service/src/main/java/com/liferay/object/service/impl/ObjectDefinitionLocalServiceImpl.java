@@ -158,6 +158,7 @@ import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -2429,32 +2430,40 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition objectDefinition2)
 		throws PortalException {
 
-		ObjectRelationship objectRelationship =
-			_objectRelationshipPersistence.fetchByODI2_E(
+		List<ObjectRelationship> objectRelationships =
+			_objectRelationshipPersistence.findByODI2_E(
 				objectDefinition2.getObjectDefinitionId(), true);
 
-		if (objectRelationship == null) {
+		if (objectRelationships.isEmpty()) {
 			return objectDefinition2;
 		}
 
-		ObjectDefinition objectDefinition1 =
-			objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId1());
+		List<Long> rootObjectDefinitionIdsToAdd = new ArrayList<>();
 
-		String previousRESTContextPath = objectDefinition2.getRESTContextPath();
+		for (ObjectRelationship objectRelationship : objectRelationships) {
+			ObjectDefinition objectDefinition1 =
+				objectDefinitionLocalService.getObjectDefinition(
+					objectRelationship.getObjectDefinitionId1());
 
-		if (objectDefinition1.isApproved()) {
-			objectDefinition2.setRootObjectDefinitionIds(
-				objectDefinition1.getRootObjectDefinitionIds(),
-				new long[] {objectDefinition2.getObjectDefinitionId()});
+			if (objectDefinition1.isApproved()) {
+				Collections.addAll(
+					rootObjectDefinitionIdsToAdd,
+					ArrayUtil.toArray(
+						objectDefinition1.getRootObjectDefinitionIds()));
+			}
 		}
-		else {
+
+		if (rootObjectDefinitionIdsToAdd.isEmpty()) {
 			objectDefinition2.setRootObjectDefinitionIds(
 				new long[] {objectDefinition2.getObjectDefinitionId()},
 				objectDefinition2.getRootObjectDefinitionIds());
 		}
-
-		objectDefinition2.setPreviousRESTContextPath(previousRESTContextPath);
+		else {
+			objectDefinition2.setRootObjectDefinitionIds(
+				ListUtil.toLongArray(
+					rootObjectDefinitionIdsToAdd, GetterUtil::getLong),
+				objectDefinition2.getRootObjectDefinitionIds());
+		}
 
 		return objectDefinition2;
 	}
