@@ -19,6 +19,7 @@ import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriteri
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.dynamic.data.mapping.form.field.type.constants.ObjectDDMFormFieldTypeConstants;
+import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -75,7 +76,9 @@ public class AttachmentDDMFormFieldTemplateContextContributor
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		int maximumFileSize = _getMaximumFileSize(ddmFormField, themeDisplay);
+		long maximumFileSize = _attachmentManager.getMaximumFileSize(
+			GetterUtil.getLong(ddmFormField.getProperty("objectFieldId")),
+			themeDisplay.isSignedIn());
 
 		Map<String, Object> parameters = HashMapBuilder.<String, Object>put(
 			"acceptedFileExtensions",
@@ -111,23 +114,14 @@ public class AttachmentDDMFormFieldTemplateContextContributor
 			_uploadServletRequestConfigurationProvider.getMaxSize()
 		).put(
 			"tip",
-			() -> {
-				String fileSize = String.valueOf(maximumFileSize);
-
-				if (maximumFileSize == 0) {
-					fileSize = _language.formatStorageSize(
-						_uploadServletRequestConfigurationProvider.getMaxSize(),
-						themeDisplay.getLocale());
-				}
-
-				return _language.format(
-					ddmFormFieldRenderingContext.getLocale(),
-					"upload-a-x-no-larger-than-x",
-					new Object[] {
-						ddmFormField.getProperty("acceptedFileExtensions"),
-						fileSize
-					});
-			}
+			() -> _language.format(
+				ddmFormFieldRenderingContext.getLocale(),
+				"upload-a-x-no-larger-than-x",
+				new Object[] {
+					ddmFormField.getProperty("acceptedFileExtensions"),
+					_language.formatStorageSize(
+						maximumFileSize, themeDisplay.getLocale())
+				})
 		).put(
 			"url",
 			_getURL(
@@ -287,22 +281,6 @@ public class AttachmentDDMFormFieldTemplateContextContributor
 				fileItemSelectorCriterion));
 	}
 
-	private int _getMaximumFileSize(
-		DDMFormField ddmFormField, ThemeDisplay themeDisplay) {
-
-		int maximumFileSize = GetterUtil.getInteger(
-			ddmFormField.getProperty("maximumFileSize"));
-
-		if (themeDisplay.isSignedIn() ||
-			(maximumFileSize <
-				_objectConfiguration.maximumFileSizeForGuestUsers())) {
-
-			return maximumFileSize;
-		}
-
-		return _objectConfiguration.maximumFileSizeForGuestUsers();
-	}
-
 	private String _getURL(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext,
@@ -357,6 +335,9 @@ public class AttachmentDDMFormFieldTemplateContextContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AttachmentDDMFormFieldTemplateContextContributor.class);
+
+	@Reference
+	private AttachmentManager _attachmentManager;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
