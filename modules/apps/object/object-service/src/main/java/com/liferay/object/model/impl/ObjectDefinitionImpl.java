@@ -274,7 +274,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	@Override
-	public boolean isReachable(long rootObjectDefinitionId) {
+	public boolean isReachableNode(long rootObjectDefinitionId) {
 		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
 			return false;
 		}
