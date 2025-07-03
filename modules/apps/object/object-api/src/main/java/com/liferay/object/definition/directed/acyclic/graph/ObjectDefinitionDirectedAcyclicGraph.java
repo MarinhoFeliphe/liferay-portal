@@ -50,10 +50,12 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.sql.Connection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +98,10 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 			objectDefinition1.getRESTContextPath();
 
 		if (objectDefinition1.getRootObjectDefinitionId() == 0) {
-			_setRootObjectDefinitionId(
+			_setRootObjectDefinitionIds(
+				new long[] {objectDefinition1.getObjectDefinitionId()},
 				objectDefinition1, objectDefinitionSettingLocalService,
-				objectDefinition1.getObjectDefinitionId());
+				new long[0]);
 		}
 
 		ObjectDefinition objectDefinition2 =
@@ -142,9 +145,10 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 				String nodeObjectDefinitionPreviousRESTContextPath =
 					nodeObjectDefinition.getRESTContextPath();
 
-				_setRootObjectDefinitionId(
+				_setRootObjectDefinitionIds(
+					objectDefinition1.getRootObjectDefinitionIds(),
 					nodeObjectDefinition, objectDefinitionSettingLocalService,
-					objectDefinition1.getRootObjectDefinitionId());
+					new long[] {objectDefinition2.getObjectDefinitionId()});
 
 				if (nodeObjectDefinition.isApproved() &&
 					objectDefinition1.isApproved()) {
@@ -162,9 +166,10 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 				return;
 			}
 
-			_setRootObjectDefinitionId(
+			_setRootObjectDefinitionIds(
+				new long[] {objectDefinition2.getObjectDefinitionId()},
 				objectDefinition2, objectDefinitionSettingLocalService,
-				objectDefinition2.getObjectDefinitionId());
+				new long[0]);
 
 			if (objectDefinition2.isApproved()) {
 				objectDefinitionLocalService.deployObjectDefinition(
@@ -182,16 +187,16 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 		}
 	}
 
-	public long getRootObjectDefinitionId(
+	public long[] getRootObjectDefinitionIds(
 		long objectDefinitionId,
 		ObjectDefinitionSettingLocalService
 			objectDefinitionSettingLocalService) {
 
-		Long rootObjectDefinitionId = _rootObjectDefinitionIds.get(
+		long[] rootObjectDefinitionIds = _rootObjectDefinitionIds.get(
 			objectDefinitionId);
 
-		if (rootObjectDefinitionId != null) {
-			return rootObjectDefinitionId;
+		if (rootObjectDefinitionIds != null) {
+			return rootObjectDefinitionIds;
 		}
 
 		ObjectDefinitionSetting objectDefinitionSetting =
@@ -201,16 +206,17 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 					NAME_ROOT_OBJECT_DEFINITION_IDS);
 
 		if (objectDefinitionSetting == null) {
-			return 0L;
+			return new long[0];
 		}
 
-		rootObjectDefinitionId = GetterUtil.getLong(
-			objectDefinitionSetting.getValue());
+		rootObjectDefinitionIds = ListUtil.toLongArray(
+			Arrays.asList(StringUtil.split(objectDefinitionSetting.getValue())),
+			GetterUtil::getLong);
 
 		_rootObjectDefinitionIds.put(
-			objectDefinitionId, rootObjectDefinitionId);
+			objectDefinitionId, rootObjectDefinitionIds);
 
-		return rootObjectDefinitionId;
+		return rootObjectDefinitionIds;
 	}
 
 	public void removeEdge(
@@ -560,11 +566,12 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 		}
 	}
 
-	private void _setRootObjectDefinitionId(
+	private void _setRootObjectDefinitionIds(
+			long[] addRootObjectDefinitionIds,
 			ObjectDefinition objectDefinition,
 			ObjectDefinitionSettingLocalService
 				objectDefinitionSettingLocalService,
-			long rootObjectDefinitionId)
+			long[] removeRootObjectDefinitionIds)
 		throws PortalException {
 
 		ObjectDefinitionSetting objectDefinitionSetting =
@@ -579,18 +586,41 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 				objectDefinition.getObjectDefinitionId(),
 				ObjectDefinitionSettingConstants.
 					NAME_ROOT_OBJECT_DEFINITION_IDS,
-				String.valueOf(rootObjectDefinitionId));
+				StringUtil.merge(addRootObjectDefinitionIds));
+
+			_rootObjectDefinitionIds.put(
+				objectDefinition.getObjectDefinitionId(),
+				addRootObjectDefinitionIds);
 		}
 		else {
+			List<String> rootObjectDefinitionIds = ListUtil.fromArray(
+				StringUtil.split(objectDefinitionSetting.getValue()));
+
+			for (long rootObjectDefinitionIdToAdd :
+					addRootObjectDefinitionIds) {
+
+				rootObjectDefinitionIds.add(
+					String.valueOf(rootObjectDefinitionIdToAdd));
+			}
+
+			for (long rootObjectDefinitionIdToRemove :
+					removeRootObjectDefinitionIds) {
+
+				rootObjectDefinitionIds.remove(
+					String.valueOf(rootObjectDefinitionIdToRemove));
+			}
+
 			objectDefinitionSetting.setValue(
-				String.valueOf(rootObjectDefinitionId));
+				StringUtil.merge(rootObjectDefinitionIds));
 
 			objectDefinitionSettingLocalService.updateObjectDefinitionSetting(
 				objectDefinitionSetting);
-		}
 
-		_rootObjectDefinitionIds.put(
-			objectDefinition.getObjectDefinitionId(), rootObjectDefinitionId);
+			_rootObjectDefinitionIds.put(
+				objectDefinition.getObjectDefinitionId(),
+				ListUtil.toLongArray(
+					rootObjectDefinitionIds, GetterUtil::getLong));
+		}
 	}
 
 	private void _shiftNode(
@@ -616,14 +646,16 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 		String previousRESTContextPath = objectDefinition2.getRESTContextPath();
 
 		if (objectDefinition1.isApproved()) {
-			_setRootObjectDefinitionId(
+			_setRootObjectDefinitionIds(
+				objectDefinition1.getRootObjectDefinitionIds(),
 				objectDefinition2, objectDefinitionSettingLocalService,
-				objectDefinition1.getRootObjectDefinitionId());
+				new long[] {objectDefinition2.getObjectDefinitionId()});
 		}
 		else {
-			_setRootObjectDefinitionId(
+			_setRootObjectDefinitionIds(
+				new long[] {objectDefinition2.getObjectDefinitionId()},
 				objectDefinition2, objectDefinitionSettingLocalService,
-				objectDefinition2.getObjectDefinitionId());
+				objectDefinition2.getRootObjectDefinitionIds());
 		}
 
 		objectDefinition2.setPreviousRESTContextPath(previousRESTContextPath);
@@ -682,9 +714,10 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 				String previousRESTContextPath =
 					nodeObjectDefinition.getRESTContextPath();
 
-				_setRootObjectDefinitionId(
+				_setRootObjectDefinitionIds(
+					objectDefinition1.getRootObjectDefinitionIds(),
 					nodeObjectDefinition, objectDefinitionSettingLocalService,
-					objectDefinition1.getRootObjectDefinitionId());
+					new long[] {objectDefinition2.getObjectDefinitionId()});
 
 				nodeObjectDefinition.setPreviousRESTContextPath(
 					previousRESTContextPath);
@@ -707,16 +740,12 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 				while (iterator.hasNext()) {
 					Node node = iterator.next();
 
-					ObjectDefinition nodeObjectDefinition =
+					_setRootObjectDefinitionIds(
+						new long[] {childNode.getPrimaryKey()},
 						objectDefinitionPersistence.findByPrimaryKey(
-							node.getPrimaryKey());
-
-					_setRootObjectDefinitionId(
-						nodeObjectDefinition,
+							node.getPrimaryKey()),
 						objectDefinitionSettingLocalService,
-						childNode.getPrimaryKey());
-
-					objectDefinitionPersistence.update(nodeObjectDefinition);
+						new long[] {objectDefinition1.getObjectDefinitionId()});
 				}
 			}
 		}
@@ -863,9 +892,23 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 
 		String previousRESTContextPath = objectDefinition.getRESTContextPath();
 
-		_setRootObjectDefinitionId(
-			objectDefinition, objectDefinitionSettingLocalService,
-			newRootObjectDefinitionId);
+		long[] addRootObjectDefinitionIds = new long[0];
+
+		if (newRootObjectDefinitionId != 0) {
+			addRootObjectDefinitionIds = new long[] {newRootObjectDefinitionId};
+		}
+
+		long[] removeRootObjectDefinitionIds = new long[0];
+
+		if (oldRootObjectDefinitionId != 0) {
+			removeRootObjectDefinitionIds = new long[] {
+				oldRootObjectDefinitionId
+			};
+		}
+
+		_setRootObjectDefinitionIds(
+			addRootObjectDefinitionIds, objectDefinition,
+			objectDefinitionSettingLocalService, removeRootObjectDefinitionIds);
 
 		objectDefinition.setPreviousRESTContextPath(previousRESTContextPath);
 
@@ -875,7 +918,7 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 	private static final ObjectDefinitionDirectedAcyclicGraph
 		_objectDefinitionDirectedAcyclicGraph =
 			new ObjectDefinitionDirectedAcyclicGraph();
-	private static final Map<Long, Long> _rootObjectDefinitionIds =
+	private static final Map<Long, long[]> _rootObjectDefinitionIds =
 		new ConcurrentHashMap<>();
 
 }

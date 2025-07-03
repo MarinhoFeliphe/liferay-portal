@@ -65,11 +65,12 @@ public class ObjectDefinitionTreeFactory extends BaseTreeFactory {
 					ObjectDefinition objectDefinition2 = _getObjectDefinition(
 						objectRelationship.getObjectDefinitionId2());
 
-					if ((excludeDifferentStatus &&
+					if ((excludeDifferentRootObjectDefinitionIds &&
+						 !objectDefinition2.isReachable(
+							 rootObjectDefinition.getObjectDefinitionId())) ||
+						(excludeDifferentStatus &&
 						 (rootObjectDefinition.getStatus() !=
-							 objectDefinition2.getStatus())) ||
-						(rootObjectDefinition.getObjectDefinitionId() !=
-							objectDefinition2.getRootObjectDefinitionId())) {
+							 objectDefinition2.getStatus()))) {
 
 						return null;
 					}
