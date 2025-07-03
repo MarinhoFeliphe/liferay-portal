@@ -901,6 +901,11 @@ public class ObjectDefinitionWrapper
 		return model.getRootObjectDefinitionId();
 	}
 
+	@Override
+	public long[] getRootObjectDefinitionIds() {
+		return model.getRootObjectDefinitionIds();
+	}
+
 	/**
 	 * Returns the scope of this object definition.
 	 *
@@ -1154,6 +1159,11 @@ public class ObjectDefinitionWrapper
 	@Override
 	public boolean isPortlet() {
 		return model.isPortlet();
+	}
+
+	@Override
+	public boolean isReachableNode(long rootObjectDefinitionId) {
+		return model.isReachableNode(rootObjectDefinitionId);
 	}
 
 	@Override

@@ -77,6 +77,8 @@ public interface ObjectDefinition
 
 	public long getRootObjectDefinitionId();
 
+	public long[] getRootObjectDefinitionIds();
+
 	public String getShortName();
 
 	public boolean isApproved();
@@ -86,6 +88,8 @@ public interface ObjectDefinition
 	public boolean isLinkedToObjectFolder(long objectFolderId);
 
 	public boolean isModifiableAndSystem();
+
+	public boolean isReachableNode(long rootObjectDefinitionId);
 
 	public boolean isRootDescendantNode();
 
