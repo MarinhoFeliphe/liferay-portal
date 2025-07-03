@@ -131,7 +131,7 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 					objectRelationshipLocalService);
 
 			Tree tree = objectDefinitionTreeFactory.create(
-				objectDefinition2.getObjectDefinitionId());
+				false, true, objectDefinition2.getObjectDefinitionId());
 
 			Iterator<Node> iterator = tree.iterator();
 
@@ -729,7 +729,7 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 
 		if (containsDraftDescendantNodeObjectDefinitions) {
 			Tree tree = objectDefinitionTreeFactory.create(
-				false, objectDefinition1.getObjectDefinitionId());
+				true, false, objectDefinition1.getObjectDefinitionId());
 
 			Node rootNode = tree.getRootNode();
 
