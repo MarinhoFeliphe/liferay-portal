@@ -28,7 +28,9 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
+import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
+import com.liferay.object.tree.Tree;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -39,6 +41,7 @@ import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -79,6 +82,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Feliphe Marinho
  */
+@DataGuard(scope = DataGuard.Scope.METHOD)
 @FeatureFlag("LPD-34594")
 @RunWith(Arquillian.class)
 public class ObjectDefinitionDirectedAcyclicGraphTest {
@@ -222,6 +226,66 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService, new String[] {"C_A", "C_AA"},
 			_objectEntryLocalService, _objectRelationshipLocalService);
+
+		// Bind two nonroot draft object definitions from different object
+		// definition trees
+
+		Tree treeA = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[0]
+			).build());
+		Tree treeB = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build());
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			List.of(
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_AA"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_BB"))));
+
+		Node rootNodeA = treeA.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeA.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		Node rootNodeB = treeB.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeB.getPrimaryKey()),
+			_objectDefinitionLocalService);
 	}
 
 	@Test
