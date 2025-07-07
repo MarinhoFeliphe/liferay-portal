@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -56,6 +57,7 @@ import java.sql.Connection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,10 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 
 	public static ObjectDefinitionDirectedAcyclicGraph getInstance() {
 		return _objectDefinitionDirectedAcyclicGraph;
+	}
+
+	public static void invalidate() {
+		_rootObjectDefinitionIds.clear();
 	}
 
 	public void addEdge(
@@ -192,29 +198,31 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 		ObjectDefinitionSettingLocalService
 			objectDefinitionSettingLocalService) {
 
-		long[] rootObjectDefinitionIds = _rootObjectDefinitionIds.get(
-			objectDefinitionId);
-
-		if (rootObjectDefinitionIds != null) {
-			return rootObjectDefinitionIds;
-		}
-
-		ObjectDefinitionSetting objectDefinitionSetting =
-			objectDefinitionSettingLocalService.fetchObjectDefinitionSetting(
+		long[] rootObjectDefinitionIds =
+			_rootObjectDefinitionIds.computeIfAbsent(
 				objectDefinitionId,
-				ObjectDefinitionSettingConstants.
-					NAME_ROOT_OBJECT_DEFINITION_IDS);
+				key -> {
+					ObjectDefinitionSetting objectDefinitionSetting =
+						objectDefinitionSettingLocalService.
+							fetchObjectDefinitionSetting(
+								key,
+								ObjectDefinitionSettingConstants.
+									NAME_ROOT_OBJECT_DEFINITION_IDS);
 
-		if (objectDefinitionSetting == null) {
+					if (objectDefinitionSetting == null) {
+						return null;
+					}
+
+					return ListUtil.toLongArray(
+						Arrays.asList(
+							StringUtil.split(
+								objectDefinitionSetting.getValue())),
+						GetterUtil::getLong);
+				});
+
+		if (rootObjectDefinitionIds == null) {
 			return new long[0];
 		}
-
-		rootObjectDefinitionIds = ListUtil.toLongArray(
-			Arrays.asList(StringUtil.split(objectDefinitionSetting.getValue())),
-			GetterUtil::getLong);
-
-		_rootObjectDefinitionIds.put(
-			objectDefinitionId, rootObjectDefinitionIds);
 
 		return rootObjectDefinitionIds;
 	}
@@ -574,53 +582,12 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 			long[] removeRootObjectDefinitionIds)
 		throws PortalException {
 
-		ObjectDefinitionSetting objectDefinitionSetting =
-			objectDefinitionSettingLocalService.fetchObjectDefinitionSetting(
-				objectDefinition.getObjectDefinitionId(),
-				ObjectDefinitionSettingConstants.
-					NAME_ROOT_OBJECT_DEFINITION_IDS);
-
-		if (objectDefinitionSetting == null) {
-			objectDefinitionSettingLocalService.addObjectDefinitionSetting(
-				objectDefinition.getUserId(),
-				objectDefinition.getObjectDefinitionId(),
-				ObjectDefinitionSettingConstants.
-					NAME_ROOT_OBJECT_DEFINITION_IDS,
-				StringUtil.merge(addRootObjectDefinitionIds));
-
-			_rootObjectDefinitionIds.put(
-				objectDefinition.getObjectDefinitionId(),
-				addRootObjectDefinitionIds);
-		}
-		else {
-			List<String> rootObjectDefinitionIds = ListUtil.fromArray(
-				StringUtil.split(objectDefinitionSetting.getValue()));
-
-			for (long rootObjectDefinitionIdToAdd :
-					addRootObjectDefinitionIds) {
-
-				rootObjectDefinitionIds.add(
-					String.valueOf(rootObjectDefinitionIdToAdd));
-			}
-
-			for (long rootObjectDefinitionIdToRemove :
-					removeRootObjectDefinitionIds) {
-
-				rootObjectDefinitionIds.remove(
-					String.valueOf(rootObjectDefinitionIdToRemove));
-			}
-
-			objectDefinitionSetting.setValue(
-				StringUtil.merge(rootObjectDefinitionIds));
-
-			objectDefinitionSettingLocalService.updateObjectDefinitionSetting(
-				objectDefinitionSetting);
-
-			_rootObjectDefinitionIds.put(
-				objectDefinition.getObjectDefinitionId(),
-				ListUtil.toLongArray(
-					rootObjectDefinitionIds, GetterUtil::getLong));
-		}
+		_rootObjectDefinitionIds.put(
+			objectDefinition.getObjectDefinitionId(),
+			_updateRootObjectDefinitionIds(
+				addRootObjectDefinitionIds, objectDefinition,
+				objectDefinitionSettingLocalService,
+				removeRootObjectDefinitionIds));
 	}
 
 	private void _shiftNode(
@@ -631,34 +598,42 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 			ObjectRelationshipPersistence objectRelationshipPersistence)
 		throws PortalException {
 
-		ObjectRelationship objectRelationship =
-			objectRelationshipPersistence.fetchByODI2_E(
+		List<ObjectRelationship> objectRelationships =
+			objectRelationshipPersistence.findByODI2_E(
 				objectDefinition2.getObjectDefinitionId(), true);
 
-		if (objectRelationship == null) {
+		if (objectRelationships.isEmpty()) {
 			return;
 		}
 
-		ObjectDefinition objectDefinition1 =
-			objectDefinitionPersistence.findByPrimaryKey(
-				objectRelationship.getObjectDefinitionId1());
+		List<Long> rootObjectDefinitionIdsToAdd = new ArrayList<>();
 
-		String previousRESTContextPath = objectDefinition2.getRESTContextPath();
+		for (ObjectRelationship objectRelationship : objectRelationships) {
+			ObjectDefinition objectDefinition1 =
+				objectDefinitionPersistence.findByPrimaryKey(
+					objectRelationship.getObjectDefinitionId1());
 
-		if (objectDefinition1.isApproved()) {
-			_setRootObjectDefinitionIds(
-				objectDefinition1.getRootObjectDefinitionIds(),
-				objectDefinition2, objectDefinitionSettingLocalService,
-				new long[] {objectDefinition2.getObjectDefinitionId()});
+			if (objectDefinition1.isApproved()) {
+				Collections.addAll(
+					rootObjectDefinitionIdsToAdd,
+					ArrayUtil.toArray(
+						objectDefinition1.getRootObjectDefinitionIds()));
+			}
 		}
-		else {
+
+		if (rootObjectDefinitionIdsToAdd.isEmpty()) {
 			_setRootObjectDefinitionIds(
 				new long[] {objectDefinition2.getObjectDefinitionId()},
 				objectDefinition2, objectDefinitionSettingLocalService,
 				objectDefinition2.getRootObjectDefinitionIds());
 		}
-
-		objectDefinition2.setPreviousRESTContextPath(previousRESTContextPath);
+		else {
+			_setRootObjectDefinitionIds(
+				ListUtil.toLongArray(
+					rootObjectDefinitionIdsToAdd, GetterUtil::getLong),
+				objectDefinition2, objectDefinitionSettingLocalService,
+				objectDefinition2.getRootObjectDefinitionIds());
+		}
 	}
 
 	private void _shiftNodeDescendants(
@@ -913,6 +888,56 @@ public class ObjectDefinitionDirectedAcyclicGraph {
 		objectDefinition.setPreviousRESTContextPath(previousRESTContextPath);
 
 		_deployObjectDefinition(objectDefinition, objectDefinitionLocalService);
+	}
+
+	private long[] _updateRootObjectDefinitionIds(
+			long[] addRootObjectDefinitionIds,
+			ObjectDefinition objectDefinition,
+			ObjectDefinitionSettingLocalService
+				objectDefinitionSettingLocalService,
+			long[] removeRootObjectDefinitionIds)
+		throws PortalException {
+
+		ObjectDefinitionSetting objectDefinitionSetting =
+			objectDefinitionSettingLocalService.fetchObjectDefinitionSetting(
+				objectDefinition.getObjectDefinitionId(),
+				ObjectDefinitionSettingConstants.
+					NAME_ROOT_OBJECT_DEFINITION_IDS);
+
+		if (objectDefinitionSetting == null) {
+			objectDefinitionSettingLocalService.addObjectDefinitionSetting(
+				objectDefinition.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				ObjectDefinitionSettingConstants.
+					NAME_ROOT_OBJECT_DEFINITION_IDS,
+				StringUtil.merge(addRootObjectDefinitionIds));
+
+			return addRootObjectDefinitionIds;
+		}
+
+		List<String> rootObjectDefinitionIds = ListUtil.fromArray(
+			StringUtil.split(objectDefinitionSetting.getValue()));
+
+		for (long rootObjectDefinitionIdToAdd : addRootObjectDefinitionIds) {
+			rootObjectDefinitionIds.add(
+				String.valueOf(rootObjectDefinitionIdToAdd));
+		}
+
+		for (long rootObjectDefinitionIdToRemove :
+				removeRootObjectDefinitionIds) {
+
+			rootObjectDefinitionIds.remove(
+				String.valueOf(rootObjectDefinitionIdToRemove));
+		}
+
+		objectDefinitionSetting.setValue(
+			StringUtil.merge(rootObjectDefinitionIds));
+
+		objectDefinitionSettingLocalService.updateObjectDefinitionSetting(
+			objectDefinitionSetting);
+
+		return ListUtil.toLongArray(
+			rootObjectDefinitionIds, GetterUtil::getLong);
 	}
 
 	private static final ObjectDefinitionDirectedAcyclicGraph
