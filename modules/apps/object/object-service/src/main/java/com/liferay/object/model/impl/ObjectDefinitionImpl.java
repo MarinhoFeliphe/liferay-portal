@@ -17,7 +17,6 @@ import com.liferay.object.service.ObjectDefinitionSettingLocalServiceUtil;
 import com.liferay.object.service.ObjectFolderLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -206,10 +205,6 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public long getRootObjectDefinitionId() {
-		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
-			return 0L;
-		}
-
 		ObjectDefinitionTreeManager objectDefinitionTreeManager =
 			ObjectDefinitionTreeManager.getInstance();
 
@@ -258,10 +253,6 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public boolean isRootDescendantNode() {
-		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
-			return false;
-		}
-
 		if ((getRootObjectDefinitionId() > 0) && !isRootNode()) {
 			return true;
 		}
@@ -271,10 +262,6 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public boolean isRootNode() {
-		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
-			return false;
-		}
-
 		if (getObjectDefinitionId() == getRootObjectDefinitionId()) {
 			return true;
 		}
