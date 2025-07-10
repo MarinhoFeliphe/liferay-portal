@@ -69,7 +69,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.db.partition.util.DBPartitionUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionLogic;
@@ -211,15 +210,12 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_objectActionLocalService.getObjectActionsMap(
 				companyId, true, ObjectActionTriggerConstants.KEY_STANDALONE);
 
-		if (FeatureFlagManagerUtil.isEnabled(companyId, "LPD-34594")) {
-			ObjectDefinitionTreeManager.populateRootObjectDefinitionIds(
-				objectDefinitions,
-				_objectDefinitionSettingLocalService.
-					getObjectDefinitionSettingMap(
-						companyId,
-						ObjectDefinitionSettingConstants.
-							NAME_ROOT_OBJECT_DEFINITION_IDS));
-		}
+		ObjectDefinitionTreeManager.populateRootObjectDefinitionIds(
+			objectDefinitions,
+			_objectDefinitionSettingLocalService.getObjectDefinitionSettingMap(
+				companyId,
+				ObjectDefinitionSettingConstants.
+					NAME_ROOT_OBJECT_DEFINITION_IDS));
 
 		Map<Long, List<ObjectLayout>> objectLayoutsMap =
 			_objectLayoutLocalService.getObjectLayoutsMap(companyId);
