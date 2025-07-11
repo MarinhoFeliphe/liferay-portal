@@ -1268,20 +1268,9 @@ public class ObjectDefinitionResourceImpl
 					}
 				).put(
 					"exportObjectDefinition",
-					() -> {
-						if (serviceBuilderObjectDefinition.
-								isRootDescendantNode() ||
-							serviceBuilderObjectDefinition.isRootNode()) {
-
-							return null;
-						}
-
-						return addAction(
-							ActionKeys.VIEW, "getObjectDefinition",
-							permissionName,
-							serviceBuilderObjectDefinition.
-								getObjectDefinitionId());
-					}
+					() -> addAction(
+						ActionKeys.VIEW, "getObjectDefinition", permissionName,
+						serviceBuilderObjectDefinition.getObjectDefinitionId())
 				).put(
 					"get",
 					addAction(
