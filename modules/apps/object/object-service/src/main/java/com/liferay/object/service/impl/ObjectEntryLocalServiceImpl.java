@@ -113,7 +113,6 @@ import com.liferay.object.service.persistence.ObjectFieldSettingPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
-import com.liferay.object.tree.Edge;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.ObjectEntryTreeFactory;
@@ -976,7 +975,7 @@ public class ObjectEntryLocalServiceImpl
 				Predicate.withParentheses(predicate)
 			).and(
 				_getPermissionWherePredicate(
-					dynamicObjectDefinitionTable, groupId)
+					dynamicObjectDefinitionTable, groupId, 0L)
 			)
 		).groupBy(
 			table.getColumn(objectField.getDBColumnName())
@@ -1310,8 +1309,6 @@ public class ObjectEntryLocalServiceImpl
 			_getDynamicObjectDefinitionTable(objectDefinitionId);
 		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId);
-		DynamicObjectDefinitionTable rootDynamicObjectDefinitionTable =
-			_getRootDynamicObjectDefinitionTable(objectDefinitionId);
 
 		DSLQuery dslQuery = DSLQueryFactoryUtil.select(
 			ObjectEntryTable.INSTANCE.objectEntryId
@@ -1327,10 +1324,6 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntryTable.INSTANCE,
 			ObjectEntryTable.INSTANCE.objectEntryId.eq(
 				dynamicObjectDefinitionTable.getPrimaryKeyColumn())
-		).innerJoinON(
-			rootDynamicObjectDefinitionTable,
-			_getInnerJoinRootObjectDefinitionTablePredicate(
-				rootDynamicObjectDefinitionTable)
 		).leftJoinOn(
 			dynamicObjectDefinitionLocalizationTable,
 			ObjectEntrySearchUtil.getLeftJoinLocalizationTablePredicate(
@@ -1339,6 +1332,12 @@ public class ObjectEntryLocalServiceImpl
 		).where(
 			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
 				objectDefinitionId
+			).and(
+				ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
+					ObjectEntryTable.INSTANCE.objectEntryId
+				).or(
+					ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(0L)
+				).withParentheses()
 			).and(
 				() -> {
 					if (ArrayUtil.isEmpty(groupIds)) {
@@ -1634,8 +1633,6 @@ public class ObjectEntryLocalServiceImpl
 			_getDynamicObjectDefinitionTable(objectDefinitionId);
 		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId);
-		DynamicObjectDefinitionTable rootDynamicObjectDefinitionTable =
-			_getRootDynamicObjectDefinitionTable(objectDefinitionId);
 
 		DSLQuery dslQuery = DSLQueryFactoryUtil.countDistinct(
 			ObjectEntryTable.INSTANCE.objectEntryId
@@ -1651,10 +1648,6 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntryTable.INSTANCE,
 			ObjectEntryTable.INSTANCE.objectEntryId.eq(
 				dynamicObjectDefinitionTable.getPrimaryKeyColumn())
-		).innerJoinON(
-			rootDynamicObjectDefinitionTable,
-			_getInnerJoinRootObjectDefinitionTablePredicate(
-				rootDynamicObjectDefinitionTable)
 		).leftJoinOn(
 			dynamicObjectDefinitionLocalizationTable,
 			ObjectEntrySearchUtil.getLeftJoinLocalizationTablePredicate(
@@ -3762,7 +3755,7 @@ public class ObjectEntryLocalServiceImpl
 					}
 
 					return _getPermissionWherePredicate(
-						dynamicObjectDefinitionTable, groupId);
+						dynamicObjectDefinitionTable, groupId, 0L);
 				}
 			).and(
 				() -> {
@@ -3835,9 +3828,11 @@ public class ObjectEntryLocalServiceImpl
 				objectRelationship.getObjectDefinitionId2());
 		ObjectField objectField = _objectFieldPersistence.fetchByPrimaryKey(
 			objectRelationship.getObjectFieldId2());
+
+		ObjectEntry objectEntry = fetchObjectEntry(primaryKey);
+
 		DynamicObjectDefinitionTable rootDynamicObjectDefinitionTable =
-			_getRootDynamicObjectDefinitionTable(
-				objectRelationship.getObjectDefinitionId2());
+			_getRootDynamicObjectDefinitionTable(objectEntry);
 
 		Column<DynamicObjectDefinitionTable, Long> primaryKeyColumn =
 			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
@@ -3912,8 +3907,21 @@ public class ObjectEntryLocalServiceImpl
 						return null;
 					}
 
+					long rootObjectDefinitionId = 0L;
+
+					if ((objectEntry != null) &&
+						(objectEntry.getRootObjectEntryId() != 0)) {
+
+						ObjectEntry rootObjectEntry = fetchObjectEntry(
+							objectEntry.getRootObjectEntryId());
+
+						rootObjectDefinitionId =
+							rootObjectEntry.getObjectDefinitionId();
+					}
+
 					return _getPermissionWherePredicate(
-						dynamicObjectDefinitionTable, groupId);
+						dynamicObjectDefinitionTable, groupId,
+						rootObjectDefinitionId);
 				}
 			).and(
 				ObjectEntrySearchUtil.getRelatedModelsPredicate(
@@ -3927,7 +3935,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private Predicate _getPermissionWherePredicate(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-			long groupId)
+			long groupId, long rootObjectDefinitionId)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
@@ -3946,9 +3954,9 @@ public class ObjectEntryLocalServiceImpl
 		Column<?, Long> primaryKeyColumn =
 			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
 
-		if (objectDefinition.isRootDescendantNode()) {
+		if (rootObjectDefinitionId != 0L) {
 			objectDefinition = _objectDefinitionPersistence.findByPrimaryKey(
-				objectDefinition.getRootObjectDefinitionId());
+				rootObjectDefinitionId);
 
 			primaryKeyColumn = ObjectEntryTable.INSTANCE.rootObjectEntryId;
 		}
@@ -3993,12 +4001,12 @@ public class ObjectEntryLocalServiceImpl
 		for (Long groupId : groupIds) {
 			if (permissionWherePredicate == null) {
 				permissionWherePredicate = _getPermissionWherePredicate(
-					dynamicObjectDefinitionTable, groupId);
+					dynamicObjectDefinitionTable, groupId, 0L);
 			}
 			else {
 				permissionWherePredicate = permissionWherePredicate.or(
 					_getPermissionWherePredicate(
-						dynamicObjectDefinitionTable, groupId));
+						dynamicObjectDefinitionTable, groupId, 0L));
 			}
 		}
 
@@ -4219,19 +4227,21 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private DynamicObjectDefinitionTable _getRootDynamicObjectDefinitionTable(
-			long objectDefinitionId)
+			ObjectEntry objectEntry)
 		throws PortalException {
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+		if ((objectEntry == null) ||
+			(objectEntry.getRootObjectEntryId() == 0)) {
 
-		if (!objectDefinition.isRootDescendantNode()) {
 			return null;
 		}
 
+		ObjectEntry rootObjectEntry = getObjectEntry(
+			objectEntry.getRootObjectEntryId());
+
 		ObjectDefinition rootObjectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(
-				objectDefinition.getRootObjectDefinitionId());
+				rootObjectEntry.getObjectDefinitionId());
 
 		if (!rootObjectDefinition.isAccountEntryRestricted()) {
 			return null;
@@ -5390,7 +5400,7 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> values)
 		throws PortalException {
 
-		if (objectDefinition.getRootObjectDefinitionId() == 0) {
+		if (ArrayUtil.isEmpty(objectDefinition.getRootObjectDefinitionIds())) {
 			objectEntry.setRootObjectEntryId(0);
 
 			return;
@@ -5402,28 +5412,30 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
-		ObjectDefinitionTreeFactory objectDefinitionTreeFactory =
-			new ObjectDefinitionTreeFactory(
-				_objectDefinitionPersistence,
-				_objectRelationshipLocalServiceSnapshot.get());
+		List<ObjectRelationship> objectRelationships =
+			_objectRelationshipPersistence.findByODI2_E(
+				objectDefinition.getObjectDefinitionId(), true);
 
-		Tree objectDefinitionTree = objectDefinitionTreeFactory.create(
-			objectDefinition.getRootObjectDefinitionId());
+		long objectEntryId = 0;
 
-		Node objectDefinitionNode = objectDefinitionTree.getNode(
-			objectDefinition.getObjectDefinitionId());
+		for (ObjectRelationship objectRelationship : objectRelationships) {
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectRelationship.getObjectFieldId2());
 
-		Edge edge = objectDefinitionNode.getEdge();
+			if (values.containsKey(objectField.getName())) {
+				objectEntryId = MapUtil.getLong(values, objectField.getName());
 
-		ObjectRelationship objectRelationship =
-			_objectRelationshipPersistence.findByPrimaryKey(
-				edge.getObjectRelationshipId());
+				break;
+			}
+		}
 
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			objectRelationship.getObjectFieldId2());
+		ObjectEntry parentObjectEntry = fetchObjectEntry(objectEntryId);
 
-		ObjectEntry parentObjectEntry = getObjectEntry(
-			MapUtil.getLong(values, objectField.getName()));
+		if (parentObjectEntry == null) {
+			objectEntry.setRootObjectEntryId(0);
+
+			return;
+		}
 
 		if ((objectEntry.getRootObjectEntryId() !=
 				parentObjectEntry.getRootObjectEntryId()) &&
