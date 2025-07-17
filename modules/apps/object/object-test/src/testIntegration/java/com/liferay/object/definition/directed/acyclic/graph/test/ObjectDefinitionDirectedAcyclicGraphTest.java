@@ -21,6 +21,8 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -33,20 +35,36 @@ import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
 import com.liferay.petra.function.UnsafeBiConsumer;
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -60,8 +78,13 @@ import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import java.io.Closeable;
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -1069,6 +1092,210 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 	}
 
 	@Test
+	public void testGetObjectEntriesWithRootObjectEntryId() throws Exception {
+		ObjectDefinition objectDefinitionA =
+			_addAndPublishCustomObjectDefinition("A");
+		ObjectDefinition objectDefinitionAA =
+			_addAndPublishCustomObjectDefinition("AA");
+
+		ObjectRelationship objectRelationshipA_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionA,
+				objectDefinitionAA);
+
+		ObjectDefinition objectDefinitionB =
+			_addAndPublishCustomObjectDefinition("B");
+
+		ObjectRelationship objectRelationshipB_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionB,
+				objectDefinitionAA);
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			List.of(objectRelationshipA_AA, objectRelationshipB_AA));
+
+		ObjectEntry objectEntryA = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionA.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		ObjectEntry objectEntryA_AA = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionAA.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				() -> {
+					ObjectField objectField =
+						_objectFieldLocalService.getObjectField(
+							objectRelationshipA_AA.getObjectFieldId2());
+
+					return objectField.getName();
+				},
+				objectEntryA.getObjectEntryId()
+			).build());
+
+		ObjectEntry objectEntryB = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionB.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		ObjectEntry objectEntryB_AA = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionAA.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				() -> {
+					ObjectField objectField =
+						_objectFieldLocalService.getObjectField(
+							objectRelationshipB_AA.getObjectFieldId2());
+
+					return objectField.getName();
+				},
+				objectEntryB.getObjectEntryId()
+			).build());
+
+		ObjectEntry objectEntryAA = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionAA.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		// User with permission to VIEW object definition A
+
+		User user2 = UserTestUtil.addUser();
+
+		_addRoleUser(new String[] {ActionKeys.VIEW}, objectDefinitionA, user2);
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
+		try (Closeable closeable = _setPermissionCheckerWithCloseable(user2)) {
+			_assertEquals(
+				() ->
+					defaultObjectEntryManager.
+						getObjectEntryRelatedObjectEntries(
+							_createDTOConverterContext(user2),
+							objectDefinitionA, objectEntryA.getObjectEntryId(),
+							objectRelationshipA_AA.getName(), null),
+				List.of(objectEntryA_AA));
+			_assertEquals(
+				() -> _objectEntryManager.getObjectEntries(
+					TestPropsValues.getCompanyId(), objectDefinitionAA, null,
+					null, _createDTOConverterContext(user2), (String)null, null,
+					null, null),
+				Collections.emptyList());
+
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", user2.getUserId(),
+					" must have VIEW permission for ",
+					objectDefinitionB.getClassName(), StringPool.SPACE,
+					objectEntryB.getObjectEntryId()),
+				() ->
+					defaultObjectEntryManager.
+						getObjectEntryRelatedObjectEntries(
+							_createDTOConverterContext(user2),
+							objectDefinitionB, objectEntryB.getObjectEntryId(),
+							objectRelationshipB_AA.getName(), null));
+		}
+
+		// User with permission to VIEW object definition AA
+
+		User user1 = UserTestUtil.addUser();
+
+		_addRoleUser(new String[] {ActionKeys.VIEW}, objectDefinitionAA, user1);
+
+		try (Closeable closeable = _setPermissionCheckerWithCloseable(user1)) {
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", user1.getUserId(),
+					" must have VIEW permission for ",
+					objectDefinitionA.getClassName(), StringPool.SPACE,
+					objectEntryA.getObjectEntryId()),
+				() ->
+					defaultObjectEntryManager.
+						getObjectEntryRelatedObjectEntries(
+							_createDTOConverterContext(user1),
+							objectDefinitionA, objectEntryA.getObjectEntryId(),
+							objectRelationshipA_AA.getName(), null));
+
+			_assertEquals(
+				() -> _objectEntryManager.getObjectEntries(
+					TestPropsValues.getCompanyId(), objectDefinitionAA, null,
+					null, _createDTOConverterContext(user1), (String)null, null,
+					null, null),
+				List.of(objectEntryAA));
+
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", user1.getUserId(),
+					" must have VIEW permission for ",
+					objectDefinitionB.getClassName(), StringPool.SPACE,
+					objectEntryB.getObjectEntryId()),
+				() ->
+					defaultObjectEntryManager.
+						getObjectEntryRelatedObjectEntries(
+							_createDTOConverterContext(user1),
+							objectDefinitionB, objectEntryB.getObjectEntryId(),
+							objectRelationshipB_AA.getName(), null));
+		}
+
+		// User with permission to VIEW object definition B
+
+		User user3 = UserTestUtil.addUser();
+
+		_addRoleUser(new String[] {ActionKeys.VIEW}, objectDefinitionB, user3);
+
+		try (Closeable closeable = _setPermissionCheckerWithCloseable(user3)) {
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", user3.getUserId(),
+					" must have VIEW permission for ",
+					objectDefinitionA.getClassName(), StringPool.SPACE,
+					objectEntryA.getObjectEntryId()),
+				() ->
+					defaultObjectEntryManager.
+						getObjectEntryRelatedObjectEntries(
+							_createDTOConverterContext(user3),
+							objectDefinitionA, objectEntryA.getObjectEntryId(),
+							objectRelationshipA_AA.getName(), null));
+
+			_assertEquals(
+				() -> _objectEntryManager.getObjectEntries(
+					TestPropsValues.getCompanyId(), objectDefinitionAA, null,
+					null, _createDTOConverterContext(user2), (String)null, null,
+					null, null),
+				Collections.emptyList());
+			_assertEquals(
+				() ->
+					defaultObjectEntryManager.
+						getObjectEntryRelatedObjectEntries(
+							_createDTOConverterContext(user3),
+							objectDefinitionB, objectEntryB.getObjectEntryId(),
+							objectRelationshipB_AA.getName(), null),
+				List.of(objectEntryB_AA));
+		}
+
+		// User with permission to VIEW object definition A, AA and B
+
+		_assertEquals(
+			() -> defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
+				_createDTOConverterContext(TestPropsValues.getUser()),
+				objectDefinitionA, objectEntryA.getObjectEntryId(),
+				objectRelationshipA_AA.getName(), null),
+			List.of(objectEntryA_AA));
+		_assertEquals(
+			() -> _objectEntryManager.getObjectEntries(
+				TestPropsValues.getCompanyId(), objectDefinitionAA, null, null,
+				_createDTOConverterContext(TestPropsValues.getUser()),
+				(String)null, null, null, null),
+			List.of(objectEntryAA));
+		_assertEquals(
+			() -> defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
+				_createDTOConverterContext(TestPropsValues.getUser()),
+				objectDefinitionB, objectEntryB.getObjectEntryId(),
+				objectRelationshipB_AA.getName(), null),
+			List.of(objectEntryB_AA));
+	}
+
+	@Test
 	public void testShiftNodeDescendants() throws Exception {
 		ObjectDefinition objectDefinitionA =
 			_addAndPublishCustomObjectDefinition("A");
@@ -1652,6 +1879,21 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 			null, values, ServiceContextTestUtil.getServiceContext());
 	}
 
+	private void _addRoleUser(
+			String[] actionIds, ObjectDefinition objectDefinition, User user)
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), objectDefinition.getClassName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), role.getRoleId(),
+			actionIds);
+
+		_userLocalService.addRoleUser(role.getRoleId(), user);
+	}
+
 	private void _asserScreenNavigationCategories(
 			int expectedSize, String objectDefinitionName)
 		throws Exception {
@@ -1668,6 +1910,39 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 		Assert.assertEquals(
 			screenNavigationCategories.toString(), expectedSize,
 			screenNavigationCategories.size());
+	}
+
+	private void _assertEquals(
+			UnsafeSupplier
+				<Page<com.liferay.object.rest.dto.v1_0.ObjectEntry>, Exception>
+					unsafeSupplier,
+			List<ObjectEntry> expectedObjectEntries)
+		throws Exception {
+
+		Page<com.liferay.object.rest.dto.v1_0.ObjectEntry>
+			actualObjectEntryPages = unsafeSupplier.get();
+
+		List<com.liferay.object.rest.dto.v1_0.ObjectEntry> actualObjectEntries =
+			ListUtil.fromCollection(actualObjectEntryPages.getItems());
+
+		Assert.assertEquals(
+			actualObjectEntries.toString(), expectedObjectEntries.size(),
+			actualObjectEntries.size());
+
+		if (expectedObjectEntries.isEmpty()) {
+			return;
+		}
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry actualObjectEntry =
+			actualObjectEntries.get(0);
+
+		Long actualObjectEntryId = actualObjectEntry.getId();
+
+		ObjectEntry expectedObjectEntry = expectedObjectEntries.get(0);
+
+		Assert.assertEquals(
+			expectedObjectEntry.getObjectEntryId(),
+			actualObjectEntryId.longValue());
 	}
 
 	private void _assertModelResourceNames(List<String> objectDefinitionNames)
@@ -1776,6 +2051,30 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 		}
 	}
 
+	private DTOConverterContext _createDTOConverterContext(User user) {
+		return new DefaultDTOConverterContext(
+			false, Collections.emptyMap(), _dtoConverterRegistry, null,
+			LocaleUtil.getDefault(), null, user);
+	}
+
+	private Closeable _setPermissionCheckerWithCloseable(User user) {
+		String originalName = PrincipalThreadLocal.getName();
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
+
+		PrincipalThreadLocal.setName(user.getUserId());
+
+		return () -> {
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
+
+			PrincipalThreadLocal.setName(originalName);
+		};
+	}
+
 	private void _testAddEdge(
 			ObjectDefinition objectDefinition1,
 			ObjectDefinition objectDefinition2,
@@ -1827,6 +2126,14 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 			objectDefinitionName, workflowDefinitionName);
 	}
 
+	@Inject(
+		filter = "object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT
+	)
+	private static ObjectEntryManager _objectEntryManager;
+
+	@Inject
+	private DTOConverterRegistry _dtoConverterRegistry;
+
 	@Inject
 	private ObjectActionLocalService _objectActionLocalService;
 
@@ -1846,6 +2153,12 @@ public class ObjectDefinitionDirectedAcyclicGraphTest {
 
 	@Inject
 	private ResourceActions _resourceActions;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 	@Inject
 	private WorkflowDefinitionLinkLocalService
