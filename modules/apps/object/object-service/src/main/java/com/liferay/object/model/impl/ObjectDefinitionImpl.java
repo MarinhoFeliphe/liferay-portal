@@ -18,6 +18,7 @@ import com.liferay.object.service.ObjectFolderLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -210,7 +211,22 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 			return 0L;
 		}
 
-		return ObjectDefinitionTreeUtil.getRootObjectDefinitionId(
+		long[] rootObjectDefinitionIds = getRootObjectDefinitionIds();
+
+		if (ArrayUtil.isEmpty(rootObjectDefinitionIds)) {
+			return 0L;
+		}
+
+		return rootObjectDefinitionIds[0];
+	}
+
+	@Override
+	public long[] getRootObjectDefinitionIds() {
+		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
+			return new long[0];
+		}
+
+		return ObjectDefinitionTreeUtil.getRootObjectDefinitionIds(
 			getObjectDefinitionId(),
 			ObjectDefinitionSettingLocalServiceUtil.getService());
 	}
@@ -251,6 +267,16 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean isReachableNode(long rootObjectDefinitionId) {
+		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
+			return false;
+		}
+
+		return ArrayUtil.contains(
+			getRootObjectDefinitionIds(), rootObjectDefinitionId);
 	}
 
 	@Override
