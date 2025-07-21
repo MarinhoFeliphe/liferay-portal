@@ -23,6 +23,8 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -43,6 +45,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -58,6 +61,7 @@ import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -72,6 +76,9 @@ import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
@@ -117,6 +124,123 @@ public class ObjectDefinitionTreeUtilTest {
 	@After
 	public void tearDown() {
 		ObjectDefinitionTreeUtil.invalidate();
+	}
+
+	@Test
+	public void testAddNodeObjectEntry() throws Exception {
+
+		// Add node object entry
+
+		ObjectDefinition objectDefinitionA =
+			_addAndPublishCustomObjectDefinition("A");
+		ObjectDefinition objectDefinitionAA =
+			_addAndPublishCustomObjectDefinition("AA");
+
+		ObjectRelationship objectRelationshipA_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionA,
+				objectDefinitionAA);
+
+		ObjectDefinition objectDefinitionB =
+			_addAndPublishCustomObjectDefinition("B");
+
+		ObjectRelationship objectRelationshipB_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionB,
+				objectDefinitionAA);
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			List.of(objectRelationshipA_AA, objectRelationshipB_AA));
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
+		ObjectEntry objectEntryA = _addObjectEntry(
+			objectDefinitionA, Collections.emptyMap());
+
+		ObjectField objectRelationshipA_AAObjectField2 =
+			_objectFieldLocalService.getObjectField(
+				objectRelationshipA_AA.getObjectFieldId2());
+		ObjectField objectRelationshipB_AAObjectField2 =
+			_objectFieldLocalService.getObjectField(
+				objectRelationshipB_AA.getObjectFieldId2());
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntryAA =
+			defaultObjectEntryManager.addNodeObjectEntry(
+				_createDTOConverterContext(TestPropsValues.getUser()),
+				objectDefinitionAA,
+				new com.liferay.object.rest.dto.v1_0.ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							objectRelationshipA_AAObjectField2::getName,
+							RandomTestUtil.randomInt()
+						).put(
+							objectRelationshipB_AAObjectField2::getName,
+							RandomTestUtil.randomInt()
+						).build();
+					}
+				},
+				_objectRelationshipLocalService.getObjectRelationship(
+					objectRelationshipA_AA.getObjectRelationshipId()),
+				objectEntryA.getObjectEntryId(),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Assert.assertEquals(
+			objectEntryA.getObjectEntryId(),
+			GetterUtil.getLong(
+				objectEntryAA.getPropertyValue(
+					objectRelationshipA_AAObjectField2.getName())));
+		Assert.assertEquals(
+			0L,
+			objectEntryAA.getPropertyValue(
+				objectRelationshipB_AAObjectField2.getName()));
+
+		ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.getObjectEntry(objectEntryAA.getId());
+
+		Assert.assertEquals(
+			objectEntryA.getObjectEntryId(),
+			serviceBuilderObjectEntry.getRootObjectEntryId());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntryAA.getId());
+
+		// Add object entry
+
+		objectEntryAA = defaultObjectEntryManager.addObjectEntry(
+			_createDTOConverterContext(TestPropsValues.getUser()),
+			objectDefinitionAA,
+			new com.liferay.object.rest.dto.v1_0.ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectRelationshipA_AAObjectField2::getName,
+						RandomTestUtil.randomInt()
+					).put(
+						objectRelationshipB_AAObjectField2::getName,
+						RandomTestUtil.randomInt()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Assert.assertEquals(
+			0L,
+			objectEntryAA.getPropertyValue(
+				objectRelationshipA_AAObjectField2.getName()));
+		Assert.assertEquals(
+			0L,
+			objectEntryAA.getPropertyValue(
+				objectRelationshipB_AAObjectField2.getName()));
+
+		serviceBuilderObjectEntry = _objectEntryLocalService.getObjectEntry(
+			objectEntryAA.getId());
+
+		Assert.assertEquals(
+			0L, serviceBuilderObjectEntry.getRootObjectEntryId());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntryAA.getId());
+		_objectEntryLocalService.deleteObjectEntry(
+			objectEntryA.getObjectEntryId());
 	}
 
 	@Test
@@ -1846,6 +1970,93 @@ public class ObjectDefinitionTreeUtilTest {
 	}
 
 	@Test
+	public void testUpdateNodeObjectEntry() throws Exception {
+
+		// Update node object entry
+
+		ObjectDefinition objectDefinitionA =
+			_addAndPublishCustomObjectDefinition("A");
+		ObjectDefinition objectDefinitionAA =
+			_addAndPublishCustomObjectDefinition("AA");
+
+		ObjectRelationship objectRelationshipA_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionA,
+				objectDefinitionAA);
+
+		ObjectDefinition objectDefinitionB =
+			_addAndPublishCustomObjectDefinition("B");
+
+		ObjectRelationship objectRelationshipB_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionB,
+				objectDefinitionAA);
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			List.of(objectRelationshipA_AA, objectRelationshipB_AA));
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
+		ObjectEntry objectEntryA = _addObjectEntry(
+			objectDefinitionA, Collections.emptyMap());
+
+		ObjectField objectRelationshipA_AAObjectField2 =
+			_objectFieldLocalService.getObjectField(
+				objectRelationshipA_AA.getObjectFieldId2());
+		ObjectField objectRelationshipB_AAObjectField2 =
+			_objectFieldLocalService.getObjectField(
+				objectRelationshipB_AA.getObjectFieldId2());
+
+		ObjectEntry serviceBuilderObjectEntryAA = _addObjectEntry(
+			objectDefinitionAA,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationshipA_AAObjectField2.getName(),
+				objectEntryA.getObjectEntryId()
+			).build());
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntryAA =
+			defaultObjectEntryManager.updateNodeObjectEntry(
+				_createDTOConverterContext(TestPropsValues.getUser()),
+				objectDefinitionAA,
+				serviceBuilderObjectEntryAA.getObjectEntryId(),
+				new com.liferay.object.rest.dto.v1_0.ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							objectRelationshipA_AAObjectField2::getName,
+							RandomTestUtil.randomInt()
+						).put(
+							objectRelationshipB_AAObjectField2::getName,
+							RandomTestUtil.randomInt()
+						).build();
+					}
+				},
+				_objectRelationshipLocalService.getObjectRelationship(
+					objectRelationshipA_AA.getObjectRelationshipId()),
+				objectEntryA.getObjectEntryId());
+
+		Assert.assertEquals(
+			objectEntryA.getObjectEntryId(),
+			GetterUtil.getLong(
+				objectEntryAA.getPropertyValue(
+					objectRelationshipA_AAObjectField2.getName())));
+		Assert.assertEquals(
+			0L,
+			objectEntryAA.getPropertyValue(
+				objectRelationshipB_AAObjectField2.getName()));
+
+		ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.getObjectEntry(objectEntryAA.getId());
+
+		Assert.assertEquals(
+			objectEntryA.getObjectEntryId(),
+			serviceBuilderObjectEntry.getRootObjectEntryId());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntryAA.getId());
+	}
+
+	@Test
 	public void testUpdateRootNodeObjectDefinition() throws Exception {
 
 		// publish a draft object definition
@@ -2209,6 +2420,12 @@ public class ObjectDefinitionTreeUtilTest {
 		}
 	}
 
+	private DTOConverterContext _createDTOConverterContext(User user) {
+		return new DefaultDTOConverterContext(
+			false, Collections.emptyMap(), _dtoConverterRegistry, null,
+			LocaleUtil.getDefault(), null, user);
+	}
+
 	private void _testBindObjectDefinitions(
 			ObjectDefinition objectDefinition1,
 			ObjectDefinition objectDefinition2,
@@ -2332,6 +2549,14 @@ public class ObjectDefinitionTreeUtilTest {
 		_assertWorkflowDefinitionLink(
 			objectDefinitionName, workflowDefinitionName);
 	}
+
+	@Inject(
+		filter = "object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT
+	)
+	private static ObjectEntryManager _objectEntryManager;
+
+	@Inject
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Inject
 	private EntityCache _entityCache;
