@@ -1110,18 +1110,16 @@ public class DefaultObjectEntryManagerImplTest
 		ObjectField objectField = objectFieldLocalService.getObjectField(
 			objectRelationship.getObjectFieldId2());
 
-		_defaultObjectEntryManager.addObjectEntry(
+		_defaultObjectEntryManager.addRelatedObjectEntry(
 			_simpleDTOConverterContext,
 			objectDefinitionLocalService.getObjectDefinition(
 				childNode.getPrimaryKey()),
 			new ObjectEntry() {
 				{
-					properties = HashMapBuilder.<String, Object>put(
-						objectField.getName(), objectEntry.getId()
-					).build();
+					properties = new HashMap<>();
 				}
 			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
+			objectRelationship, objectEntry.getId(), null);
 
 		_user = _addUser();
 
@@ -1134,18 +1132,16 @@ public class DefaultObjectEntryManagerImplTest
 		_addResourcePermission(
 			ActionKeys.UPDATE, _rootObjectDefinition, _buyerRole);
 
-		_defaultObjectEntryManager.addObjectEntry(
+		_defaultObjectEntryManager.addRelatedObjectEntry(
 			_simpleDTOConverterContext,
 			objectDefinitionLocalService.getObjectDefinition(
 				childNode.getPrimaryKey()),
 			new ObjectEntry() {
 				{
-					properties = HashMapBuilder.<String, Object>put(
-						objectField.getName(), objectEntry.getId()
-					).build();
+					properties = new HashMap<>();
 				}
 			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
+			objectRelationship, objectEntry.getId(), null);
 
 		_removeResourcePermission(
 			ActionKeys.UPDATE, _rootObjectDefinition, _buyerRole);
@@ -8774,7 +8770,7 @@ public class DefaultObjectEntryManagerImplTest
 
 			Edge edge = node.getEdge();
 
-			ObjectRelationship objectRelationships =
+			ObjectRelationship objectRelationship =
 				_objectRelationshipLocalService.getObjectRelationship(
 					edge.getObjectRelationshipId());
 
@@ -8792,10 +8788,10 @@ public class DefaultObjectEntryManagerImplTest
 								_createDTOConverterContext(),
 								objectDefinitionLocalService.
 									getObjectDefinition(
-										objectRelationships.
+										objectRelationship.
 											getObjectDefinitionId1()),
 								parentNode.getPrimaryKey(),
-								objectRelationships.getName(), null));
+								objectRelationship.getName(), null));
 			}
 			else {
 				Page<ObjectEntry> objectEntryPage =
@@ -8803,9 +8799,9 @@ public class DefaultObjectEntryManagerImplTest
 						getObjectEntryRelatedObjectEntries(
 							_createDTOConverterContext(),
 							objectDefinitionLocalService.getObjectDefinition(
-								objectRelationships.getObjectDefinitionId1()),
+								objectRelationship.getObjectDefinitionId1()),
 							parentNode.getPrimaryKey(),
-							objectRelationships.getName(), null);
+							objectRelationship.getName(), null);
 
 				Assert.assertEquals(
 					relatedObjectEntriesSize, objectEntryPage.getTotalCount());
