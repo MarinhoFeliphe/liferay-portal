@@ -5,6 +5,7 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
+import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.User;
@@ -23,8 +24,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.validation.constraints.NotNull;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -97,6 +100,58 @@ public abstract class BaseObjectEntryRelatedObjectsResourceImpl {
 				@Context Pagination pagination)
 		throws Exception;
 
+	@Consumes({"application/json", "application/xml"})
+	@Operation(
+		operationId = "postByExternalReferenceCodeObjectEntryObjectRelationshipName"
+	)
+	@Parameters(
+		{
+			@Parameter(
+				in = ParameterIn.PATH, name = "currentExternalReferenceCode"
+			),
+			@Parameter(in = ParameterIn.PATH, name = "objectRelationshipName")
+		}
+	)
+	@Path(
+		"/by-external-reference-code/{currentExternalReferenceCode}/{objectRelationshipName}"
+	)
+	@POST
+	@Produces({"application/json", "application/xml"})
+	@Tags(@Tag(name = "ObjectEntry"))
+	public abstract Object
+			postByExternalReferenceCodeObjectEntryObjectRelationshipName(
+				@NotNull @Parameter(hidden = true)
+				@PathParam("currentExternalReferenceCode")
+				String currentExternalReferenceCode,
+				ObjectEntry objectEntry,
+				@NotNull @Parameter(hidden = true)
+				@PathParam("objectRelationshipName")
+				String objectRelationshipName)
+		throws Exception;
+
+	@Consumes({"application/json", "application/xml"})
+	@Operation(operationId = "postObjectEntryObjectRelationshipName")
+	@Parameters(
+		{
+			@Parameter(in = ParameterIn.PATH, name = "currentObjectEntryId"),
+			@Parameter(in = ParameterIn.PATH, name = "objectRelationshipName")
+		}
+	)
+	@Path("/{currentObjectEntryId}/{objectRelationshipName}")
+	@POST
+	@Produces({"application/json", "application/xml"})
+	@Tags(@Tag(name = "ObjectEntry"))
+	public abstract Object postObjectEntryObjectRelationshipName(
+			@NotNull @Parameter(hidden = true)
+			@PathParam("currentObjectEntryId")
+			Long currentObjectEntryId,
+			ObjectEntry objectEntry,
+			@NotNull @Parameter(hidden = true)
+			@PathParam("objectRelationshipName")
+			String objectRelationshipName)
+		throws Exception;
+
+	@Consumes({"application/json", "application/xml"})
 	@Operation(
 		operationId = "putByExternalReferenceCodeObjectEntryObjectRelationshipNameRelatedObjectEntry"
 	)
@@ -122,6 +177,7 @@ public abstract class BaseObjectEntryRelatedObjectsResourceImpl {
 				@NotNull @Parameter(hidden = true)
 				@PathParam("currentExternalReferenceCode")
 				String currentExternalReferenceCode,
+				ObjectEntry objectEntry,
 				@NotNull @Parameter(hidden = true)
 				@PathParam("objectRelationshipName")
 				String objectRelationshipName,
@@ -130,6 +186,7 @@ public abstract class BaseObjectEntryRelatedObjectsResourceImpl {
 				String relatedExternalReferenceCode)
 		throws Exception;
 
+	@Consumes({"application/json", "application/xml"})
 	@Operation(
 		operationId = "putObjectEntryObjectRelationshipNameRelatedObjectEntry"
 	)
@@ -150,6 +207,7 @@ public abstract class BaseObjectEntryRelatedObjectsResourceImpl {
 			@NotNull @Parameter(hidden = true)
 			@PathParam("currentObjectEntryId")
 			Long currentObjectEntryId,
+			ObjectEntry objectEntry,
 			@NotNull @Parameter(hidden = true)
 			@PathParam("objectRelationshipName")
 			String objectRelationshipName,

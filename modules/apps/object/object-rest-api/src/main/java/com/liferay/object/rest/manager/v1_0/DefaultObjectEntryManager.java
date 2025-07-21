@@ -26,6 +26,13 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface DefaultObjectEntryManager extends ObjectEntryManager {
 
+	public ObjectEntry addNodeObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			ObjectRelationship objectRelationship, long parentNodeObjectEntryId,
+			String scopeKey)
+		throws Exception;
+
 	public ObjectEntry addObjectRelationshipMappingTableValues(
 			DTOConverterContext dtoConverterContext,
 			ObjectRelationship objectRelationship, long primaryKey1,
@@ -177,6 +184,13 @@ public interface DefaultObjectEntryManager extends ObjectEntryManager {
 			DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			String scopeKey, int version)
+		throws Exception;
+
+	public ObjectEntry updateNodeObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, long objectEntryId,
+			ObjectEntry objectEntry, ObjectRelationship objectRelationship,
+			long parentNodeObjectEntryId)
 		throws Exception;
 
 	public ObjectEntry updateObjectEntry(

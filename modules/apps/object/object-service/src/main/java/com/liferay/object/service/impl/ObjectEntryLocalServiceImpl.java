@@ -5422,8 +5422,16 @@ public class ObjectEntryLocalServiceImpl
 		ObjectField objectField = _objectFieldLocalService.getObjectField(
 			objectRelationship.getObjectFieldId2());
 
-		ObjectEntry parentObjectEntry = getObjectEntry(
-			MapUtil.getLong(values, objectField.getName()));
+		long parentObjectEntryId = MapUtil.getLong(
+			values, objectField.getName());
+
+		if (parentObjectEntryId == 0) {
+			objectEntry.setRootObjectEntryId(0);
+
+			return;
+		}
+
+		ObjectEntry parentObjectEntry = getObjectEntry(parentObjectEntryId);
 
 		if ((objectEntry.getRootObjectEntryId() !=
 				parentObjectEntry.getRootObjectEntryId()) &&
