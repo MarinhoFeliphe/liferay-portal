@@ -665,6 +665,8 @@ public class PortalUpgradeProcessRegistryImpl
 					ReleaseInfo.getVersionDisplayName(),
 					"' where servletContextName = '",
 					ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME, "'")));
+
+		upgradeVersionTreeMap.put(new Version(33, 3, 0), new UpgradeDB2());
 	}
 
 }
