@@ -175,8 +175,7 @@ public class BatchEngineBundleTrackerTest {
 			atomicReference::set, "batch11",
 			"/batch11/data.batch-engine-data.json");
 
-		BatchEngineImportTask batchEngineImportTask =
-			atomicReference.get();
+		BatchEngineImportTask batchEngineImportTask = atomicReference.get();
 
 		long userId = batchEngineImportTask.getUserId();
 
@@ -187,8 +186,7 @@ public class BatchEngineBundleTrackerTest {
 		int status = user.getStatus();
 
 		user = _userLocalService.updateStatus(
-			user, WorkflowConstants.STATUS_INACTIVE,
-			new ServiceContext());
+			user, WorkflowConstants.STATUS_INACTIVE, new ServiceContext());
 
 		Assert.assertFalse(user.isActive());
 
@@ -211,8 +209,7 @@ public class BatchEngineBundleTrackerTest {
 				_roleLocalService.getUserRoles(user.getUserId()),
 				role -> RoleConstants.ADMINISTRATOR.equals(role.getName())));
 
-		_userLocalService.updateStatus(
-			userId, status, new ServiceContext());
+		_userLocalService.updateStatus(userId, status, new ServiceContext());
 	}
 
 	@Test
