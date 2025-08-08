@@ -119,12 +119,10 @@ public class RelatedObjectEntryResourceImpl
 				pagination);
 		}
 
-		return (Page)
-			defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-				_getDefaultDTOConverterContext(
-					systemObjectDefinition, objectEntryId, _uriInfo),
-				systemObjectDefinition, objectEntryId, objectRelationshipName,
-				pagination);
+		return (Page)defaultObjectEntryManager.getRelatedObjectEntries(
+			_getDefaultDTOConverterContext(
+				systemObjectDefinition, objectEntryId, _uriInfo),
+			objectEntryId, objectRelationship, pagination);
 	}
 
 	@Override

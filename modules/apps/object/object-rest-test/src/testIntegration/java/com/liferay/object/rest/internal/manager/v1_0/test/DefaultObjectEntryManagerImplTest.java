@@ -113,8 +113,8 @@ import com.liferay.object.tree.Edge;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.Tree;
 import com.liferay.object.tree.constants.TreeConstants;
+import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.UnsafeTriFunction;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -3830,31 +3830,15 @@ public class DefaultObjectEntryManagerImplTest
 
 	@Test
 	public void testDeleteRelatedObjectEntry() throws Exception {
-
-		// Delete object entry
-
-		ObjectEntry objectEntryAA1 = _addObjectEntry(
-			_objectDefinitionAA, Collections.emptyMap());
-
-		_defaultObjectEntryManager.deleteObjectEntry(
-			_createDTOConverterContext(), _objectDefinitionAA,
-			objectEntryAA1.getId());
-
-		Assert.assertNull(
-			_objectEntryLocalService.fetchObjectEntry(objectEntryAA1.getId()));
-
-		// Delete related object entry
-
 		_testDeleteRelatedObjectEntry(
-			(objectDefinition, objectEntry1, objectEntry2) ->
+			(objectEntry1, objectEntry2, objectRelationship) ->
 				_defaultObjectEntryManager.deleteRelatedObjectEntry(
-					objectEntry2.getId(), _objectRelationshipA_AA,
+					objectEntry2.getId(), objectRelationship,
 					objectEntry1.getId()));
 		_testDeleteRelatedObjectEntry(
-			(objectDefinition, objectEntry1, objectEntry2) ->
+			(objectEntry1, objectEntry2, objectRelationship) ->
 				_defaultObjectEntryManager.deleteRelatedObjectEntry(
-					objectEntry2.getExternalReferenceCode(),
-					_objectRelationshipA_AA,
+					objectEntry2.getExternalReferenceCode(), objectRelationship,
 					objectEntry1.getExternalReferenceCode()));
 	}
 
@@ -5430,21 +5414,6 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testGetObjectEntriesWithRootObjectEntryId() throws Exception {
-		_testGetObjectEntriesWithRootObjectEntryId(
-			(objectDefinition, objectEntry, objectRelationship) ->
-				_defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-					_createDTOConverterContext(), objectDefinition,
-					objectEntry.getId(), objectRelationship.getName(), null));
-		_testGetObjectEntriesWithRootObjectEntryId(
-			(objectDefinition, objectEntry, objectRelationship) ->
-				_defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-					_createDTOConverterContext(),
-					objectEntry.getExternalReferenceCode(), objectRelationship,
-					null));
-	}
-
-	@Test
 	public void testGetObjectEntriesWithScopeDepot() throws Exception {
 		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
 			HashMapBuilder.put(
@@ -5615,7 +5584,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testGetObjectEntryRelatedObjectEntriesWithAccountEntryRestricted()
+	public void testGetRelatedObjectEntriesWithAccountEntryRestricted()
 		throws Exception {
 
 		// Account entry restricted scope
@@ -5715,9 +5684,9 @@ public class DefaultObjectEntryManagerImplTest
 			accountEntry.getAccountEntryId(), _user.getUserId());
 
 		Page<ObjectEntry> page =
-			_defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-				_simpleDTOConverterContext, _objectDefinition3,
-				objectEntry1.getId(), objectRelationship1.getName(), null);
+			_defaultObjectEntryManager.getRelatedObjectEntries(
+				_simpleDTOConverterContext, objectEntry1.getId(),
+				objectRelationship1, null);
 
 		Collection<ObjectEntry> objectEntries = page.getItems();
 
@@ -5782,9 +5751,9 @@ public class DefaultObjectEntryManagerImplTest
 		_organizationLocalService.addUserOrganization(
 			user.getUserId(), organization.getOrganizationId());
 
-		page = _defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-			_simpleDTOConverterContext, _objectDefinition3,
-			objectEntry2.getId(), objectRelationship1.getName(), null);
+		page = _defaultObjectEntryManager.getRelatedObjectEntries(
+			_simpleDTOConverterContext, objectEntry2.getId(),
+			objectRelationship1, null);
 
 		objectEntries = page.getItems();
 
@@ -5855,13 +5824,30 @@ public class DefaultObjectEntryManagerImplTest
 
 		PrincipalThreadLocal.setName(user.getUserId());
 
-		page = _defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-			_simpleDTOConverterContext, _objectDefinition3,
-			objectEntry3.getId(), objectRelationship3.getName(), null);
+		page = _defaultObjectEntryManager.getRelatedObjectEntries(
+			_simpleDTOConverterContext, objectEntry3.getId(),
+			objectRelationship3, null);
 
 		objectEntries = page.getItems();
 
 		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
+	}
+
+	@Test
+	public void testGetRelatedObjectEntriesWithRootObjectEntryId()
+		throws Exception {
+
+		_testGetObjectEntriesWithRootObjectEntryId(
+			(objectEntry, objectRelationship) ->
+				_defaultObjectEntryManager.getRelatedObjectEntries(
+					_createDTOConverterContext(), objectEntry.getId(),
+					objectRelationship, null));
+		_testGetObjectEntriesWithRootObjectEntryId(
+			(objectEntry, objectRelationship) ->
+				_defaultObjectEntryManager.getRelatedObjectEntries(
+					_createDTOConverterContext(),
+					objectEntry.getExternalReferenceCode(), objectRelationship,
+					null));
 	}
 
 	@FeatureFlag("LPD-17564")
@@ -9222,7 +9208,7 @@ public class DefaultObjectEntryManagerImplTest
 
 	private void _testDeleteRelatedObjectEntry(
 			UnsafeTriConsumer
-				<ObjectDefinition, ObjectEntry, ObjectEntry, Exception>
+				<ObjectEntry, ObjectEntry, ObjectRelationship, Exception>
 					unsafeTriConsumer)
 		throws Exception {
 
@@ -9255,14 +9241,14 @@ public class DefaultObjectEntryManagerImplTest
 			NoSuchObjectEntryException.class,
 			StringBundler.concat(
 				"No ObjectEntry exists with the key {",
-				_objectRelationshipA_AAObjectField2.getName(), "=",
+				_objectRelationshipB_AAObjectField2.getName(), "=",
 				_objectEntryB.getId(), ", objectEntryId=",
 				objectEntryAA2.getId(), "}"),
 			() -> unsafeTriConsumer.accept(
-				_objectDefinitionB, _objectEntryB, objectEntryAA2));
+				_objectEntryB, objectEntryAA2, _objectRelationshipB_AA));
 
 		unsafeTriConsumer.accept(
-			_objectDefinitionA, _objectEntryA, objectEntryAA2);
+			_objectEntryA, objectEntryAA2, _objectRelationshipA_AA);
 
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(objectEntryAA2.getId()));
@@ -9307,26 +9293,15 @@ public class DefaultObjectEntryManagerImplTest
 						" must have VIEW permission for ",
 						rootObjectDefinition.getClassName(), StringPool.SPACE,
 						rootNode.getPrimaryKey()),
-					() ->
-						_defaultObjectEntryManager.
-							getObjectEntryRelatedObjectEntries(
-								_createDTOConverterContext(),
-								objectDefinitionLocalService.
-									getObjectDefinition(
-										objectRelationship.
-											getObjectDefinitionId1()),
-								parentNode.getPrimaryKey(),
-								objectRelationship.getName(), null));
+					() -> _defaultObjectEntryManager.getRelatedObjectEntries(
+						_createDTOConverterContext(),
+						parentNode.getPrimaryKey(), objectRelationship, null));
 			}
 			else {
 				Page<ObjectEntry> objectEntryPage =
-					_defaultObjectEntryManager.
-						getObjectEntryRelatedObjectEntries(
-							_createDTOConverterContext(),
-							objectDefinitionLocalService.getObjectDefinition(
-								objectRelationship.getObjectDefinitionId1()),
-							parentNode.getPrimaryKey(),
-							objectRelationship.getName(), null);
+					_defaultObjectEntryManager.getRelatedObjectEntries(
+						_createDTOConverterContext(),
+						parentNode.getPrimaryKey(), objectRelationship, null);
 
 				Assert.assertEquals(
 					relatedObjectEntriesSize, objectEntryPage.getTotalCount());
@@ -9335,9 +9310,9 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	private void _testGetObjectEntriesWithRootObjectEntryId(
-			UnsafeTriFunction
-				<ObjectDefinition, ObjectEntry, ObjectRelationship,
-				 Page<ObjectEntry>, Exception> unsafeTriFunction)
+			UnsafeBiFunction
+				<ObjectEntry, ObjectRelationship, Page<ObjectEntry>, Exception>
+					unsafeBiFunction)
 		throws Exception {
 
 		// User with permission to VIEW object definition A
@@ -9390,8 +9365,8 @@ public class DefaultObjectEntryManagerImplTest
 
 		_addRoleUser(new String[] {ActionKeys.VIEW}, _objectDefinitionA, _user);
 
-		Page<ObjectEntry> objectEntryPage = unsafeTriFunction.apply(
-			_objectDefinitionA, _objectEntryA, _objectRelationshipA_AA);
+		Page<ObjectEntry> objectEntryPage = unsafeBiFunction.apply(
+			_objectEntryA, _objectRelationshipA_AA);
 
 		assertEquals(
 			(List<ObjectEntry>)objectEntryPage.getItems(),
@@ -9411,8 +9386,8 @@ public class DefaultObjectEntryManagerImplTest
 				"User ", _user.getUserId(), " must have VIEW permission for ",
 				_objectDefinitionB.getClassName(), StringPool.SPACE,
 				_objectEntryB.getId()),
-			() -> unsafeTriFunction.apply(
-				_objectDefinitionB, _objectEntryB, _objectRelationshipB_AA));
+			() -> unsafeBiFunction.apply(
+				_objectEntryB, _objectRelationshipB_AA));
 
 		// User with permission to VIEW object definition AA
 
@@ -9427,8 +9402,8 @@ public class DefaultObjectEntryManagerImplTest
 				"User ", _user.getUserId(), " must have VIEW permission for ",
 				_objectDefinitionA.getClassName(), StringPool.SPACE,
 				_objectEntryA.getId()),
-			() -> unsafeTriFunction.apply(
-				_objectDefinitionA, _objectEntryA, _objectRelationshipA_AA));
+			() -> unsafeBiFunction.apply(
+				_objectEntryA, _objectRelationshipA_AA));
 
 		objectEntryPage = _objectEntryManager.getObjectEntries(
 			TestPropsValues.getCompanyId(), _objectDefinitionAA, null, null,
@@ -9444,8 +9419,8 @@ public class DefaultObjectEntryManagerImplTest
 				"User ", _user.getUserId(), " must have VIEW permission for ",
 				_objectDefinitionB.getClassName(), StringPool.SPACE,
 				_objectEntryB.getId()),
-			() -> unsafeTriFunction.apply(
-				_objectDefinitionB, _objectEntryB, _objectRelationshipB_AA));
+			() -> unsafeBiFunction.apply(
+				_objectEntryB, _objectRelationshipB_AA));
 
 		// User with permission to VIEW object definition B
 
@@ -9459,10 +9434,9 @@ public class DefaultObjectEntryManagerImplTest
 				"User ", _user.getUserId(), " must have VIEW permission for ",
 				_objectDefinitionA.getClassName(), StringPool.SPACE,
 				_objectEntryA.getId()),
-			() -> _defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-				_createDTOConverterContext(), _objectDefinitionA,
-				_objectEntryA.getId(), _objectRelationshipA_AA.getName(),
-				null));
+			() -> _defaultObjectEntryManager.getRelatedObjectEntries(
+				_createDTOConverterContext(), _objectEntryA.getId(),
+				_objectRelationshipA_AA, null));
 
 		objectEntryPage = _objectEntryManager.getObjectEntries(
 			TestPropsValues.getCompanyId(), _objectDefinitionAA, null, null,
@@ -9472,8 +9446,8 @@ public class DefaultObjectEntryManagerImplTest
 			(List<ObjectEntry>)objectEntryPage.getItems(),
 			Collections.emptyList());
 
-		objectEntryPage = unsafeTriFunction.apply(
-			_objectDefinitionB, _objectEntryB, _objectRelationshipB_AA);
+		objectEntryPage = unsafeBiFunction.apply(
+			_objectEntryB, _objectRelationshipB_AA);
 
 		assertEquals(
 			(List<ObjectEntry>)objectEntryPage.getItems(),
@@ -9488,8 +9462,8 @@ public class DefaultObjectEntryManagerImplTest
 			new String[] {ActionKeys.VIEW}, _objectDefinitionAA, _user);
 		_addRoleUser(new String[] {ActionKeys.VIEW}, _objectDefinitionB, _user);
 
-		objectEntryPage = unsafeTriFunction.apply(
-			_objectDefinitionA, _objectEntryA, _objectRelationshipA_AA);
+		objectEntryPage = unsafeBiFunction.apply(
+			_objectEntryA, _objectRelationshipA_AA);
 
 		assertEquals(
 			(List<ObjectEntry>)objectEntryPage.getItems(),
@@ -9503,8 +9477,8 @@ public class DefaultObjectEntryManagerImplTest
 			(List<ObjectEntry>)objectEntryPage.getItems(),
 			List.of(objectEntryAA));
 
-		objectEntryPage = unsafeTriFunction.apply(
-			_objectDefinitionB, _objectEntryB, _objectRelationshipB_AA);
+		objectEntryPage = unsafeBiFunction.apply(
+			_objectEntryB, _objectRelationshipB_AA);
 
 		assertEquals(
 			(List<ObjectEntry>)objectEntryPage.getItems(),
