@@ -141,7 +141,7 @@ public class ObjectEntryRelatedObjectsResourceImpl
 				objectRelationshipName);
 
 		Page<ObjectEntry> page =
-			defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
+			defaultObjectEntryManager.getRelatedObjectEntries(
 				_getDTOConverterContext(null), currentExternalReferenceCode,
 				objectRelationship, pagination);
 
@@ -183,10 +183,9 @@ public class ObjectEntryRelatedObjectsResourceImpl
 		}
 
 		Page<ObjectEntry> page =
-			defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
+			defaultObjectEntryManager.getRelatedObjectEntries(
 				_getDTOConverterContext(currentObjectEntryId),
-				_objectDefinition, currentObjectEntryId, objectRelationshipName,
-				pagination);
+				currentObjectEntryId, objectRelationship, pagination);
 
 		return Page.of(
 			page.getActions(),

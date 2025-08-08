@@ -872,16 +872,14 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	@Override
-	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, Long objectEntryId,
-			String objectRelationshipName, Pagination pagination)
+	public Page<ObjectEntry> getRelatedObjectEntries(
+			DTOConverterContext dtoConverterContext, long objectEntryId,
+			ObjectRelationship objectRelationship, Pagination pagination)
 		throws Exception {
 
-		ObjectRelationship objectRelationship =
-			_objectRelationshipLocalService.getObjectRelationship(
-				objectDefinition.getObjectDefinitionId(),
-				objectRelationshipName);
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId1());
 
 		ObjectDefinition relatedObjectDefinition = _getRelatedObjectDefinition(
 			objectDefinition, objectRelationship);
@@ -905,7 +903,7 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	@Override
-	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(
+	public Page<ObjectEntry> getRelatedObjectEntries(
 			DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectRelationship objectRelationship,
 			Pagination pagination)
