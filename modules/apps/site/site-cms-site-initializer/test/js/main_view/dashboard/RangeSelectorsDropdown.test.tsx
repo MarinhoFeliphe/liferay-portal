@@ -14,6 +14,21 @@ import {
 	RangeSelectorsDropdown,
 } from '../../../../src/main/resources/META-INF/resources/js/main_view/dashboard/components/RangeSelectorsDropdown';
 
+jest.mock('frontend-js-web', () => ({
+	dateUtils: {
+		getFirstDayOfWeek: jest.fn(() => 0),
+		getWeekdaysShort: jest.fn(() => [
+			'Sun',
+			'Mon',
+			'Tue',
+			'Wed',
+			'Thu',
+			'Fri',
+			'Sat',
+		]),
+	},
+}));
+
 describe('[CMS Dashboard] Components: RangeSelectorsDropdown', () => {
 	const mockedOnChange = jest.fn();
 	const mockedProps: IRangeSelectorsDropdown = {
