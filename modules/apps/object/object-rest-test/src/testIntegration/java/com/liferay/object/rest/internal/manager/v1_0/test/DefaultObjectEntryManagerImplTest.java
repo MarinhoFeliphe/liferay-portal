@@ -5820,12 +5820,12 @@ public class DefaultObjectEntryManagerImplTest
 	public void testGetRelatedObjectEntriesWithRootObjectEntryId()
 		throws Exception {
 
-		_testGetObjectEntriesWithRootObjectEntryId(
+		_testGetRelatedObjectEntriesWithRootObjectEntryId(
 			(objectEntry, objectRelationship) ->
 				_defaultObjectEntryManager.getRelatedObjectEntries(
 					_createDTOConverterContext(), objectEntry.getId(),
 					objectRelationship, null));
-		_testGetObjectEntriesWithRootObjectEntryId(
+		_testGetRelatedObjectEntriesWithRootObjectEntryId(
 			(objectEntry, objectRelationship) ->
 				_defaultObjectEntryManager.getRelatedObjectEntries(
 					_createDTOConverterContext(),
@@ -9292,7 +9292,7 @@ public class DefaultObjectEntryManagerImplTest
 		}
 	}
 
-	private void _testGetObjectEntriesWithRootObjectEntryId(
+	private void _testGetRelatedObjectEntriesWithRootObjectEntryId(
 			UnsafeBiFunction
 				<ObjectEntry, ObjectRelationship, Page<ObjectEntry>, Exception>
 					unsafeBiFunction)
