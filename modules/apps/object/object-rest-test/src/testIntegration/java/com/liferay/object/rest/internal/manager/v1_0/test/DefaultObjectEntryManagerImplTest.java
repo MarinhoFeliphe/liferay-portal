@@ -334,23 +334,6 @@ public class DefaultObjectEntryManagerImplTest
 		_objectRelationshipB_AAObjectField2 =
 			_objectFieldLocalService.getObjectField(
 				_objectRelationshipB_AA.getObjectFieldId2());
-
-		_originalName = PrincipalThreadLocal.getName();
-		_originalPermissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-		_simpleDateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
-			"yyyy-MM-dd");
-
-		adminUser = TestPropsValues.getUser();
-
-		_simpleDTOConverterContext = new DefaultDTOConverterContext(
-			false, Collections.emptyMap(), dtoConverterRegistry, null,
-			LocaleUtil.getDefault(), null, adminUser);
-
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(adminUser));
-
-		PrincipalThreadLocal.setName(adminUser.getUserId());
 	}
 
 	@AfterClass
