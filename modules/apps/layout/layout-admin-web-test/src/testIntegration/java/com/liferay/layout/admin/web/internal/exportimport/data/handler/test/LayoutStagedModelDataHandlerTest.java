@@ -776,14 +776,15 @@ public class LayoutStagedModelDataHandlerTest
 
 		JournalArticle journalArticle1 = _addJournalArticle(
 			RandomTestUtil.randomString(), group1);
-		JournalArticle journalArticle2 = _addJournalArticle(
-			RandomTestUtil.randomString(), group1);
 
 		_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
 			TestPropsValues.getUserId(), group1.getGroupId(), classNameId,
 			journalArticle1.getResourcePrimKey(),
 			layoutPageTemplateEntry1.getLayoutPageTemplateEntryId(),
 			AssetDisplayPageConstants.TYPE_SPECIFIC, new ServiceContext());
+
+		JournalArticle journalArticle2 = _addJournalArticle(
+			RandomTestUtil.randomString(), group1);
 
 		_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
 			TestPropsValues.getUserId(), group1.getGroupId(), classNameId,
@@ -797,7 +798,6 @@ public class LayoutStagedModelDataHandlerTest
 				group1.getGroupId(), RandomTestUtil.randomString(),
 				AssetListEntryTypeConstants.TYPE_MANUAL,
 				ServiceContextTestUtil.getServiceContext(group1.getGroupId()));
-
 		AssetEntry assetEntry2 = _getAssetEntry(journalArticle2);
 
 		_assetListEntryAssetEntryRelLocalService.addAssetListEntryAssetEntryRel(
