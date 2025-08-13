@@ -399,12 +399,10 @@ public class AssetCategoriesSearchFacetDisplayContextTest
 			"assetCategoryIds"
 		);
 
-		RenderRequest renderRequest = Mockito.mock(RenderRequest.class);
-
 		AssetCategoriesSearchFacetDisplayContextBuilder
 			assetCategoriesSearchFacetDisplayContextBuilder =
 				new AssetCategoriesSearchFacetDisplayContextBuilder(
-					groupLocalService, renderRequest);
+					groupLocalService, Mockito.mock(RenderRequest.class));
 
 		assetCategoriesSearchFacetDisplayContextBuilder.
 			setAssetCategoryLocalService(_assetCategoryLocalService);
