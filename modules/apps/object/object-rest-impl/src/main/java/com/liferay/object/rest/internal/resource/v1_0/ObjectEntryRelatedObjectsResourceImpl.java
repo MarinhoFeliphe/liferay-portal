@@ -18,9 +18,12 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -127,7 +130,9 @@ public class ObjectEntryRelatedObjectsResourceImpl
 	public Page<Object>
 			getByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNamePage(
 				String currentExternalReferenceCode,
-				String objectRelationshipName, Pagination pagination)
+				String objectRelationshipName, String search,
+				Aggregation aggregation, Filter filter, Pagination pagination,
+				Sort[] sorts)
 		throws Exception {
 
 		DefaultObjectEntryManager defaultObjectEntryManager =
@@ -143,7 +148,7 @@ public class ObjectEntryRelatedObjectsResourceImpl
 		Page<ObjectEntry> page =
 			defaultObjectEntryManager.getRelatedObjectEntries(
 				_getDTOConverterContext(null), currentExternalReferenceCode,
-				objectRelationship, pagination);
+				objectRelationship, pagination, search, sorts);
 
 		return Page.of(
 			page.getActions(),

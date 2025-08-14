@@ -1167,17 +1167,24 @@ public class ObjectEntryLocalServiceImpl
 	@Override
 	public List<ObjectEntry> getOneToManyObjectEntries(
 			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, String search, int start, int end)
+			boolean related, String search, int start, int end, Sort[] sorts)
 		throws PortalException {
 
 		DSLQuery dslQuery = _getOneToManyObjectEntriesGroupByStep(
 			DSLQueryFactoryUtil.selectDistinct(ObjectEntryTable.INSTANCE),
 			groupId, objectRelationshipId, primaryKey, related, search
-		).orderBy(
-			ObjectEntryTable.INSTANCE.objectEntryId.ascending()
 		).limit(
 			start, end
 		);
+
+		ObjectRelationshipLocalService objectRelationshipLocalService =
+			_objectRelationshipLocalServiceSnapshot.get();
+
+		ObjectRelationship objectRelationship =
+			objectRelationshipLocalService.getObjectRelationship(
+				objectRelationshipId);
+
+		_setOrderBy(dslQuery, objectRelationship.getObjectDefinitionId2(), sorts);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Get one to many related object entries: " + dslQuery);
@@ -1318,20 +1325,7 @@ public class ObjectEntryLocalServiceImpl
 			start, end
 		);
 
-		if (sorts != null) {
-			SortDSLQueryVisitor sortDSLQueryVisitor = new SortDSLQueryVisitor(
-				_objectFieldLocalService,
-				_objectRelationshipLocalServiceSnapshot.get());
-
-			for (Sort sort : sorts) {
-				dslQuery = sortDSLQueryVisitor.visit(
-					dslQuery,
-					new com.liferay.object.internal.sort.Sort(
-						_objectDefinitionPersistence.findByPrimaryKey(
-							objectDefinitionId),
-						sort));
-			}
-		}
+		_setOrderBy(dslQuery, objectDefinitionId, sorts);
 
 		return TransformUtil.transform(
 			objectEntryPersistence.dslQuery(dslQuery),
@@ -5610,6 +5604,27 @@ public class ObjectEntryLocalServiceImpl
 
 		objectEntry.setRootObjectEntryId(
 			parentObjectEntry.getRootObjectEntryId());
+	}
+
+	private void _setOrderBy(DSLQuery dslQuery, long objectDefinitionId, Sort[] sorts)
+		throws PortalException {
+
+		if (sorts == null) {
+			return;
+		}
+
+		SortDSLQueryVisitor sortDSLQueryVisitor = new SortDSLQueryVisitor(
+			_objectFieldLocalService,
+			_objectRelationshipLocalServiceSnapshot.get());
+
+		for (Sort sort : sorts) {
+			dslQuery = sortDSLQueryVisitor.visit(
+				dslQuery,
+				new com.liferay.object.internal.sort.Sort(
+					_objectDefinitionPersistence.findByPrimaryKey(
+						objectDefinitionId),
+					sort));
+		}
 	}
 
 	private void _startWorkflowInstance(

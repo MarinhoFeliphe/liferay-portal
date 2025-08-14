@@ -41,7 +41,7 @@ public class OneToManyObjectRelationshipRelatedInfoCollectionProvider
 				objectEntry.getGroupId(),
 				objectRelationship.getObjectRelationshipId(),
 				objectEntry.getObjectEntryId(), true, null,
-				pagination.getStart(), pagination.getEnd()),
+				pagination.getStart(), pagination.getEnd(), null),
 			pagination,
 			objectEntryLocalService.getOneToManyObjectEntriesCount(
 				objectEntry.getGroupId(),

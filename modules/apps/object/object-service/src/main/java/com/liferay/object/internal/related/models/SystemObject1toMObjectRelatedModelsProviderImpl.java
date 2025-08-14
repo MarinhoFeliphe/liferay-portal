@@ -32,6 +32,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -86,7 +87,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 		List<T> relatedModels = getRelatedModels(
 			groupId, objectRelationshipId, primaryKey, null, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS);
+			QueryUtil.ALL_POS, null);
 
 		if (relatedModels.isEmpty()) {
 			return;
@@ -250,7 +251,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 	@Override
 	public List<T> getRelatedModels(
 			long groupId, long objectRelationshipId, long primaryKey,
-			String search, int start, int end)
+			String search, int start, int end, Sort[] sorts)
 		throws PortalException {
 
 		PersistedModelLocalService persistedModelLocalService =

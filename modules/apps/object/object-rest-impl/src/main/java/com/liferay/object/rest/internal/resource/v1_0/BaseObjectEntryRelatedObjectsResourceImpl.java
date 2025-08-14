@@ -9,7 +9,10 @@ import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -33,6 +36,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
 
@@ -115,11 +119,15 @@ public abstract class BaseObjectEntryRelatedObjectsResourceImpl {
 				in = ParameterIn.PATH, name = "currentExternalReferenceCode"
 			),
 			@Parameter(in = ParameterIn.PATH, name = "objectRelationshipName"),
+			@Parameter(in = ParameterIn.QUERY, name = "aggregationTerms"),
 			@Parameter(in = ParameterIn.QUERY, name = "fields"),
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
 			@Parameter(in = ParameterIn.QUERY, name = "nestedFields"),
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
-			@Parameter(in = ParameterIn.QUERY, name = "restrictFields")
+			@Parameter(in = ParameterIn.QUERY, name = "restrictFields"),
+			@Parameter(in = ParameterIn.QUERY, name = "search"),
+			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
 	@Path(
@@ -135,7 +143,9 @@ public abstract class BaseObjectEntryRelatedObjectsResourceImpl {
 				@NotNull @Parameter(hidden = true)
 				@PathParam("objectRelationshipName")
 				String objectRelationshipName,
-				@Context Pagination pagination)
+				@Parameter(hidden = true) @QueryParam("search") String search,
+				@Context Aggregation aggregation, @Context Filter filter,
+				@Context Pagination pagination, @Context Sort[] sorts)
 		throws Exception;
 
 	@GET

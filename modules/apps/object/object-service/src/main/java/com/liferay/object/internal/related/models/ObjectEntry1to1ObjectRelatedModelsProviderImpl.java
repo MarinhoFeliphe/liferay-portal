@@ -16,6 +16,7 @@ import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
@@ -56,7 +57,7 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 				objectRelationshipId);
 
 		List<ObjectEntry> relatedModels = getRelatedModels(
-			groupId, objectRelationshipId, primaryKey, null, 0, 1);
+			groupId, objectRelationshipId, primaryKey, null, 0, 1, null);
 
 		if (relatedModels.isEmpty()) {
 			return;
@@ -140,11 +141,12 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 	@Override
 	public List<ObjectEntry> getRelatedModels(
 			long groupId, long objectRelationshipId, long primaryKey,
-			String search, int start, int end)
+			String search, int start, int end, Sort[] sorts)
 		throws PortalException {
 
 		return _objectEntryService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, true, search, 0, 1);
+			groupId, objectRelationshipId, primaryKey, true, search, 0, 1,
+			sorts);
 	}
 
 	@Override
@@ -154,7 +156,7 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 		throws PortalException {
 
 		List<ObjectEntry> relatedModels = getRelatedModels(
-			groupId, objectRelationshipId, primaryKey, search, 0, 1);
+			groupId, objectRelationshipId, primaryKey, search, 0, 1, null);
 
 		return relatedModels.size();
 	}
