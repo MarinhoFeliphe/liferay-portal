@@ -411,7 +411,7 @@ public interface ObjectEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectEntry> getOneToManyObjectEntries(
 			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, String search, int start, int end)
+			boolean related, String search, int start, int end, Sort[] sorts)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
