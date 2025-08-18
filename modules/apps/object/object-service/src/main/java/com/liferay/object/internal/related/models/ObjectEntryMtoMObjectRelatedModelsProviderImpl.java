@@ -15,6 +15,7 @@ import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 
 		List<ObjectEntry> relatedModels = getRelatedModels(
 			groupId, objectRelationshipId, primaryKey, null, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS);
+			QueryUtil.ALL_POS, null);
 
 		if (relatedModels.isEmpty()) {
 			return;
@@ -109,7 +110,7 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 
 	public List<ObjectEntry> getRelatedModels(
 			long groupId, long objectRelationshipId, long primaryKey,
-			String search, int start, int end)
+			String search, int start, int end, Sort[] sorts)
 		throws PortalException {
 
 		ObjectRelationship objectRelationship =
@@ -176,7 +177,7 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 
 		List<ObjectEntry> relatedModels = getRelatedModels(
 			groupId, objectRelationshipId, primaryKey, null, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS);
+			QueryUtil.ALL_POS, null);
 
 		if (relatedModels.isEmpty()) {
 			return;

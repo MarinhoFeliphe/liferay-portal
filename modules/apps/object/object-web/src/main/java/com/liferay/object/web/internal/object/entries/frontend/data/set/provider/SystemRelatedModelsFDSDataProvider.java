@@ -87,7 +87,7 @@ public class SystemRelatedModelsFDSDataProvider
 				objectScopeProvider.getGroupId(httpServletRequest),
 				objectRelationshipId, objectEntryId, fdsKeywords.getKeywords(),
 				fdsPagination.getStartPosition(),
-				fdsPagination.getEndPosition()),
+				fdsPagination.getEndPosition(), null),
 			relatedModel -> {
 				ObjectField titleObjectField =
 					_objectFieldLocalService.fetchObjectField(

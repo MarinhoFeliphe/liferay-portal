@@ -864,8 +864,7 @@ public class DefaultObjectEntryManagerImpl
 	@Override
 	public Page<ObjectEntry> getRelatedObjectEntries(
 			DTOConverterContext dtoConverterContext, long objectEntryId,
-			ObjectRelationship objectRelationship, Pagination pagination,
-			Sort[] sorts)
+			ObjectRelationship objectRelationship, Pagination pagination)
 		throws Exception {
 
 		ObjectDefinition objectDefinition =
@@ -987,7 +986,7 @@ public class DefaultObjectEntryManagerImpl
 						objectRelationship.getObjectRelationshipId(),
 						serviceBuilderObjectEntry.getPrimaryKey(), null,
 						_getStartPosition(pagination),
-						_getEndPosition(pagination)),
+						_getEndPosition(pagination), null),
 				baseModel -> _toDTO(
 					baseModel, serviceBuilderObjectEntry,
 					_systemObjectDefinitionManagerRegistry.
@@ -2152,7 +2151,7 @@ public class DefaultObjectEntryManagerImpl
 		return objectRelatedModelsProvider.getRelatedModels(
 			GroupThreadLocal.getGroupId(),
 			objectRelationship.getObjectRelationshipId(), primaryKey, null, -1,
-			-1);
+			-1, null);
 	}
 
 	private ObjectDefinition _getRelatedObjectDefinition(
@@ -2349,7 +2348,7 @@ public class DefaultObjectEntryManagerImpl
 				objectRelatedModelsProvider.getRelatedModels(
 					groupId, objectRelationship.getObjectRelationshipId(),
 					objectEntryId, null, _getStartPosition(pagination),
-					_getEndPosition(pagination))),
+					_getEndPosition(pagination), null)),
 			pagination,
 			objectRelatedModelsProvider.getRelatedModelsCount(
 				groupId, objectRelationship.getObjectRelationshipId(),

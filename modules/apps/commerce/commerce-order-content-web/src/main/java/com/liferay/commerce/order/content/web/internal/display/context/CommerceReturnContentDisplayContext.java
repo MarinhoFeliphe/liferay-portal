@@ -829,7 +829,7 @@ public class CommerceReturnContentDisplayContext {
 					commerceReturnToCommerceReturnItems.
 						getObjectRelationshipId(),
 					commerceReturn.getId(), true, null, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS),
+					QueryUtil.ALL_POS, null),
 				curObjectEntry -> {
 					Map<String, Serializable> values =
 						curObjectEntry.getValues();

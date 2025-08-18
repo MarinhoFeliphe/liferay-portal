@@ -12,6 +12,7 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.List;
@@ -89,12 +90,12 @@ public class DeleteOnDisassociateObjectRelatedModelsProvider
 
 	@Override
 	public List<ObjectEntry> getRelatedModels(
-			long groupId, long objectRelationshipId, long primaryKey,
-			String search, int start, int end)
+		long groupId, long objectRelationshipId, long primaryKey,
+		String search, int start, int end, Sort[] sorts)
 		throws PortalException {
 
 		return _objectRelatedModelsProvider.getRelatedModels(
-			groupId, objectRelationshipId, primaryKey, search, start, end);
+			groupId, objectRelationshipId, primaryKey, search, start, end, sorts);
 	}
 
 	@Override
