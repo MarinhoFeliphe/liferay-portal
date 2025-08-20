@@ -9709,8 +9709,6 @@ public class DefaultObjectEntryManagerImplTest
 	private void _testUpdateRelatedObjectEntry(boolean partialUpdate)
 		throws Exception {
 
-		// Update related object entry
-
 		ObjectEntry objectEntry =
 			_defaultObjectEntryManager.addRelatedObjectEntry(
 				_createDTOConverterContext(),
