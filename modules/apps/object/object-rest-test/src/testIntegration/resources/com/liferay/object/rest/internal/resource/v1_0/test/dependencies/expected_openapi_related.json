@@ -2559,20 +2559,6 @@
 						}
 					}
 				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						},
-						"application/xml": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						}
-					}
-				},
 				"responses": {
 					"default": {
 						"content": {
@@ -2864,20 +2850,6 @@
 						}
 					}
 				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						},
-						"application/xml": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						}
-					}
-				},
 				"responses": {
 					"default": {
 						"content": {
@@ -3169,20 +3141,6 @@
 						}
 					}
 				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						},
-						"application/xml": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						}
-					}
-				},
 				"responses": {
 					"default": {
 						"content": {
@@ -6005,20 +5963,6 @@
 						}
 					}
 				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						},
-						"application/xml": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						}
-					}
-				},
 				"responses": {
 					"default": {
 						"content": {
@@ -6310,20 +6254,6 @@
 						}
 					}
 				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						},
-						"application/xml": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						}
-					}
-				},
 				"responses": {
 					"default": {
 						"content": {
@@ -6615,20 +6545,6 @@
 						}
 					}
 				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						},
-						"application/xml": {
-							"schema": {
-								"$ref": "#/components/schemas/Object2"
-							}
-						}
-					}
-				},
 				"responses": {
 					"default": {
 						"content": {
