@@ -9,12 +9,11 @@
 
 <%
 SearchIteratorDisplayContext searchIteratorDisplayContext = (SearchIteratorDisplayContext)request.getAttribute(SampleWebKeys.SEARCH_ITERATOR_DISPLAY_CONTEXT);
-jakarta.portlet.RenderResponse renderResponse = (jakarta.portlet.RenderResponse)request.getAttribute("jakarta.portlet.response");
 %>
 
 <clay:container-fluid>
 	<liferay-ui:search-container
-		rowChecker="<%= new com.liferay.portal.kernel.dao.search.RowChecker(renderResponse) %>"
+		rowChecker='<%= new com.liferay.portal.kernel.dao.search.RowChecker((RenderResponse)request.getAttribute("jakarta.portlet.response")) %>'
 		searchContainer="<%= searchIteratorDisplayContext.getSearchContainer() %>"
 	>
 		<liferay-ui:search-container-row
