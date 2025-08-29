@@ -422,7 +422,7 @@ public class ObjectEntryLocalServiceImpl
 
 		_addResourcePermissions(objectDefinition, objectEntry);
 
-		if (objectDefinition.isRootDescendantNode() ||
+		if (objectEntry.isRootDescendantNode() ||
 			(workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
 			try {
@@ -5837,7 +5837,7 @@ public class ObjectEntryLocalServiceImpl
 		try {
 			WorkflowThreadLocal.setEnabled(true);
 
-			if (objectDefinition.isRootDescendantNode()) {
+			if (objectEntry.isRootDescendantNode()) {
 				ObjectEntry rootObjectEntry =
 					objectEntryPersistence.fetchByPrimaryKey(
 						objectEntry.getRootObjectEntryId());
