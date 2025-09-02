@@ -57,12 +57,10 @@ public class DeepLTranslatorTest {
 
 	@Test
 	public void testTranslationHandlesBaseLanguage() throws PortalException {
-		TranslatorPacket originTranslatorPacket = _getTranslatorPocket(
-			Map.of("infoField--JournalArticle_title--0", false), "en_US",
-			"ca_ES");
-
 		TranslatorPacket translatorPacket = _deepLTranslator.translate(
-			originTranslatorPacket);
+			_getTranslatorPocket(
+				Map.of("infoField--JournalArticle_title--0", false), "en_US",
+				"ca_ES"));
 
 		Assert.assertEquals(
 			Map.of("infoField--JournalArticle_title--0", "¡Hola, mundo!"),
@@ -71,12 +69,10 @@ public class DeepLTranslatorTest {
 
 	@Test
 	public void testTranslationHandlesLanguageVariant() throws PortalException {
-		TranslatorPacket originTranslatorPacket = _getTranslatorPocket(
-			Map.of("infoField--JournalArticle_title--0", false), "en_US",
-			"pt_BR");
-
 		TranslatorPacket translatorPacket = _deepLTranslator.translate(
-			originTranslatorPacket);
+			_getTranslatorPocket(
+				Map.of("infoField--JournalArticle_title--0", false), "en_US",
+				"pt_BR"));
 
 		Assert.assertEquals(
 			Map.of("infoField--JournalArticle_title--0", "Olá, mundo!"),
@@ -87,12 +83,10 @@ public class DeepLTranslatorTest {
 	public void testTranslationHandlesTraditionalChinese()
 		throws PortalException {
 
-		TranslatorPacket originTranslatorPacket = _getTranslatorPocket(
-			Map.of("infoField--JournalArticle_title--0", false), "en_US",
-			"zh_TW");
-
 		TranslatorPacket translatorPacket = _deepLTranslator.translate(
-			originTranslatorPacket);
+			_getTranslatorPocket(
+				Map.of("infoField--JournalArticle_title--0", false), "en_US",
+				"zh_TW"));
 
 		Assert.assertEquals(
 			Map.of("infoField--JournalArticle_title--0", "哈囉，世界！"),
