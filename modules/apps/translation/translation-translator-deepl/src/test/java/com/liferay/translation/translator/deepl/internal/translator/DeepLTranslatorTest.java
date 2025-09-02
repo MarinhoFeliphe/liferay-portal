@@ -50,9 +50,7 @@ public class DeepLTranslatorTest {
 		ConfigurationProvider configurationProvider =
 			_setUpConfigurationProvider(_companyId);
 
-		Http http = _setUpHttp();
-
-		_setUpDeepLTranslator(configurationProvider, http);
+		_setUpDeepLTranslator(configurationProvider, _setUpHttp());
 
 		_setUpPortalUtil();
 	}
@@ -101,7 +99,7 @@ public class DeepLTranslatorTest {
 			translatorPacket.getFieldsMap());
 	}
 
-	private String _getTranslations(String text) {
+	private String _getTranslationsJSON(String text) {
 		return JSONUtil.put(
 			"translations",
 			JSONUtil.put(
@@ -231,15 +229,15 @@ public class DeepLTranslatorTest {
 					).toString();
 
 					if (targetLanguage.equals("ZH-HANT")) {
-						return _getTranslations("哈囉，世界！");
+						return _getTranslationsJSON("哈囉，世界！");
 					}
 
 					if (targetLanguage.equals("ES")) {
-						return _getTranslations("¡Hola, mundo!");
+						return _getTranslationsJSON("¡Hola, mundo!");
 					}
 
 					if (targetLanguage.equals("PT-BR")) {
-						return _getTranslations("Olá, mundo!");
+						return _getTranslationsJSON("Olá, mundo!");
 					}
 				}
 
