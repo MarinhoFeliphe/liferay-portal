@@ -47,7 +47,7 @@ public class DeepLTranslatorTest {
 	}
 
 	@Test
-	public void testTranslationHandlesBaseLanguage() throws Exception {
+	public void testTranslationHandlesLanguage() throws Exception {
 		TranslatorPacket translatorPacket = _deepLTranslator.translate(
 			_getTranslatorPocket(
 				Map.of("infoField--JournalArticle_title--0", false), "en_US",
