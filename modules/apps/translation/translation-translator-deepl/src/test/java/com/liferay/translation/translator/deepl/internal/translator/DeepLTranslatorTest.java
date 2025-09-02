@@ -45,13 +45,7 @@ public class DeepLTranslatorTest {
 
 	@Before
 	public void setUp() throws ConfigurationException, IOException {
-		_companyId = RandomTestUtil.randomLong();
-
-		ConfigurationProvider configurationProvider =
-			_setUpConfigurationProvider(_companyId);
-
-		_setUpDeepLTranslator(configurationProvider, _setUpHttp());
-
+		_setUpDeepLTranslator();
 		_setUpPortalUtil();
 	}
 
@@ -113,7 +107,7 @@ public class DeepLTranslatorTest {
 
 			@Override
 			public long getCompanyId() {
-				return _companyId;
+				return _COMPANY_ID;
 			}
 
 			@Override
@@ -183,12 +177,12 @@ public class DeepLTranslatorTest {
 		return configurationProvider;
 	}
 
-	private void _setUpDeepLTranslator(
-		ConfigurationProvider configurationProvider, Http http) {
-
+	private void _setUpDeepLTranslator() {
 		ReflectionTestUtil.setFieldValue(
-			_deepLTranslator, "_configurationProvider", configurationProvider);
-		ReflectionTestUtil.setFieldValue(_deepLTranslator, "_http", http);
+			_deepLTranslator, "_configurationProvider",
+			_setUpConfigurationProvider(_COMPANY_ID));
+		ReflectionTestUtil.setFieldValue(
+			_deepLTranslator, "_http", _setUpHttp());
 		ReflectionTestUtil.setFieldValue(
 			_deepLTranslator, "_jsonFactory", new JSONFactoryImpl());
 	}
@@ -256,7 +250,8 @@ public class DeepLTranslatorTest {
 		);
 	}
 
-	private long _companyId;
+	private static final long _COMPANY_ID = RandomTestUtil.randomLong();
+
 	private final DeepLTranslator _deepLTranslator = new DeepLTranslator();
 
 }
