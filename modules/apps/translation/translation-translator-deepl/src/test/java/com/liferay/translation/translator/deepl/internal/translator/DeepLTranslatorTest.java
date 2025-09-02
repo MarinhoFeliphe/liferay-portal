@@ -167,12 +167,10 @@ public class DeepLTranslatorTest {
 			"https://api-free.deepl.com/v2/translate"
 		);
 
-		String languagesUrlString = "https://api-free.deepl.com/v2/languages";
-
 		Mockito.when(
 			deepLTranslatorConfiguration.validateLanguageURL()
 		).thenReturn(
-			languagesUrlString
+			"https://api-free.deepl.com/v2/languages"
 		);
 
 		Mockito.when(
