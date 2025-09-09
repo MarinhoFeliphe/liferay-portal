@@ -885,6 +885,11 @@ public class ObjectDefinitionWrapper
 		return model.getPortletId();
 	}
 
+	@Override
+	public String getPreviousRESTContextPath() {
+		return model.getPreviousRESTContextPath();
+	}
+
 	/**
 	 * Returns the primary key of this object definition.
 	 *
@@ -913,11 +918,6 @@ public class ObjectDefinitionWrapper
 	@Override
 	public long getRootObjectDefinitionId() {
 		return model.getRootObjectDefinitionId();
-	}
-
-	@Override
-	public long[] getRootObjectDefinitionIds() {
-		return model.getRootObjectDefinitionIds();
 	}
 
 	/**
@@ -1188,11 +1188,6 @@ public class ObjectDefinitionWrapper
 	@Override
 	public boolean isRootDescendantNode() {
 		return model.isRootDescendantNode();
-	}
-
-	@Override
-	public boolean isRootDescendantNode(long rootObjectDefinitionId) {
-		return model.isRootDescendantNode(rootObjectDefinitionId);
 	}
 
 	@Override
@@ -1692,6 +1687,11 @@ public class ObjectDefinitionWrapper
 	@Override
 	public void setPortlet(boolean portlet) {
 		model.setPortlet(portlet);
+	}
+
+	@Override
+	public void setPreviousRESTContextPath(String previousRESTContextPath) {
+		model.setPreviousRESTContextPath(previousRESTContextPath);
 	}
 
 	/**
