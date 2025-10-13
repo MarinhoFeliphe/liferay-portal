@@ -2,3 +2,4 @@ Bundle-Name: Liferay Portal Workflow Kaleo Runtime Implementation
 Bundle-SymbolicName: com.liferay.portal.workflow.kaleo.runtime.impl
 Bundle-Version: 6.0.97
 -dsannotations-options: inherit
+-fixupmessages: Classes found in the wrong directory: ...;is:=ignore

@@ -1,6 +1,8 @@
 dependencies {
 	testIntegrationImplementation group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	testIntegrationImplementation group: "org.osgi", name: "org.osgi.service.cm", version: "1.6.0"
+	testIntegrationImplementation group: 'dev.langchain4j', name: 'langchain4j-core', version: '1.7.1'
+	testIntegrationImplementation group: 'dev.langchain4j', name: 'langchain4j-vertex-ai-gemini', version: '1.7.1-beta14'
 	testIntegrationImplementation project(":apps:account:account-api")
 	testIntegrationImplementation project(":apps:blogs:blogs-api")
 	testIntegrationImplementation project(":apps:change-tracking:change-tracking-api")

@@ -6,6 +6,9 @@
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.definition.DelayDuration;
@@ -25,21 +28,23 @@ import com.liferay.portal.workflow.kaleo.runtime.calendar.DueDateCalculator;
 import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
 import com.liferay.portal.workflow.kaleo.runtime.node.BaseNodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
+import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
+import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.Serializable;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -103,6 +108,75 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 	protected void doExecute(
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
+
+		Map<String, Serializable> workflowContext =
+			executionContext.getWorkflowContext();
+
+		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
+			.project("upgrades-accelerator-liferay")
+			.location("us-central1")
+			.modelName("gemini-2.5-flash-lite")
+			.build();
+
+			model.chat("Based in the content bellow, retrieve me a summary of it, also I'd like that this content is " +
+					   "categorized, please retrieve this data in a json format but do not include the json delimiters, " +
+					   "like this: {\"summary\":\"content summary\", \"category\":\"content category\"} content: " +
+					   "The Butterfly's Journey: A Simple Life Cycle\n" +
+					   "The life of a butterfly is a fascinating transformation that happens in four main stages. This process is called complete metamorphosis.\n" +
+					   "\n" +
+					   "Stage 1: The Egg\n" +
+					   "A butterfly's life begins when an adult female lays a tiny egg, usually on a specific plant that the future caterpillar will eat. The egg stage is the shortest of the four.\n" +
+					   "\n" +
+					   "Stage 2: The Larva (Caterpillar)\n" +
+					   "Next, the egg hatches into a larva, which we commonly call a caterpillar. A caterpillar's only job is to eat, eat, and eat! It grows rapidly, shedding its skin many times (a process called molting) to accommodate its increasing size.\n" +
+					   "\n" +
+					   "Stage 3: The Pupa (Chrysalis)\n" +
+					   "Once the caterpillar is fully grown, it enters the pupa stage. For butterflies, the pupa is known as a chrysalis. During this seemingly resting stage, a massive change is taking place inside the protective casing. The caterpillar's body is entirely reorganized into the shape of an adult butterfly.\n" +
+					   "\n" +
+					   "Stage 4: The Adult Butterfly\n" +
+					   "Finally, the adult butterfly emerges from the chrysalis. The adult's main job is to reproduce (mate and lay eggs) and feed on nectar from flowers, starting the entire cycle over again.",
+				new StreamingChatResponseHandler() {
+
+				@Override
+				public void onPartialResponse(String partialResponse) {
+				}
+
+				@Override
+				public void onCompleteResponse(ChatResponse completeResponse) {
+					try {
+						JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+							completeResponse.aiMessage().text());
+
+						workflowContext.put(
+							"category", jsonObject.getString("category"));
+						workflowContext.put(
+							"summary", jsonObject.getString("summary"));
+
+						_kaleoInstanceLocalService.updateKaleoInstance(
+							executionContext.getKaleoInstanceToken().getKaleoInstanceId(),
+							workflowContext);
+
+						System.out.println(completeResponse);
+					}
+					catch (JSONException e) {
+						throw new RuntimeException(e);
+					}
+					catch (PortalException e) {
+						throw new RuntimeException(e);
+					}
+					finally {
+						model.close();
+					}
+				}
+
+				@Override
+				public void onError(Throwable error) {
+					System.out.println(error);
+					model.close();
+				}
+			});
+
+		System.out.println("MAIN THREAD");
 	}
 
 	@Override
@@ -206,5 +280,8 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 
 	@Reference
 	private KaleoTaskLocalService _kaleoTaskLocalService;
+
+	@Reference
+	private KaleoInstanceLocalService _kaleoInstanceLocalService;
 
 }
