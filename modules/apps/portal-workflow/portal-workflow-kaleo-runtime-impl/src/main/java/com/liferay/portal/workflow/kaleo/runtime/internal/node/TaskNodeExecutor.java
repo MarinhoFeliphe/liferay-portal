@@ -5,12 +5,12 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
+import com.liferay.petra.string.StringPool;
+import dev.langchain4j.agent.tool.P;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.workflow.kaleo.definition.DelayDuration;
 import com.liferay.portal.workflow.kaleo.definition.DurationScale;
 import com.liferay.portal.workflow.kaleo.definition.ExecutionType;
@@ -33,9 +33,11 @@ import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
-import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
+import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.invocation.InvocationParameters;
+import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.UserMessage;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -104,12 +106,68 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		return true;
 	}
 
+	public interface Assistant {
+		String ask(@UserMessage String userMessage, InvocationParameters parameters);
+	}
+
+	public class AssistantTool {
+
+		@Tool("Complete the current node")
+		public void completeWorkflowTask(
+			@P("Transition name") String transitionName,
+			InvocationParameters parameters) {
+
+			try {
+				ExecutionContext executionContext =
+					parameters.get("executionContext");
+
+				KaleoTaskInstanceToken kaleoTaskInstanceToken =
+					executionContext.getKaleoTaskInstanceToken();
+
+				_workflowTaskManager.assignWorkflowTaskToUser(
+					kaleoTaskInstanceToken.getCompanyId(),
+					kaleoTaskInstanceToken.getUserId(),
+					kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
+					kaleoTaskInstanceToken.getUserId(), "", null,
+					executionContext.getWorkflowContext());
+
+				_workflowTaskManager.completeWorkflowTask(
+					kaleoTaskInstanceToken.getCompanyId(),
+					kaleoTaskInstanceToken.getUserId(),
+					kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(), transitionName, "",
+					executionContext.getWorkflowContext());
+			}
+			catch (PortalException e) {
+				System.out.println(e);
+			}
+		}
+	}
+
 	@Override
 	protected void doExecute(
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
-		Map<String, Serializable> workflowContext =
+ 		VertexAiGeminiChatModel model = VertexAiGeminiChatModel.builder()
+			.project("upgrades-accelerator-liferay")
+			.location("us-central1")
+			.modelName("gemini-2.5-flash-lite")
+			.build();
+
+		Assistant assistant = AiServices.builder(Assistant.class)
+			.chatModel(model)
+			.tools(new AssistantTool())
+			.build();
+
+		String assistantResponse = assistant.ask(
+			"Complete the current node following the reject transition",
+			InvocationParameters.from(
+				Map.of("executionContext", executionContext)
+			));
+
+		System.out.println("Assistant: " + assistantResponse);
+
+		/*Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
 
 		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
@@ -118,66 +176,107 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 			.modelName("gemini-2.5-flash-lite")
 			.build();
 
-			model.chat("Based in the content bellow, retrieve me a summary of it, also I'd like that this content is " +
-					   "categorized, please retrieve this data in a json format but do not include the json delimiters, " +
-					   "like this: {\"summary\":\"content summary\", \"category\":\"content category\"} content: " +
-					   "The Butterfly's Journey: A Simple Life Cycle\n" +
-					   "The life of a butterfly is a fascinating transformation that happens in four main stages. This process is called complete metamorphosis.\n" +
-					   "\n" +
-					   "Stage 1: The Egg\n" +
-					   "A butterfly's life begins when an adult female lays a tiny egg, usually on a specific plant that the future caterpillar will eat. The egg stage is the shortest of the four.\n" +
-					   "\n" +
-					   "Stage 2: The Larva (Caterpillar)\n" +
-					   "Next, the egg hatches into a larva, which we commonly call a caterpillar. A caterpillar's only job is to eat, eat, and eat! It grows rapidly, shedding its skin many times (a process called molting) to accommodate its increasing size.\n" +
-					   "\n" +
-					   "Stage 3: The Pupa (Chrysalis)\n" +
-					   "Once the caterpillar is fully grown, it enters the pupa stage. For butterflies, the pupa is known as a chrysalis. During this seemingly resting stage, a massive change is taking place inside the protective casing. The caterpillar's body is entirely reorganized into the shape of an adult butterfly.\n" +
-					   "\n" +
-					   "Stage 4: The Adult Butterfly\n" +
-					   "Finally, the adult butterfly emerges from the chrysalis. The adult's main job is to reproduce (mate and lay eggs) and feed on nectar from flowers, starting the entire cycle over again.",
-				new StreamingChatResponseHandler() {
+		JsonObjectSchema parametersSchema = JsonObjectSchema.builder()
+			.addNumberProperty("a", "The first number to sum")
+			.addNumberProperty("b", "The second number to sum")
+			.required(List.of("a", "b"))
+			.build();
 
-				@Override
-				public void onPartialResponse(String partialResponse) {
+		ToolSpecification sumToolSpecification = ToolSpecification.builder()
+			.name("sum") // The name the LLM will use for the function call
+			.description("Sums two numbers (a and b) and returns the total.")
+			.parameters(parametersSchema) // Pass the JsonObjectSchema here
+			.build();
+
+		model.chat(
+			ChatRequest.builder(
+			).messages(
+				new ChatMessage[] {
+					UserMessage.from("How much is 4 + 5 and 7 * 10?")
 				}
+			).parameters(
+				ChatRequestParameters.builder(
+				).toolSpecifications(
+					List.of(sumToolSpecification)
+				).build()
+			).build(),
+			new StreamingChatResponseHandler() {
 
-				@Override
-				public void onCompleteResponse(ChatResponse completeResponse) {
-					try {
-						JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-							completeResponse.aiMessage().text());
+			@Override
+			public void onPartialResponse(String partialResponse) {
+			}
 
-						workflowContext.put(
-							"category", jsonObject.getString("category"));
-						workflowContext.put(
-							"summary", jsonObject.getString("summary"));
+			@Override
+			public void onCompleteResponse(ChatResponse completeResponse) {
+				try {
+					JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+						completeResponse.aiMessage().text());
 
-						_kaleoInstanceLocalService.updateKaleoInstance(
-							executionContext.getKaleoInstanceToken().getKaleoInstanceId(),
-							workflowContext);
+					workflowContext.put(
+						"category", jsonObject.getString("category"));
+					workflowContext.put(
+						"summary", jsonObject.getString("summary"));
 
-						System.out.println(completeResponse);
-					}
-					catch (JSONException e) {
-						throw new RuntimeException(e);
-					}
-					catch (PortalException e) {
-						throw new RuntimeException(e);
-					}
-					finally {
-						model.close();
-					}
+					KaleoInstanceToken kaleoInstanceToken =
+						executionContext.getKaleoInstanceToken();
+
+					_kaleoInstanceLocalService.updateKaleoInstance(
+						kaleoInstanceToken.getKaleoInstanceId(),
+						workflowContext);
+
+					KaleoTaskInstanceToken kaleoTaskInstanceToken =
+						executionContext.getKaleoTaskInstanceToken();
+
+					System.out.println(completeResponse);
+
+					_workflowTaskManager.completeWorkflowTask(
+						kaleoInstanceToken.getCompanyId(),
+						kaleoInstanceToken.getUserId(),
+						kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
+						"reject", "", workflowContext);
 				}
-
-				@Override
-				public void onError(Throwable error) {
-					System.out.println(error);
+				catch (JSONException e) {
+					throw new RuntimeException(e);
+				}
+				catch (PortalException e) {
+					throw new RuntimeException(e);
+				}
+				finally {
 					model.close();
 				}
-			});
+			}
+
+			@Override
+			public void onError(Throwable error) {
+				System.out.println(error);
+				model.close();
+			}
+		});*/
 
 		System.out.println("MAIN THREAD");
 	}
+
+	private final String _USER_MESSAGE_1 =
+		"Based in the content bellow, retrieve me a summary of it, also I'd like that this content is " +
+		"categorized, please retrieve this data in a json format but do not include the json delimiters, " +
+		"like this: {\"summary\":\"content summary\", \"category\":\"content category\"} content: " +
+		"The Butterfly's Journey: A Simple Life Cycle\n" +
+		"The life of a butterfly is a fascinating transformation that happens in four main stages. This process is called complete metamorphosis.\n" +
+		"\n" +
+		"Stage 1: The Egg\n" +
+		"A butterfly's life begins when an adult female lays a tiny egg, usually on a specific plant that the future caterpillar will eat. The egg stage is the shortest of the four.\n" +
+		"\n" +
+		"Stage 2: The Larva (Caterpillar)\n" +
+		"Next, the egg hatches into a larva, which we commonly call a caterpillar. A caterpillar's only job is to eat, eat, and eat! It grows rapidly, shedding its skin many times (a process called molting) to accommodate its increasing size.\n" +
+		"\n" +
+		"Stage 3: The Pupa (Chrysalis)\n" +
+		"Once the caterpillar is fully grown, it enters the pupa stage. For butterflies, the pupa is known as a chrysalis. During this seemingly resting stage, a massive change is taking place inside the protective casing. The caterpillar's body is entirely reorganized into the shape of an adult butterfly.\n" +
+		"\n" +
+		"Stage 4: The Adult Butterfly\n" +
+		"Finally, the adult butterfly emerges from the chrysalis. The adult's main job is to reproduce (mate and lay eggs) and feed on nectar from flowers, starting the entire cycle over again.";
+
+	@Reference
+	private WorkflowTaskManager _workflowTaskManager;
 
 	@Override
 	protected void doExit(

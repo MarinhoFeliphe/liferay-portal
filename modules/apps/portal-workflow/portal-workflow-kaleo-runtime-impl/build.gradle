@@ -9,6 +9,8 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.4.0"
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly group: "org.springframework", name: "spring-context", version: "6.2.9"
+	compileInclude group: 'dev.langchain4j', name: 'langchain4j', version: '1.7.1'
+	compileInclude group: 'org.apache.opennlp', name: 'opennlp-tools', version: '2.5.4'
 	compileInclude group: 'dev.langchain4j', name: 'langchain4j-core', version: '1.7.1'
 	compileInclude group: 'dev.langchain4j', name: 'langchain4j-vertex-ai-gemini', version: '1.7.1-beta14'
 	compileInclude group: 'com.google.cloud', name: 'google-cloud-vertexai', version: '1.27.0'
