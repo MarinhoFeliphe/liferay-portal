@@ -5,8 +5,6 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
-import dev.langchain4j.model.output.structured.Description;
-import dev.langchain4j.agent.tool.P;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
@@ -33,6 +31,8 @@ import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
+import dev.langchain4j.model.output.structured.Description;
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
@@ -136,9 +136,7 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
        - Content must have a clear title, introduction and conclusion.
        - Content that is complete and well-structured MUST be approved.
        """)
-		@UserMessage("Analyze the following content and provide a decision: '{content}'")
-		public ContentDecision analyze(
-			@P("content") String content);
+		public String analyze(@UserMessage String userMessage, InvocationParameters parameters);
 	}
 
 	public class AssistantTool {
@@ -151,6 +149,10 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 			try {
 				ExecutionContext executionContext =
 					parameters.get("executionContext");
+
+				if (executionContext == null) {
+					return;
+				}
 
 				KaleoTaskInstanceToken kaleoTaskInstanceToken =
 					executionContext.getKaleoTaskInstanceToken();
@@ -179,23 +181,23 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
- 		VertexAiGeminiChatModel model = VertexAiGeminiChatModel.builder()
-			.project("upgrades-accelerator-liferay")
-			.location("us-central1")
-			.modelName("gemini-2.5-flash-lite")
-			.logRequests(true)
-			.logResponses(true)
-			.build();
-
-		ContentAnalyzerAssistant contentAnalyzerAssistant =
-			AiServices.builder(ContentAnalyzerAssistant.class)
-			.chatModel(model)
-			.tools(new AssistantTool())
-			.build();
+		ContentAnalyzerAssistant assistant = AiServices.builder(
+				ContentAnalyzerAssistant.class
+			).chatModel(
+				VertexAiGeminiChatModel.builder()
+					.project("upgrades-accelerator-liferay")
+					.location("us-central1")
+					.modelName("gemini-2.5-flash-lite")
+					.logRequests(true)
+					.logResponses(true)
+					.build()
+			).tools(
+				new AssistantTool()
+			).build();
 
 		try {
-			ContentDecision contentDecision = contentAnalyzerAssistant.analyze(
-				"Title: The Benefits of Remote Work for Employee Productivity " +
+			String response = assistant.analyze(
+				"Analyze the following content and complete the current node with the decided transition. This is the content: Title: The Benefits of Remote Work for Employee Productivity " +
 				"Introduction Remote work has become increasingly prevalent, " +
 				"offering numerous advantages for both employees and organizations. " +
 				"This document outlines key benefits related to productivity and overall well-being. Key Advantages: " +
@@ -207,12 +209,15 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 				"in a home office environment compared to a bustling open-plan office. " +
 				"* **Access to Global Talent Pool:** Organizations are not restricted by geography, enabling them to hire the best candidates worldwide. " +
 				"Conclusion While remote work presents its own challenges, the productivity gains and enhanced employee satisfaction often outweigh " +
-				"the drawbacks, making it a viable and beneficial model for many industries.");
+				"the drawbacks, making it a viable and beneficial model for many industries.",
+				InvocationParameters.from(
+					Map.of("executionContext", executionContext)
+				));
 
-			System.out.println("Assistant: " + contentDecision);
+			System.out.println(response);
 		}
 		catch (Exception exception) {
-			System.out.println(exception);
+			System.out.println(exception.getMessage());
 		}
 
 		/*Map<String, Serializable> workflowContext =
