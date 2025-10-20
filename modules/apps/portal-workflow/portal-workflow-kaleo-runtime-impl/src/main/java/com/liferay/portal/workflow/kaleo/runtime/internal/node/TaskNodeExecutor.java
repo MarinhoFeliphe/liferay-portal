@@ -5,8 +5,15 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectEntryLocalServiceUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlParserUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.workflow.kaleo.definition.DelayDuration;
@@ -31,14 +38,15 @@ import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
-import dev.langchain4j.model.output.structured.Description;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
-import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
+import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -107,28 +115,10 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		return true;
 	}
 
-	public interface Assistant {
-		String ask(@UserMessage String userMessage, InvocationParameters parameters);
-	}
-
-	public record ContentDecision(
-		@Description("The final transition to follow. Must be either 'reject' or 'approve'.")
-		String transition,
-
-		@Description("A brief, one-sentence justification for the chosen transition.")
-		String reason,
-
-		@Description("A short example on how this content should be in order to be approved.")
-		String suggestion
-	) {}
-
 	public interface ContentAnalyzerAssistant {
 
 		@SystemMessage("""
-       You are a strict content validation expert. Your task is to analyze content and decide the next workflow transition.
-       
-       **CRITICAL RULE: YOUR ENTIRE RESPONSE MUST BE A SINGLE, VALID, RAW JSON OBJECT.**
-       **DO NOT** include any conversational text, headers, introductory phrases, or markdown fences (like ```json).
+       You are a strict content validation expert. Your task is to analyze and categorize the content and decide the next workflow transition.
        
        Available transitions are: 'reject' and 'approve'.
 
@@ -136,23 +126,66 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
        - Content must have a clear title, introduction and conclusion.
        - Content that is complete and well-structured MUST be approved.
        """)
-		public String analyze(@UserMessage String userMessage, InvocationParameters parameters);
+		@UserMessage("""
+		Analyze and categorize the content and complete the current node with the decided transition.
+		
+		This is the content: {{content}}
+		""")
+		public TokenStream analyze(@V("content") String content, InvocationParameters parameters);
 	}
 
 	public class AssistantTool {
 
+		@Tool("Call this tool to categorize a content. Input must be the the category name")
+		public void categorizeContent(
+			@P("Category name") String categoryName,
+			InvocationParameters parameters) {
+
+			ExecutionContext executionContext =
+				parameters.get("executionContext");
+
+			PermissionThreadLocal.setPermissionChecker(
+				parameters.get("permissionChecker"));
+
+			ServiceContext serviceContext =
+				executionContext.getServiceContext();
+
+			try (SafeCloseable safeCloseable =
+					 CompanyThreadLocal.setCompanyIdWithSafeCloseable(
+						 serviceContext.getCompanyId())) {
+
+				Map<String, Serializable> workflowContext =
+					executionContext.getWorkflowContext();
+
+				ObjectEntry objectEntry =
+					ObjectEntryLocalServiceUtil.getObjectEntry(
+						GetterUtil.getLong(
+							workflowContext.get("entryClassPK")));
+
+				serviceContext.setAssetTagNames(new String[] {categoryName});
+
+				ObjectEntryLocalServiceUtil.updateObjectEntry(
+					objectEntry.getUserId(), objectEntry.getObjectEntryId(),
+					objectEntry.getObjectEntryFolderId(),
+					objectEntry.getValues(), serviceContext);
+			}
+			catch (Exception exception) {
+				System.out.println(exception.getMessage());
+			}
+		}
+
 		@Tool("Complete the current node")
 		public void completeWorkflowTask(
 			@P("Transition name") String transitionName,
+			@P("A brief, one-sentence justification for the chosen transition.") String reason,
 			InvocationParameters parameters) {
 
 			try {
 				ExecutionContext executionContext =
 					parameters.get("executionContext");
 
-				if (executionContext == null) {
-					return;
-				}
+				PermissionThreadLocal.setPermissionChecker(
+					parameters.get("permissionChecker"));
 
 				KaleoTaskInstanceToken kaleoTaskInstanceToken =
 					executionContext.getKaleoTaskInstanceToken();
@@ -167,13 +200,27 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 				_workflowTaskManager.completeWorkflowTask(
 					kaleoTaskInstanceToken.getCompanyId(),
 					kaleoTaskInstanceToken.getUserId(),
-					kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(), transitionName, "",
+					kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
+					transitionName, reason,
 					executionContext.getWorkflowContext());
 			}
 			catch (PortalException e) {
-				System.out.println(e);
+				System.out.println(e.getMessage());
 			}
 		}
+	}
+
+	private String _getContent(ExecutionContext executionContext)
+		throws PortalException {
+
+		Map<String, Serializable> workflowContext =
+			executionContext.getWorkflowContext();
+
+		ObjectEntry objectEntry = ObjectEntryLocalServiceUtil.getObjectEntry(
+			GetterUtil.getLong(workflowContext.get("entryClassPK")));
+
+		return HtmlParserUtil.extractText(
+			GetterUtil.getString(objectEntry.getValues().get("content")));
 	}
 
 	@Override
@@ -181,182 +228,58 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
+		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
+			.project("upgrades-accelerator-liferay")
+			.location("us-central1")
+			.modelName("gemini-2.5-flash-lite")
+			.logRequests(true)
+			.logResponses(true)
+			.build();
+
 		ContentAnalyzerAssistant assistant = AiServices.builder(
 				ContentAnalyzerAssistant.class
-			).chatModel(
-				VertexAiGeminiChatModel.builder()
-					.project("upgrades-accelerator-liferay")
-					.location("us-central1")
-					.modelName("gemini-2.5-flash-lite")
-					.logRequests(true)
-					.logResponses(true)
-					.build()
+			).streamingChatModel(
+				model
 			).tools(
 				new AssistantTool()
 			).build();
 
 		try {
-			String response = assistant.analyze(
-				"Analyze the following content and complete the current node with the decided transition. This is the content: Title: The Benefits of Remote Work for Employee Productivity " +
-				"Introduction Remote work has become increasingly prevalent, " +
-				"offering numerous advantages for both employees and organizations. " +
-				"This document outlines key benefits related to productivity and overall well-being. Key Advantages: " +
-				"* **Flexibility and Work-Life Balance:** Employees can better manage personal commitments, " +
-				"leading to reduced stress and higher job satisfaction. " +
-				"* **Reduced Commute Stress:** Eliminating daily commutes saves time, money, and mental energy, " +
-				"allowing employees to start their day refreshed. " +
-				"* **Increased Focus:** Many remote workers find fewer distractions " +
-				"in a home office environment compared to a bustling open-plan office. " +
-				"* **Access to Global Talent Pool:** Organizations are not restricted by geography, enabling them to hire the best candidates worldwide. " +
-				"Conclusion While remote work presents its own challenges, the productivity gains and enhanced employee satisfaction often outweigh " +
-				"the drawbacks, making it a viable and beneficial model for many industries.",
+			TokenStream tokenStream = assistant.analyze(
+				_getContent(executionContext),
 				InvocationParameters.from(
-					Map.of("executionContext", executionContext)
-				));
+					Map.of(
+						"executionContext", executionContext,
+						"permissionChecker",
+						PermissionThreadLocal.getPermissionChecker())));
 
-			System.out.println(response);
+			tokenStream
+				.beforeToolExecution(toolExecution -> {
+					System.out.println(toolExecution);
+				})
+				.onCompleteResponse(
+					response -> {
+						System.out.println("Thread: " + Thread.currentThread().getId());
+						System.out.println(response.aiMessage().text());
+
+						model.close();
+					})
+				.onError(
+					throwable -> {
+						System.out.println("Thread: " + Thread.currentThread().getId());
+						System.out.println(throwable.getMessage());
+
+						model.close();
+					}
+				)
+				.start();
 		}
 		catch (Exception exception) {
 			System.out.println(exception.getMessage());
 		}
 
-		/*Map<String, Serializable> workflowContext =
-			executionContext.getWorkflowContext();
-
-InvocationParameters.from(
-				Map.of("executionContext", executionContext)
-			)
-
-		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
-			.project("upgrades-accelerator-liferay")
-			.location("us-central1")
-			.modelName("gemini-2.5-flash-lite")
-			.build();
-
-		JsonObjectSchema parametersSchema = JsonObjectSchema.builder()
-			.addNumberProperty("a", "The first number to sum")
-			.addNumberProperty("b", "The second number to sum")
-			.required(List.of("a", "b"))
-			.build();
-
-		ToolSpecification sumToolSpecification = ToolSpecification.builder()
-			.name("sum") // The name the LLM will use for the function call
-			.description("Sums two numbers (a and b) and returns the total.")
-			.parameters(parametersSchema) // Pass the JsonObjectSchema here
-			.build();
-
-		model.chat(
-			ChatRequest.builder(
-			).messages(
-				new ChatMessage[] {
-					UserMessage.from("How much is 4 + 5 and 7 * 10?")
-				}
-			).parameters(
-				ChatRequestParameters.builder(
-				).toolSpecifications(
-					List.of(sumToolSpecification)
-				).build()
-			).build(),
-			new StreamingChatResponseHandler() {
-
-			@Override
-			public void onPartialResponse(String partialResponse) {
-			}
-
-			@Override
-			public void onCompleteResponse(ChatResponse completeResponse) {
-				try {
-					JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-						completeResponse.aiMessage().text());
-
-					workflowContext.put(
-						"category", jsonObject.getString("category"));
-					workflowContext.put(
-						"summary", jsonObject.getString("summary"));
-
-					KaleoInstanceToken kaleoInstanceToken =
-						executionContext.getKaleoInstanceToken();
-
-					_kaleoInstanceLocalService.updateKaleoInstance(
-						kaleoInstanceToken.getKaleoInstanceId(),
-						workflowContext);
-
-					KaleoTaskInstanceToken kaleoTaskInstanceToken =
-						executionContext.getKaleoTaskInstanceToken();
-
-					System.out.println(completeResponse);
-
-					_workflowTaskManager.completeWorkflowTask(
-						kaleoInstanceToken.getCompanyId(),
-						kaleoInstanceToken.getUserId(),
-						kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
-						"reject", "", workflowContext);
-				}
-				catch (JSONException e) {
-					throw new RuntimeException(e);
-				}
-				catch (PortalException e) {
-					throw new RuntimeException(e);
-				}
-				finally {
-					model.close();
-				}
-			}
-
-			@Override
-			public void onError(Throwable error) {
-				System.out.println(error);
-				model.close();
-			}
-		});*/
-
-		System.out.println("MAIN THREAD");
+		System.out.println("Main Thread: " + Thread.currentThread().getId());
 	}
-
-	private static final String _CONTENT_1 =
-		"""
-		Title: The Benefits of Remote Work for Employee Productivity
-				
-		Introduction
-		Remote work has become increasingly prevalent, offering numerous advantages for both employees and organizations. This document outlines key benefits related to productivity and overall well-being.
-				
-		Key Advantages:
-		* **Flexibility and Work-Life Balance:** Employees can better manage personal commitments, leading to reduced stress and higher job satisfaction.
-		* **Reduced Commute Stress:** Eliminating daily commutes saves time, money, and mental energy, allowing employees to start their day refreshed.
-		* **Increased Focus:** Many remote workers find fewer distractions in a home office environment compared to a bustling open-plan office.
-		* **Access to Global Talent Pool:** Organizations are not restricted by geography, enabling them to hire the best candidates worldwide.
-				
-		Conclusion
-		While remote work presents its own challenges, the productivity gains and enhanced employee satisfaction often outweigh the drawbacks, making it a viable and beneficial model for many industries.
-		""";
-
-	private static final String _CONTENT_2 =
-		"""
-		This is my content, lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-		  
-		Some more text here, maybe later. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		  
-		Just a draft for now.
-		""";
-
-	private final String _USER_MESSAGE_1 =
-		"Based in the content bellow, retrieve me a summary of it, also I'd like that this content is " +
-		"categorized, please retrieve this data in a json format but do not include the json delimiters, " +
-		"like this: {\"summary\":\"content summary\", \"category\":\"content category\"} content: " +
-		"The Butterfly's Journey: A Simple Life Cycle\n" +
-		"The life of a butterfly is a fascinating transformation that happens in four main stages. This process is called complete metamorphosis.\n" +
-		"\n" +
-		"Stage 1: The Egg\n" +
-		"A butterfly's life begins when an adult female lays a tiny egg, usually on a specific plant that the future caterpillar will eat. The egg stage is the shortest of the four.\n" +
-		"\n" +
-		"Stage 2: The Larva (Caterpillar)\n" +
-		"Next, the egg hatches into a larva, which we commonly call a caterpillar. A caterpillar's only job is to eat, eat, and eat! It grows rapidly, shedding its skin many times (a process called molting) to accommodate its increasing size.\n" +
-		"\n" +
-		"Stage 3: The Pupa (Chrysalis)\n" +
-		"Once the caterpillar is fully grown, it enters the pupa stage. For butterflies, the pupa is known as a chrysalis. During this seemingly resting stage, a massive change is taking place inside the protective casing. The caterpillar's body is entirely reorganized into the shape of an adult butterfly.\n" +
-		"\n" +
-		"Stage 4: The Adult Butterfly\n" +
-		"Finally, the adult butterfly emerges from the chrysalis. The adult's main job is to reproduce (mate and lay eggs) and feed on nectar from flowers, starting the entire cycle over again.";
 
 	@Reference
 	private WorkflowTaskManager _workflowTaskManager;
