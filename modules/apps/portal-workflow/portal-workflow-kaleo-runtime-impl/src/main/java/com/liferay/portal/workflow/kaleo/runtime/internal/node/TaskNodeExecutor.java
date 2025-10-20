@@ -5,7 +5,7 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
-import com.liferay.petra.string.StringPool;
+import dev.langchain4j.model.output.structured.Description;
 import dev.langchain4j.agent.tool.P;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -37,6 +37,7 @@ import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -110,6 +111,36 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		String ask(@UserMessage String userMessage, InvocationParameters parameters);
 	}
 
+	public record ContentDecision(
+		@Description("The final transition to follow. Must be either 'reject' or 'approve'.")
+		String transition,
+
+		@Description("A brief, one-sentence justification for the chosen transition.")
+		String reason,
+
+		@Description("A short example on how this content should be in order to be approved.")
+		String suggestion
+	) {}
+
+	public interface ContentAnalyzerAssistant {
+
+		@SystemMessage("""
+       You are a strict content validation expert. Your task is to analyze content and decide the next workflow transition.
+       
+       **CRITICAL RULE: YOUR ENTIRE RESPONSE MUST BE A SINGLE, VALID, RAW JSON OBJECT.**
+       **DO NOT** include any conversational text, headers, introductory phrases, or markdown fences (like ```json).
+       
+       Available transitions are: 'reject' and 'approve'.
+
+       Criteria:
+       - Content must have a clear title, introduction and conclusion.
+       - Content that is complete and well-structured MUST be approved.
+       """)
+		@UserMessage("Analyze the following content and provide a decision: '{content}'")
+		public ContentDecision analyze(
+			@P("content") String content);
+	}
+
 	public class AssistantTool {
 
 		@Tool("Complete the current node")
@@ -152,23 +183,44 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 			.project("upgrades-accelerator-liferay")
 			.location("us-central1")
 			.modelName("gemini-2.5-flash-lite")
+			.logRequests(true)
+			.logResponses(true)
 			.build();
 
-		Assistant assistant = AiServices.builder(Assistant.class)
+		ContentAnalyzerAssistant contentAnalyzerAssistant =
+			AiServices.builder(ContentAnalyzerAssistant.class)
 			.chatModel(model)
 			.tools(new AssistantTool())
 			.build();
 
-		String assistantResponse = assistant.ask(
-			"Complete the current node following the reject transition",
-			InvocationParameters.from(
-				Map.of("executionContext", executionContext)
-			));
+		try {
+			ContentDecision contentDecision = contentAnalyzerAssistant.analyze(
+				"Title: The Benefits of Remote Work for Employee Productivity " +
+				"Introduction Remote work has become increasingly prevalent, " +
+				"offering numerous advantages for both employees and organizations. " +
+				"This document outlines key benefits related to productivity and overall well-being. Key Advantages: " +
+				"* **Flexibility and Work-Life Balance:** Employees can better manage personal commitments, " +
+				"leading to reduced stress and higher job satisfaction. " +
+				"* **Reduced Commute Stress:** Eliminating daily commutes saves time, money, and mental energy, " +
+				"allowing employees to start their day refreshed. " +
+				"* **Increased Focus:** Many remote workers find fewer distractions " +
+				"in a home office environment compared to a bustling open-plan office. " +
+				"* **Access to Global Talent Pool:** Organizations are not restricted by geography, enabling them to hire the best candidates worldwide. " +
+				"Conclusion While remote work presents its own challenges, the productivity gains and enhanced employee satisfaction often outweigh " +
+				"the drawbacks, making it a viable and beneficial model for many industries.");
 
-		System.out.println("Assistant: " + assistantResponse);
+			System.out.println("Assistant: " + contentDecision);
+		}
+		catch (Exception exception) {
+			System.out.println(exception);
+		}
 
 		/*Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
+
+InvocationParameters.from(
+				Map.of("executionContext", executionContext)
+			)
 
 		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
 			.project("upgrades-accelerator-liferay")
@@ -255,6 +307,32 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 
 		System.out.println("MAIN THREAD");
 	}
+
+	private static final String _CONTENT_1 =
+		"""
+		Title: The Benefits of Remote Work for Employee Productivity
+				
+		Introduction
+		Remote work has become increasingly prevalent, offering numerous advantages for both employees and organizations. This document outlines key benefits related to productivity and overall well-being.
+				
+		Key Advantages:
+		* **Flexibility and Work-Life Balance:** Employees can better manage personal commitments, leading to reduced stress and higher job satisfaction.
+		* **Reduced Commute Stress:** Eliminating daily commutes saves time, money, and mental energy, allowing employees to start their day refreshed.
+		* **Increased Focus:** Many remote workers find fewer distractions in a home office environment compared to a bustling open-plan office.
+		* **Access to Global Talent Pool:** Organizations are not restricted by geography, enabling them to hire the best candidates worldwide.
+				
+		Conclusion
+		While remote work presents its own challenges, the productivity gains and enhanced employee satisfaction often outweigh the drawbacks, making it a viable and beneficial model for many industries.
+		""";
+
+	private static final String _CONTENT_2 =
+		"""
+		This is my content, lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+		  
+		Some more text here, maybe later. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		  
+		Just a draft for now.
+		""";
 
 	private final String _USER_MESSAGE_1 =
 		"Based in the content bellow, retrieve me a summary of it, also I'd like that this content is " +
