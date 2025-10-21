@@ -42,14 +42,20 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalServ
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.invocation.InvocationParameters;
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
+import dev.langchain4j.service.memory.ChatMemoryAccess;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -155,6 +161,13 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		public TokenStream refine(@V("text") String text);
 	}
 
+	public interface ChatAssistant extends ChatMemoryAccess {
+
+		public TokenStream chat(
+			@MemoryId String memoryId, @UserMessage String message,
+			InvocationParameters parameters);
+	}
+
 	public class AssistantTool {
 
 		@Tool("Call this tool to categorize a content. Input must be the the category name")
@@ -249,6 +262,100 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
+		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
+			.project("upgrades-accelerator-liferay")
+			.location("us-central1")
+			.modelName("gemini-2.5-flash-lite")
+			.logRequests(true)
+			.logResponses(true)
+			.build();
+
+		ChatAssistant assistant = AiServices.builder(ChatAssistant.class)
+			.streamingChatModel(model)
+			.chatMemoryProvider(memoryId ->
+				MessageWindowChatMemory
+					.builder()
+					.chatMemoryStore(_inMemoryChatMemoryStore)
+					.maxMessages(10)
+					.id(memoryId)
+					.build())
+			.tools(
+				new AssistantTool()
+			).build();
+
+		Map<String, Serializable> workflowContext =
+			executionContext.getWorkflowContext();
+
+		Map<String, Serializable> message =
+			(Map<String, Serializable>)workflowContext.get("message");
+
+		try {
+			TokenStream tokenStream = assistant.chat(
+				GetterUtil.getString(message.get("memoryId")),
+				GetterUtil.getString(message.get("content")),
+				InvocationParameters.from(
+					Map.of(
+						"executionContext", executionContext,
+						"permissionChecker",
+						PermissionThreadLocal.getPermissionChecker())));
+
+			tokenStream
+				.onCompleteResponse(
+					response -> {
+						System.out.println("Thread: " + Thread.currentThread().getId());
+						System.out.println(response.aiMessage().text());
+
+						ChatMemory chatMemory = assistant.getChatMemory(
+							GetterUtil.getString(message.get("memoryId")));
+
+						chatMemory.messages();
+
+						_updateWorkflowContext(response, executionContext);
+
+						model.close();
+					})
+				.onError(
+					throwable -> {
+						System.out.println("Thread: " + Thread.currentThread().getId());
+						System.out.println(throwable.getMessage());
+
+						model.close();
+					}
+				)
+				.start();
+		}
+		catch (Exception exception) {
+			System.out.println(exception.getMessage());
+		}
+
+		System.out.println("Main Thread: " + Thread.currentThread().getId());
+	}
+
+	private final InMemoryChatMemoryStore _inMemoryChatMemoryStore = new InMemoryChatMemoryStore();
+
+	private void _updateWorkflowContext(
+			ChatResponse chatResponse, ExecutionContext executionContext) {
+
+		try {
+			Map<String, Serializable> workflowContext =
+				executionContext.getWorkflowContext();
+
+			workflowContext.put(
+				"response", chatResponse.aiMessage().text());
+
+			KaleoInstanceToken kaleoInstanceToken =
+				executionContext.getKaleoInstanceToken();
+
+			_workflowInstanceManager.updateWorkflowContext(
+				kaleoInstanceToken.getCompanyId(),
+				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
+		}
+		catch (WorkflowException exception) {
+			System.out.println(exception.getMessage());
+		}
+	}
+
+	private void _execute2(ExecutionContext executionContext) {
 		Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
 
@@ -291,28 +398,6 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 				}
 			)
 			.start();
-	}
-
-	private void _updateWorkflowContext(
-			ChatResponse chatResponse, ExecutionContext executionContext) {
-
-		try {
-			Map<String, Serializable> workflowContext =
-				executionContext.getWorkflowContext();
-
-			workflowContext.put(
-				"response", chatResponse.aiMessage().text());
-
-			KaleoInstanceToken kaleoInstanceToken =
-				executionContext.getKaleoInstanceToken();
-
-			_workflowInstanceManager.updateWorkflowContext(
-				kaleoInstanceToken.getCompanyId(),
-				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
-		}
-		catch (WorkflowException exception) {
-			System.out.println(exception.getMessage());
-		}
 	}
 
 	private void _execute1(ExecutionContext executionContext) {
