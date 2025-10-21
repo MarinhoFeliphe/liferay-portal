@@ -60,6 +60,10 @@ public class ObjectReviewedUtil {
 	private static String _getAssetTitle(
 		long classPK, String entryClassName, Locale locale) {
 
+		if (entryClassName.isEmpty()) {
+			return "";
+		}
+
 		WorkflowHandler<?> workflowHandler =
 			WorkflowHandlerRegistryUtil.getWorkflowHandler(entryClassName);
 
@@ -69,6 +73,10 @@ public class ObjectReviewedUtil {
 	private static String _getAssetType(String entryClassName, Locale locale) {
 		WorkflowHandler<?> workflowHandler =
 			WorkflowHandlerRegistryUtil.getWorkflowHandler(entryClassName);
+
+		if (entryClassName.isEmpty()) {
+			return "";
+		}
 
 		return workflowHandler.getType(locale);
 	}

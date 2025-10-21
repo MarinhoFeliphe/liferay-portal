@@ -180,6 +180,7 @@ public class WorkflowInstanceResourceImpl
 							_kaleoInstanceModelResourcePermission)
 					).build());
 				setCompleted(workflowInstance::isComplete);
+				setContext(_toContext(workflowInstance.getWorkflowContext()));
 				setCurrentNodeNames(
 					() -> transformToArray(
 						workflowInstance.getCurrentWorkflowNodes(),
@@ -198,6 +199,18 @@ public class WorkflowInstanceResourceImpl
 						workflowInstance.getWorkflowDefinitionVersion()));
 			}
 		};
+	}
+
+	private Map<String, ?> _toContext(
+		Map<String, Serializable> workflowContext) {
+
+		Map<String, String> map = new HashMap<>();
+
+		map.put(
+			"response",
+			GetterUtil.getString(workflowContext.get("response")));
+
+		return map;
 	}
 
 	@Reference(

@@ -15,6 +15,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowException;
+import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.workflow.kaleo.definition.DelayDuration;
 import com.liferay.portal.workflow.kaleo.definition.DurationScale;
@@ -41,6 +43,7 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.SystemMessage;
@@ -132,6 +135,24 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		This is the content: {{content}}
 		""")
 		public TokenStream analyze(@V("content") String content, InvocationParameters parameters);
+	}
+
+	public interface WritingAssistant {
+
+		@SystemMessage("""
+       You are a professional writing editor.
+       
+       Your sole task is to take the provided text and rewrite it to be significantly more concise, direct, and free of unnecessary filler words,
+       nominalizations, and passive voice, while retaining the original meaning and professional tone.
+       
+       Only output the revised, concise text.
+       
+       Do not include any explanation, introduction, or conversation.
+       """)
+		@UserMessage("""
+		This is the text to be rewritten : {{text}}
+		""")
+		public TokenStream refine(@V("text") String text);
 	}
 
 	public class AssistantTool {
@@ -228,6 +249,73 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
+		Map<String, Serializable> workflowContext =
+			executionContext.getWorkflowContext();
+
+		Map<String, Serializable> content =
+			(Map<String, Serializable>)workflowContext.get("content");
+
+		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
+			.project("upgrades-accelerator-liferay")
+			.location("us-central1")
+			.modelName("gemini-2.5-flash-lite")
+			.logRequests(true)
+			.logResponses(true)
+			.build();
+
+		WritingAssistant assistant = AiServices.builder(
+			WritingAssistant.class
+		).streamingChatModel(
+			model
+		).build();
+
+		TokenStream tokenStream = assistant.refine(
+			GetterUtil.getString(content.get("value")));
+
+		tokenStream
+			.onCompleteResponse(
+				response -> {
+					System.out.println("Thread: " + Thread.currentThread().getId());
+					System.out.println(response.aiMessage().text());
+
+					_updateWorkflowContext(response, executionContext);
+
+					model.close();
+				})
+			.onError(
+				throwable -> {
+					System.out.println("Thread: " + Thread.currentThread().getId());
+					System.out.println(throwable.getMessage());
+
+					model.close();
+				}
+			)
+			.start();
+	}
+
+	private void _updateWorkflowContext(
+			ChatResponse chatResponse, ExecutionContext executionContext) {
+
+		try {
+			Map<String, Serializable> workflowContext =
+				executionContext.getWorkflowContext();
+
+			workflowContext.put(
+				"response", chatResponse.aiMessage().text());
+
+			KaleoInstanceToken kaleoInstanceToken =
+				executionContext.getKaleoInstanceToken();
+
+			_workflowInstanceManager.updateWorkflowContext(
+				kaleoInstanceToken.getCompanyId(),
+				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
+		}
+		catch (WorkflowException exception) {
+			System.out.println(exception.getMessage());
+		}
+	}
+
+	private void _execute1(ExecutionContext executionContext) {
 		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
 			.project("upgrades-accelerator-liferay")
 			.location("us-central1")
@@ -237,12 +325,12 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 			.build();
 
 		ContentAnalyzerAssistant assistant = AiServices.builder(
-				ContentAnalyzerAssistant.class
-			).streamingChatModel(
-				model
-			).tools(
-				new AssistantTool()
-			).build();
+			ContentAnalyzerAssistant.class
+		).streamingChatModel(
+			model
+		).tools(
+			new AssistantTool()
+		).build();
 
 		try {
 			TokenStream tokenStream = assistant.analyze(
@@ -254,9 +342,7 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 						PermissionThreadLocal.getPermissionChecker())));
 
 			tokenStream
-				.beforeToolExecution(toolExecution -> {
-					System.out.println(toolExecution);
-				})
+				.beforeToolExecution(System.out::println)
 				.onCompleteResponse(
 					response -> {
 						System.out.println("Thread: " + Thread.currentThread().getId());
@@ -283,6 +369,9 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 
 	@Reference
 	private WorkflowTaskManager _workflowTaskManager;
+
+	@Reference
+	private WorkflowInstanceManager _workflowInstanceManager;
 
 	@Override
 	protected void doExit(

@@ -46,7 +46,7 @@ public class ObjectFieldDTOConverter
 	}
 
 	@Override
-	public ObjectField toDTO(
+	public ObjectField 	toDTO(
 			DTOConverterContext dtoConverterContext,
 			com.liferay.object.model.ObjectField objectField)
 		throws Exception {
