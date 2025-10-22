@@ -5,6 +5,7 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
+import dev.langchain4j.mcp.client.DefaultMcpClient;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.petra.lang.SafeCloseable;
@@ -42,7 +43,6 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalServ
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
-import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -262,6 +262,68 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
+		/*McpTransport transport = new StreamableHttpMcpTransport.Builder()
+			.url("http://localhost:8080/o/mcp/sse")
+			.logRequests(true)
+			.logResponses(true)
+			.build();
+
+		McpClient mcpClient = new DefaultMcpClient.Builder()
+			.key("FooMCPClient")
+			.transport(transport)
+			.build();
+
+		McpToolProvider toolProvider = McpToolProvider.builder()
+			.mcpClients(mcpClient)
+			.build();*/
+
+		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
+			.project("upgrades-accelerator-liferay")
+			.location("us-central1")
+			.modelName("gemini-2.5-flash-lite")
+			.logRequests(true)
+			.logResponses(true)
+			.build();
+
+		ChatAssistant assistant = AiServices.builder(ChatAssistant.class)
+			.streamingChatModel(model)
+			.chatMemoryProvider(memoryId ->
+				MessageWindowChatMemory
+					.builder()
+					.chatMemoryStore(_inMemoryChatMemoryStore)
+					.maxMessages(10)
+					.id(memoryId)
+					.build())
+			.build();
+
+		System.out.println("Main Thread: " + Thread.currentThread().getId());
+	}
+
+	private final InMemoryChatMemoryStore _inMemoryChatMemoryStore = new InMemoryChatMemoryStore();
+
+	private void _updateWorkflowContext(
+			ChatResponse chatResponse, ExecutionContext executionContext) {
+
+		try {
+			Map<String, Serializable> workflowContext =
+				executionContext.getWorkflowContext();
+
+			workflowContext.put(
+				"response", chatResponse.aiMessage().text());
+
+			KaleoInstanceToken kaleoInstanceToken =
+				executionContext.getKaleoInstanceToken();
+
+			_workflowInstanceManager.updateWorkflowContext(
+				kaleoInstanceToken.getCompanyId(),
+				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
+		}
+		catch (WorkflowException exception) {
+			System.out.println(exception.getMessage());
+		}
+	}
+
+	private void _execute3(ExecutionContext executionContext) {
 		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
 			.project("upgrades-accelerator-liferay")
 			.location("us-central1")
@@ -325,32 +387,6 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 				.start();
 		}
 		catch (Exception exception) {
-			System.out.println(exception.getMessage());
-		}
-
-		System.out.println("Main Thread: " + Thread.currentThread().getId());
-	}
-
-	private final InMemoryChatMemoryStore _inMemoryChatMemoryStore = new InMemoryChatMemoryStore();
-
-	private void _updateWorkflowContext(
-			ChatResponse chatResponse, ExecutionContext executionContext) {
-
-		try {
-			Map<String, Serializable> workflowContext =
-				executionContext.getWorkflowContext();
-
-			workflowContext.put(
-				"response", chatResponse.aiMessage().text());
-
-			KaleoInstanceToken kaleoInstanceToken =
-				executionContext.getKaleoInstanceToken();
-
-			_workflowInstanceManager.updateWorkflowContext(
-				kaleoInstanceToken.getCompanyId(),
-				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
-		}
-		catch (WorkflowException exception) {
 			System.out.println(exception.getMessage());
 		}
 	}
