@@ -5,7 +5,6 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
-import dev.langchain4j.mcp.client.DefaultMcpClient;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.petra.lang.SafeCloseable;
@@ -15,6 +14,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
@@ -44,6 +44,13 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
+import dev.langchain4j.mcp.McpToolProvider;
+import dev.langchain4j.mcp.client.DefaultMcpClient;
+import dev.langchain4j.mcp.client.McpClient;
+import dev.langchain4j.mcp.client.transport.McpOperationHandler;
+import dev.langchain4j.mcp.client.transport.McpTransport;
+import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
+import dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -60,6 +67,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -257,25 +266,49 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 			GetterUtil.getString(objectEntry.getValues().get("content")));
 	}
 
+	private String _getAuthorization() {
+		try {
+			Base64.Encoder encoder = Base64.getEncoder();
+
+			String userNameAndPassword =
+				"test@liferay.com:" + PropsValues.DEFAULT_ADMIN_PASSWORD;
+
+			return "Basic " +
+				   new String(
+					   encoder.encode(userNameAndPassword.getBytes("UTF-8")),
+					   "UTF-8");
+		}
+		catch (UnsupportedEncodingException unsupportedEncodingException) {
+			throw new RuntimeException(unsupportedEncodingException);
+		}
+	}
+
 	@Override
 	protected void doExecute(
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
-		/*McpTransport transport = new StreamableHttpMcpTransport.Builder()
-			.url("http://localhost:8080/o/mcp/sse")
+		McpTransport mcpTransport = new StreamableHttpMcpTransport.Builder()
+			.url("http://localhost:8080/o/mcp")
+			.customHeaders(Map.of("Authorization", _getAuthorization()))
 			.logRequests(true)
 			.logResponses(true)
 			.build();
 
+		/*McpTransport mcpTransport = new HttpMcpTransport.Builder()
+			.sseUrl("http://localhost:8080/o/mcp/sse")
+			.customHeaders(Map.of("Authorization", _getAuthorization()))
+			.logRequests(true)
+			.logResponses(true)
+			.build();*/
+
 		McpClient mcpClient = new DefaultMcpClient.Builder()
-			.key("FooMCPClient")
-			.transport(transport)
+			.transport(mcpTransport)
 			.build();
 
 		McpToolProvider toolProvider = McpToolProvider.builder()
 			.mcpClients(mcpClient)
-			.build();*/
+			.build();
 
 		VertexAiGeminiStreamingChatModel model = VertexAiGeminiStreamingChatModel.builder()
 			.project("upgrades-accelerator-liferay")
@@ -287,6 +320,7 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 
 		ChatAssistant assistant = AiServices.builder(ChatAssistant.class)
 			.streamingChatModel(model)
+			.toolProvider(toolProvider)
 			.chatMemoryProvider(memoryId ->
 				MessageWindowChatMemory
 					.builder()
@@ -295,6 +329,58 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 					.id(memoryId)
 					.build())
 			.build();
+
+		Map<String, Serializable> workflowContext =
+			executionContext.getWorkflowContext();
+
+		Map<String, Serializable> message =
+			(Map<String, Serializable>)workflowContext.get("message");
+
+		TokenStream tokenStream = assistant.chat(
+			GetterUtil.getString(message.get("memoryId")),
+			GetterUtil.getString(message.get("content")),
+			InvocationParameters.from(
+				Map.of(
+					"executionContext", executionContext,
+					"permissionChecker",
+					PermissionThreadLocal.getPermissionChecker())));
+
+		tokenStream
+			.onCompleteResponse(
+				response -> {
+					System.out.println("Thread: " + Thread.currentThread().getId());
+					System.out.println(response.aiMessage().text());
+
+					ChatMemory chatMemory = assistant.getChatMemory(
+						GetterUtil.getString(message.get("memoryId")));
+
+					chatMemory.messages();
+
+					_updateWorkflowContext(response, executionContext);
+
+					model.close();
+					try {
+						mcpClient.close();
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				})
+			.onError(
+				throwable -> {
+					System.out.println("Thread: " + Thread.currentThread().getId());
+					System.out.println(throwable.getMessage());
+
+					model.close();
+					try {
+						mcpClient.close();
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			)
+			.start();
 
 		System.out.println("Main Thread: " + Thread.currentThread().getId());
 	}

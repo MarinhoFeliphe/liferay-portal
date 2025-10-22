@@ -35,6 +35,7 @@ import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.server.transport.HttpServletSseServerTransportProvider;
+import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import jakarta.servlet.GenericServlet;
@@ -125,10 +126,22 @@ public class MCPServerServlet extends HttpServlet {
 					"/message"
 				).build();
 
+		HttpServletStreamableServerTransportProvider
+			httpServletStreamableServerTransportProvider =
+				HttpServletStreamableServerTransportProvider.builder(
+				).mcpEndpoint(
+					"/mcp"
+				).contextExtractor(
+					request -> McpTransportContext.create(
+						HashMapBuilder.<String, Object>put(
+							"authorization", request.getHeader("Authorization")
+						).build())
+				).build();
+
 		JSONObject toolsJSONObject = _getToolsJSONObject(baseURL);
 
 		McpSyncServer mcpSyncServer = McpServer.sync(
-			httpServletSseServerTransportProvider
+			httpServletStreamableServerTransportProvider
 		).capabilities(
 			McpSchema.ServerCapabilities.builder(
 			).tools(
@@ -175,7 +188,7 @@ public class MCPServerServlet extends HttpServlet {
 					ServletResponse servletResponse)
 				throws IOException, ServletException {
 
-				httpServletSseServerTransportProvider.service(
+				httpServletStreamableServerTransportProvider.service(
 					servletRequest, servletResponse);
 			}
 

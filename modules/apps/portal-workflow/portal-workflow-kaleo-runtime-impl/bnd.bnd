@@ -1,6 +1,16 @@
 Bundle-Name: Liferay Portal Workflow Kaleo Runtime Implementation
 Bundle-SymbolicName: com.liferay.portal.workflow.kaleo.runtime.impl
 Bundle-Version: 6.0.97
-Import-Package: !kotlin.*
+Import-Package:\
+	android.*;resolution:=optional,\
+	\
+	!org.bouncycastle.jsse.*,\
+	\
+	!org.conscrypt.*,\
+	\
+	!org.openjsse.javax.net.ssl.*,\
+	!org.openjsse.net.ssl.*,\
+	\
+	*
 -dsannotations-options: inherit
 -fixupmessages: Classes found in the wrong directory: ...;is:=ignore
