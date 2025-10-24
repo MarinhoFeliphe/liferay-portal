@@ -10,6 +10,10 @@ package com.liferay.portal.kernel.model;
  */
 public class GroupConstants {
 
+	public static final String AI_HUB = "AI_HUB";
+
+	public static final String AI_HUB_FRIENDLY_URL = "/ai-hub";
+
 	public static final int ANY_PARENT_GROUP_ID = -1;
 
 	public static final String APP = "App";
@@ -47,7 +51,7 @@ public class GroupConstants {
 	public static final int MEMBERSHIP_RESTRICTION_TO_PARENT_SITE_MEMBERS = 1;
 
 	public static final String[] SYSTEM_GROUPS = {
-		CALENDAR, CMS, CONTROL_PANEL, FORMS, GUEST,
+		AI_HUB, CALENDAR, CMS, CONTROL_PANEL, FORMS, GUEST,
 		GroupConstants.USER_PERSONAL_SITE
 	};
 
