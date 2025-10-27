@@ -453,6 +453,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		if (className.equals(Group.class.getName())) {
 			if (!site && (liveGroupId == 0) &&
 				!(StringUtil.startsWith(groupKey, GroupConstants.APP) ||
+				  groupKey.equals(GroupConstants.AI_HUB) ||
 				  groupKey.equals(GroupConstants.CALENDAR) ||
 				  groupKey.equals(GroupConstants.CMS) ||
 				  groupKey.equals(GroupConstants.CONTROL_PANEL) ||
@@ -817,8 +818,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		long guestUserId = _userLocalService.getGuestUserId(companyId);
 
 		for (String groupKey : systemGroups) {
-			if (groupKey.equals(GroupConstants.CMS) &&
-				!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			if ((groupKey.equals(GroupConstants.AI_HUB) &&
+				 !FeatureFlagManagerUtil.isEnabled(companyId, "LPD-62272")) ||
+				(groupKey.equals(GroupConstants.CMS) &&
+				 !FeatureFlagManagerUtil.isEnabled(companyId, "LPD-17564"))) {
 
 				continue;
 			}
@@ -835,7 +838,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				boolean site = true;
 				UnicodeProperties typeSettingsUnicodeProperties = null;
 
-				if (groupKey.equals(GroupConstants.CALENDAR)) {
+				if (groupKey.equals(GroupConstants.AI_HUB)) {
+					type = GroupConstants.TYPE_SITE_PRIVATE;
+					friendlyURL = GroupConstants.AI_HUB_FRIENDLY_URL;
+					site = false;
+				}
+				else if (groupKey.equals(GroupConstants.CALENDAR)) {
 					type = GroupConstants.TYPE_SITE_PRIVATE;
 					friendlyURL = GroupConstants.CALENDAR_FRIENDLY_URL;
 					site = false;
