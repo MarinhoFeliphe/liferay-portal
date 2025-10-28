@@ -108,14 +108,11 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 
 		TaskNodeExecutorDelegate taskNodeExecutorDelegate =
 			TaskNodeExecutorDelegateRegistryUtil.getTaskNodeExecutorDelegate(
-				"improveWriting");
+				currentKaleoNode.getName());
 
-		try {
+		if (taskNodeExecutorDelegate != null) {
 			taskNodeExecutorDelegate.execute(
 				currentKaleoNode, executionContext, remainingPathElements);
-		}
-		catch (PortalException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

@@ -15,7 +15,6 @@
 		{
 			"active": true,
 			"content": {
-				"#tag-name": "workflow-definition",
 				"#child-nodes": [
 					{
 						"#tag-name": "name",
@@ -26,14 +25,12 @@
 						"#value": "1"
 					},
 					{
-						"#tag-name": "state",
 						"#child-nodes": [
 							{
 								"#tag-name": "name",
 								"#value": "start"
 							},
 							{
-								"#tag-name": "metadata",
 								"#cdata-value": [
 									"{",
 									"    \"xy\": [",
@@ -41,37 +38,36 @@
 									"        25",
 									"    ]",
 									"}"
-								]
+								],
+								"#tag-name": "metadata"
 							},
 							{
 								"#tag-name": "initial",
 								"#value": "true"
 							},
 							{
-								"#tag-name": "labels",
 								"#child-nodes": [
 									{
 										"#tag-name": "label",
 										"#value": "Start",
 										"language-id": "en_US"
 									}
-								]
+								],
+								"#tag-name": "labels"
 							},
 							{
-								"#tag-name": "transitions",
 								"#child-nodes": [
 									{
-										"#tag-name": "transition",
 										"#child-nodes": [
 											{
-												"#tag-name": "labels",
 												"#child-nodes": [
 													{
 														"#tag-name": "label",
 														"#value": "Improve Writing",
 														"language-id": "en_US"
 													}
-												]
+												],
+												"#tag-name": "labels"
 											},
 											{
 												"#tag-name": "name",
@@ -85,14 +81,16 @@
 												"#tag-name": "default",
 												"#value": "true"
 											}
-										]
+										],
+										"#tag-name": "transition"
 									}
-								]
+								],
+								"#tag-name": "transitions"
 							}
-						]
+						],
+						"#tag-name": "state"
 					},
 					{
-						"#tag-name": "state",
 						"#child-nodes": [
 							{
 								"#tag-name": "name",
@@ -103,7 +101,6 @@
 								"#value": "Conclude the workflow."
 							},
 							{
-								"#tag-name": "metadata",
 								"#cdata-value": [
 									"{",
 									"    \"terminal\": true,",
@@ -112,29 +109,29 @@
 									"        459",
 									"    ]",
 									"}"
-								]
+								],
+								"#tag-name": "metadata"
 							},
 							{
-								"#tag-name": "labels",
 								"#child-nodes": [
 									{
 										"#tag-name": "label",
 										"#value": "End",
 										"language-id": "en_US"
 									}
-								]
+								],
+								"#tag-name": "labels"
 							}
-						]
+						],
+						"#tag-name": "state"
 					},
 					{
-						"#tag-name": "task",
 						"#child-nodes": [
 							{
 								"#tag-name": "name",
 								"#value": "improveWritingTask"
 							},
 							{
-								"#tag-name": "metadata",
 								"#cdata-value": [
 									"{",
 									"    \"xy\": [",
@@ -142,41 +139,40 @@
 									"        242",
 									"    ]",
 									"}"
-								]
+								],
+								"#tag-name": "metadata"
 							},
 							{
-								"#tag-name": "assignments",
 								"#child-nodes": [
 									{
 										"#tag-name": "user"
 									}
-								]
+								],
+								"#tag-name": "assignments"
 							},
 							{
-								"#tag-name": "labels",
 								"#child-nodes": [
 									{
 										"#tag-name": "label",
 										"#value": "Improve Writing Task",
 										"language-id": "en_US"
 									}
-								]
+								],
+								"#tag-name": "labels"
 							},
 							{
-								"#tag-name": "transitions",
 								"#child-nodes": [
 									{
-										"#tag-name": "transition",
 										"#child-nodes": [
 											{
-												"#tag-name": "labels",
 												"#child-nodes": [
 													{
 														"#tag-name": "label",
 														"#value": "end",
 														"language-id": "en_US"
 													}
-												]
+												],
+												"#tag-name": "labels"
 											},
 											{
 												"#tag-name": "name",
@@ -190,16 +186,20 @@
 												"#tag-name": "default",
 												"#value": "true"
 											}
-										]
+										],
+										"#tag-name": "transition"
 									}
-								]
+								],
+								"#tag-name": "transitions"
 							}
-						]
+						],
+						"#tag-name": "task"
 					}
 				],
+				"#tag-name": "workflow-definition",
 				"xmlns": "urn:liferay.com:liferay-workflow_7.4.0",
-				"xsi:schemaLocation": "urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd",
-				"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"
+				"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+				"xsi:schemaLocation": "urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd"
 			},
 			"externalReferenceCode": "L_AI_HUB_IMPROVE_WRITING",
 			"name": "Improve Writing",

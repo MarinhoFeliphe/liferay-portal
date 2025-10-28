@@ -38,23 +38,24 @@ public class ObjectReviewedUtil {
 		}
 
 		long entryClassPK = GetterUtil.getLong(
-			optionalAttributes.get(
-				WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
+			optionalAttributes.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
 
 		return new ObjectReviewed() {
 			{
-				setAssetTitle(() -> workflowHandler.getTitle(entryClassPK, locale));
+				setAssetTitle(
+					() -> workflowHandler.getTitle(entryClassPK, locale));
 				setAssetType(() -> workflowHandler.getType(locale));
 				setId(() -> entryClassPK);
 				setResourceType(
 					() -> {
 						if (Objects.equals(
-							entryClassName, BlogsEntry.class.getName())) {
+								entryClassName, BlogsEntry.class.getName())) {
 
 							return "BlogPosting";
 						}
 						else if (Objects.equals(
-							entryClassName, MBDiscussion.class.getName())) {
+									entryClassName,
+									MBDiscussion.class.getName())) {
 
 							return "Comment";
 						}
