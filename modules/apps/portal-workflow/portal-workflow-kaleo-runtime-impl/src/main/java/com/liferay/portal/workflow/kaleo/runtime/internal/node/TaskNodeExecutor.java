@@ -23,8 +23,10 @@ import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
 import com.liferay.portal.workflow.kaleo.runtime.assignment.AggregateKaleoTaskAssignmentSelector;
 import com.liferay.portal.workflow.kaleo.runtime.calendar.DueDateCalculator;
 import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
+import com.liferay.portal.workflow.kaleo.runtime.internal.node.util.TaskNodeExecutorDelegateRegistryUtil;
 import com.liferay.portal.workflow.kaleo.runtime.node.BaseNodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
+import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorDelegate;
 import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
@@ -103,6 +105,18 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 	protected void doExecute(
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
+
+		TaskNodeExecutorDelegate taskNodeExecutorDelegate =
+			TaskNodeExecutorDelegateRegistryUtil.getTaskNodeExecutorDelegate(
+				"improveWriting");
+
+		try {
+			taskNodeExecutorDelegate.execute(
+				currentKaleoNode, executionContext, remainingPathElements);
+		}
+		catch (PortalException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
