@@ -5,20 +5,14 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.node;
 
-import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
-import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
-
-import java.util.List;
 
 /**
  * @author Feliphe Marinho
  */
-public interface TaskNodeExecutorDelegate {
+public interface TaskNodeExecutorAIDelegate {
 
-	public void execute(
-		KaleoNode currentKaleoNode, ExecutionContext executionContext,
-		List<PathElement> remainingPathElements);
+	public void execute(ExecutionContext executionContext, String taskNodeName);
 
 	public String getKey();
 

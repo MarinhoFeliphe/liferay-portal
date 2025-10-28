@@ -8,7 +8,7 @@ package com.liferay.portal.workflow.kaleo.runtime.internal.node.util;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorDelegate;
+import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorAIDelegate;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -17,29 +17,29 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * @author Feliphe Marinho
  */
-public class TaskNodeExecutorDelegateRegistryUtil {
+public class TaskNodeExecutorAIDelegateRegistryUtil {
 
-	public static TaskNodeExecutorDelegate getTaskNodeExecutorDelegate(
+	public static TaskNodeExecutorAIDelegate getTaskNodeExecutorDelegate(
 		String key) {
 
 		return _serviceTrackerMap.getService(key);
 	}
 
-	private static final ServiceTrackerMap<String, TaskNodeExecutorDelegate>
+	private static final ServiceTrackerMap<String, TaskNodeExecutorAIDelegate>
 		_serviceTrackerMap;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(
-			TaskNodeExecutorDelegateRegistryUtil.class);
+			TaskNodeExecutorAIDelegateRegistryUtil.class);
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, TaskNodeExecutorDelegate.class, null,
+			bundleContext, TaskNodeExecutorAIDelegate.class, null,
 			ServiceReferenceMapperFactory.create(
 				bundleContext,
-				(taskNodeExecutorDelegate, emitter) -> emitter.emit(
-					taskNodeExecutorDelegate.getKey())));
+				(taskNodeExecutorAIDelegate, emitter) -> emitter.emit(
+					taskNodeExecutorAIDelegate.getKey())));
 	}
 
 }

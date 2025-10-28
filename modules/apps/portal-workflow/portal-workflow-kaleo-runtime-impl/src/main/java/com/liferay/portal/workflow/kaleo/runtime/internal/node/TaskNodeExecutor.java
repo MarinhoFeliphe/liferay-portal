@@ -6,6 +6,7 @@
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.definition.DelayDuration;
@@ -23,10 +24,10 @@ import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
 import com.liferay.portal.workflow.kaleo.runtime.assignment.AggregateKaleoTaskAssignmentSelector;
 import com.liferay.portal.workflow.kaleo.runtime.calendar.DueDateCalculator;
 import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
-import com.liferay.portal.workflow.kaleo.runtime.internal.node.util.TaskNodeExecutorDelegateRegistryUtil;
+import com.liferay.portal.workflow.kaleo.runtime.internal.node.util.TaskNodeExecutorAIDelegateRegistryUtil;
 import com.liferay.portal.workflow.kaleo.runtime.node.BaseNodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
-import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorDelegate;
+import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorAIDelegate;
 import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
@@ -106,13 +107,19 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 		KaleoNode currentKaleoNode, ExecutionContext executionContext,
 		List<PathElement> remainingPathElements) {
 
-		TaskNodeExecutorDelegate taskNodeExecutorDelegate =
-			TaskNodeExecutorDelegateRegistryUtil.getTaskNodeExecutorDelegate(
+		if (!FeatureFlagManagerUtil.isEnabled(
+				currentKaleoNode.getCompanyId(), "LPD-62272")) {
+
+			return;
+		}
+
+		TaskNodeExecutorAIDelegate taskNodeExecutorAIDelegate =
+			TaskNodeExecutorAIDelegateRegistryUtil.getTaskNodeExecutorDelegate(
 				currentKaleoNode.getName());
 
-		if (taskNodeExecutorDelegate != null) {
-			taskNodeExecutorDelegate.execute(
-				currentKaleoNode, executionContext, remainingPathElements);
+		if (taskNodeExecutorAIDelegate != null) {
+			taskNodeExecutorAIDelegate.execute(
+				executionContext, currentKaleoNode.getName());
 		}
 	}
 

@@ -10,10 +10,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
-import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
-import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
-import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorDelegate;
+import com.liferay.portal.workflow.kaleo.runtime.node.TaskNodeExecutorAIDelegate;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -23,7 +21,6 @@ import dev.langchain4j.service.TokenStream;
 
 import java.io.Serializable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,16 +30,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Feliphe Marinho
  */
-@Component(service = TaskNodeExecutorDelegate.class)
-public class ImproveWritingTaskNodeExecutorDelegate
-	implements TaskNodeExecutorDelegate {
+@Component(service = TaskNodeExecutorAIDelegate.class)
+public class ImproveWritingTaskNodeExecutorAIDelegate
+	implements TaskNodeExecutorAIDelegate {
 
 	@Override
 	public void execute(
-		KaleoNode currentKaleoNode, ExecutionContext executionContext,
-		List<PathElement> remainingPathElements) {
+		ExecutionContext executionContext, String taskNodeName) {
 
-		if (!Objects.equals(currentKaleoNode.getName(), getKey())) {
+		if (!Objects.equals(taskNodeName, getKey())) {
 			return;
 		}
 
@@ -113,13 +109,16 @@ public class ImproveWritingTaskNodeExecutorDelegate
 		KaleoInstanceToken kaleoInstanceToken =
 			executionContext.getKaleoInstanceToken();
 
-		try (vertexAiGeminiStreamingChatModel) {
+		try {
 			_workflowInstanceManager.updateWorkflowContext(
 				kaleoInstanceToken.getCompanyId(),
 				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
 		}
 		catch (WorkflowException workflowException) {
 			throw new RuntimeException(workflowException);
+		}
+		finally {
+			vertexAiGeminiStreamingChatModel.close();
 		}
 	}
 
