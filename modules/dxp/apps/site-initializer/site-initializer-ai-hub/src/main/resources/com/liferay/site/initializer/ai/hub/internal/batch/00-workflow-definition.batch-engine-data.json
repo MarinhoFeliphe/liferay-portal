@@ -1,0 +1,213 @@
+{
+	"configuration": {
+		"className": "com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition",
+		"multiCompany": true,
+		"parameters": {
+			"containsHeaders": "true",
+			"createStrategy": "INSERT",
+			"featureFlag": "LPD-62272",
+			"importStrategy": "ON_ERROR_FAIL",
+			"updateStrategy": "UPDATE"
+		},
+		"taskItemDelegateName": "DEFAULT"
+	},
+	"items": [
+		{
+			"active": true,
+			"content": {
+				"#tag-name": "workflow-definition",
+				"#child-nodes": [
+					{
+						"#tag-name": "name",
+						"#value": "Improve Writing"
+					},
+					{
+						"#tag-name": "version",
+						"#value": "1"
+					},
+					{
+						"#tag-name": "state",
+						"#child-nodes": [
+							{
+								"#tag-name": "name",
+								"#value": "start"
+							},
+							{
+								"#tag-name": "metadata",
+								"#cdata-value": [
+									"{",
+									"    \"xy\": [",
+									"        273,",
+									"        25",
+									"    ]",
+									"}"
+								]
+							},
+							{
+								"#tag-name": "initial",
+								"#value": "true"
+							},
+							{
+								"#tag-name": "labels",
+								"#child-nodes": [
+									{
+										"#tag-name": "label",
+										"#value": "Start",
+										"language-id": "en_US"
+									}
+								]
+							},
+							{
+								"#tag-name": "transitions",
+								"#child-nodes": [
+									{
+										"#tag-name": "transition",
+										"#child-nodes": [
+											{
+												"#tag-name": "labels",
+												"#child-nodes": [
+													{
+														"#tag-name": "label",
+														"#value": "Improve Writing",
+														"language-id": "en_US"
+													}
+												]
+											},
+											{
+												"#tag-name": "name",
+												"#value": "improveWriting"
+											},
+											{
+												"#tag-name": "target",
+												"#value": "improveWritingTask"
+											},
+											{
+												"#tag-name": "default",
+												"#value": "true"
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					{
+						"#tag-name": "state",
+						"#child-nodes": [
+							{
+								"#tag-name": "name",
+								"#value": "end"
+							},
+							{
+								"#tag-name": "description",
+								"#value": "Conclude the workflow."
+							},
+							{
+								"#tag-name": "metadata",
+								"#cdata-value": [
+									"{",
+									"    \"terminal\": true,",
+									"    \"xy\": [",
+									"        277,",
+									"        459",
+									"    ]",
+									"}"
+								]
+							},
+							{
+								"#tag-name": "labels",
+								"#child-nodes": [
+									{
+										"#tag-name": "label",
+										"#value": "End",
+										"language-id": "en_US"
+									}
+								]
+							}
+						]
+					},
+					{
+						"#tag-name": "task",
+						"#child-nodes": [
+							{
+								"#tag-name": "name",
+								"#value": "improveWritingTask"
+							},
+							{
+								"#tag-name": "metadata",
+								"#cdata-value": [
+									"{",
+									"    \"xy\": [",
+									"        276,",
+									"        242",
+									"    ]",
+									"}"
+								]
+							},
+							{
+								"#tag-name": "assignments",
+								"#child-nodes": [
+									{
+										"#tag-name": "user"
+									}
+								]
+							},
+							{
+								"#tag-name": "labels",
+								"#child-nodes": [
+									{
+										"#tag-name": "label",
+										"#value": "Improve Writing Task",
+										"language-id": "en_US"
+									}
+								]
+							},
+							{
+								"#tag-name": "transitions",
+								"#child-nodes": [
+									{
+										"#tag-name": "transition",
+										"#child-nodes": [
+											{
+												"#tag-name": "labels",
+												"#child-nodes": [
+													{
+														"#tag-name": "label",
+														"#value": "end",
+														"language-id": "en_US"
+													}
+												]
+											},
+											{
+												"#tag-name": "name",
+												"#value": "end"
+											},
+											{
+												"#tag-name": "target",
+												"#value": "end"
+											},
+											{
+												"#tag-name": "default",
+												"#value": "true"
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				],
+				"xmlns": "urn:liferay.com:liferay-workflow_7.4.0",
+				"xsi:schemaLocation": "urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd",
+				"xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"
+			},
+			"externalReferenceCode": "L_AI_HUB_IMPROVE_WRITING",
+			"name": "Improve Writing",
+			"title": "Improve Writing",
+			"title_i18n": {
+				"en_US": "Improve Writing"
+			},
+			"version": "1"
+		}
+	]
+}
