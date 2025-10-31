@@ -8,15 +8,21 @@ package com.liferay.ai.hub.rest.internal.resource.v1_0;
 import com.liferay.ai.hub.rest.dto.v1_0.Task;
 import com.liferay.ai.hub.rest.resource.v1_0.TaskResource;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
+
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.sse.Sse;
+import jakarta.ws.rs.sse.SseEventSink;
 
 import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -32,34 +38,27 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class TaskResourceImpl extends BaseTaskResourceImpl {
 
 	@Override
-	public Task postTask(Task task) throws Exception {
+	public void postTask(SseEventSink sseEventSink, Task task)
+		throws Exception {
+
 		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-62272")) {
+				CompanyThreadLocal.getCompanyId(), "LPD-62272")) {
 
 			throw new UnsupportedOperationException();
 		}
 
-		Map<String, Serializable> workflowContext = _toWorkflowContext(
-			task.getContext());
-
-		WorkflowInstance workflowInstance =
-			_workflowInstanceManager.startWorkflowInstance(
-				contextCompany.getCompanyId(),
-				WorkflowConstants.DEFAULT_GROUP_ID, contextUser.getUserId(),
-				task.getType(), 1, null, workflowContext);
-
-		return new Task() {
-			{
-				setExternalReferenceCode(
-					() -> String.valueOf(
-						workflowInstance.getWorkflowInstanceId()));
-				setType(task::getType);
-			}
-		};
+		_workflowInstanceManager.startWorkflowInstance(
+			CompanyThreadLocal.getCompanyId(),
+			WorkflowConstants.DEFAULT_GROUP_ID,
+			PrincipalThreadLocal.getUserId(), task.getType(), 1, null,
+			_toWorkflowContext(sseEventSink, task));
 	}
 
-	private Map<String, Serializable> _toWorkflowContext(Map<String, ?> context)
+	private Map<String, Serializable> _toWorkflowContext(
+			SseEventSink sseEventSink, Task task)
 		throws Exception {
+
+		Map<String, ?> context = task.getContext();
 
 		Map<String, Serializable> workflowContext = new HashMap<>();
 
@@ -72,11 +71,37 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 		}
 
 		workflowContext.put(
+			"close", (Runnable & Serializable)sseEventSink::close);
+		workflowContext.put(
+			"send",
+			(BiConsumer<String, String> & Serializable)
+				(String data, String id) -> {
+					try {
+						sseEventSink.send(
+							_sse.newEventBuilder(
+							).name(
+								task.getType()
+							).data(
+								String.class, data
+							).id(
+								id
+							).build());
+					}
+					catch (Exception exception) {
+						sseEventSink.close();
+
+						throw exception;
+					}
+				});
+		workflowContext.put(
 			WorkflowConstants.CONTEXT_SERVICE_CONTEXT,
 			ServiceContextFactory.getInstance(contextHttpServletRequest));
 
 		return workflowContext;
 	}
+
+	@Context
+	private Sse _sse;
 
 	@Reference
 	private WorkflowInstanceManager _workflowInstanceManager;
