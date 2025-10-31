@@ -24,6 +24,7 @@ import dev.langchain4j.service.TokenStream;
 import java.io.Serializable;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -74,7 +75,8 @@ public class ImproveWritingTaskNodeExecutorAIDelegate
 			response -> _completeResponse(
 				response, executionContext, vertexAiGeminiStreamingChatModel)
 		).onError(
-			throwable -> vertexAiGeminiStreamingChatModel.close()
+			throwable -> _close(
+				workflowContext, vertexAiGeminiStreamingChatModel)
 		).start();
 	}
 
@@ -89,6 +91,17 @@ public class ImproveWritingTaskNodeExecutorAIDelegate
 
 	}
 
+	private void _close(
+		Map<String, Serializable> workflowContext,
+		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel) {
+
+		Runnable runnable = (Runnable)workflowContext.get("close");
+
+		runnable.run();
+
+		vertexAiGeminiStreamingChatModel.close();
+	}
+
 	private void _completeResponse(
 		ChatResponse chatResponse, ExecutionContext executionContext,
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel) {
@@ -100,10 +113,17 @@ public class ImproveWritingTaskNodeExecutorAIDelegate
 
 		workflowContext.put("rewrittenText", aiMessage.text());
 
-		KaleoInstanceToken kaleoInstanceToken =
-			executionContext.getKaleoInstanceToken();
-
 		try {
+			KaleoInstanceToken kaleoInstanceToken =
+				executionContext.getKaleoInstanceToken();
+
+			BiConsumer<String, String> consumer =
+				(BiConsumer)workflowContext.get("send");
+
+			consumer.accept(
+				aiMessage.text(),
+				String.valueOf(kaleoInstanceToken.getKaleoInstanceId()));
+
 			_workflowInstanceManager.updateWorkflowContext(
 				kaleoInstanceToken.getCompanyId(),
 				kaleoInstanceToken.getKaleoInstanceId(), workflowContext);
@@ -121,7 +141,7 @@ public class ImproveWritingTaskNodeExecutorAIDelegate
 			throw new RuntimeException(portalException);
 		}
 		finally {
-			vertexAiGeminiStreamingChatModel.close();
+			_close(workflowContext, vertexAiGeminiStreamingChatModel);
 		}
 	}
 
