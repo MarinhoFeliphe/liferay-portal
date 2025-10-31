@@ -79,10 +79,13 @@ public abstract class BaseTaskResourceImpl
 	@jakarta.ws.rs.Consumes({"application/json", "application/xml"})
 	@jakarta.ws.rs.Path("/tasks")
 	@jakarta.ws.rs.POST
-	@jakarta.ws.rs.Produces({"application/json", "application/xml"})
+	@jakarta.ws.rs.Produces("text/event-stream")
 	@Override
-	public Task postTask(Task task) throws Exception {
-		return new Task();
+	public void postTask(
+			@jakarta.ws.rs.core.Context jakarta.ws.rs.sse.SseEventSink
+				sseEventSink,
+			Task task)
+		throws Exception {
 	}
 
 	/**
@@ -107,6 +110,8 @@ public abstract class BaseTaskResourceImpl
 	@jakarta.ws.rs.Produces("application/json")
 	@Override
 	public Response postTaskBatch(
+			@jakarta.ws.rs.core.Context jakarta.ws.rs.sse.SseEventSink
+				sseEventSink,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@jakarta.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -141,7 +146,14 @@ public abstract class BaseTaskResourceImpl
 			"createStrategy", "INSERT");
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
-			taskUnsafeFunction = task -> postTask(task);
+			taskUnsafeFunction = task -> {
+				postTask(
+					(jakarta.ws.rs.sse.SseEventSink)parameters.get(
+						"sseEventSink"),
+					task);
+
+				return null;
+			};
 		}
 
 		if (taskUnsafeFunction == null) {

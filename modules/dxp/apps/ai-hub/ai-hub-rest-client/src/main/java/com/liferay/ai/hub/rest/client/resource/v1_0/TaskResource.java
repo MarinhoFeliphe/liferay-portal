@@ -31,16 +31,21 @@ public interface TaskResource {
 		return new Builder();
 	}
 
-	public Task postTask(Task task) throws Exception;
-
-	public HttpInvoker.HttpResponse postTaskHttpResponse(Task task)
+	public void postTask(jakarta.ws.rs.sse.SseEventSink sseEventSink, Task task)
 		throws Exception;
 
-	public void postTaskBatch(String callbackURL, Object object)
+	public HttpInvoker.HttpResponse postTaskHttpResponse(
+			jakarta.ws.rs.sse.SseEventSink sseEventSink, Task task)
+		throws Exception;
+
+	public void postTaskBatch(
+			jakarta.ws.rs.sse.SseEventSink sseEventSink, String callbackURL,
+			Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postTaskBatchHttpResponse(
-			String callbackURL, Object object)
+			jakarta.ws.rs.sse.SseEventSink sseEventSink, String callbackURL,
+			Object object)
 		throws Exception;
 
 	public static class Builder {
@@ -151,8 +156,12 @@ public interface TaskResource {
 
 	public static class TaskResourceImpl implements TaskResource {
 
-		public Task postTask(Task task) throws Exception {
-			HttpInvoker.HttpResponse httpResponse = postTaskHttpResponse(task);
+		public void postTask(
+				jakarta.ws.rs.sse.SseEventSink sseEventSink, Task task)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse = postTaskHttpResponse(
+				sseEventSink, task);
 
 			String content = httpResponse.getContent();
 
@@ -202,8 +211,7 @@ public interface TaskResource {
 			}
 
 			try {
-				return com.liferay.ai.hub.rest.client.serdes.v1_0.TaskSerDes.
-					toDTO(content);
+				return;
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -214,7 +222,8 @@ public interface TaskResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse postTaskHttpResponse(Task task)
+		public HttpInvoker.HttpResponse postTaskHttpResponse(
+				jakarta.ws.rs.sse.SseEventSink sseEventSink, Task task)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -253,11 +262,13 @@ public interface TaskResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postTaskBatch(String callbackURL, Object object)
+		public void postTaskBatch(
+				jakarta.ws.rs.sse.SseEventSink sseEventSink, String callbackURL,
+				Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = postTaskBatchHttpResponse(
-				callbackURL, object);
+				sseEventSink, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -308,7 +319,8 @@ public interface TaskResource {
 		}
 
 		public HttpInvoker.HttpResponse postTaskBatchHttpResponse(
-				String callbackURL, Object object)
+				jakarta.ws.rs.sse.SseEventSink sseEventSink, String callbackURL,
+				Object object)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();

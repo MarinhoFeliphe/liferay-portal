@@ -44,9 +44,12 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface TaskResource {
 
-	public Task postTask(Task task) throws Exception;
+	public void postTask(jakarta.ws.rs.sse.SseEventSink sseEventSink, Task task)
+		throws Exception;
 
-	public Response postTaskBatch(String callbackURL, Object object)
+	public Response postTaskBatch(
+			jakarta.ws.rs.sse.SseEventSink sseEventSink, String callbackURL,
+			Object object)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

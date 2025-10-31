@@ -45,15 +45,24 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public Task createTask(@GraphQLName("task") Task task) throws Exception {
-		return _applyComponentServiceObjects(
+	public boolean createTask(
+			@GraphQLName("sseEventSink") jakarta.ws.rs.sse.SseEventSink
+				sseEventSink,
+			@GraphQLName("task") Task task)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
 			_taskResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			taskResource -> taskResource.postTask(task));
+			taskResource -> taskResource.postTask(sseEventSink, task));
+
+		return true;
 	}
 
 	@GraphQLField
 	public Response createTaskBatch(
+			@GraphQLName("sseEventSink") jakarta.ws.rs.sse.SseEventSink
+				sseEventSink,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -61,7 +70,8 @@ public class Mutation {
 		return _applyComponentServiceObjects(
 			_taskResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			taskResource -> taskResource.postTaskBatch(callbackURL, object));
+			taskResource -> taskResource.postTaskBatch(
+				sseEventSink, callbackURL, object));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
