@@ -26,6 +26,11 @@ paths:
     "/tasks":
         post:
             operationId: postTask
+            parameters:
+                -   in: context
+                    name: sseEventSink
+                    schema:
+                        type: sseEventSink
             requestBody:
                 content:
                     application/json:
@@ -37,10 +42,5 @@ paths:
             responses:
                 200:
                     content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Task"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Task"
+                        text/event-stream: {}
             tags: ["Task"]
