@@ -20,7 +20,19 @@ import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.sse.InboundSseEvent;
+import jakarta.ws.rs.sse.SseEventSource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,14 +43,23 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class TaskResourceTest extends BaseTaskResourceTestCase {
 
-	@Override
-	@Test
-	public void testPostTask() throws Exception {
+	@BeforeClass
+	public static void setUpClass() throws Exception {
 		SiteInitializer siteInitializer =
 			_siteInitializerRegistry.getSiteInitializer("ai-hub-initializer");
 
 		siteInitializer.initialize(TestPropsValues.getGroupId());
+	}
 
+	@Override
+	@Test
+	public void testGetTaskSubscribe() throws Exception {
+
+	}
+
+	@Override
+	@Test
+	public void testPostTask() throws Exception {
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				"context", JSONUtil.put("text", RandomTestUtil.randomString())
@@ -58,7 +79,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	}
 
 	@Inject
-	private SiteInitializerRegistry _siteInitializerRegistry;
+	private static SiteInitializerRegistry _siteInitializerRegistry;
 
 	@Inject
 	private WorkflowInstanceManager _workflowInstanceManager;
