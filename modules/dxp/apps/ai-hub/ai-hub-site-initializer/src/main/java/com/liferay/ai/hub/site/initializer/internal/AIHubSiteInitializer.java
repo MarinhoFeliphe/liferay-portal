@@ -76,6 +76,30 @@ public class AIHubSiteInitializer implements SiteInitializer {
 		return FeatureFlagManagerUtil.isEnabled(companyId, "LPD-62272");
 	}
 
+	private void _deployWorkflowDefinition(
+			Company company, String externalReferenceCode, String json,
+			String workflowDefinitionName)
+		throws Exception {
+
+		Map<String, String> titleMap = new HashMap<>();
+
+		for (Locale locale :
+				_language.getCompanyAvailableLocales(company.getCompanyId())) {
+
+			titleMap.put(
+				_language.getLanguageId(locale),
+				_language.get(locale, workflowDefinitionName));
+		}
+
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			externalReferenceCode, company.getCompanyId(),
+			PrincipalThreadLocal.getUserId(),
+			_localization.getXml(
+				titleMap, _language.getLanguageId(company.getLocale()),
+				"title"),
+			workflowDefinitionName, json.getBytes());
+	}
+
 	private void _initialize(long groupId) throws Exception {
 		Group group = _groupLocalService.getGroup(groupId);
 
@@ -89,28 +113,25 @@ public class AIHubSiteInitializer implements SiteInitializer {
 
 		Company company = _companyLocalService.getCompany(group.getCompanyId());
 
-		Map<String, String> titleMap = new HashMap<>();
-
-		for (Locale locale :
-				_language.getCompanyAvailableLocales(company.getCompanyId())) {
-
-			titleMap.put(
-				_language.getLanguageId(locale),
-				_language.get(
-					locale, WorkflowDefinitionConstants.NAME_IMPROVE_WRITING));
-		}
-
-		String json = StringUtil.read(
+		String json1 = StringUtil.read(
 			AIHubSiteInitializer.class.getResourceAsStream(
 				"dependencies/improve-writing-workflow-definition.json"));
 
-		_workflowDefinitionManager.deployWorkflowDefinition(
+		_deployWorkflowDefinition(
+			company,
 			WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_IMPROVE_WRITING,
-			company.getCompanyId(), PrincipalThreadLocal.getUserId(),
-			_localization.getXml(
-				titleMap, _language.getLanguageId(company.getLocale()),
-				"title"),
-			WorkflowDefinitionConstants.NAME_IMPROVE_WRITING, json.getBytes());
+			json1, WorkflowDefinitionConstants.NAME_IMPROVE_WRITING);
+
+		String json2 = StringUtil.read(
+			AIHubSiteInitializer.class.getResourceAsStream(
+				"dependencies/fix-spelling-and-grammar-workflow-definition." +
+					"json"));
+
+		_deployWorkflowDefinition(
+			company,
+			WorkflowDefinitionConstants.
+				EXTERNAL_REFERENCE_CODE_FIX_SPELLING_AND_GRAMMAR,
+			json2, WorkflowDefinitionConstants.NAME_FIX_SPELLING_AND_GRAMMAR);
 	}
 
 	@Reference
