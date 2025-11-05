@@ -42,7 +42,7 @@ public abstract class BaseTaskNodeExecutorAIDelegate
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
 			VertexAiGeminiStreamingChatModel.builder(
 			).project(
-				""
+				"upgrades-accelerator-liferay"
 			).location(
 				"us-central1"
 			).modelName(

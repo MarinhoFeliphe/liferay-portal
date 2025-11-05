@@ -56,10 +56,10 @@ export default function WritingAssistantActions({
 					type: 'Make Shorter',
 				},
 				{
-					disabled: true,
+					disabled: false,
 					name: Liferay.Language.get('make-longer'),
 					symbolLeft: 'align-justify',
-					type: 'Make Shorter',
+					type: 'Make Longer',
 				},
 				{
 					disabled: true,
