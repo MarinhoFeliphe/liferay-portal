@@ -29,6 +29,10 @@ export const contents = {
 		showDeleteButton: true,
 		title: Liferay.Language.get('actions'),
 	},
+	'llm': {
+		sections: ['nodeInformation'],
+		title: Liferay.Language.get('llm-node'),
+	},
 	'assignments': {
 		backButton: (setContentName) => () => setContentName('task'),
 		deleteFunction: (setSelectedItem) => () =>
