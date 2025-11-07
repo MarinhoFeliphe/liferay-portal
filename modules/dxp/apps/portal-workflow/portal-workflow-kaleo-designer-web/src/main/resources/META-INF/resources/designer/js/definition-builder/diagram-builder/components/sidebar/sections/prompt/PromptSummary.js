@@ -11,10 +11,6 @@ import SidebarPanel from '../../SidebarPanel';
 const PromptSummary = ({setContentName}) => {
 	return (
 		<SidebarPanel panelTitle={Liferay.Language.get('prompt')}>
-			<CurrentActions
-				actions={selectedItem.data?.actions}
-				setContentName={setContentName}
-			/>
 		</SidebarPanel>
 	);
 };
