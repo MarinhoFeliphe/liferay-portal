@@ -10,6 +10,7 @@ import ConditionNode from './ConditionNode';
 import ForkNode from './ForkNode';
 import JoinNode from './JoinNode';
 import JoinXorNode from './JoinXorNode';
+import LLMNode from './LLMNode';
 import TaskNode from './TaskNode';
 import EndNode from './state/EndNode';
 import StartNode from './state/StartNode';
@@ -42,6 +43,7 @@ const nodeDescription = {
 	'fork': Liferay.Language.get('split-the-workflow-into-multiple-paths'),
 	'join': Liferay.Language.get('all-interactions-need-to-be-closed'),
 	'join-xor': Liferay.Language.get('only-one-interaction-needs-to-be-closed'),
+	'llm': Liferay.Language.get('acts-as-a-smart-processing-step'),
 	'start': Liferay.Language.get('begin-a-workflow'),
 	'state': Liferay.Language.get('execute-actions-in-the-workflow'),
 	'task': Liferay.Language.get('ask-a-user-to-work-on-the-item'),
@@ -53,6 +55,7 @@ const nodeTypes = {
 	'fork': ForkNode,
 	'join': JoinNode,
 	'join-xor': JoinXorNode,
+	'llm': LLMNode,
 	'start': StartNode,
 	'state': StateNode,
 	'task': TaskNode,
