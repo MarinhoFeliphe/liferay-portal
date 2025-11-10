@@ -1,0 +1,5 @@
+Bundle-Name: Liferay AI Hub REST Test Utilities
+Bundle-SymbolicName: com.liferay.ai.hub.rest.test.util
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.ai.hub.rest.test.util
+-fixupmessages: Classes found in the wrong directory: ...;is:=ignore
