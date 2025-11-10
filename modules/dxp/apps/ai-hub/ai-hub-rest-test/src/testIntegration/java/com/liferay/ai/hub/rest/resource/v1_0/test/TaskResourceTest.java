@@ -6,7 +6,9 @@
 package com.liferay.ai.hub.rest.resource.v1_0.test;
 
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
+import com.liferay.ai.hub.rest.test.util.AIAssistantTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -93,6 +95,61 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	@Ignore
 	@Test
+	public void testPostTaskWithImproveWriting() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText =
+			"In my opinion, I personally believe that this new approach " +
+				"might potentially result in better outcomes.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", originalText)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_IMPROVE_WRITING
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_IMPROVE_WRITING, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"improves ORIGINAL_TEXT in writing quality.\nImprovement means:",
+			"\n- More concise and direct\n- Removes filler, redundancy, and ",
+			"unnecessary words\n- Reduces or eliminates passive voice\n- ",
+			"Avoids nominalizations when possible\n- Maintains the original ",
+			"meaning and professional tone.\nYou will receive:\n",
+			"ORIGINAL_TEXT: the original text\nOUTPUT_TEXT: the edited version",
+			"\nEvaluation criteria:\n- If OUTPUT_TEXT improves the writing ",
+			"based on the criteria, then return \"Valid\"\n- If OUTPUT_TEXT ",
+			"does not improve the writing, or adds/removes meaning, then ",
+			"return: \"Invalid\"\nRules:\n- Do NOT rewrite text\n- Do NOT ",
+			"propose suggestions\n- Do NOT evaluate style preferences\n- Only ",
+			"determine whether the action \"improve writing\" was ",
+			"successfully performed. \nYour entire response must follow this ",
+			"exact format: \"Valid\" or \"Invalid\". These are some examples ",
+			"that you can follow:\nInput: Today is going to be a great day!\n",
+			"VALID output1: Today will be great.\nVALID output2: Today will ",
+			"be a great day.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Ignore
+	@Test
 	public void testPostTaskWithTypeFixSpellingAndGrammar() throws Exception {
 		CountDownLatch countDownLatch = new CountDownLatch(5);
 		List<String> lines = new ArrayList<>();
@@ -108,12 +165,10 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			).toString(),
 			"ai-hub/v1.0/tasks", Http.Method.POST);
 
-		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_FIX_SPELLING_AND_GRAMMAR, lines);
 
-		Assert.assertEquals(lines.toString(), 5, lines.size());
-		Assert.assertEquals("event: Fix Spelling and Grammar", lines.get(2));
-		Assert.assertEquals(
-			"id: " + jsonObject.getLong("externalReferenceCode"), lines.get(3));
 		Assert.assertEquals("data: This text is wrong.", lines.get(4));
 	}
 
@@ -124,6 +179,18 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		String content = StringUtil.read(inputStream);
 
 		return content.getBytes();
+	}
+
+	private void _assertEvent(
+			CountDownLatch countDownLatch, long eventId, String eventName,
+			List<String> lines)
+		throws Exception {
+
+		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+
+		Assert.assertEquals(lines.toString(), 5, lines.size());
+		Assert.assertEquals("event: " + eventName, lines.get(2));
+		Assert.assertEquals("id: " + eventId, lines.get(3));
 	}
 
 	private void _testGetTaskSubscribe(
