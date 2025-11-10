@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
@@ -83,15 +84,29 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 		ServiceContext serviceContext = executionContext.getServiceContext();
 
+		VertexAiGeminiStreamingChatModel.VertexAiGeminiStreamingChatModelBuilder
+			vertexAiGeminiStreamingChatModelBuilder =
+				VertexAiGeminiStreamingChatModel.builder(
+				).project(
+					"ai-hub-liferay"
+				).location(
+					"us-central1"
+				).modelName(
+					"gemini-2.5-flash-lite"
+				);
+
+		if (PortalRunMode.isTestMode()) {
+			vertexAiGeminiStreamingChatModelBuilder.temperature(
+				0F
+			).topP(
+				1F
+			).topK(
+				1
+			);
+		}
+
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
-			VertexAiGeminiStreamingChatModel.builder(
-			).project(
-				"ai-hub-liferay"
-			).location(
-				"us-central1"
-			).modelName(
-				"gemini-2.5-flash-lite"
-			).build();
+			vertexAiGeminiStreamingChatModelBuilder.build();
 
 		Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
