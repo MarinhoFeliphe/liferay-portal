@@ -154,6 +154,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		_testPostByExternalReferenceCodeTaskWithScope();
 		_testPostByExternalReferenceCodeTaskWithTypeAIDecisionNodeWithToolWorkflowDefinition();
 		_testPostByExternalReferenceCodeTaskWithTypeAIDecisionNodeWorkflowDefinition();
+		_testPostByExternalReferenceCodeTaskWithTypeChangeTone();
 		_testPostByExternalReferenceCodeTaskWithTypeFixSpellingAndGrammar();
 		_testPostByExternalReferenceCodeTaskWithTypeImproveWriting();
 		_testPostByExternalReferenceCodeTaskWithTypeLLMNodeWithToolWorkflowDefinition();
@@ -304,6 +305,45 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 				return null;
 			});
+	}
+
+	private void _testPostByExternalReferenceCodeTaskWithTypeChangeTone()
+		throws Exception {
+
+		CountDownLatch countDownLatch = new CountDownLatch(4);
+		List<String> lines = new ArrayList<>();
+
+		String originalText =
+			"Thank you for your assistance. Your support is appreciated.";
+
+		String sseEventSinkKey = SseEventSourceTestUtil.open(
+			List.of(countDownLatch), lines, "tasks/subscribe");
+
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context",
+				JSONUtil.put(
+					"text", originalText
+				).put(
+					"tone", "Casual"
+				)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_CHANGE_TONE
+			).toString(),
+			"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
+				"/tasks",
+			Http.Method.POST);
+
+		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+
+		Assert.assertEquals(lines.toString(), 4, lines.size());
+		Assert.assertEquals(
+			"event: " + WorkflowDefinitionConstants.NAME_CHANGE_TONE,
+			lines.get(2));
+		Assert.assertEquals(
+			"data: {\"data\":\"Thanks for your help. I really appreciate it." +
+				"\"}",
+			lines.get(3));
 	}
 
 	private void _testPostByExternalReferenceCodeTaskWithTypeFixSpellingAndGrammar()
