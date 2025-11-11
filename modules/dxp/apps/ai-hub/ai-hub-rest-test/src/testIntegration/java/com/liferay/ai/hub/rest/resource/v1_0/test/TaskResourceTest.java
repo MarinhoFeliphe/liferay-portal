@@ -95,6 +95,75 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	@Ignore
 	@Test
+	public void testPostTaskWithChangeTone() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText =
+			"Thank you for your assistance. Your support is appreciated.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context",
+				JSONUtil.put(
+					"text", originalText
+				).put(
+					"tone", "Casual"
+				)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_CHANGE_TONE
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_CHANGE_TONE, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"correctly changes the tone of\nORIGINAL_TEXT based on the ",
+			"requested tone.\nRequested tone will be one of: Formal, ",
+			"Friendly, Casual, or Persuasive.\nA tone change is considered ",
+			"successful when:\n- The tone of OUTPUT_TEXT matches the ",
+			"requested tone (Formal, Friendly, Casual, or Persuasive)\n- The ",
+			"original meaning, intent, and clarity are preserved\n- ",
+			"Modifications in vocabulary, phrasing, or sentence structure ",
+			"serve only to change tone\n- No new information is added and no ",
+			"meaning is removed\nYou will receive:\nORIGINAL_TEXT: the ",
+			"original text\nOUTPUT_TEXT: the edited version\nTONE: the target ",
+			"tone\nEvaluation criteria:\n- If OUTPUT_TEXT matches the ",
+			"requested tone and preserves meaning, return \"Valid\"\n- If ",
+			"OUTPUT_TEXT does not match the requested tone, changes meaning, ",
+			"or adds/removes content, return \"Invalid\"\nRules:\n- Do NOT ",
+			"rewrite text\n- Do NOT provide suggestions\n- Do NOT explain ",
+			"your reasoning\n- Only determine whether the action \"change ",
+			"tone\" was successfully performed\nYour entire response must ",
+			"follow this exact format: \"Valid\" or \"Invalid\".\nThese are ",
+			"some examples that you can follow:\ninput1: Hey, can you send me ",
+			"the report?\ntone: Formal\nVALID output1: Could you please send ",
+			"me the report?\ninput2: Please submit your response at your ",
+			"earliest convenience\ntone: Casual\nVALID output2: Submit your ",
+			"response, it is urgent.\ninput3: Your order has been shipped.\n",
+			"tone: Friendly\nVALID output3: Your order has shipped! Can’t ",
+			"wait for you to receive it.\ninput4: Our app helps people manage ",
+			"their daily tasks.\ntone: Persuasive\nVALID output4: Boost your ",
+			"productivity every day with our task-management app.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Ignore
+	@Test
 	public void testPostTaskWithImproveWriting() throws Exception {
 		CountDownLatch countDownLatch = new CountDownLatch(5);
 		List<String> lines = new ArrayList<>();
