@@ -219,6 +219,63 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	@Ignore
 	@Test
+	public void testPostTaskWithMakeLonger() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText = "This text will be bigger.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", originalText)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_MAKE_LONGER
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_MAKE_LONGER, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"expands ORIGINAL_TEXT by adding meaningful, relevant, and ",
+			"natural details.\nImprovement means:\n- The expanded text adds ",
+			"relevant information, clarification, or depth\n- The original ",
+			"meaning, tone, and intent are preserved\n- No unnecessary ",
+			"filler, repetition, or unrelated ideas are introduced\n- The ",
+			"structure of the original text remains recognizable\nYou will ",
+			"receive:\nORIGINAL_TEXT: the original text\nOUTPUT_TEXT: the ",
+			"expanded version\nEvaluation criteria:\n- If OUTPUT_TEXT ",
+			"meaningfully expands ORIGINAL_TEXT while preserving tone, ",
+			"intent, and meaning, return \"Valid\"\n- If OUTPUT_TEXT changes ",
+			"meaning, tone, or intent, introduces irrelevant content, or does ",
+			"not expand the text, return \"Invalid\"\nRules:\n- Do NOT ",
+			"rewrite text\n- Do NOT propose suggestions\n- Do NOT evaluate ",
+			"personal style preferences\n- Only determine whether the action ",
+			"\"make longer\" was successfully performed\nYour entire response ",
+			"must follow this exact format: \"Valid\" or \"Invalid\".These ",
+			"are some examples that you can follow:\nInput: The system update ",
+			"was successful.\nVALID output1: The system update was ",
+			"successful, and all components are now functioning as expected.",
+			"\nVALID output2: The system update was successful, and all core ",
+			"functionalities are now operating as expected.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Ignore
+	@Test
 	public void testPostTaskWithTypeFixSpellingAndGrammar() throws Exception {
 		CountDownLatch countDownLatch = new CountDownLatch(5);
 		List<String> lines = new ArrayList<>();
