@@ -274,6 +274,63 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		Assert.assertEquals("Valid", validation);
 	}
 
+	@Test
+	public void testPostTaskWithMakeShorter() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText =
+			"This long and rich in details text will be reduced to a less " +
+				"complex text.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", originalText)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_MAKE_SHORTER
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_MAKE_SHORTER, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"shortens ORIGINAL_TEXT while preserving its essential ",
+			"information, meaning, and intent.\nImprovement means:\n- The ",
+			"text is shorter and more concise\n- Redundancy, filler, or ",
+			"unnecessary detail is removed\n- Meaning, tone, and key points ",
+			"are preserved\n- No new information is added\nYou will receive:\n",
+			"ORIGINAL_TEXT: the original text\nOUTPUT_TEXT: the shortened ",
+			"version\nEvaluation criteria:\n- If OUTPUT_TEXT shortens ",
+			"ORIGINAL_TEXT while preserving meaning, return \"Valid\"\n- If ",
+			"OUTPUT_TEXT changes meaning, removes essential information, or ",
+			"does not reduce length, return \"Invalid\"\nRules:\n- Do NOT ",
+			"rewrite text\n- Do NOT propose suggestions\n- Do NOT judge style ",
+			"preferences\n- Only determine whether the action \"make shorter",
+			"\" was successfully performed\nYour entire response must follow ",
+			"this exact format: \"Valid\" or \"Invalid\".\nThese are some ",
+			"examples that you can follow:\nInput: We need to schedule a ",
+			"meeting sometime this week so we can discuss the project ",
+			"timeline and next steps.\nVALID output1: Let us meet this week ",
+			"to discuss the project timeline and next steps.\nVALID output2: ",
+			"Let us schedule a meeting this week to discuss the project ",
+			"timeline and next steps.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
 	@Ignore
 	@Test
 	public void testPostTaskWithTypeFixSpellingAndGrammar() throws Exception {
