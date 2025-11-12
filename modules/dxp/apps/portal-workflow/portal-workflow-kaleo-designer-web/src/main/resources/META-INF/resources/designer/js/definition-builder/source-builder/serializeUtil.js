@@ -627,6 +627,7 @@ function serializeDefinition(xmlNamespace, metadata, nodes, transitions) {
 		const description = item.data?.description;
 		const initial = item.type === 'start';
 		const name = item.id;
+		const prompt = item.data?.prompt;
 		const script = item.data?.script;
 		const scriptLanguage = item.data?.scriptLanguage;
 		let xmlType = item.type;
@@ -694,6 +695,10 @@ function serializeDefinition(xmlNamespace, metadata, nodes, transitions) {
 					scriptLanguage || DEFAULT_LANGUAGE
 				)
 			);
+		}
+
+		if (item.type === 'llm' && prompt) {
+			buffer.push(XMLUtil.create('prompt', cdata(prompt)));
 		}
 
 		const nodeTransitions = transitions.filter(

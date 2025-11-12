@@ -114,6 +114,10 @@ DeserializeUtil.prototype = {
 						node.scriptLanguage || DEFAULT_LANGUAGE;
 				}
 
+				if (type === 'llm') {
+					data.prompt = node.prompt || '';
+				}
+
 				data.actions = node.actions?.length && parseActions(node);
 
 				data.notifications =
