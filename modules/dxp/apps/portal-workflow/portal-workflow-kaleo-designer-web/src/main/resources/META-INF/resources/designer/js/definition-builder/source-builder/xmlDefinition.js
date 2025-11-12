@@ -367,6 +367,10 @@ XMLDefinition.prototype = {
 				},
 				'metadata',
 				'name',
+				{
+					key: 'prompt',
+					locator: 'prompt',
+				},
 				'script',
 				{
 					key: 'scriptLanguage',

@@ -23,6 +23,7 @@ const COL_TYPES_FIELD = [
 	'fork',
 	'join',
 	'join-xor',
+	'llm',
 	'state',
 	'task',
 ];
