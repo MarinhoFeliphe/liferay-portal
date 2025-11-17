@@ -1,0 +1,91 @@
+{
+	"className": "com.liferay.object.model.ObjectDefinition#J8S4",
+	"enableCategorization": true,
+	"enableComments": false,
+	"enableFriendlyURLCustomization": false,
+	"enableIndexSearch": true,
+	"enableLocalization": false,
+	"enableObjectEntryDraft": false,
+	"enableObjectEntryHistory": false,
+	"externalReferenceCode": "L_MCP_SERVER",
+	"friendlyURLSeparator": "c_mcpserver",
+	"label": {
+		"en_US": "MCP Server"
+	},
+	"modifiable": true,
+	"name": "MCPServer",
+	"objectActions": [
+	],
+	"objectDefinitionSettings": [
+	],
+	"objectFields": [
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "null",
+			"externalReferenceCode": "SSE_URL",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "SSE URL"
+			},
+			"localized": false,
+			"name": "sseUrl",
+			"objectFieldSettings": [
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": true,
+			"state": false,
+			"system": true,
+			"type": "String",
+			"unique": false
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "null",
+			"externalReferenceCode": "CREDENTIALS",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "Credentials"
+			},
+			"localized": false,
+			"name": "credentials",
+			"objectFieldSettings": [
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "String",
+			"unique": false
+		}
+	],
+	"objectFolderExternalReferenceCode": "default",
+	"objectLayouts": [
+	],
+	"objectRelationships": [
+	],
+	"objectValidationRules": [
+	],
+	"objectViews": [
+	],
+	"panelCategoryKey": "site_administration.configuration",
+	"parameterRequired": false,
+	"pluralLabel": {
+		"en_US": "MCP Server"
+	},
+	"portlet": true,
+	"restContextPath": "/o/c/mcpservers",
+	"scope": "site",
+	"status": {
+		"code": 0
+	},
+	"system": true,
+	"titleObjectFieldName": "externalReferenceCode"
+}
