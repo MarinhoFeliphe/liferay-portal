@@ -7,6 +7,7 @@ package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node
 
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
+import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.provider.MCPToolProviderImpl;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -57,8 +58,9 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	@Override
 	protected void doExecute(
-		KaleoNode currentKaleoNode, ExecutionContext executionContext,
-		List<PathElement> remainingPathElements) {
+			KaleoNode currentKaleoNode, ExecutionContext executionContext,
+			List<PathElement> remainingPathElements)
+		throws PortalException {
 
 		Map<String, String> kaleoNodeSettingValues = new HashMap<>();
 
@@ -97,6 +99,10 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			).systemMessageProvider(
 				object -> InputVariablesUtil.applyInputVariables(
 					executionContext, "prompt", kaleoNodeSettingValues)
+			).toolProvider(
+				_mcpToolProviderImpl.provide(
+					executionContext.getKaleoInstanceToken(),
+					kaleoNodeSettingValues.get("tools"))
 			).userMessage(
 				InputVariablesUtil.applyInputVariables(
 					executionContext, "userMessage", kaleoNodeSettingValues)
@@ -168,6 +174,9 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	@Reference
 	private KaleoNodeSettingLocalService _kaleoNodeSettingLocalService;
+
+	@Reference
+	private MCPToolProviderImpl _mcpToolProviderImpl;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;

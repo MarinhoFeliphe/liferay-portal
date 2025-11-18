@@ -5,6 +5,7 @@
 
 package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node;
 
+import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.provider.MCPToolProviderImpl;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -103,8 +104,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 
 	@Override
 	protected void doExecute(
-		KaleoNode currentKaleoNode, ExecutionContext executionContext,
-		List<PathElement> remainingPathElements) {
+			KaleoNode currentKaleoNode, ExecutionContext executionContext,
+			List<PathElement> remainingPathElements)
+		throws PortalException {
 
 		Map<String, String> kaleoNodeSettingValues = new HashMap<>();
 
@@ -136,6 +138,10 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			vertexAiGeminiStreamingChatModel
 		).tools(
 			new Tools()
+		).toolProvider(
+			_mcpToolProviderImpl.provide(
+				executionContext.getKaleoInstanceToken(),
+				kaleoNodeSettingValues.get("tools"))
 		).build();
 
 		decisionAssistant.decide(
@@ -179,6 +185,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 
 	@Reference
 	private KaleoNodeSettingLocalService _kaleoNodeSettingLocalService;
+
+	@Reference
+	private MCPToolProviderImpl _mcpToolProviderImpl;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;
