@@ -23,6 +23,8 @@ public class DefaultAssistantHandler implements AssistantHandler {
 			assistantHandlerContext.getSystemMessageProvider()
 		).streamingChatModel(
 			assistantHandlerContext.getVertexAiGeminiStreamingChatModel()
+		).toolProvider(
+			assistantHandlerContext.getToolProvider()
 		).build();
 
 		defaultAssistant.assist(
