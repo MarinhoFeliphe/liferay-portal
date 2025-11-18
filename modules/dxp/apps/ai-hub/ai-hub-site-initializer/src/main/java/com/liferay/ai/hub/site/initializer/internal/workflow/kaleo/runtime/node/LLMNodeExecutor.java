@@ -8,10 +8,18 @@ package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
+import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.MCPToolProviderUtil;
+import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
@@ -24,6 +32,7 @@ import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
 import com.liferay.portal.workflow.kaleo.service.KaleoNodeSettingLocalService;
 
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 
@@ -57,8 +66,9 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	@Override
 	protected void doExecute(
-		KaleoNode currentKaleoNode, ExecutionContext executionContext,
-		List<PathElement> remainingPathElements) {
+			KaleoNode currentKaleoNode, ExecutionContext executionContext,
+			List<PathElement> remainingPathElements)
+		throws PortalException {
 
 		Map<String, String> kaleoNodeSettingValues = new HashMap<>();
 
@@ -70,6 +80,13 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			kaleoNodeSettingValues.put(
 				kaleoNodeSetting.getName(), kaleoNodeSetting.getValue());
 		}
+
+		McpToolProvider mcpToolProvider = MCPToolProviderUtil.provide(
+			_dtoConverterRegistry, _groupLocalService,
+			executionContext.getKaleoInstanceToken(),
+			_objectDefinitionLocalService, _objectEntryManager,
+			kaleoNodeSettingValues.get("tools"), _userService,
+			_workflowInstanceManager);
 
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
 			VertexAiGeminiStreamingChatModel.builder(
@@ -97,6 +114,8 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			).systemMessageProvider(
 				object -> InputVariablesUtil.applyInputVariables(
 					executionContext, "prompt", kaleoNodeSettingValues)
+			).toolProvider(
+				mcpToolProvider
 			).userMessage(
 				InputVariablesUtil.applyInputVariables(
 					executionContext, "userMessage", kaleoNodeSettingValues)
@@ -167,7 +186,27 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 	}
 
 	@Reference
+	private static DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private KaleoNodeSettingLocalService _kaleoNodeSettingLocalService;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference(
+		target = "(object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
+	)
+	private ObjectEntryManager _objectEntryManager;
+
+	@Reference
+	private UserService _userService;
+
+	@Reference
+	private WorkflowInstanceManager _workflowInstanceManager;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;
