@@ -5,8 +5,10 @@
 
 package com.liferay.ai.hub.site.initializer.internal.assistant.handler;
 
+import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
+import dev.langchain4j.service.tool.ToolProvider;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -25,6 +27,7 @@ public class AssistantHandlerContext {
 		_onCompleteResponse = builder._onCompleteResponse;
 		_onError = builder._onError;
 		_systemMessageProvider = builder._systemMessageProvider;
+		_toolProvider = builder._toolProvider;
 		_userMessage = builder._userMessage;
 		_vertexAiGeminiStreamingChatModel =
 			builder._vertexAiGeminiStreamingChatModel;
@@ -44,6 +47,10 @@ public class AssistantHandlerContext {
 
 	public Function<Object, String> getSystemMessageProvider() {
 		return _systemMessageProvider;
+	}
+
+	public ToolProvider getToolProvider() {
+		return _toolProvider;
 	}
 
 	public String getUserMessage() {
@@ -90,6 +97,12 @@ public class AssistantHandlerContext {
 			return this;
 		}
 
+		public Builder toolProvider(McpToolProvider toolProvider) {
+			_toolProvider = toolProvider;
+
+			return this;
+		}
+
 		public Builder userMessage(String userMessage) {
 			_userMessage = userMessage;
 
@@ -109,6 +122,7 @@ public class AssistantHandlerContext {
 		private Consumer<ChatResponse> _onCompleteResponse;
 		private Consumer<Throwable> _onError;
 		private Function<Object, String> _systemMessageProvider;
+		private McpToolProvider _toolProvider;
 		private String _userMessage;
 		private VertexAiGeminiStreamingChatModel
 			_vertexAiGeminiStreamingChatModel;
@@ -119,6 +133,7 @@ public class AssistantHandlerContext {
 	private final Consumer<ChatResponse> _onCompleteResponse;
 	private final Consumer<Throwable> _onError;
 	private final Function<Object, String> _systemMessageProvider;
+	private final McpToolProvider _toolProvider;
 	private final String _userMessage;
 	private final VertexAiGeminiStreamingChatModel
 		_vertexAiGeminiStreamingChatModel;
