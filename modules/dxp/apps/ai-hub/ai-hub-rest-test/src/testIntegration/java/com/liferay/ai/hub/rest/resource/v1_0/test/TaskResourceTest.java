@@ -6,7 +6,9 @@
 package com.liferay.ai.hub.rest.resource.v1_0.test;
 
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
+import com.liferay.ai.hub.rest.test.util.AIAssistantTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -93,6 +95,244 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	@Ignore
 	@Test
+	public void testPostTaskWithChangeTone() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText =
+			"Thank you for your assistance. Your support is appreciated.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context",
+				JSONUtil.put(
+					"text", originalText
+				).put(
+					"tone", "Casual"
+				)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_CHANGE_TONE
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_CHANGE_TONE, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"correctly changes the tone of\nORIGINAL_TEXT based on the ",
+			"requested tone.\nRequested tone will be one of: Formal, ",
+			"Friendly, Casual, or Persuasive.\nA tone change is considered ",
+			"successful when:\n- The tone of OUTPUT_TEXT matches the ",
+			"requested tone (Formal, Friendly, Casual, or Persuasive)\n- The ",
+			"original meaning, intent, and clarity are preserved\n- ",
+			"Modifications in vocabulary, phrasing, or sentence structure ",
+			"serve only to change tone\n- No new information is added and no ",
+			"meaning is removed\nYou will receive:\nORIGINAL_TEXT: the ",
+			"original text\nOUTPUT_TEXT: the edited version\nTONE: the target ",
+			"tone\nEvaluation criteria:\n- If OUTPUT_TEXT matches the ",
+			"requested tone and preserves meaning, return \"Valid\"\n- If ",
+			"OUTPUT_TEXT does not match the requested tone, changes meaning, ",
+			"or adds/removes content, return \"Invalid\"\nRules:\n- Do NOT ",
+			"rewrite text\n- Do NOT provide suggestions\n- Do NOT explain ",
+			"your reasoning\n- Only determine whether the action \"change ",
+			"tone\" was successfully performed\nYour entire response must ",
+			"follow this exact format: \"Valid\" or \"Invalid\".\nThese are ",
+			"some examples that you can follow:\ninput1: Hey, can you send me ",
+			"the report?\ntone: Formal\nVALID output1: Could you please send ",
+			"me the report?\ninput2: Please submit your response at your ",
+			"earliest convenience\ntone: Casual\nVALID output2: Submit your ",
+			"response, it is urgent.\ninput3: Your order has been shipped.\n",
+			"tone: Friendly\nVALID output3: Your order has shipped! Can’t ",
+			"wait for you to receive it.\ninput4: Our app helps people manage ",
+			"their daily tasks.\ntone: Persuasive\nVALID output4: Boost your ",
+			"productivity every day with our task-management app.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Ignore
+	@Test
+	public void testPostTaskWithImproveWriting() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText =
+			"In my opinion, I personally believe that this new approach " +
+				"might potentially result in better outcomes.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", originalText)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_IMPROVE_WRITING
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_IMPROVE_WRITING, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"improves ORIGINAL_TEXT in writing quality.\nImprovement means:",
+			"\n- More concise and direct\n- Removes filler, redundancy, and ",
+			"unnecessary words\n- Reduces or eliminates passive voice\n- ",
+			"Avoids nominalizations when possible\n- Maintains the original ",
+			"meaning and professional tone.\nYou will receive:\n",
+			"ORIGINAL_TEXT: the original text\nOUTPUT_TEXT: the edited version",
+			"\nEvaluation criteria:\n- If OUTPUT_TEXT improves the writing ",
+			"based on the criteria, then return \"Valid\"\n- If OUTPUT_TEXT ",
+			"does not improve the writing, or adds/removes meaning, then ",
+			"return: \"Invalid\"\nRules:\n- Do NOT rewrite text\n- Do NOT ",
+			"propose suggestions\n- Do NOT evaluate style preferences\n- Only ",
+			"determine whether the action \"improve writing\" was ",
+			"successfully performed. \nYour entire response must follow this ",
+			"exact format: \"Valid\" or \"Invalid\". These are some examples ",
+			"that you can follow:\nInput: Today is going to be a great day!\n",
+			"VALID output1: Today will be great.\nVALID output2: Today will ",
+			"be a great day.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Ignore
+	@Test
+	public void testPostTaskWithMakeLonger() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText = "This text will be bigger.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", originalText)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_MAKE_LONGER
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_MAKE_LONGER, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"expands ORIGINAL_TEXT by adding meaningful, relevant, and ",
+			"natural details.\nImprovement means:\n- The expanded text adds ",
+			"relevant information, clarification, or depth\n- The original ",
+			"meaning, tone, and intent are preserved\n- No unnecessary ",
+			"filler, repetition, or unrelated ideas are introduced\n- The ",
+			"structure of the original text remains recognizable\nYou will ",
+			"receive:\nORIGINAL_TEXT: the original text\nOUTPUT_TEXT: the ",
+			"expanded version\nEvaluation criteria:\n- If OUTPUT_TEXT ",
+			"meaningfully expands ORIGINAL_TEXT while preserving tone, ",
+			"intent, and meaning, return \"Valid\"\n- If OUTPUT_TEXT changes ",
+			"meaning, tone, or intent, introduces irrelevant content, or does ",
+			"not expand the text, return \"Invalid\"\nRules:\n- Do NOT ",
+			"rewrite text\n- Do NOT propose suggestions\n- Do NOT evaluate ",
+			"personal style preferences\n- Only determine whether the action ",
+			"\"make longer\" was successfully performed\nYour entire response ",
+			"must follow this exact format: \"Valid\" or \"Invalid\".These ",
+			"are some examples that you can follow:\nInput: The system update ",
+			"was successful.\nVALID output1: The system update was ",
+			"successful, and all components are now functioning as expected.",
+			"\nVALID output2: The system update was successful, and all core ",
+			"functionalities are now operating as expected.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Test
+	public void testPostTaskWithMakeShorter() throws Exception {
+		CountDownLatch countDownLatch = new CountDownLatch(5);
+		List<String> lines = new ArrayList<>();
+
+		_testGetTaskSubscribe(countDownLatch, lines);
+
+		String originalText =
+			"This long and rich in details text will be reduced to a less " +
+				"complex text.";
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", originalText)
+			).put(
+				"type", WorkflowDefinitionConstants.NAME_MAKE_SHORTER
+			).toString(),
+			"ai-hub/v1.0/tasks", Http.Method.POST);
+
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_MAKE_SHORTER, lines);
+
+		String outputText = lines.get(4);
+
+		outputText = StringUtil.removeSubstring(outputText, "data: ");
+
+		String prompt = StringBundler.concat(
+			"You are a strict evaluation agent. You are not generating or ",
+			"editing text.\nYour task is to determine whether OUTPUT_TEXT ",
+			"shortens ORIGINAL_TEXT while preserving its essential ",
+			"information, meaning, and intent.\nImprovement means:\n- The ",
+			"text is shorter and more concise\n- Redundancy, filler, or ",
+			"unnecessary detail is removed\n- Meaning, tone, and key points ",
+			"are preserved\n- No new information is added\nYou will receive:\n",
+			"ORIGINAL_TEXT: the original text\nOUTPUT_TEXT: the shortened ",
+			"version\nEvaluation criteria:\n- If OUTPUT_TEXT shortens ",
+			"ORIGINAL_TEXT while preserving meaning, return \"Valid\"\n- If ",
+			"OUTPUT_TEXT changes meaning, removes essential information, or ",
+			"does not reduce length, return \"Invalid\"\nRules:\n- Do NOT ",
+			"rewrite text\n- Do NOT propose suggestions\n- Do NOT judge style ",
+			"preferences\n- Only determine whether the action \"make shorter",
+			"\" was successfully performed\nYour entire response must follow ",
+			"this exact format: \"Valid\" or \"Invalid\".\nThese are some ",
+			"examples that you can follow:\nInput: We need to schedule a ",
+			"meeting sometime this week so we can discuss the project ",
+			"timeline and next steps.\nVALID output1: Let us meet this week ",
+			"to discuss the project timeline and next steps.\nVALID output2: ",
+			"Let us schedule a meeting this week to discuss the project ",
+			"timeline and next steps.");
+
+		String validation = AIAssistantTestUtil.runValidatorAIModel(
+			originalText, outputText, prompt);
+
+		Assert.assertEquals("Valid", validation);
+	}
+
+	@Ignore
+	@Test
 	public void testPostTaskWithTypeFixSpellingAndGrammar() throws Exception {
 		CountDownLatch countDownLatch = new CountDownLatch(5);
 		List<String> lines = new ArrayList<>();
@@ -108,12 +348,10 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			).toString(),
 			"ai-hub/v1.0/tasks", Http.Method.POST);
 
-		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+		_assertEvent(
+			countDownLatch, jsonObject.getLong("externalReferenceCode"),
+			WorkflowDefinitionConstants.NAME_FIX_SPELLING_AND_GRAMMAR, lines);
 
-		Assert.assertEquals(lines.toString(), 5, lines.size());
-		Assert.assertEquals("event: Fix Spelling and Grammar", lines.get(2));
-		Assert.assertEquals(
-			"id: " + jsonObject.getLong("externalReferenceCode"), lines.get(3));
 		Assert.assertEquals("data: This text is wrong.", lines.get(4));
 	}
 
@@ -124,6 +362,18 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		String content = StringUtil.read(inputStream);
 
 		return content.getBytes();
+	}
+
+	private void _assertEvent(
+			CountDownLatch countDownLatch, long eventId, String eventName,
+			List<String> lines)
+		throws Exception {
+
+		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+
+		Assert.assertEquals(lines.toString(), 5, lines.size());
+		Assert.assertEquals("event: " + eventName, lines.get(2));
+		Assert.assertEquals("id: " + eventId, lines.get(3));
 	}
 
 	private void _testGetTaskSubscribe(
