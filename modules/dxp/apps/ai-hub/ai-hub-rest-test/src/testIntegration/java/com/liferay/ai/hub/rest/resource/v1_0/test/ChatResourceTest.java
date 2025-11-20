@@ -6,14 +6,22 @@
 package com.liferay.ai.hub.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.test.rule.FeatureFlag;
 
-import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Feliphe Marinho
  */
-@Ignore
+@FeatureFlag("LPD-62272")
 @RunWith(Arquillian.class)
 public class ChatResourceTest extends BaseChatResourceTestCase {
+
+	@Override
+	@Test
+	public void testGetChatSubscribe() throws Exception {
+		super.testGetChatSubscribe();
+	}
+
 }
