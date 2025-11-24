@@ -2,7 +2,7 @@
 	"#child-nodes": [
 		{
 			"#tag-name": "name",
-			"#value": "LLM Node Workflow Definition"
+			"#value": "LLM Node With Tool Workflow Definition"
 		},
 		{
 			"#tag-name": "version",
@@ -136,7 +136,7 @@
 					"#cdata-value": [
 						"[",
 						"    {",
-						"        \"name\": \"content\",",
+						"        \"name\": \"userMessage\",",
 						"        \"type\": \"string\"",
 						"    }",
 						"]"
@@ -145,25 +145,7 @@
 				},
 				{
 					"#cdata-value": [
-						"[",
-						"    {",
-						"        \"name\": \"outputVariable\",",
-						"        \"type\": \"string\"",
-						"    }",
-						"]"
-					],
-					"#tag-name": "output-variables"
-				},
-				{
-					"#cdata-value": [
-						"You are an MCP-compliant AI agent. When answering ",
-						"questions about your structure, tools, capabilities, ",
-						"or methods, follow these rules strictly: When the ",
-						"user asks \"What tools do you have?\" or any ",
-						"equivalent question, respond ONLY with a single line ",
-						"containing the tool names separated by commas. ",
-						"Example format: tool1, tool2, tool3. No bullet ",
-						"points. No paragraphs. No explanations. No extra text."
+						"Respond ONLY with \"yes\" or \"no\" to the following question. Do not provide any other text, punctuation, or explanation."
 					],
 					"#tag-name": "prompt"
 				},
@@ -201,7 +183,7 @@
 				},
 				{
 					"#cdata-value": [
-						"Analyze the following content: {{content}}"
+						"{{userMessage}}"
 					],
 					"#tag-name": "user-message"
 				}

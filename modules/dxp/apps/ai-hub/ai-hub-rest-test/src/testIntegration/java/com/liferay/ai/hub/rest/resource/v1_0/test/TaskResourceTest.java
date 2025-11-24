@@ -8,7 +8,6 @@ package com.liferay.ai.hub.rest.resource.v1_0.test;
 import com.liferay.ai.hub.rest.resource.v1_0.test.util.SseEventSourceTestUtil;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.configuration.test.util.GroupConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -16,7 +15,6 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
@@ -24,6 +22,7 @@ import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowNode;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
@@ -47,7 +46,11 @@ import org.junit.runner.RunWith;
 /**
  * @author Feliphe Marinho
  */
-@FeatureFlag("LPD-62272")
+@FeatureFlags(
+	featureFlags = {
+		@FeatureFlag(value = "LPD-62272"), @FeatureFlag(value = "LPD-63311")
+	}
+)
 @RunWith(Arquillian.class)
 public class TaskResourceTest extends BaseTaskResourceTestCase {
 
@@ -60,16 +63,16 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		_workflowDefinitionManager.deployWorkflowDefinition(
 			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			StringUtil.randomId(), _WORKFLOW_DEFINITION_NAME,
-			_getContentBytes("workflow-definition.json"));
-		_workflowDefinitionManager.deployWorkflowDefinition(
-			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
 			StringUtil.randomId(), "AI Decision Node Workflow Definition",
 			_getContentBytes("ai-decision-node-workflow-definition.json"));
 		_workflowDefinitionManager.deployWorkflowDefinition(
 			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			StringUtil.randomId(), "LLM Node Workflow Definition",
-			_getContentBytes("llm-node-workflow-definition.json"));
+			StringUtil.randomId(), "LLM Node With Tool Workflow Definition",
+			_getContentBytes("llm-node-with-tool-workflow-definition.json"));
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			StringUtil.randomId(), "Workflow Definition",
+			_getContentBytes("workflow-definition.json"));
 	}
 
 	@After
@@ -92,7 +95,6 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		_testPostByExternalReferenceCodeTaskWithScope();
 	}
 
-	@Ignore
 	@Test
 	public void testPostTaskWithTypeAIDecisionWorkflowDefinition()
 		throws Exception {
@@ -110,101 +112,60 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	@Ignore
 	@Test
 	public void testPostTaskWithTypeFixSpellingAndGrammar() throws Exception {
-		Group group = GroupTestUtil.addGroup();
+		CountDownLatch countDownLatch = new CountDownLatch(4);
+		List<String> lines = new ArrayList<>();
 
-		try (GroupConfigurationTemporarySwapper configurationTemporarySwapper =
-				new GroupConfigurationTemporarySwapper(
-					group.getGroupId(),
-					"com.liferay.ai.hub.site.initializer.internal.workflow." +
-						"kaleo.runtime.node.configuration.MCPConfiguration",
-					HashMapDictionaryBuilder.<String, Object>put(
-						"enabled", false
-					).build())) {
+		String sseEventSinkKey = SseEventSourceTestUtil.open(
+			List.of(countDownLatch), lines, "tasks/subscribe");
 
-			CountDownLatch countDownLatch = new CountDownLatch(4);
-			List<String> lines = new ArrayList<>();
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context", JSONUtil.put("text", "Thi text ix wrong.")
+			).put(
+				"type",
+				WorkflowDefinitionConstants.NAME_FIX_SPELLING_AND_GRAMMAR
+			).toString(),
+			"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
+				"/tasks",
+			Http.Method.POST);
 
-			String sseEventSinkKey = SseEventSourceTestUtil.open(
-				List.of(countDownLatch), lines, "tasks/subscribe");
+		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
 
-			HTTPTestUtil.invokeToJSONObject(
-				JSONUtil.put(
-					"context", JSONUtil.put("text", "Thi text ix wrong.")
-				).put(
-					"scope",
-					JSONUtil.put(
-						"externalReferenceCode",
-						group.getExternalReferenceCode())
-				).put(
-					"type",
-					WorkflowDefinitionConstants.NAME_FIX_SPELLING_AND_GRAMMAR
-				).toString(),
-				"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
-					"/tasks",
-				Http.Method.POST);
-
-			Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
-
-			Assert.assertEquals(lines.toString(), 4, lines.size());
-			Assert.assertEquals(
-				"event: Fix Spelling and Grammar", lines.get(2));
-			Assert.assertEquals("data: This text is wrong.", lines.get(3));
-		}
+		Assert.assertEquals(lines.toString(), 4, lines.size());
+		Assert.assertEquals("event: Fix Spelling and Grammar", lines.get(2));
+		Assert.assertEquals("data: This text is wrong.", lines.get(3));
 	}
 
 	@Ignore
 	@Test
-	public void testPostTaskWithTypeLLMWorkflowDefinitionMCPEnabled()
+	public void testPostTaskWithTypeLLMNodeWithToolWorkflowDefinition()
 		throws Exception {
 
-		Group group = GroupTestUtil.addGroup();
+		CountDownLatch countDownLatch = new CountDownLatch(4);
+		List<String> lines = new ArrayList<>();
 
-		try (GroupConfigurationTemporarySwapper configurationTemporarySwapper =
-				new GroupConfigurationTemporarySwapper(
-					group.getGroupId(),
-					"com.liferay.ai.hub.site.initializer.internal.workflow." +
-						"kaleo.runtime.node.configuration.MCPConfiguration",
-					HashMapDictionaryBuilder.<String, Object>put(
-						"enabled", true
-					).put(
-						"password", "test"
-					).put(
-						"sseUrl", "http://localhost:8080/o/mcp/sse"
-					).put(
-						"userName", "test@liferay.com"
-					).build())) {
+		String sseEventSinkKey = SseEventSourceTestUtil.open(
+			List.of(countDownLatch), lines, "tasks/subscribe");
 
-			CountDownLatch countDownLatch = new CountDownLatch(4);
-			List<String> lines = new ArrayList<>();
-
-			String sseEventSinkKey = SseEventSourceTestUtil.open(
-				List.of(countDownLatch), lines, "tasks/subscribe");
-
-			HTTPTestUtil.invokeToJSONObject(
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context",
 				JSONUtil.put(
-					"context",
-					JSONUtil.put(
-						"content", "Is the \"get_openapi\" tool available?")
-				).put(
-					"scope",
-					JSONUtil.put(
-						"externalReferenceCode",
-						group.getExternalReferenceCode())
-				).put(
-					"type", "LLM Node Workflow Definition"
-				).toString(),
-				"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
-					"/tasks",
-				Http.Method.POST);
+					"userMessage", "Is the \"get_openapi\" tool available?")
+			).put(
+				"type", "LLM Node With Tool Workflow Definition"
+			).toString(),
+			"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
+				"/tasks",
+			Http.Method.POST);
 
-			Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
 
-			Assert.assertEquals(lines.toString(), 4, lines.size());
+		Assert.assertEquals(lines.toString(), 4, lines.size());
 
-			String response = StringUtil.toLowerCase(lines.get(3));
+		String response = StringUtil.toLowerCase(lines.get(3));
 
-			Assert.assertTrue(response, response.contains("yes"));
-		}
+		Assert.assertTrue(response, response.contains("yes"));
 	}
 
 	private static byte[] _getContentBytes(String fileName) throws Exception {
@@ -221,7 +182,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			JSONUtil.put(
 				"context", JSONUtil.put("text", RandomTestUtil.randomString())
 			).put(
-				"type", _WORKFLOW_DEFINITION_NAME
+				"type", "Workflow Definition"
 			).toString(),
 			"ai-hub/v1.0/by-external-reference-code/" +
 				RandomTestUtil.randomString() + "/tasks",
@@ -233,7 +194,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 				jsonObject.getLong("externalReferenceCode"));
 
 		Assert.assertEquals(
-			_WORKFLOW_DEFINITION_NAME,
+			"Workflow Definition",
 			workflowInstance.getWorkflowDefinitionName());
 	}
 
@@ -250,7 +211,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 				JSONUtil.put(
 					"externalReferenceCode", group.getExternalReferenceCode())
 			).put(
-				"type", _WORKFLOW_DEFINITION_NAME
+				"type", "Workflow Definition"
 			).toString(),
 			"ai-hub/v1.0/by-external-reference-code/" +
 				RandomTestUtil.randomString() + "/tasks",
@@ -263,7 +224,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		Assert.assertEquals(group.getGroupId(), workflowInstance.getGroupId());
 		Assert.assertEquals(
-			_WORKFLOW_DEFINITION_NAME,
+			"Workflow Definition",
 			workflowInstance.getWorkflowDefinitionName());
 	}
 
@@ -299,9 +260,6 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 				return null;
 			});
 	}
-
-	private static final String _WORKFLOW_DEFINITION_NAME =
-		"Workflow Definition";
 
 	@Inject
 	private static SiteInitializerRegistry _siteInitializerRegistry;

@@ -7,15 +7,11 @@ package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node
 
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
-import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.configuration.manager.util.MCPConfigurationManagerUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
-import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowInstance;
-import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
@@ -31,7 +27,6 @@ import com.liferay.portal.workflow.kaleo.service.KaleoNodeSettingLocalService;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
-import dev.langchain4j.mcp.client.McpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -69,9 +64,8 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	@Override
 	protected void doExecute(
-			KaleoNode currentKaleoNode, ExecutionContext executionContext,
-			List<PathElement> remainingPathElements)
-		throws PortalException {
+		KaleoNode currentKaleoNode, ExecutionContext executionContext,
+		List<PathElement> remainingPathElements) {
 
 		Map<String, String> kaleoNodeSettingValues = new HashMap<>();
 
@@ -82,48 +76,6 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 		for (KaleoNodeSetting kaleoNodeSetting : kaleoNodeSettings) {
 			kaleoNodeSettingValues.put(
 				kaleoNodeSetting.getName(), kaleoNodeSetting.getValue());
-		}
-
-		McpToolProvider toolProvider = null;
-
-		KaleoInstanceToken kaleoInstanceToken =
-			executionContext.getKaleoInstanceToken();
-
-		WorkflowInstance workflowInstance =
-			_workflowInstanceManager.getWorkflowInstance(
-				CompanyThreadLocal.getCompanyId(),
-				kaleoInstanceToken.getKaleoInstanceId());
-
-		long groupId = workflowInstance.getGroupId();
-
-		if (MCPConfigurationManagerUtil.enabled(
-				_configurationProvider, groupId)) {
-
-			McpTransport mcpTransport = new HttpMcpTransport.Builder(
-			).sseUrl(
-				MCPConfigurationManagerUtil.sseUrl(
-					_configurationProvider, groupId)
-			).customHeaders(
-				Map.of(
-					"Authorization",
-					_getAuthorization(
-						MCPConfigurationManagerUtil.authorizationType(
-							_configurationProvider, groupId),
-						MCPConfigurationManagerUtil.password(
-							_configurationProvider, groupId),
-						MCPConfigurationManagerUtil.userName(
-							_configurationProvider, groupId)))
-			).build();
-
-			McpClient mcpClient = new DefaultMcpClient.Builder(
-			).transport(
-				mcpTransport
-			).build();
-
-			toolProvider = McpToolProvider.builder(
-			).mcpClients(
-				mcpClient
-			).build();
 		}
 
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
@@ -153,7 +105,22 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 				object -> InputVariablesUtil.applyInputVariables(
 					executionContext, "prompt", kaleoNodeSettingValues)
 			).toolProvider(
-				toolProvider
+				() -> {
+					McpTransport mcpTransport = new HttpMcpTransport.Builder(
+					).sseUrl(
+						"http://localhost:8080/o/mcp/sse"
+					).customHeaders(
+						Map.of("Authorization", _getAuthorization())
+					).build();
+
+					return McpToolProvider.builder(
+					).mcpClients(
+						new DefaultMcpClient.Builder(
+						).transport(
+							mcpTransport
+						).build()
+					).build();
+				}
 			).userMessage(
 				InputVariablesUtil.applyInputVariables(
 					executionContext, "userMessage", kaleoNodeSettingValues)
@@ -223,32 +190,25 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 		}
 	}
 
-	private String _getAuthorization(
-		String authorizationType, String password, String userName) {
+	private String _getAuthorization() {
+		Base64.Encoder encoder = Base64.getEncoder();
+
+		String userNameAndPassword =
+			"test@liferay.com:" + PropsValues.DEFAULT_ADMIN_PASSWORD;
 
 		try {
-			Base64.Encoder encoder = Base64.getEncoder();
-
-			String userNameAndPassword = userName + ":" + password;
-
-			return authorizationType + " " +
+			return "Basic " +
 				new String(
 					encoder.encode(userNameAndPassword.getBytes("UTF-8")),
 					"UTF-8");
 		}
-		catch (UnsupportedEncodingException unsupportedEncodingException) {
-			throw new RuntimeException(unsupportedEncodingException);
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Reference
-	private ConfigurationProvider _configurationProvider;
-
-	@Reference
 	private KaleoNodeSettingLocalService _kaleoNodeSettingLocalService;
-
-	@Reference
-	private WorkflowInstanceManager _workflowInstanceManager;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;
