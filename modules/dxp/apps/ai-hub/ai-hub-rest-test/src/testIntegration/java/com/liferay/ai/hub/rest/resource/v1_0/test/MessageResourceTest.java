@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
@@ -25,14 +26,17 @@ import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Feliphe Marinho
  */
-@FeatureFlag("LPD-62272")
+@FeatureFlags(
+	featureFlags = {
+		@FeatureFlag(value = "LPD-62272"), @FeatureFlag(value = "LPD-63311")
+	}
+)
 @RunWith(Arquillian.class)
 public class MessageResourceTest extends BaseMessageResourceTestCase {
 
@@ -49,7 +53,6 @@ public class MessageResourceTest extends BaseMessageResourceTestCase {
 		SseUtil.closeAll();
 	}
 
-	@Ignore
 	@Override
 	@Test
 	public void testPostChatByExternalReferenceCodeMessage() throws Exception {
