@@ -10,6 +10,7 @@ import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantH
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.provider.MCPToolProviderImpl;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
@@ -25,6 +26,7 @@ import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
 import com.liferay.portal.workflow.kaleo.service.KaleoNodeSettingLocalService;
 
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 
@@ -88,6 +90,12 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 		AssistantHandlerUtil.handle(
 			AssistantHandlerContext.builder(
+			).invocationParameters(
+				InvocationParameters.from(
+					Map.of(
+						"executionContext", executionContext,
+						"permissionChecker",
+						PermissionThreadLocal.getPermissionChecker()))
 			).memoryId(
 				GetterUtil.getString(workflowContext.get("memoryId"))
 			).onCompleteResponse(

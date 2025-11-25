@@ -5,6 +5,8 @@
 
 package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node;
 
+import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
+import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.provider.MCPToolProviderImpl;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -26,9 +28,6 @@ import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
-import dev.langchain4j.service.AiServices;
-import dev.langchain4j.service.TokenStream;
-import dev.langchain4j.service.UserMessage;
 
 import java.io.Serializable;
 
@@ -50,26 +49,18 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 		return NodeType.AI_DECISION;
 	}
 
-	public interface DecisionAssistant {
-
-		public TokenStream decide(
-			InvocationParameters invocationParameters,
-			@UserMessage String userMessage);
-
-	}
-
 	public class Tools {
 
 		@Tool(
 			"Complete the workflow node by proceeding to the chosen transition"
 		)
 		public void completeWorkflowNode(
+				InvocationParameters parameters,
 				@P(
 					"A brief, one-sentence justification for the chosen transition."
 				)
 				String reason,
-				@P("Transition name") String transitionName,
-				InvocationParameters parameters)
+				@P("Transition name") String transitionName)
 			throws PortalException {
 
 			ExecutionContext executionContext = parameters.get(
@@ -129,33 +120,34 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 				"gemini-2.5-flash-lite"
 			).build();
 
-		DecisionAssistant decisionAssistant = AiServices.builder(
-			DecisionAssistant.class
-		).systemMessageProvider(
-			object -> InputVariablesUtil.applyInputVariables(
-				executionContext, "prompt", kaleoNodeSettingValues)
-		).streamingChatModel(
-			vertexAiGeminiStreamingChatModel
-		).tools(
-			new Tools()
-		).toolProvider(
-			_mcpToolProviderImpl.provide(
-				executionContext.getKaleoInstanceToken(),
-				kaleoNodeSettingValues.get("tools"))
-		).build();
-
-		decisionAssistant.decide(
-			InvocationParameters.from(
-				Map.of(
-					"executionContext", executionContext, "permissionChecker",
-					PermissionThreadLocal.getPermissionChecker())),
-			InputVariablesUtil.applyInputVariables(
-				executionContext, "userMessage", kaleoNodeSettingValues)
-		).onCompleteResponse(
-			response -> vertexAiGeminiStreamingChatModel.close()
-		).onError(
-			throwable -> vertexAiGeminiStreamingChatModel.close()
-		).start();
+		AssistantHandlerUtil.handle(
+			AssistantHandlerContext.builder(
+			).invocationParameters(
+				InvocationParameters.from(
+					Map.of(
+						"executionContext", executionContext,
+						"permissionChecker",
+						PermissionThreadLocal.getPermissionChecker()))
+			).onCompleteResponse(
+				response -> vertexAiGeminiStreamingChatModel.close()
+			).onError(
+				throwable -> vertexAiGeminiStreamingChatModel.close()
+			).systemMessageProvider(
+				object -> InputVariablesUtil.applyInputVariables(
+					executionContext, "prompt", kaleoNodeSettingValues)
+			).tools(
+				new Tools()
+			).toolProvider(
+				_mcpToolProviderImpl.provide(
+					executionContext.getKaleoInstanceToken(),
+					kaleoNodeSettingValues.get("tools"))
+			).userMessage(
+				InputVariablesUtil.applyInputVariables(
+					executionContext, "userMessage", kaleoNodeSettingValues)
+			).vertexAiGeminiStreamingChatModel(
+				vertexAiGeminiStreamingChatModel
+			).build(),
+			"default");
 	}
 
 	@Override
