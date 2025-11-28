@@ -26,23 +26,24 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
-
+import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.McpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 import dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport;
+import dev.langchain4j.model.chat.request.json.JsonAnyOfSchema;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
+import dev.langchain4j.model.chat.request.json.JsonSchemaElement;
 
 import java.io.UnsupportedEncodingException;
-
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author João Victor Alves
@@ -84,10 +85,10 @@ public class MCPToolProviderUtil {
 
 		try {
 			page = objectEntryManager.getObjectEntries(
-				CompanyThreadLocal.getCompanyId(),
+				kaleoInstanceToken.getCompanyId(),
 				objectDefinitionLocalService.
 					fetchObjectDefinitionByExternalReferenceCode(
-						"L_MCP_SERVER", CompanyThreadLocal.getCompanyId()),
+						"L_MCP_SERVER", kaleoInstanceToken.getCompanyId()),
 				group.getGroupKey(), null,
 				new DefaultDTOConverterContext(
 					false, Collections.emptyMap(), dtoConverterRegistry, null,
@@ -115,31 +116,35 @@ public class MCPToolProviderUtil {
 
 				McpTransport mcpTransport = null;
 
-				if (Objects.equals(
-						objectEntry.getExternalReferenceCode(),
-						"L_LIFERAY_MCP_SERVER")) {
+				String credentials = GetterUtil.getString(
+					objectEntryProperties.get("credentials"));
 
+				Map<String, String> customHeaders = Map.of();
+
+				if (!credentials.isBlank()) {
+					customHeaders = Map.of(
+						"Authorization",
+						_getAuthorization(
+							GetterUtil.getString(
+								objectEntryProperties.get("credentials"))));
+				}
+
+				String url = GetterUtil.getString(objectEntryProperties.get("url"));
+
+				if (url.endsWith("/sse")) {
 					mcpTransport = new HttpMcpTransport.Builder(
 					).sseUrl(
-						GetterUtil.getString(objectEntryProperties.get("url"))
+						url
 					).customHeaders(
-						Map.of(
-							"Authorization",
-							_getAuthorization(
-								GetterUtil.getString(
-									objectEntryProperties.get("credentials"))))
+						customHeaders
 					).build();
 				}
 				else {
 					mcpTransport = new StreamableHttpMcpTransport.Builder(
 					).url(
-						GetterUtil.getString(objectEntryProperties.get("url"))
+						url
 					).customHeaders(
-						Map.of(
-							"Authorization",
-							_getAuthorization(
-								GetterUtil.getString(
-									objectEntryProperties.get("credentials"))))
+						customHeaders
 					).build();
 				}
 
@@ -154,10 +159,28 @@ public class MCPToolProviderUtil {
 			toolProvider = McpToolProvider.builder(
 			).mcpClients(
 				mcpClients
+			).filter(
+				(mcpClient, toolSpecification) ->
+					_filterToolSpecifications(toolSpecification)
 			).build();
 		}
 
 		return toolProvider;
+	}
+
+	private static boolean _filterToolSpecifications(ToolSpecification toolSpecification) {
+		JsonObjectSchema jsonObjectSchema = toolSpecification.parameters();
+
+		Map<String, JsonSchemaElement> properties =
+			jsonObjectSchema.properties();
+
+		for (JsonSchemaElement jsonSchemaElement : properties.values()) {
+			if (jsonSchemaElement instanceof JsonAnyOfSchema) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private static String _getAuthorization(String credentials) {
