@@ -5,52 +5,47 @@
 
 package com.liferay.ai.hub.rest.resource.v1_0.test;
 
+import com.liferay.ai.hub.rest.resource.v1_0.test.util.SseEventSourceTestUtil;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.PropsValues;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowNode;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import java.time.Duration;
+import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -60,7 +55,11 @@ import org.junit.runner.RunWith;
 /**
  * @author Feliphe Marinho
  */
-@FeatureFlag("LPD-62272")
+@FeatureFlags(
+	featureFlags = {
+		@FeatureFlag(value = "LPD-62272"), @FeatureFlag(value = "LPD-63311")
+	}
+)
 @RunWith(Arquillian.class)
 public class TaskResourceTest extends BaseTaskResourceTestCase {
 
@@ -69,16 +68,22 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		SiteInitializer siteInitializer =
 			_siteInitializerRegistry.getSiteInitializer("ai-hub-initializer");
 
+		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
+
 		siteInitializer.initialize(TestPropsValues.getGroupId());
 
-		_workflowDefinitionManager.deployWorkflowDefinition(
-			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			StringUtil.randomId(), _WORKFLOW_DEFINITION_NAME,
-			_getContentBytes("workflow-definition.json"));
-		_workflowDefinitionManager.deployWorkflowDefinition(
-			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			StringUtil.randomId(), "AI Decision Node Workflow Definition",
-			_getContentBytes("ai-decision-node-workflow-definition.json"));
+		_group = GroupTestUtil.addGroup();
+
+		_addObjectEntry(_group);
+
+		_deployWorkflowDefinitions();
+
+		_originalName = PrincipalThreadLocal.getName();
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		PrincipalThreadLocal.setName(_originalName);
 	}
 
 	@After
@@ -89,7 +94,9 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	@Override
 	@Test
 	public void testGetTaskSubscribe() throws Exception {
-		_testGetTaskSubscribe(null, new ArrayList<>());
+		Assert.assertNotNull(
+			SseEventSourceTestUtil.open(
+				List.of(), new ArrayList<>(), "tasks/subscribe"));
 	}
 
 	@Override
@@ -97,6 +104,46 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	public void testPostByExternalReferenceCodeTask() throws Exception {
 		_testPostByExternalReferenceCodeTask();
 		_testPostByExternalReferenceCodeTaskWithScope();
+	}
+
+	@Ignore
+	@Test
+	public void testPostTaskWithTypeAIDecisionNodeWithToolWorkflowDefinition()
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context",
+				JSONUtil.put(
+					"question", "Is the \"get_openapis\" tool available?")
+			).put(
+				"scope",
+				JSONUtil.put(
+					"externalReferenceCode", _group.getExternalReferenceCode())
+			).put(
+				"type", "AI Decision Node With Tool Workflow Definition"
+			).toString(),
+			"ai-hub/v1.0/by-external-reference-code/" +
+				RandomTestUtil.randomString() + "/tasks",
+			Http.Method.POST);
+
+		IdempotentRetryAssert.retryAssert(
+			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
+			() -> {
+				WorkflowInstance workflowInstance =
+					_workflowInstanceManager.getWorkflowInstance(
+						TestPropsValues.getCompanyId(),
+						jsonObject.getLong("externalReferenceCode"));
+
+				List<WorkflowNode> workflowNodes =
+					workflowInstance.getCurrentWorkflowNodes();
+
+				WorkflowNode workflowNode = workflowNodes.get(0);
+
+				Assert.assertEquals("approved", workflowNode.getName());
+
+				return null;
+			});
 	}
 
 	@Ignore
@@ -120,7 +167,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		CountDownLatch countDownLatch = new CountDownLatch(4);
 		List<String> lines = new ArrayList<>();
 
-		_testGetTaskSubscribe(countDownLatch, lines);
+		String sseEventSinkKey = SseEventSourceTestUtil.open(
+			List.of(countDownLatch), lines, "tasks/subscribe");
 
 		HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
@@ -129,8 +177,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 				"type",
 				WorkflowDefinitionConstants.NAME_FIX_SPELLING_AND_GRAMMAR
 			).toString(),
-			"ai-hub/v1.0/by-external-reference-code/" +
-				StringUtil.replaceFirst(lines.get(1), "data: ", "") + "/tasks",
+			"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
+				"/tasks",
 			Http.Method.POST);
 
 		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
@@ -138,6 +186,84 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		Assert.assertEquals(lines.toString(), 4, lines.size());
 		Assert.assertEquals("event: Fix Spelling and Grammar", lines.get(2));
 		Assert.assertEquals("data: This text is wrong.", lines.get(3));
+	}
+
+	@Ignore
+	@Test
+	public void testPostTaskWithTypeLLMNodeWithToolWorkflowDefinition()
+		throws Exception {
+
+		CountDownLatch countDownLatch = new CountDownLatch(4);
+		List<String> lines = new ArrayList<>();
+
+		String sseEventSinkKey = SseEventSourceTestUtil.open(
+			List.of(countDownLatch), lines, "tasks/subscribe");
+
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"context",
+				JSONUtil.put(
+					"userMessage", "Is the \"get_openapi\" tool available?")
+			).put(
+				"scope",
+				JSONUtil.put(
+					"externalReferenceCode", _group.getExternalReferenceCode())
+			).put(
+				"type", "LLM Node With Tool Workflow Definition"
+			).toString(),
+			"ai-hub/v1.0/by-external-reference-code/" + sseEventSinkKey +
+				"/tasks",
+			Http.Method.POST);
+
+		Assert.assertTrue(countDownLatch.await(10, TimeUnit.SECONDS));
+
+		Assert.assertEquals(lines.toString(), 4, lines.size());
+
+		String response = StringUtil.toLowerCase(lines.get(3));
+
+		Assert.assertTrue(response, response.contains("yes"));
+	}
+
+	private static void _addObjectEntry(Group group) throws Exception {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					"L_MCP_SERVER", TestPropsValues.getCompanyId());
+
+		_objectEntryLocalService.addObjectEntry(
+			group.getGroupId(), TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(), 0,
+			LocaleUtil.toLanguageId(LocaleUtil.getDefault()),
+			HashMapBuilder.<String, Serializable>put(
+				"credentials", "test@liferay.com:test"
+			).put(
+				"externalReferenceCode", "L_LIFERAY_MCP_SERVER"
+			).put(
+				"url", "http://localhost:8080/o/mcp/sse"
+			).build(),
+			ServiceContextTestUtil.getServiceContext(
+				group, TestPropsValues.getUserId()));
+	}
+
+	private static void _deployWorkflowDefinitions() throws Exception {
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			StringUtil.randomId(), "AI Decision Node Workflow Definition",
+			_getContentBytes("ai-decision-node-workflow-definition.json"));
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			StringUtil.randomId(),
+			"AI Decision Node With Tool Workflow Definition",
+			_getContentBytes(
+				"ai-decision-node-with-tool-workflow-definition.json"));
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			StringUtil.randomId(), "LLM Node With Tool Workflow Definition",
+			_getContentBytes("llm-node-with-tool-workflow-definition.json"));
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			StringUtil.randomId(), "Workflow Definition",
+			_getContentBytes("workflow-definition.json"));
 	}
 
 	private static byte[] _getContentBytes(String fileName) throws Exception {
@@ -149,83 +275,12 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		return content.getBytes();
 	}
 
-	private void _testGetTaskSubscribe(
-			CountDownLatch countDownLatch2, List<String> lines)
-		throws Exception {
-
-		CountDownLatch countDownLatch1 = new CountDownLatch(2);
-
-		HttpClient httpClient = HttpClient.newBuilder(
-		).connectTimeout(
-			Duration.ofSeconds(5)
-		).build();
-
-		String credentials =
-			"test@liferay.com:" + PropsValues.DEFAULT_ADMIN_PASSWORD;
-
-		CompletableFuture<HttpResponse<InputStream>> completableFuture =
-			httpClient.sendAsync(
-				HttpRequest.newBuilder(
-				).header(
-					"Accept", "text/event-stream"
-				).header(
-					"Authorization",
-					"Basic " + Base64.encode(credentials.getBytes())
-				).uri(
-					URI.create(
-						"http://localhost:8080/o/ai-hub/v1.0/tasks/subscribe")
-				).GET(
-				).build(),
-				HttpResponse.BodyHandlers.ofInputStream());
-
-		completableFuture.thenAccept(
-			response -> {
-				try (InputStream inputStream = response.body();
-					BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(inputStream))) {
-
-					String line = "";
-
-					while ((line = bufferedReader.readLine()) != null) {
-						if (line.isEmpty()) {
-							continue;
-						}
-
-						countDownLatch1.countDown();
-
-						if (countDownLatch2 != null) {
-							countDownLatch2.countDown();
-						}
-
-						lines.add(line);
-					}
-				}
-				catch (Exception exception) {
-					_log.error(exception);
-				}
-			});
-
-		Assert.assertTrue(countDownLatch1.await(10, TimeUnit.SECONDS));
-
-		Assert.assertEquals(lines.toString(), 2, lines.size());
-		Assert.assertEquals("event: Subscribe", lines.get(0));
-
-		Set<String> sseEventSinksKeys = SseUtil.getSSEEventSinksKeys();
-
-		Assert.assertEquals(
-			sseEventSinksKeys.toString(), 1, sseEventSinksKeys.size());
-
-		Iterator<String> iterator = sseEventSinksKeys.iterator();
-
-		Assert.assertEquals("data: " + iterator.next(), lines.get(1));
-	}
-
 	private void _testPostByExternalReferenceCodeTask() throws Exception {
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				"context", JSONUtil.put("text", RandomTestUtil.randomString())
 			).put(
-				"type", _WORKFLOW_DEFINITION_NAME
+				"type", "Workflow Definition"
 			).toString(),
 			"ai-hub/v1.0/by-external-reference-code/" +
 				RandomTestUtil.randomString() + "/tasks",
@@ -237,14 +292,12 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 				jsonObject.getLong("externalReferenceCode"));
 
 		Assert.assertEquals(
-			_WORKFLOW_DEFINITION_NAME,
+			"Workflow Definition",
 			workflowInstance.getWorkflowDefinitionName());
 	}
 
 	private void _testPostByExternalReferenceCodeTaskWithScope()
 		throws Exception {
-
-		Group group = GroupTestUtil.addGroup();
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
@@ -252,9 +305,9 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			).put(
 				"scope",
 				JSONUtil.put(
-					"externalReferenceCode", group.getExternalReferenceCode())
+					"externalReferenceCode", _group.getExternalReferenceCode())
 			).put(
-				"type", _WORKFLOW_DEFINITION_NAME
+				"type", "Workflow Definition"
 			).toString(),
 			"ai-hub/v1.0/by-external-reference-code/" +
 				RandomTestUtil.randomString() + "/tasks",
@@ -265,9 +318,9 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 				TestPropsValues.getCompanyId(),
 				jsonObject.getLong("externalReferenceCode"));
 
-		Assert.assertEquals(group.getGroupId(), workflowInstance.getGroupId());
+		Assert.assertEquals(_group.getGroupId(), workflowInstance.getGroupId());
 		Assert.assertEquals(
-			_WORKFLOW_DEFINITION_NAME,
+			"Workflow Definition",
 			workflowInstance.getWorkflowDefinitionName());
 	}
 
@@ -278,6 +331,10 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				"context", JSONUtil.put("content", content)
+			).put(
+				"scope",
+				JSONUtil.put(
+					"externalReferenceCode", _group.getExternalReferenceCode())
 			).put(
 				"type", "AI Decision Node Workflow Definition"
 			).toString(),
@@ -304,11 +361,15 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			});
 	}
 
-	private static final String _WORKFLOW_DEFINITION_NAME =
-		"Workflow Definition";
+	private static Group _group;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		TaskResourceTest.class);
+	@Inject
+	private static ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
+	private static ObjectEntryLocalService _objectEntryLocalService;
+
+	private static String _originalName;
 
 	@Inject
 	private static SiteInitializerRegistry _siteInitializerRegistry;
