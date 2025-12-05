@@ -8,6 +8,7 @@ package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.site.initializer.internal.mcp.tool.provider.MCPToolProviderUtil;
+import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.CredentialsUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
@@ -88,12 +89,14 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
 			VertexAiGeminiStreamingChatModel.builder(
-			).project(
-				"ai-hub-liferay"
+			).credentials(
+				CredentialsUtil.createGoogleCredentials()
 			).location(
 				"us-central1"
 			).modelName(
 				"gemini-2.5-flash-lite"
+			).project(
+				"ai-hub-liferay"
 			).build();
 
 		Map<String, Serializable> workflowContext =
