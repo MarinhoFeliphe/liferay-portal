@@ -46,6 +46,8 @@ Import-Package:\
 	\
 	!io.netty.internal.*,\
 	\
+	!io.opentelemetry.*,\
+	\
 	!javassist.*,\
 	\
 	!javax.activation,\
@@ -67,6 +69,8 @@ Import-Package:\
 	!lzma.sdk.*,\
 	\
 	!net.jpountz.*,\
+	\
+	!co.elastic.clients.*,\
 	\
 	!org.HdrHistogram.*,\
 	\

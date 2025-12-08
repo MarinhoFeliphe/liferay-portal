@@ -36,6 +36,9 @@ dependencies {
 	compileInclude group: "com.liferay", name: "org.apache.logging.log4j.core", version: "2.17.1.LIFERAY-PATCHED-2"
 	compileInclude group: "com.liferay", name: "org.elasticsearch.plugin.legacy.geo", version: elasticsearchClientVersion
 	compileInclude group: "commons-lang", name: "commons-lang", version: "2.6"
+	compileInclude group: "dev.langchain4j", name: "langchain4j", version: "1.7.1"
+	compileInclude group: "dev.langchain4j", name: "langchain4j-core", version: "1.7.1"
+	compileInclude group: "dev.langchain4j", name: "langchain4j-elasticsearch", version: "1.7.1-beta14"
 	compileInclude group: "org.apache.lucene", name: "lucene-core", version: luceneVersion
 	compileInclude group: "org.apache.lucene", name: "lucene-highlighter", version: luceneVersion
 	compileInclude group: "org.apache.lucene", name: "lucene-join", version: luceneVersion
@@ -43,6 +46,7 @@ dependencies {
 	compileInclude group: "org.apache.lucene", name: "lucene-queryparser", version: luceneVersion
 	compileInclude group: "org.apache.lucene", name: "lucene-sandbox", version: luceneVersion
 	compileInclude group: "org.apache.lucene", name: "lucene-suggest", version: luceneVersion
+	compileInclude group: "org.apache.opennlp", name: "opennlp-tools", version: "2.5.4"
 	compileInclude group: "org.elasticsearch", name: "elasticsearch", version: elasticsearchClientVersion
 	compileInclude group: "org.elasticsearch", name: "elasticsearch-cli", version: elasticsearchClientVersion
 	compileInclude group: "org.elasticsearch", name: "elasticsearch-core", version: elasticsearchClientVersion
@@ -55,6 +59,7 @@ dependencies {
 	compileInclude group: "org.elasticsearch.plugin", name: "parent-join-client", version: elasticsearchClientVersion
 	compileInclude group: "org.elasticsearch.plugin", name: "percolator-client", version: elasticsearchClientVersion
 	compileInclude group: "org.elasticsearch.plugin", name: "rank-eval-client", version: elasticsearchClientVersion
+	compileInclude group: "org.jspecify", name: "jspecify", version: "1.0.0"
 	compileInclude group: "org.locationtech.jts", name: "jts-core", version: "1.20.0"
 	compileInclude group: "org.locationtech.spatial4j", name: "spatial4j", version: "0.8"
 	compileInclude group: "org.yaml", name: "snakeyaml", version: "2.3"
@@ -82,6 +87,7 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.4.0"
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly group: "org.ow2.asm", name: "asm", version: "9.7"
+	compileOnly project(":apps:ai-hub:ai-hub-api")
 	compileOnly project(":apps:configuration-admin:configuration-admin-api")
 	compileOnly project(":apps:portal-configuration:portal-configuration-module-configuration-api")
 	compileOnly project(":apps:portal-search-elasticsearch7:portal-search-elasticsearch7-api")

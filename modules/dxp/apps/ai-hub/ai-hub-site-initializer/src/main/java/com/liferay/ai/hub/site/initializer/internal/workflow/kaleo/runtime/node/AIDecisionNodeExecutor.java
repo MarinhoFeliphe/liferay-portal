@@ -5,11 +5,11 @@
 
 package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node;
 
+import com.liferay.ai.hub.mcp.tool.provider.MCPToolProviderFactory;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
-import com.liferay.ai.hub.site.initializer.mcp.tool.provider.MCPToolProviderFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;

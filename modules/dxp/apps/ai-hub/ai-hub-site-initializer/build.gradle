@@ -1,5 +1,8 @@
 dependencies {
+	compileInclude group: "com.google.api.grpc", name: "proto-google-cloud-aiplatform-v1beta1", version: "0.85.0"
 	compileInclude group: "com.google.api.grpc", name: "proto-google-cloud-vertexai-v1", version: "1.27.0"
+	compileInclude group: "com.google.cloud", name: "google-cloud-aiplatform", version: "3.69.0"
+	compileInclude group: "com.google.cloud", name: "google-cloud-discoveryengine", version: "0.64.0"
 	compileInclude group: "com.google.cloud", name: "google-cloud-vertexai", version: "1.27.0"
 	compileInclude group: "com.squareup.okhttp3", name: "okhttp", version: "4.12.0"
 	compileInclude group: "com.squareup.okhttp3", name: "okhttp-sse", version: "4.12.0"
@@ -9,6 +12,7 @@ dependencies {
 	compileInclude group: "dev.langchain4j", name: "langchain4j-core", version: "1.7.1"
 	compileInclude group: "dev.langchain4j", name: "langchain4j-http-client", version: "1.7.1"
 	compileInclude group: "dev.langchain4j", name: "langchain4j-mcp", version: "1.7.1-beta14"
+	compileInclude group: "dev.langchain4j", name: "langchain4j-vertex-ai", version: "1.7.1-beta14"
 	compileInclude group: "dev.langchain4j", name: "langchain4j-vertex-ai-gemini", version: "1.7.1-beta14"
 	compileInclude group: "org.apache.opennlp", name: "opennlp-tools", version: "2.5.4"
 	compileInclude group: "org.jetbrains", name: "annotations", version: "13.0"
@@ -26,6 +30,7 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.annotation.versioning", version: "1.1.0"
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.4.0"
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
+	compileOnly project(":apps:ai-hub:ai-hub-api")
 	compileOnly project(":apps:batch-engine:batch-engine-api")
 	compileOnly project(":apps:object:object-admin-rest-api")
 	compileOnly project(":apps:object:object-api")
@@ -38,7 +43,7 @@ dependencies {
 	compileOnly project(":apps:portal-workflow:portal-workflow-kaleo-runtime-api")
 	compileOnly project(":apps:site:site-api")
 	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
+	compileOnly project(":core:osgi-service-tracker-collections")
 	compileOnly project(":core:petra:petra-function")
 	compileOnly project(":core:petra:petra-string")
-	compileOnly project(":dxp:apps:ai-hub:ai-hub-site-initializer-api")
 }

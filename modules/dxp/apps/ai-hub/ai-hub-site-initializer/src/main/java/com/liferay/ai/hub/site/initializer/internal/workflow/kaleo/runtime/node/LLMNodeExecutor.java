@@ -5,11 +5,13 @@
 
 package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node;
 
+import com.liferay.ai.hub.embedding.store.EmbeddingStoreFactory;
+import com.liferay.ai.hub.embedding.store.EmbeddingStoreFactoryRegistry;
+import com.liferay.ai.hub.mcp.tool.provider.MCPToolProviderFactory;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.InputVariablesUtil;
 import com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
-import com.liferay.ai.hub.site.initializer.mcp.tool.provider.MCPToolProviderFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -28,12 +30,27 @@ import com.liferay.portal.workflow.kaleo.runtime.node.BaseNodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
 import com.liferay.portal.workflow.kaleo.service.KaleoNodeSettingLocalService;
 
+import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.loader.UrlDocumentLoader;
+import dev.langchain4j.data.document.parser.TextDocumentParser;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.vertexai.VertexAiEmbeddingModel;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 
 import java.io.Serializable;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +115,8 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 		AssistantHandlerUtil.handle(
 			AssistantHandlerContext.builder(
+			).contentRetriever(
+				_createContentRetriever()
 			).invocationParameters(
 				InvocationParameters.from(
 					Map.of(
@@ -196,6 +215,64 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			vertexAiGeminiStreamingChatModel.close();
 		}
 	}
+
+	private ContentRetriever _createContentRetriever() {
+		Document document = _loadDocument();
+
+		DocumentSplitter documentSplitter = DocumentSplitters.recursive(300, 0);
+
+		List<TextSegment> textSegments = documentSplitter.split(document);
+
+		EmbeddingModel embeddingModel = VertexAiEmbeddingModel.builder(
+		).location(
+			"us-central1"
+		).modelName(
+			"gemini-embedding-001"
+		).project(
+			"ai-hub-liferay"
+		).publisher(
+			"google"
+		).build();
+
+		List<Embedding> embeddings = embeddingModel.embedAll(
+			textSegments
+		).content();
+
+		EmbeddingStoreFactory embeddingStoreFactory =
+			_embeddingStoreFactoryRegistry.getEmbeddingStoreFactory(
+				"in-memory");
+
+		EmbeddingStore<TextSegment> embeddingStore =
+			embeddingStoreFactory.create();
+
+		embeddingStore.addAll(embeddings, textSegments);
+
+		return EmbeddingStoreContentRetriever.builder(
+		).embeddingStore(
+			embeddingStore
+		).embeddingModel(
+			embeddingModel
+		).maxResults(
+			2
+		).minScore(
+			0.5
+		).build();
+	}
+
+	private Document _loadDocument() {
+		try {
+			return UrlDocumentLoader.load(
+				new URL(
+					"https://gist.githubusercontent.com/MarinhoFeliphe/3790737933594e76f697bb7e834473b9/raw/b1e0ded2b9921de222476e81323f9b42890dcb9e/about-feliphe-marinho.txt"),
+				new TextDocumentParser());
+		}
+		catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Reference
+	private EmbeddingStoreFactoryRegistry _embeddingStoreFactoryRegistry;
 
 	@Reference
 	private JSONFactory _jsonFactory;

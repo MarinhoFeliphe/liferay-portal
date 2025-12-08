@@ -24,14 +24,16 @@ public class ChatAssistantHandler implements AssistantHandler {
 	public void handle(AssistantHandlerContext assistantHandlerContext) {
 		ChatAssistant chatAssistant = AiServices.builder(
 			ChatAssistant.class
+		).contentRetriever(
+			assistantHandlerContext.getContentRetriever()
 		).chatMemoryProvider(
 			id -> MessageWindowChatMemory.builder(
 			).chatMemoryStore(
 				_inMemoryChatMemoryStore
-			).maxMessages(
-				30
 			).id(
 				id
+			).maxMessages(
+				30
 			).build()
 		).systemMessageProvider(
 			assistantHandlerContext.getSystemMessageProvider()

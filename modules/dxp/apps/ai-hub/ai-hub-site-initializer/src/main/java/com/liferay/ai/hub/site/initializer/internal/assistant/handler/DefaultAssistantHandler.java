@@ -21,6 +21,8 @@ public class DefaultAssistantHandler implements AssistantHandler {
 	public void handle(AssistantHandlerContext assistantHandlerContext) {
 		DefaultAssistant defaultAssistant = AiServices.builder(
 			DefaultAssistant.class
+		).contentRetriever(
+			assistantHandlerContext.getContentRetriever()
 		).systemMessageProvider(
 			assistantHandlerContext.getSystemMessageProvider()
 		).streamingChatModel(
