@@ -2,9 +2,13 @@ Bundle-Name: Liferay AI Hub Site Initializer
 Bundle-SymbolicName: com.liferay.ai.hub.site.initializer
 Bundle-Version: 1.0.4
 Import-Package:\
+	!javax.annotation,\
+	\
 	!org.bouncycastle.jsse.*,\
 	\
 	!org.conscrypt.*,\
+	\
+	!org.elasticsearch.client.*,\
 	\
 	!org.openjsse.javax.net.ssl.*,\
 	!org.openjsse.net.ssl.*,\

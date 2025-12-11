@@ -1,0 +1,276 @@
+{
+	"configuration": {
+		"generalConfiguration": {
+			"clauseContributorsIncludes": [
+				"*"
+			],
+			"emptySearchEnabled": true,
+			"explain": true,
+			"includeResponseString": true,
+			"languageId": "en_US"
+		},
+		"queryConfiguration": {
+			"applyIndexerClauses": true
+		}
+	},
+	"elementInstances": [
+		{
+			"configurationEntry": {
+				"queryConfiguration": {
+					"queryEntries": [
+						{
+							"condition": {
+								"exists": {
+									"parameterName": "keywords"
+								}
+							},
+							"rescores": [
+								{
+									"query": {
+										"script_score": {
+											"boost": 10,
+											"min_score": 1,
+											"query": {
+												"bool": {
+													"filter": [
+														{
+															"exists": {
+																"field": "text_embedding_${ml.text_embeddings.vector_dimensions}_${context.language_id}"
+															}
+														}
+													],
+													"must": [
+														{
+															"match_all": {
+															}
+														}
+													]
+												}
+											},
+											"script": {
+												"params": {
+													"query_vector": "${ml.text_embeddings.keywords_embedding}"
+												},
+												"source": "cosineSimilarity(params.query_vector, 'text_embedding_${ml.text_embeddings.vector_dimensions}_${context.language_id}') + 1"
+											}
+										}
+									},
+									"queryWeight": 0.01,
+									"rescoreQueryWeight": 10,
+									"scoreMode": "avg",
+									"windowSize": 50
+								}
+							]
+						}
+					]
+				}
+			},
+			"sxpElement": {
+				"createDate": "2025-12-12T14:24:53Z",
+				"description": "Rescore the results of the original query using the text embedding value. This element is effective only if the text embeddings are enabled and configured to operate on specific content types and languages. See the Semantic Search entry in Instance Settings.",
+				"description_i18n": {
+					"en-US": "rescore-by-text-embedding-description"
+				},
+				"elementDefinition": {
+					"category": "semantic%20search",
+					"configuration": {
+						"queryConfiguration": {
+							"queryEntries": [
+								{
+									"condition": {
+										"exists": {
+											"parameterName": "keywords"
+										}
+									},
+									"rescores": [
+										{
+											"query": {
+												"script_score": {
+													"boost": "%24%7Bconfiguration.boost%7D",
+													"min_score": "%24%7Bconfiguration.min_score%7D",
+													"query": {
+														"bool": {
+															"filter": [
+																{
+																	"exists": {
+																		"field": "text_embedding_%24%7Bml.text_embeddings.vector_dimensions%7D_%24%7Bcontext.language_id%7D"
+																	}
+																}
+															],
+															"must": [
+																{
+																	"match_all": {
+																	}
+																}
+															]
+														}
+													},
+													"script": {
+														"params": {
+															"query_vector": "%24%7Bml.text_embeddings.keywords_embedding%7D"
+														},
+														"source": "%24%7Bconfiguration.vector_field_function%7D(params.query_vector%2C%20'text_embedding_%24%7Bml.text_embeddings.vector_dimensions%7D_%24%7Bcontext.language_id%7D')%20%2B%201"
+													}
+												}
+											},
+											"queryWeight": "%24%7Bconfiguration.query_weight%7D",
+											"rescoreQueryWeight": "%24%7Bconfiguration.rescore_query_weight%7D",
+											"scoreMode": "%24%7Bconfiguration.score_mode%7D",
+											"windowSize": "%24%7Bconfiguration.window_size%7D"
+										}
+									]
+								}
+							]
+						}
+					},
+					"icon": "custom-field",
+					"uiConfiguration": {
+						"fieldSets": [
+							{
+								"fields": [
+									{
+										"defaultValue": 10,
+										"label": "boost",
+										"labelLocalized": "Boost",
+										"name": "boost",
+										"type": "number",
+										"typeOptions": {
+											"min": 0
+										}
+									},
+									{
+										"defaultValue": "cosineSimilarity",
+										"helpText": "vector-field-function-field-help",
+										"helpTextLocalized": "Specify%20the%20vector%20function%20for%20measuring%20similarity%20between%20the%20text%20embeddings%20of%20the%20search%20keywords%20and%20target%20documents.%20Check%20the%20model's%20documentation%20for%20suitability.",
+										"label": "vector-field-function",
+										"labelLocalized": "Vector%20Field%20Function",
+										"name": "vector_field_function",
+										"type": "select",
+										"typeOptions": {
+											"nullable": false,
+											"options": [
+												{
+													"label": "Cosine%20Similarity",
+													"value": "cosineSimilarity"
+												},
+												{
+													"label": "Dot%20Product",
+													"value": "dotProduct"
+												}
+											]
+										}
+									},
+									{
+										"defaultValue": 1,
+										"helpText": "min-score-field-help",
+										"helpTextLocalized": "Set%20the%20minimum%20score%20for%20a%20result%20to%20be%20rescored.",
+										"label": "min-score",
+										"labelLocalized": "Min%20Score",
+										"name": "min_score",
+										"type": "number",
+										"typeOptions": {
+											"min": 0
+										}
+									},
+									{
+										"defaultValue": 0.01,
+										"helpText": "query-weight-field-help",
+										"helpTextLocalized": "Set%20the%20weight%20of%20the%20original%20query%20to%20determine%20its%20importance%20in%20the%20final%20score%20calculation.",
+										"label": "query-weight",
+										"labelLocalized": "Query%20Weight",
+										"name": "query_weight",
+										"type": "slider",
+										"typeOptions": {
+											"min": 0.01,
+											"step": 0.1
+										}
+									},
+									{
+										"defaultValue": 10,
+										"helpText": "rescore-query-weight-field-help",
+										"helpTextLocalized": "Set%20the%20weight%20of%20the%20rescore%20query%20to%20determine%20its%20importance%20in%20the%20final%20score%20calculation.",
+										"label": "rescore-query-weight",
+										"labelLocalized": "Rescore%20Query%20Weight",
+										"name": "rescore_query_weight",
+										"type": "slider",
+										"typeOptions": {
+											"min": 0.01,
+											"step": 0.1
+										}
+									},
+									{
+										"defaultValue": "avg",
+										"helpText": "score-mode-field-help",
+										"helpTextLocalized": "Choose%20how%20the%20original%20and%20rescore%20query%20scores%20are%20combined%20when%20calculating%20the%20final%20score.",
+										"label": "score-mode",
+										"labelLocalized": "Score%20Mode",
+										"name": "score_mode",
+										"type": "select",
+										"typeOptions": {
+											"nullable": false,
+											"options": [
+												{
+													"label": "Average",
+													"value": "avg"
+												},
+												{
+													"label": "Max",
+													"value": "max"
+												},
+												{
+													"label": "Min",
+													"value": "min"
+												},
+												{
+													"label": "Multiply",
+													"value": "multiply"
+												},
+												{
+													"label": "Total",
+													"value": "total"
+												}
+											]
+										}
+									},
+									{
+										"defaultValue": 50,
+										"helpText": "rescore-window-size-field-help",
+										"helpTextLocalized": "Set%20the%20number%20of%20top%20results%20from%20the%20original%20query%20to%20rescore.",
+										"label": "rescore-window-size",
+										"labelLocalized": "Rescore%20Window%20Size",
+										"name": "window_size",
+										"type": "number",
+										"typeOptions": {
+											"min": 1
+										}
+									}
+								]
+							}
+						]
+					}
+				},
+				"externalReferenceCode": "234ae79a-7d1e-cb77-7960-3771f69f77c5",
+				"id": 102,
+				"modifiedDate": "2025-12-12T14:25:03Z",
+				"readOnly": false,
+				"schemaVersion": "1.0",
+				"title": "Rescore by Text Embedding",
+				"title_i18n": {
+					"en-US": "rescore-by-text-embedding"
+				},
+				"type": 0,
+				"userName": "Test Test",
+				"version": "1.1"
+			},
+			"uiConfigurationValues": {
+				"boost": 10,
+				"min_score": 1,
+				"query_weight": 0.01,
+				"rescore_query_weight": 10,
+				"score_mode": "avg",
+				"vector_field_function": "cosineSimilarity",
+				"window_size": 50
+			}
+		}
+	]
+}

@@ -77,6 +77,7 @@ public class TextEmbeddingDocumentContributorImpl
 			return;
 		}
 
+		_addTextEmbeddedField(document, languageId, text);
 		_addTextEmbeddingField(document, languageId, textEmbedding);
 	}
 
@@ -114,6 +115,7 @@ public class TextEmbeddingDocumentContributorImpl
 				continue;
 			}
 
+			_addTextEmbeddedField(document, languageId, text);
 			_addTextEmbeddingField(document, languageId, textEmbedding);
 		}
 	}
@@ -219,6 +221,15 @@ public class TextEmbeddingDocumentContributorImpl
 	@Reference
 	protected SemanticSearchConfigurationProvider
 		semanticSearchConfigurationProvider;
+
+	private void _addTextEmbeddedField(
+		Document document, String languageId, String text) {
+
+		document.add(
+			new Field(
+				StringBundler.concat("text_embedded_", languageId),
+				text));
+	}
 
 	private void _addTextEmbeddingField(
 		Document document, String languageId, Double[] textEmbedding) {
