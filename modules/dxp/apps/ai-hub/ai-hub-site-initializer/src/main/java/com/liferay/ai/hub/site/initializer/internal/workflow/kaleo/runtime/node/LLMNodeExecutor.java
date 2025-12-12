@@ -5,6 +5,7 @@
 
 package com.liferay.ai.hub.site.initializer.internal.workflow.kaleo.runtime.node;
 
+import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.site.initializer.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.site.initializer.internal.mcp.tool.provider.MCPToolProviderUtil;
@@ -41,7 +42,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -169,14 +169,12 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			Map<String, Serializable> workflowContext =
 				executionContext.getWorkflowContext();
 
-			BiConsumer<String, String> biConsumer =
-				(BiConsumer)workflowContext.get("sendOutBoundEvent");
-
 			AiMessage aiMessage = chatResponse.aiMessage();
 
-			biConsumer.accept(
+			SseUtil.send(
 				aiMessage.text(),
-				GetterUtil.getString(workflowContext.get("outBoundEventName")));
+				GetterUtil.getString(workflowContext.get("outBoundEventName")),
+				GetterUtil.getString(workflowContext.get("sseEventSinkKey")));
 
 			KaleoInstanceToken kaleoInstanceToken =
 				executionContext.getKaleoInstanceToken();
