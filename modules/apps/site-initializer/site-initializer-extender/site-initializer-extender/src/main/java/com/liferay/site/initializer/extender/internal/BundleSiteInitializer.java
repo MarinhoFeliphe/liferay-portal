@@ -28,6 +28,7 @@ import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.asset.list.util.comparator.ClassNameModelResourceComparator;
 import com.liferay.asset.util.AssetRendererFactoryWrapper;
+import com.liferay.batch.engine.unit.BatchEngineUnitThreadLocal;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
 import com.liferay.client.extension.service.ClientExtensionEntryLocalService;
@@ -1264,29 +1265,39 @@ public class BundleSiteInitializer implements SiteInitializer {
 			ObjectDefinition existingObjectDefinition =
 				objectDefinitionsPage.fetchFirstItem();
 
-			if (existingObjectDefinition == null) {
-				if (GetterUtil.getBoolean(
-						objectDefinition.getAccountEntryRestricted())) {
+			try {
+				BatchEngineUnitThreadLocal.setFileName(
+					String.valueOf(
+						_siteBundle.getBundleContext(
+						).getBundle()));
 
-					accountEntryRestrictedObjectDefinitions.put(
-						objectDefinition.getName(), objectDefinition);
+				if (existingObjectDefinition == null) {
+					if (GetterUtil.getBoolean(
+							objectDefinition.getAccountEntryRestricted())) {
+
+						accountEntryRestrictedObjectDefinitions.put(
+							objectDefinition.getName(), objectDefinition);
+					}
+
+					objectDefinition =
+						objectDefinitionResource.postObjectDefinition(
+							objectDefinition);
+
+					objectDefinitionIds.add(objectDefinition.getId());
+				}
+				else {
+					objectDefinition =
+						objectDefinitionResource.patchObjectDefinition(
+							existingObjectDefinition.getId(), objectDefinition);
 				}
 
-				objectDefinition =
-					objectDefinitionResource.postObjectDefinition(
-						objectDefinition);
-
-				objectDefinitionIds.add(objectDefinition.getId());
+				_replaceObjectDefinitionValues(
+					objectDefinition.getClassName(), objectDefinition.getName(),
+					objectDefinition.getId(), stringUtilReplaceValues);
 			}
-			else {
-				objectDefinition =
-					objectDefinitionResource.patchObjectDefinition(
-						existingObjectDefinition.getId(), objectDefinition);
+			finally {
+				BatchEngineUnitThreadLocal.setFileName(StringPool.BLANK);
 			}
-
-			_replaceObjectDefinitionValues(
-				objectDefinition.getClassName(), objectDefinition.getName(),
-				objectDefinition.getId(), stringUtilReplaceValues);
 		}
 	}
 
