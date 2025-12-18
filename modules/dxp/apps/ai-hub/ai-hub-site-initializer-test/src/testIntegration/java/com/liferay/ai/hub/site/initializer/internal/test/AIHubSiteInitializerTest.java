@@ -9,7 +9,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -61,8 +60,6 @@ public class AIHubSiteInitializerTest {
 	@After
 	public void tearDown() throws Exception {
 		ServiceContextThreadLocal.popServiceContext();
-
-		GroupLocalServiceUtil.deleteGroup(_group);
 	}
 
 	@Test
