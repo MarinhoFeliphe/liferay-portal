@@ -14,10 +14,6 @@
 	},
 	"modifiable": true,
 	"name": "MCPServer",
-	"objectActions": [
-	],
-	"objectDefinitionSettings": [
-	],
 	"objectFields": [
 		{
 			"DBType": "Clob",
@@ -60,8 +56,6 @@
 			},
 			"localized": false,
 			"name": "externalReferenceCode",
-			"objectFieldSettings": [
-			],
 			"readOnly": "false",
 			"readOnlyConditionExpression": "",
 			"required": true,
@@ -83,8 +77,6 @@
 			},
 			"localized": true,
 			"name": "title",
-			"objectFieldSettings": [
-			],
 			"readOnly": "false",
 			"readOnlyConditionExpression": "",
 			"required": false,
@@ -106,8 +98,6 @@
 			},
 			"localized": false,
 			"name": "url",
-			"objectFieldSettings": [
-			],
 			"readOnly": "false",
 			"readOnlyConditionExpression": "",
 			"required": false,
@@ -187,12 +177,6 @@
 			]
 		}
 	],
-	"objectRelationships": [
-	],
-	"objectValidationRules": [
-	],
-	"objectViews": [
-	],
 	"panelCategoryKey": "site_administration.configuration",
 	"parameterRequired": false,
 	"pluralLabel": {
@@ -200,9 +184,6 @@
 	},
 	"portlet": true,
 	"scope": "site",
-	"status": {
-		"code": 0
-	},
 	"system": true,
 	"titleObjectFieldName": "title"
 }
