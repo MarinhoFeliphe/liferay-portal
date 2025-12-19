@@ -9,6 +9,12 @@
 				"type": "layout"
 			},
 			{
+				"friendlyURL": "/home",
+				"order": 0,
+				"title": "Home",
+				"type": "layout"
+			},
+			{
 				"openInNewTab": true,
 				"order": 2,
 				"title": "Liferay",
