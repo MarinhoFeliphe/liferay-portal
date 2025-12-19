@@ -11,12 +11,18 @@
 TaskDefinitionDisplayContext taskDefinitionDisplayContext = new TaskDefinitionDisplayContext();
 %>
 
-<frontend-data-set:headless-display
-	apiURL="<%= taskDefinitionDisplayContext.getAPIURL() %>"
-	formName="fm"
-	id="<%= AIHubSiteInitializerFDSNames.TASK_DEFINITION %>"
-	itemsPerPage="<%= 10 %>"
-	selectedItemsKey="id"
-	selectionType="multiple"
-	style="fluid"
-/>
+<div class="ml-8 mr-8 mt-5">
+	<div class="mb-6">
+		<h2>AI Tasks</h2>
+	</div>
+
+	<frontend-data-set:headless-display
+		apiURL="<%= taskDefinitionDisplayContext.getAPIURL() %>"
+		formName="fm"
+		id="<%= AIHubSiteInitializerFDSNames.TASK_DEFINITION %>"
+		itemsPerPage="<%= 10 %>"
+		selectedItemsKey="id"
+		selectionType="multiple"
+		style="fluid"
+	/>
+</div>
