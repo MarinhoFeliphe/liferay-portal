@@ -39,6 +39,10 @@ components:
             type: object
         TaskDefinition:
             properties:
+                description:
+                    type: string
+                externalReferenceCode:
+                    type: string
                 id:
                     format: int64
                     readOnly: true

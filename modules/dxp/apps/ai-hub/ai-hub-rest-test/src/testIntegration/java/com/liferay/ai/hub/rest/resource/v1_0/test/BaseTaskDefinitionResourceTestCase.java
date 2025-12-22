@@ -170,6 +170,8 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 
 		TaskDefinition taskDefinition = randomTaskDefinition();
 
+		taskDefinition.setDescription(regex);
+		taskDefinition.setExternalReferenceCode(regex);
 		taskDefinition.setName(regex);
 
 		String json = TaskDefinitionSerDes.toJSON(taskDefinition);
@@ -178,6 +180,8 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 
 		taskDefinition = TaskDefinitionSerDes.toDTO(json);
 
+		Assert.assertEquals(regex, taskDefinition.getDescription());
+		Assert.assertEquals(regex, taskDefinition.getExternalReferenceCode());
 		Assert.assertEquals(regex, taskDefinition.getName());
 	}
 
@@ -641,6 +645,24 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("description", additionalAssertFieldName)) {
+				if (taskDefinition.getDescription() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (taskDefinition.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (taskDefinition.getName() == null) {
 					valid = false;
@@ -715,6 +737,8 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
+		graphQLFields.add(new GraphQLField("externalReferenceCode"));
+
 		graphQLFields.add(new GraphQLField("id"));
 
 		for (java.lang.reflect.Field field :
@@ -776,6 +800,30 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("description", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						taskDefinition1.getDescription(),
+						taskDefinition2.getDescription())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						taskDefinition1.getExternalReferenceCode(),
+						taskDefinition2.getExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("id", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -916,6 +964,98 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
+		if (entityFieldName.equals("description")) {
+			Object object = taskDefinition.getDescription();
+
+			String value = String.valueOf(object);
+
+			if (operator.equals("contains")) {
+				sb = new StringBundler();
+
+				sb.append("contains(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 2)) {
+					sb.append(value.substring(1, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else if (operator.equals("startswith")) {
+				sb = new StringBundler();
+
+				sb.append("startswith(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 1)) {
+					sb.append(value.substring(0, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else {
+				sb.append("'");
+				sb.append(value);
+				sb.append("'");
+			}
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("externalReferenceCode")) {
+			Object object = taskDefinition.getExternalReferenceCode();
+
+			String value = String.valueOf(object);
+
+			if (operator.equals("contains")) {
+				sb = new StringBundler();
+
+				sb.append("contains(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 2)) {
+					sb.append(value.substring(1, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else if (operator.equals("startswith")) {
+				sb = new StringBundler();
+
+				sb.append("startswith(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 1)) {
+					sb.append(value.substring(0, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else {
+				sb.append("'");
+				sb.append(value);
+				sb.append("'");
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1018,6 +1158,10 @@ public abstract class BaseTaskDefinitionResourceTestCase {
 	protected TaskDefinition randomTaskDefinition() throws Exception {
 		return new TaskDefinition() {
 			{
+				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				version = RandomTestUtil.randomInt();

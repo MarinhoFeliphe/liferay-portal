@@ -7,7 +7,7 @@ package com.liferay.ai.hub.site.initializer.internal.frontend.data.set.view.tabl
 
 import com.liferay.ai.hub.site.initializer.internal.constants.AIHubSiteInitializerFDSNames;
 import com.liferay.frontend.data.set.view.FDSView;
-import com.liferay.frontend.data.set.view.table.BaseTableFDSView;
+import com.liferay.frontend.data.set.view.list.BaseListFDSView;
 import com.liferay.frontend.data.set.view.table.FDSTableSchema;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilder;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
@@ -24,21 +24,15 @@ import org.osgi.service.component.annotations.Reference;
 	property = "frontend.data.set.name=" + AIHubSiteInitializerFDSNames.TASK_DEFINITION,
 	service = FDSView.class
 )
-public class TaskDefinitionTableFDSView extends BaseTableFDSView {
+public class TaskDefinitionListFDSView extends BaseListFDSView {
 
 	@Override
-	public FDSTableSchema getFDSTableSchema(Locale locale) {
-		FDSTableSchemaBuilder fdsTableSchemaBuilder =
-			_fdsTableSchemaBuilderFactory.create();
-
-		return fdsTableSchemaBuilder.add(
-			"name", "name"
-		).add(
-			"version", "version"
-		).build();
+	public String getDescription() {
+		return "description";
 	}
 
-	@Reference
-	private FDSTableSchemaBuilderFactory _fdsTableSchemaBuilderFactory;
-
+	@Override
+	public String getTitle() {
+		return "name";
+	}
 }

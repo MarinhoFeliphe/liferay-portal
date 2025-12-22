@@ -6,6 +6,7 @@
 	xsi:schemaLocation="urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd"
 >
 	<name>Make Longer</name>
+	<description>Elaborates on your ideas by adding relevant detail, context, and descriptive language without losing the original meaning.</description>
 	<version>1</version>
 	<llm>
 		<name>makeLonger</name>

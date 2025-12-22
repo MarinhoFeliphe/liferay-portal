@@ -6,6 +6,7 @@
 	xsi:schemaLocation="urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd"
 >
 	<name>Chat Message Pipeline</name>
+	<description>Serves as the central processing engine for every interaction within a chat interface. It acts as a bridge between the raw user input and the final AI response, ensuring that data is cleaned, analyzed, and enriched before being displayed.</description>
 	<version>1</version>
 	<llm>
 		<name>chatMessageHandler</name>
@@ -61,6 +62,15 @@
 			<![CDATA[You are a highly helpful and context-aware chat assistant. The context you are aware is the content and the title, they can be present or not and they will be passed during the conversation because they are dynamically updated. Maintain a friendly and professional conversational tone, and use the chat history to maintain flow.
 ]]>
 		</prompt>
+		<rag>
+			<![CDATA[
+	{
+		"contentRetriever": {
+			"key": "liferay"
+		}
+	}
+]]>
+		</rag>
 		<tools>
 			<![CDATA[
 []

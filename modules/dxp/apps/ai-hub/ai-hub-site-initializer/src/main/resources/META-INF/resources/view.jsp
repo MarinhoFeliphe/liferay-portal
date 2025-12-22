@@ -8,7 +8,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-TaskDefinitionDisplayContext taskDefinitionDisplayContext = new TaskDefinitionDisplayContext();
+TaskDefinitionDisplayContext taskDefinitionDisplayContext = new TaskDefinitionDisplayContext(request, liferayPortletResponse);
 %>
 
 <div class="ml-8 mr-8 mt-5">
@@ -18,11 +18,10 @@ TaskDefinitionDisplayContext taskDefinitionDisplayContext = new TaskDefinitionDi
 
 	<frontend-data-set:headless-display
 		apiURL="<%= taskDefinitionDisplayContext.getAPIURL() %>"
-		formName="fm"
+		creationMenu="<%= taskDefinitionDisplayContext.getCreationMenu() %>"
+		fdsActionDropdownItems="<%= taskDefinitionDisplayContext.getFDSActionDropdownItems() %>"
 		id="<%= AIHubSiteInitializerFDSNames.TASK_DEFINITION %>"
-		itemsPerPage="<%= 10 %>"
-		selectedItemsKey="id"
-		selectionType="multiple"
+		itemsPerPage="<%= 20 %>"
 		style="fluid"
 	/>
 </div>
