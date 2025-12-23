@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -74,12 +75,17 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 
-		SiteInitializer siteInitializer =
-			_siteInitializerRegistry.getSiteInitializer("ai-hub-initializer");
-
-		siteInitializer.initialize(TestPropsValues.getGroupId());
-
 		_group = GroupTestUtil.addGroup();
+
+		ServiceContextThreadLocal.pushServiceContext(
+			ServiceContextTestUtil.getServiceContext(
+				_group, TestPropsValues.getUserId()));
+
+		SiteInitializer siteInitializer =
+			_siteInitializerRegistry.getSiteInitializer(
+				"com.liferay.ai.hub.site.initializer");
+
+		siteInitializer.initialize(_group.getGroupId());
 
 		_objectDefinition =
 			_objectDefinitionLocalService.
@@ -131,6 +137,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			_objectDefinition.getObjectDefinitionId());
 
 		PrincipalThreadLocal.setName(_originalName);
+
+		ServiceContextThreadLocal.popServiceContext();
 	}
 
 	@After

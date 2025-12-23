@@ -90,6 +90,8 @@ public class TaskDefinitionResourceImpl extends BaseTaskDefinitionResourceImpl {
 		};
 	}
 
+	// TODO use WorkflowDefinitionManager
+
 	@Reference
 	private KaleoDefinitionVersionLocalService
 		_kaleoDefinitionVersionLocalService;
