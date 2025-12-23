@@ -1,0 +1,9 @@
+{
+	"active": true,
+	"externalReferenceCode": "L_CHAT_MESSAGE_PIPELINE",
+	"name": "Chat Message Pipeline",
+	"title": "Chat Message Pipeline",
+	"title_i18n": {
+		"en_US": "Chat Message Pipeline"
+	}
+}
