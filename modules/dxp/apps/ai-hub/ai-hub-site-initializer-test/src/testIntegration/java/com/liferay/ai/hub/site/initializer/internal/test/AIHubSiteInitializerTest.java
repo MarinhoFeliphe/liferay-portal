@@ -6,10 +6,15 @@
 package com.liferay.ai.hub.site.initializer.internal.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
@@ -20,6 +25,7 @@ import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -44,14 +50,26 @@ public class AIHubSiteInitializerTest {
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
+
+		ServiceContextThreadLocal.pushServiceContext(
+			ServiceContextTestUtil.getServiceContext(
+				_group, TestPropsValues.getUserId()));
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		ServiceContextThreadLocal.popServiceContext();
 	}
 
 	@Test
 	public void test() throws Exception {
 		SiteInitializer siteInitializer =
-			_siteInitializerRegistry.getSiteInitializer("ai-hub-initializer");
+			_siteInitializerRegistry.getSiteInitializer(
+				"com.liferay.ai.hub.site.initializer");
 
 		siteInitializer.initialize(_group.getGroupId());
+
+		_assertObjectDefinitions();
 
 		_assertWorkflowDefinitionExists(
 			WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_CHANGE_TONE,
@@ -71,6 +89,16 @@ public class AIHubSiteInitializerTest {
 			WorkflowDefinitionConstants.NAME_MAKE_SHORTER);
 	}
 
+	private void _assertObjectDefinitions() {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_MCP_SERVER", _group.getCompanyId());
+
+		Assert.assertTrue(objectDefinition.isApproved());
+		Assert.assertTrue(objectDefinition.isSystem());
+	}
+
 	private void _assertWorkflowDefinitionExists(
 			String externalReferenceCode, String name)
 		throws Exception {
@@ -84,6 +112,9 @@ public class AIHubSiteInitializerTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Inject
 	private SiteInitializerRegistry _siteInitializerRegistry;
