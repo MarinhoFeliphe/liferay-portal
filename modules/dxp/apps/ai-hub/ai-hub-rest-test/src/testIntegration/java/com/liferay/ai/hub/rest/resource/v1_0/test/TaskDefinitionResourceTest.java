@@ -42,7 +42,8 @@ public class TaskDefinitionResourceTest
 		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 
 		SiteInitializer siteInitializer =
-			_siteInitializerRegistry.getSiteInitializer("ai-hub-initializer");
+			_siteInitializerRegistry.getSiteInitializer(
+				"com.liferay.ai.hub.site.initializer");
 
 		siteInitializer.initialize(TestPropsValues.getGroupId());
 	}

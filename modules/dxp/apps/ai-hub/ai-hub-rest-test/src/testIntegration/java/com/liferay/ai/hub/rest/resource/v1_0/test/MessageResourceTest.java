@@ -45,7 +45,8 @@ public class MessageResourceTest extends BaseMessageResourceTestCase {
 		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 
 		SiteInitializer siteInitializer =
-			_siteInitializerRegistry.getSiteInitializer("ai-hub-initializer");
+			_siteInitializerRegistry.getSiteInitializer(
+				"com.liferay.ai.hub.site.initializer");
 
 		siteInitializer.initialize(TestPropsValues.getGroupId());
 	}
