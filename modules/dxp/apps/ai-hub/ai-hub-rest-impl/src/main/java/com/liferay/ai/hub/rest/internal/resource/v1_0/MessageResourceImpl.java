@@ -5,6 +5,8 @@
 
 package com.liferay.ai.hub.rest.internal.resource.v1_0;
 
+import com.liferay.ai.hub.agentic.Agent;
+import com.liferay.ai.hub.agentic.AgentContext;
 import com.liferay.ai.hub.rest.dto.v1_0.Message;
 import com.liferay.ai.hub.rest.internal.resource.v1_0.util.GroupUtil;
 import com.liferay.ai.hub.rest.internal.resource.v1_0.util.WorkflowContextUtil;
@@ -55,17 +57,25 @@ public class MessageResourceImpl extends BaseMessageResourceImpl {
 		workflowContext.put("outBoundEventName", "Chat Message Sent");
 		workflowContext.put("userMessage", message.getText());
 
-		_workflowInstanceManager.startWorkflowInstance(
+		/*_workflowInstanceManager.startWorkflowInstance(
 			contextCompany.getCompanyId(),
 			GroupUtil.getGroupId(
 				contextCompany.getCompanyId(), _groupService,
 				message.getScope()),
 			contextUser.getUserId(),
 			WorkflowDefinitionConstants.NAME_CHAT_MESSAGE_PIPELINE, 1, null,
-			workflowContext);
+			workflowContext);*/
+
+		AgentContext agentContext =
+			AgentContext.builder().input(Map.of("message", message.getText())).build();
+
+		_agent.invoke(agentContext);
 
 		return message;
 	}
+
+	@Reference
+	private Agent _agent;
 
 	@Reference
 	private GroupService _groupService;

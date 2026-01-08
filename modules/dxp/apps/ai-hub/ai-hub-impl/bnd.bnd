@@ -4,6 +4,8 @@ Bundle-Version: 1.0.4
 Import-Package:\
 	!org.bouncycastle.jsse.*,\
 	\
+	!com.fasterxml.jackson.datatype.*,\
+	\
 	!org.conscrypt.*,\
 	\
 	!org.openjsse.javax.net.ssl.*,\
