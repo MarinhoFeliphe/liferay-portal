@@ -47,6 +47,20 @@ public class KaleoDefinitionVersionServiceWrapper
 			companyId, name);
 	}
 
+	@Override
+	public java.util.List<KaleoDefinitionVersion>
+			getLatestKaleoDefinitionVersions(
+				long companyId, String scope, String keywords, int status,
+				java.util.Locale locale, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<KaleoDefinitionVersion> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoDefinitionVersionService.getLatestKaleoDefinitionVersions(
+			companyId, scope, keywords, status, locale, start, end,
+			orderByComparator);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *

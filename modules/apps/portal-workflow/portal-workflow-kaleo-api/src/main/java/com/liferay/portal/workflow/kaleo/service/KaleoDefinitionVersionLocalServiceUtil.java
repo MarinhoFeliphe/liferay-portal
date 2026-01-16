@@ -396,12 +396,13 @@ public class KaleoDefinitionVersionLocalServiceUtil {
 	}
 
 	public static List<KaleoDefinitionVersion> getLatestKaleoDefinitionVersions(
-		long companyId, String keywords, int status, java.util.Locale locale,
-		int start, int end,
+		long companyId, String scope, String keywords, int status,
+		java.util.Locale locale, int start, int end,
 		OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
 
 		return getService().getLatestKaleoDefinitionVersions(
-			companyId, keywords, status, locale, start, end, orderByComparator);
+			companyId, scope, keywords, status, locale, start, end,
+			orderByComparator);
 	}
 
 	public static int getLatestKaleoDefinitionVersionsCount(

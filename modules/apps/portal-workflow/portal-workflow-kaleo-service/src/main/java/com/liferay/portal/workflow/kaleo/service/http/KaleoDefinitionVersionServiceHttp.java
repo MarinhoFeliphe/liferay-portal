@@ -130,6 +130,57 @@ public class KaleoDefinitionVersionServiceHttp {
 		}
 	}
 
+	public static java.util.List
+		<com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion>
+				getLatestKaleoDefinitionVersions(
+					HttpPrincipal httpPrincipal, long companyId, String scope,
+					String keywords, int status, java.util.Locale locale,
+					int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.portal.workflow.kaleo.model.
+							KaleoDefinitionVersion> orderByComparator)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				KaleoDefinitionVersionServiceUtil.class,
+				"getLatestKaleoDefinitionVersions",
+				_getLatestKaleoDefinitionVersionsParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, scope, keywords, status, locale, start,
+				end, orderByComparator);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (java.util.List
+				<com.liferay.portal.workflow.kaleo.model.
+					KaleoDefinitionVersion>)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		KaleoDefinitionVersionServiceHttp.class);
 
@@ -137,5 +188,11 @@ public class KaleoDefinitionVersionServiceHttp {
 		new Class[] {long.class, String.class, String.class};
 	private static final Class<?>[] _getKaleoDefinitionVersionsParameterTypes1 =
 		new Class[] {long.class, String.class};
+	private static final Class<?>[]
+		_getLatestKaleoDefinitionVersionsParameterTypes2 = new Class[] {
+			long.class, String.class, String.class, int.class,
+			java.util.Locale.class, int.class, int.class,
+			com.liferay.portal.kernel.util.OrderByComparator.class
+		};
 
 }

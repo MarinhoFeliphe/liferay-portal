@@ -7,6 +7,7 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.service.Snapshot;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 
 import java.util.List;
@@ -42,6 +43,17 @@ public class KaleoDefinitionVersionServiceUtil {
 		throws PortalException {
 
 		return getService().getKaleoDefinitionVersions(companyId, name);
+	}
+
+	public static List<KaleoDefinitionVersion> getLatestKaleoDefinitionVersions(
+			long companyId, String scope, String keywords, int status,
+			java.util.Locale locale, int start, int end,
+			OrderByComparator<KaleoDefinitionVersion> orderByComparator)
+		throws PortalException {
+
+		return getService().getLatestKaleoDefinitionVersions(
+			companyId, scope, keywords, status, locale, start, end,
+			orderByComparator);
 	}
 
 	/**
