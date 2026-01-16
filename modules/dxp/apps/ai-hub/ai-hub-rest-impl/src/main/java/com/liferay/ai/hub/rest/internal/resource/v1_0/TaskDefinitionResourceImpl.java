@@ -9,21 +9,22 @@ import com.liferay.ai.hub.rest.dto.v1_0.TaskDefinition;
 import com.liferay.ai.hub.rest.resource.v1_0.TaskDefinitionResource;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
-import com.liferay.portal.vulcan.util.SearchUtil;
-import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
-import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
-import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
+import com.liferay.portal.workflow.comparator.WorkflowComparatorFactory;
+import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
+
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -49,50 +50,59 @@ public class TaskDefinitionResourceImpl extends BaseTaskDefinitionResourceImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return SearchUtil.search(
+		return Page.of(
 			HashMapBuilder.put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getTaskDefinitionsPage",
 					WorkflowConstants.RESOURCE_NAME, null)
 			).build(),
-			booleanQuery -> {
-				BooleanFilter booleanFilter =
-					booleanQuery.getPreBooleanFilter();
+			transform(
+				_workflowDefinitionManager.getLatestKaleoDefinitionVersions(
+					contextCompany.getCompanyId(), "ai", null,
+					WorkflowConstants.STATUS_ANY, LocaleUtil.CANADA,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					_toOrderByComparator((Sort)ArrayUtil.getValue(sorts, 0))),
+				this::_toTaskDefinition),
+			pagination,
+			_workflowDefinitionManager.getLatestWorkflowDefinitionsCount(
+				contextCompany.getCompanyId()));
+	}
 
-				booleanFilter.add(
-					new TermFilter("scope", "ai"), BooleanClauseOccur.MUST);
-			},
-			filter, KaleoDefinitionVersion.class.getName(), search, pagination,
-			queryConfig -> queryConfig.setSelectedFieldNames(Field.NAME),
-			searchContext -> searchContext.setCompanyId(
-				contextCompany.getCompanyId()),
-			sorts,
-			document -> _toTaskDefinition(
-				_kaleoDefinitionVersionLocalService.
-					getLatestKaleoDefinitionVersion(
-						contextCompany.getCompanyId(),
-						document.get(Field.NAME))));
+	private OrderByComparator<WorkflowDefinition> _toOrderByComparator(
+		Sort sort) {
+
+		if (sort == null) {
+			return _workflowComparatorFactory.
+				getDefinitionModifiedDateComparator(false);
+		}
+
+		if (StringUtil.equals(sort.getFieldName(), "name")) {
+			return _workflowComparatorFactory.getDefinitionNameComparator(
+				!sort.isReverse());
+		}
+
+		return _workflowComparatorFactory.getDefinitionModifiedDateComparator(
+			!sort.isReverse());
 	}
 
 	private TaskDefinition _toTaskDefinition(
-			KaleoDefinitionVersion kaleoDefinitionVersion)
+			WorkflowDefinition workflowDefinition)
 		throws PortalException {
-
-		KaleoDefinition kaleoDefinition =
-			kaleoDefinitionVersion.getKaleoDefinition();
 
 		return new TaskDefinition() {
 			{
-				setDescription(kaleoDefinition::getDescription);
-				setName(kaleoDefinition::getName);
-				setVersion(kaleoDefinition::getVersion);
+				setDescription(workflowDefinition::getDescription);
+				setName(workflowDefinition::getName);
+				setVersion(workflowDefinition::getVersion);
 			}
 		};
 	}
 
 	@Reference
-	private KaleoDefinitionVersionLocalService
-		_kaleoDefinitionVersionLocalService;
+	private WorkflowComparatorFactory _workflowComparatorFactory;
+
+	@Reference
+	private WorkflowDefinitionManager _workflowDefinitionManager;
 
 }
