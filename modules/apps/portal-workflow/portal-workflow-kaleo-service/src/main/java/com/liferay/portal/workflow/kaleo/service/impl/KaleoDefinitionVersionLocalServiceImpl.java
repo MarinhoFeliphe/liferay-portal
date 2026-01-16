@@ -348,11 +348,12 @@ public class KaleoDefinitionVersionLocalServiceImpl
 
 	@Override
 	public List<KaleoDefinitionVersion> getLatestKaleoDefinitionVersions(
-		long companyId, String keywords, int status, Locale locale, int start,
-		int end, OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
+		long companyId, String scope, String keywords, int status,
+		Locale locale, int start, int end,
+		OrderByComparator<KaleoDefinitionVersion> orderByComparator) {
 
 		List<Long> kaleoDefinitionVersionIds = _getKaleoDefinitionVersionIds(
-			companyId, keywords, status);
+			companyId, keywords, scope, status);
 
 		if (kaleoDefinitionVersionIds.isEmpty()) {
 			return Collections.emptyList();
@@ -422,13 +423,13 @@ public class KaleoDefinitionVersionLocalServiceImpl
 		long companyId, String keywords, int status) {
 
 		List<Long> kaleoDefinitionVersionIds = _getKaleoDefinitionVersionIds(
-			companyId, keywords, status);
+			companyId, keywords, WorkflowDefinitionConstants.SCOPE_ALL, status);
 
 		return kaleoDefinitionVersionIds.size();
 	}
 
 	private List<Long> _getKaleoDefinitionVersionIds(
-		long companyId, String keywords, int status) {
+		long companyId, String keywords, String scope, int status) {
 
 		List<Long> kaleoDefinitionVersionIds = new ArrayList<>();
 
@@ -451,8 +452,11 @@ public class KaleoDefinitionVersionLocalServiceImpl
 
 		BooleanQuery booleanQuery = _queries.booleanQuery();
 
-		booleanQuery.addMustQueryClauses(
-			_queries.term("scope", WorkflowDefinitionConstants.SCOPE_ALL));
+		if (Validator.isNull(scope)) {
+			scope = WorkflowDefinitionConstants.SCOPE_ALL;
+		}
+
+		booleanQuery.addMustQueryClauses(_queries.term("scope", scope));
 
 		if (Validator.isNotNull(keywords)) {
 			BooleanQuery keywordsBooleanQuery = _queries.booleanQuery();
