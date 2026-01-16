@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Micha Kiener
@@ -53,6 +54,15 @@ public interface WorkflowDefinitionManager {
 
 	public default int getActiveWorkflowDefinitionsCount(long companyId)
 		throws WorkflowException {
+
+		throw new UnsupportedOperationException();
+	}
+
+	public default List<WorkflowDefinition> getLatestKaleoDefinitionVersions(
+			long companyId, String scope, String keywords, int status,
+			Locale locale, int start, int end,
+			OrderByComparator<WorkflowDefinition> orderByComparator)
+		throws PortalException {
 
 		throw new UnsupportedOperationException();
 	}

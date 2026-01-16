@@ -29,6 +29,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.runtime.WorkflowEngine;
 import com.liferay.portal.workflow.kaleo.runtime.integration.internal.util.WorkflowLockUtil;
 import com.liferay.portal.workflow.kaleo.runtime.util.comparator.KaleoDefinitionOrderByComparator;
+import com.liferay.portal.workflow.kaleo.runtime.util.comparator.KaleoDefinitionVersionOrderByComparator;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
@@ -38,6 +39,7 @@ import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -155,6 +157,24 @@ public class WorkflowDefinitionManagerImpl
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
+	}
+
+	@Override
+	public List<WorkflowDefinition> getLatestKaleoDefinitionVersions(
+			long companyId, String scope, String keywords, int status,
+			Locale locale, int start, int end,
+			OrderByComparator<WorkflowDefinition> orderByComparator)
+		throws PortalException {
+
+		List<KaleoDefinitionVersion> kaleoDefinitionVersions =
+			_kaleoDefinitionVersionService.getLatestKaleoDefinitionVersions(
+				companyId, scope, keywords, status, locale, start, end,
+				KaleoDefinitionVersionOrderByComparator.getOrderByComparator(
+					orderByComparator, _kaleoWorkflowModelConverter));
+
+		return _toWorkflowDefinitions(
+			kaleoDefinitionVersions.toArray(new KaleoDefinitionVersion[0]),
+			orderByComparator);
 	}
 
 	@Override
