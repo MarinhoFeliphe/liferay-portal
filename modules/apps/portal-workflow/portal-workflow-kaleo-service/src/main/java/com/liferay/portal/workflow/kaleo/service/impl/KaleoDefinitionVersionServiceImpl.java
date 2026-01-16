@@ -9,12 +9,14 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
 import com.liferay.portal.workflow.kaleo.service.base.KaleoDefinitionVersionServiceBaseImpl;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,6 +56,22 @@ public class KaleoDefinitionVersionServiceImpl
 
 		return _kaleoDefinitionVersionLocalService.getKaleoDefinitionVersions(
 			companyId, name);
+	}
+
+	@Override
+	public List<KaleoDefinitionVersion> getLatestKaleoDefinitionVersions(
+			long companyId, String scope, String keywords, int status,
+			Locale locale, int start, int end,
+			OrderByComparator<KaleoDefinitionVersion> orderByComparator)
+		throws PortalException {
+
+		_kaleoDefinitionModelResourcePermission.check(
+			getPermissionChecker(), null, ActionKeys.VIEW);
+
+		return _kaleoDefinitionVersionLocalService.
+			getLatestKaleoDefinitionVersions(
+				companyId, scope, keywords, status, locale, start, end,
+				orderByComparator);
 	}
 
 	@Reference(
