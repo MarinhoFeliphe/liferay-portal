@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.ai.hub.agentic;
+package com.liferay.ai.hub.agent;
 
 /**
  * @author João Victor Alves
  */
-public interface Agent {
+public interface SupervisorAgent {
 
 	public void invoke(AgentContext agentContext);
 

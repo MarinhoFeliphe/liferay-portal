@@ -139,9 +139,7 @@ public class ActionExecutorManagerImpl implements ActionExecutorManager {
 			ListUtil.fromCollection(
 				_serviceTrackerMap.getService(actionExecutorKey)),
 			actionExecutor -> {
-				if (actionExecutor instanceof CompanyScoped) {
-					CompanyScoped companyScoped = (CompanyScoped)actionExecutor;
-
+				if (actionExecutor instanceof CompanyScoped companyScoped) {
 					return companyScoped.isAllowedCompany(companyId);
 				}
 

@@ -175,6 +175,8 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 			AiMessage aiMessage = chatResponse.aiMessage();
 
+			workflowContext.put("rewrittenText", aiMessage.text());
+
 			SseUtil.send(
 				aiMessage.text(),
 				GetterUtil.getString(workflowContext.get("outBoundEventName")),

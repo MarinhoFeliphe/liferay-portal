@@ -5,8 +5,8 @@
 
 package com.liferay.ai.hub.rest.internal.resource.v1_0;
 
-import com.liferay.ai.hub.agentic.Agent;
-import com.liferay.ai.hub.agentic.AgentContext;
+import com.liferay.ai.hub.agent.SupervisorAgent;
+import com.liferay.ai.hub.agent.AgentContext;
 import com.liferay.ai.hub.rest.dto.v1_0.Message;
 import com.liferay.ai.hub.rest.resource.v1_0.MessageResource;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
@@ -32,8 +32,7 @@ public class MessageResourceImpl extends BaseMessageResourceImpl {
 
 	@Override
 	public Message postChatByExternalReferenceCodeMessage(
-			String externalReferenceCode, Message message)
-		throws Exception {
+			String externalReferenceCode, Message message) {
 
 		if (!FeatureFlagManagerUtil.isEnabled(
 				contextCompany.getCompanyId(), "LPD-62272")) {
@@ -43,7 +42,7 @@ public class MessageResourceImpl extends BaseMessageResourceImpl {
 
 		SseUtil.setSse(_sse);
 
-		_agent.invoke(
+		_supervisorAgent.invoke(
 			AgentContext.builder(
 			).input(
 				Map.of("message", message.getText())
@@ -55,7 +54,7 @@ public class MessageResourceImpl extends BaseMessageResourceImpl {
 	}
 
 	@Reference
-	private Agent _agent;
+	private SupervisorAgent _supervisorAgent;
 
 	@Context
 	private Sse _sse;
