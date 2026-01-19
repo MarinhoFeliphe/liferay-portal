@@ -5,6 +5,8 @@
 
 package com.liferay.ai.hub.agent;
 
+import com.liferay.portal.kernel.service.ServiceContext;
+
 import java.util.Map;
 
 /**
@@ -17,16 +19,36 @@ public class AgentContext {
 	}
 
 	public AgentContext(AgentContext.Builder builder) {
+		_companyId = builder._companyId;
+		_groupId = builder._groupId;
 		_input = builder._input;
+		_serviceContext = builder._serviceContext;
 		_sseEventSinkKey = builder._sseEventSinkKey;
+		_userId = builder._userId;
+	}
+
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	public long getGroupId() {
+		return _groupId;
 	}
 
 	public Map<String, Object> getInput() {
 		return _input;
 	}
 
+	public ServiceContext getServiceContext() {
+		return _serviceContext;
+	}
+
 	public String getSseEventSinkKey() {
 		return _sseEventSinkKey;
+	}
+
+	public long getUserId() {
+		return _userId;
 	}
 
 	public static class Builder {
@@ -35,8 +57,26 @@ public class AgentContext {
 			return new AgentContext(this);
 		}
 
+		public Builder companyId(long companyId) {
+			_companyId = companyId;
+
+			return this;
+		}
+
+		public Builder groupId(long groupId) {
+			_groupId = groupId;
+
+			return this;
+		}
+
 		public Builder input(Map<String, Object> input) {
 			_input = input;
+
+			return this;
+		}
+
+		public Builder serviceContext(ServiceContext serviceContext) {
+			_serviceContext = serviceContext;
 
 			return this;
 		}
@@ -47,12 +87,26 @@ public class AgentContext {
 			return this;
 		}
 
+		public Builder userId(long userId) {
+			_userId = userId;
+
+			return this;
+		}
+
+		private long _companyId;
+		private long _groupId;
 		private Map<String, Object> _input;
+		private ServiceContext _serviceContext;
 		private String _sseEventSinkKey;
+		private long _userId;
 
 	}
 
+	private final long _companyId;
+	private final long _groupId;
 	private final Map<String, Object> _input;
+	private final ServiceContext _serviceContext;
 	private final String _sseEventSinkKey;
+	private final long _userId;
 
 }
