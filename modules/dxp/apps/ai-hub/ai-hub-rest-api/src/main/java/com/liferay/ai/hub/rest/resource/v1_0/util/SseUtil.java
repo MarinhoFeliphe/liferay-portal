@@ -7,6 +7,7 @@ package com.liferay.ai.hub.rest.resource.v1_0.util;
 
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import jakarta.ws.rs.sse.Sse;
@@ -58,7 +59,7 @@ public class SseUtil {
 	}
 
 	public static void send(String data, String name, String sseEventSinkKey) {
-		if (sseEventSinkKey == null) {
+		if (Validator.isBlank(sseEventSinkKey)) {
 			return;
 		}
 
