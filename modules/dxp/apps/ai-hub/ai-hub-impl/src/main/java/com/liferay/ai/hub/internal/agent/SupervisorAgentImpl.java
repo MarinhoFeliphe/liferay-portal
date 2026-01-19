@@ -5,8 +5,8 @@
 
 package com.liferay.ai.hub.internal.agent;
 
-import com.liferay.ai.hub.agent.Agent;
 import com.liferay.ai.hub.agent.AgentContext;
+import com.liferay.ai.hub.agent.SupervisorAgent;
 import com.liferay.ai.hub.internal.web.search.LiferayWebSearchEngine;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.petra.executor.PortalExecutorManager;
@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
+import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.agentic.AgenticServices;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
@@ -30,10 +31,11 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * @author Feliphe Marinho
  * @author João Victor Alves
  */
-@Component(service = Agent.class)
-public class AgentImpl implements Agent {
+@Component(service = SupervisorAgent.class)
+public class SupervisorAgentImpl implements SupervisorAgent {
 
 	@Override
 	public void invoke(AgentContext agentContext) {
@@ -48,7 +50,8 @@ public class AgentImpl implements Agent {
 			).build();
 
 		ExecutorService executorService =
-			_portalExecutorManager.getPortalExecutor(AgentImpl.class.getName());
+			_portalExecutorManager.getPortalExecutor(
+				SupervisorAgentImpl.class.getName());
 
 		executorService.submit(
 			() -> {
@@ -92,7 +95,7 @@ public class AgentImpl implements Agent {
 
 	public interface LiferayKnowledgeAgent {
 
-		@dev.langchain4j.agentic.Agent(
+		@Agent(
 			description = "This agent provides targeted support by searching the Liferay DXP instance for the most relevant data, ensuring every response is grounded in your specific environment.",
 			name = "Liferay Knowledge Agent", outputKey = "response"
 		)
@@ -104,7 +107,8 @@ public class AgentImpl implements Agent {
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(AgentImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SupervisorAgentImpl.class);
 
 	private final InMemoryChatMemoryStore _inMemoryChatMemoryStore =
 		new InMemoryChatMemoryStore();

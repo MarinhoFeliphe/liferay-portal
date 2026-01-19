@@ -8,7 +8,7 @@ package com.liferay.ai.hub.agent;
 /**
  * @author João Victor Alves
  */
-public interface Agent {
+public interface SupervisorAgent {
 
 	public void invoke(AgentContext agentContext);
 
