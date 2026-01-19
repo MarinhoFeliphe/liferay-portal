@@ -7,24 +7,18 @@ package com.liferay.ai.hub.internal.agent;
 
 import com.liferay.ai.hub.agent.AgentContext;
 import com.liferay.ai.hub.agent.SupervisorAgent;
-import com.liferay.ai.hub.internal.web.search.LiferayWebSearchEngine;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
+import com.liferay.portal.workflow.instance.WorkflowInstanceActionExecutor;
 
-import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.agentic.AgenticServices;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.agentic.supervisor.SupervisorResponseStrategy;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
-import dev.langchain4j.rag.content.retriever.WebSearchContentRetriever;
-import dev.langchain4j.service.SystemMessage;
-import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.service.V;
-import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.osgi.service.component.annotations.Component;
@@ -39,81 +33,77 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 
 	@Override
 	public void invoke(AgentContext agentContext) {
-		VertexAiGeminiChatModel vertexAiGeminiChatModel =
-			VertexAiGeminiChatModel.builder(
-			).location(
-				"us-central1"
-			).modelName(
-				"gemini-2.5-flash-lite"
-			).project(
-				"ai-hub-liferay"
-			).build();
-
 		ExecutorService executorService =
 			_portalExecutorManager.getPortalExecutor(
 				SupervisorAgentImpl.class.getName());
 
 		executorService.submit(
 			() -> {
-				try {
-					LiferayKnowledgeAgent liferayKnowledgeAgent =
-						AgenticServices.agentBuilder(
-							LiferayKnowledgeAgent.class
-						).chatMemoryProvider(
-							id -> MessageWindowChatMemory.builder(
-							).chatMemoryStore(
-								_inMemoryChatMemoryStore
-							).id(
-								id
-							).maxMessages(
-								30
-							).build()
-						).chatModel(
-							vertexAiGeminiChatModel
-						).contentRetriever(
-							WebSearchContentRetriever.builder(
-							).webSearchEngine(
-								new LiferayWebSearchEngine(null)
-							).build()
-						).build();
+				try (VertexAiGeminiChatModel vertexAiGeminiChatModel =
+						VertexAiGeminiChatModel.builder(
+						).location(
+							"us-central1"
+						).modelName(
+							"gemini-2.5-flash-lite"
+						).project(
+							"ai-hub-liferay"
+						).build()) {
 
-					Map<String, Object> input = agentContext.getInput();
-
-					SseUtil.send(
-						liferayKnowledgeAgent.invoke(
-							GetterUtil.getString(input.get("message"))),
-						"Chat Message Sent", agentContext.getSseEventSinkKey());
+					_invoke(agentContext, vertexAiGeminiChatModel);
 				}
 				catch (Exception exception) {
 					_log.error(exception);
 				}
-				finally {
-					vertexAiGeminiChatModel.close();
-				}
 			});
 	}
 
-	public interface LiferayKnowledgeAgent {
+	private void _invoke(
+		AgentContext agentContext,
+		VertexAiGeminiChatModel vertexAiGeminiChatModel) {
 
-		@Agent(
-			description = "This agent provides targeted support by searching the Liferay DXP instance for the most relevant data, ensuring every response is grounded in your specific environment.",
-			name = "Liferay Knowledge Agent", outputKey = "response"
-		)
-		@SystemMessage(
-			"You are a Liferay Knowledge Agent, a specialized AI agent designed to assist users by retrieving accurate information specifically from the Liferay Digital Experience Platform (DXP) instance or using the chat history. Your tone is professional, helpful, and concise."
-		)
-		@UserMessage("{{request}}")
-		public String invoke(@V("request") String request);
+		dev.langchain4j.agentic.supervisor.SupervisorAgent supervisorAgent =
+			AgenticServices.supervisorBuilder(
+			).chatModel(
+				vertexAiGeminiChatModel
+			).subAgents(
+				new ChangeToneAgent(
+					agentContext, _workflowInstanceActionExecutor,
+					_workflowInstanceManager),
+				new ChatMessagePipelineAgent(
+					agentContext, _workflowInstanceActionExecutor,
+					_workflowInstanceManager),
+				new FixSpellingAndGrammarAgent(
+					agentContext, _workflowInstanceActionExecutor,
+					_workflowInstanceManager),
+				new ImproveWritingAgent(
+					agentContext, _workflowInstanceActionExecutor,
+					_workflowInstanceManager),
+				new MakeLongerAgent(
+					agentContext, _workflowInstanceActionExecutor,
+					_workflowInstanceManager),
+				new MakeShorterAgent(
+					agentContext, _workflowInstanceActionExecutor,
+					_workflowInstanceManager)
+			).responseStrategy(
+				SupervisorResponseStrategy.SUMMARY
+			).build();
 
+		SseUtil.send(
+			supervisorAgent.invoke(
+				MapUtil.getString(agentContext.getInput(), "message")),
+			"Chat Message Sent", agentContext.getSseEventSinkKey());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SupervisorAgentImpl.class);
 
-	private final InMemoryChatMemoryStore _inMemoryChatMemoryStore =
-		new InMemoryChatMemoryStore();
-
 	@Reference
 	private PortalExecutorManager _portalExecutorManager;
+
+	@Reference
+	private WorkflowInstanceActionExecutor _workflowInstanceActionExecutor;
+
+	@Reference
+	private WorkflowInstanceManager _workflowInstanceManager;
 
 }

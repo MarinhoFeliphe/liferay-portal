@@ -15,7 +15,9 @@ import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -116,7 +118,7 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			).onCompleteResponse(
 				response -> _completeResponse(
 					response, executionContext, currentKaleoNode,
-					vertexAiGeminiStreamingChatModel)
+					kaleoNodeSettingValues, vertexAiGeminiStreamingChatModel)
 			).onError(
 				throwable -> vertexAiGeminiStreamingChatModel.close()
 			).systemMessageProvider(
@@ -166,7 +168,7 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	private void _completeResponse(
 		ChatResponse chatResponse, ExecutionContext executionContext,
-		KaleoNode kaleoNode,
+		KaleoNode kaleoNode, Map<String, String> kaleoNodeSettingValues,
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel) {
 
 		try {
@@ -174,6 +176,16 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 				executionContext.getWorkflowContext();
 
 			AiMessage aiMessage = chatResponse.aiMessage();
+
+			String outputVariablesString = kaleoNodeSettingValues.get(
+				"outputVariables");
+
+			JSONArray jsonArray = _jsonFactory.createJSONArray(
+				outputVariablesString);
+
+			JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+			workflowContext.put(jsonObject.getString("name"), aiMessage.text());
 
 			SseUtil.send(
 				aiMessage.text(),

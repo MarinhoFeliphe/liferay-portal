@@ -7,6 +7,7 @@ package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.workflow.instance.WorkflowInstanceActionExecutor;
 import com.liferay.portal.workflow.kaleo.constants.KaleoInstanceTokenConstants;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
@@ -64,6 +65,10 @@ public class StateNodeExecutor extends BaseNodeExecutor {
 					kaleoInstanceToken.getKaleoInstanceId());
 			}
 
+			_workflowInstanceActionExecutor.executeCompletionAction(
+				kaleoInstanceToken.getKaleoInstanceId(),
+				executionContext.getWorkflowContext());
+
 			return;
 		}
 
@@ -101,5 +106,8 @@ public class StateNodeExecutor extends BaseNodeExecutor {
 
 	@Reference
 	private KaleoInstanceTokenLocalService _kaleoInstanceTokenLocalService;
+
+	@Reference
+	private WorkflowInstanceActionExecutor _workflowInstanceActionExecutor;
 
 }
