@@ -8,6 +8,7 @@ Export-Package:\
 	com.liferay.portal.workflow.definition.groovy.script.use,\
 	com.liferay.portal.workflow.definition.link.update.handler,\
 	com.liferay.portal.workflow.exception,\
+	com.liferay.portal.workflow.instance,\
 	com.liferay.portal.workflow.instance.tracker.url.provider,\
 	com.liferay.portal.workflow.manager,\
 	com.liferay.portal.workflow.portlet.tab,\
