@@ -33,7 +33,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -81,28 +80,29 @@ public class MessageResourceTest extends BaseMessageResourceTestCase {
 		SseUtil.closeAll();
 	}
 
-	@Ignore
 	@Override
 	@Test
 	public void testPostChatByExternalReferenceCodeMessage() throws Exception {
 		CountDownLatch countDownLatch1 = new CountDownLatch(4);
 		CountDownLatch countDownLatch2 = new CountDownLatch(6);
+		CountDownLatch countDownLatch3 = new CountDownLatch(8);
 
 		List<String> lines = new ArrayList<>();
 
 		String sseEventSinkKey = SseEventSourceTestUtil.open(
-			List.of(countDownLatch1, countDownLatch2), lines,
+			List.of(countDownLatch1, countDownLatch2, countDownLatch3), lines,
 			"chats/subscribe");
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
-				"text", "Hello"
+				"text", "What do you know about Ray?"
 			).toString(),
 			"ai-hub/v1.0/chats/by-external-reference-code/" + sseEventSinkKey +
 				"/messages",
 			Http.Method.POST);
 
-		Assert.assertEquals("Hello", jsonObject.getString("text"));
+		Assert.assertEquals(
+			"What do you know about Ray?", jsonObject.getString("text"));
 
 		Assert.assertEquals(lines.toString(), 2, lines.size());
 
@@ -120,7 +120,7 @@ public class MessageResourceTest extends BaseMessageResourceTestCase {
 			Http.Method.POST);
 
 		Assert.assertEquals(
-			"What is the first message sent in this chat?",
+			"What was the first message sent in this chat?",
 			jsonObject.getString("text"));
 
 		Assert.assertEquals(lines.toString(), 4, lines.size());
@@ -132,7 +132,34 @@ public class MessageResourceTest extends BaseMessageResourceTestCase {
 
 		String line = lines.get(5);
 
-		Assert.assertTrue(line.contains("Hello"));
+		Assert.assertTrue(line.contains("Ray"));
+
+		String originalText = "this are a worng text";
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"text", "Fix this text and make it longer: " + originalText
+			).toString(),
+			"ai-hub/v1.0/chats/by-external-reference-code/" + sseEventSinkKey +
+				"/messages",
+			Http.Method.POST);
+
+		Assert.assertEquals(
+			"Fix this text and make it longer: " + originalText,
+			jsonObject.getString("text"));
+
+		Assert.assertEquals(lines.toString(), 6, lines.size());
+
+		Assert.assertTrue(countDownLatch3.await(10, TimeUnit.SECONDS));
+
+		Assert.assertEquals(lines.toString(), 8, lines.size());
+		Assert.assertEquals("event: Chat Message Sent", lines.get(4));
+
+		line = lines.get(7);
+
+		Assert.assertFalse(line.contains("originalText"));
+
+		Assert.assertTrue(line.length() > originalText.length());
 	}
 
 	private static String _originalName;
