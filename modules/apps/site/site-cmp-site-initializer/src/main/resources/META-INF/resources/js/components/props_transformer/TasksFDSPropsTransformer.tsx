@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {DateRenderer, IInternalRenderer} from '@liferay/frontend-data-set-web';
+import {DateRenderer, IInternalRenderer, IView} from '@liferay/frontend-data-set-web';
 import {AssigneeValue} from '@liferay/object-dynamic-data-mapping-form-field-type';
 import {
+	AdditionalProps,
 	AssignToModalContent,
 	SimpleActionLinkRenderer,
 	UpdateDueDateModalContent,
@@ -19,6 +20,7 @@ import StateLabel from '../StateLabel';
 import EditAssigneeModalContent from '../modal/EditAssigneeModalContent';
 import ACTIONS from './actions/creationMenuActions';
 import {cmpTasksFDSAtom} from './atoms';
+import KanbanView from './views/kanban_view/KanbanView';
 
 const _CLASS_NAME_KALEO_TASK_INSTANCE_TOKEN =
 	'com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken';
@@ -89,13 +91,43 @@ const WORKFLOW_TASK_MODALS: Record<
 };
 
 export default function TasksFDSPropsTransformer({
+	additionalProps,
 	creationMenu,
+	id,
 	itemsActions = [],
+	views,
 	...otherProps
 }: {
+	additionalProps: AdditionalProps;
 	creationMenu: any;
+	id: string;
 	itemsActions?: any[];
+	views: IView[];
 }) {
+	const nonDefaultViews = views.map((view) => {
+		return {
+			...view,
+			default: false,
+		};
+	});
+
+	const kanbanView: IView = {
+		component: (props: any) => KanbanView({...props, additionalProps}),
+		dataSetId: id,
+		default: false,
+		label: Liferay.Language.get('kanban'),
+		name: 'kanban',
+		schema: {
+			description: 'description',
+			image: 'imageURL',
+			link: '',
+			sticker: '',
+			symbol: '',
+			title: 'embedded.title',
+		},
+		thumbnail: 'columns',
+	};
+
 	return {
 		...otherProps,
 		atom: cmpTasksFDSAtom,
@@ -204,6 +236,7 @@ export default function TasksFDSPropsTransformer({
 				} as IInternalRenderer,
 			],
 		},
+		id,
 		itemsActions: itemsActions.map((action) => {
 			if (action?.data?.id === 'delete') {
 				return {
@@ -267,5 +300,6 @@ export default function TasksFDSPropsTransformer({
 				});
 			}
 		},
+		views: [...nonDefaultViews, kanbanView],
 	};
 }
