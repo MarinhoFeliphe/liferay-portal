@@ -40,3 +40,13 @@ liferay-sample-etc-spring-boot-workflow-action-1:
     oAuth2ApplicationExternalReferenceCode: liferay-sample-etc-spring-boot-oaua
     resourcePath: /workflow/action/1
     type: workflowAction
+json-to-something-workflow-action:
+    name: JSON To Something Workflow Action
+    oAuth2ApplicationExternalReferenceCode: liferay-sample-etc-spring-boot-oaua
+    resourcePath: /workflow-action/json-to-something
+    type: workflowAction
+minify-html-workflow-action:
+    name: Minify HTML Workflow Action
+    oAuth2ApplicationExternalReferenceCode: liferay-sample-etc-spring-boot-oaua
+    resourcePath: /workflow-action/minify-html
+    type: workflowAction
