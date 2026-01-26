@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.workflow.kaleo.definition.ActionType;
 import com.liferay.portal.workflow.kaleo.definition.ScriptLanguage;
 import com.liferay.portal.workflow.kaleo.model.KaleoAction;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
 import com.liferay.portal.workflow.kaleo.runtime.action.ActionExecutorManager;
 import com.liferay.portal.workflow.kaleo.runtime.action.executor.ActionExecutor;
@@ -44,6 +45,11 @@ public class ActionExecutorManagerImpl implements ActionExecutorManager {
 		String actionExecutorKey = _getActionExecutorKey(kaleoAction);
 
 		ActionExecutor actionExecutor = null;
+
+		if (CompanyThreadLocal.getCompanyId() == 0) {
+			CompanyThreadLocal.setCompanyId(
+				executionContext.getKaleoInstanceToken().getCompanyId());
+		}
 
 		List<ActionExecutor> actionExecutors = _getActionExecutors(
 			actionExecutorKey, CompanyThreadLocal.getCompanyId());
@@ -139,9 +145,7 @@ public class ActionExecutorManagerImpl implements ActionExecutorManager {
 			ListUtil.fromCollection(
 				_serviceTrackerMap.getService(actionExecutorKey)),
 			actionExecutor -> {
-				if (actionExecutor instanceof CompanyScoped) {
-					CompanyScoped companyScoped = (CompanyScoped)actionExecutor;
-
+				if (actionExecutor instanceof CompanyScoped companyScoped) {
 					return companyScoped.isAllowedCompany(companyId);
 				}
 

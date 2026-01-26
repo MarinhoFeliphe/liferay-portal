@@ -27,6 +27,7 @@ public class AgentContext {
 		_serviceContext = builder._serviceContext;
 		_sseEventSinkKey = builder._sseEventSinkKey;
 		_userId = builder._userId;
+		_userToken = builder._userToken;
 	}
 
 	public long getCompanyId() {
@@ -55,6 +56,10 @@ public class AgentContext {
 
 	public long getUserId() {
 		return _userId;
+	}
+
+	public String getUserToken() {
+		return _userToken;
 	}
 
 	public static class Builder {
@@ -101,6 +106,12 @@ public class AgentContext {
 			return this;
 		}
 
+		public Builder userToken(String userToken) {
+			_userToken = userToken;
+
+			return this;
+		}
+
 		public Builder userId(long userId) {
 			_userId = userId;
 
@@ -114,6 +125,7 @@ public class AgentContext {
 		private ServiceContext _serviceContext;
 		private String _sseEventSinkKey;
 		private long _userId;
+		private String _userToken;
 
 	}
 
@@ -124,5 +136,6 @@ public class AgentContext {
 	private final ServiceContext _serviceContext;
 	private final String _sseEventSinkKey;
 	private final long _userId;
+	private final String _userToken;
 
 }

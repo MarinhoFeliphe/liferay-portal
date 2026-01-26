@@ -78,6 +78,8 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 				agents
 			).responseStrategy(
 				SupervisorResponseStrategy.SUMMARY
+			).maxAgentsInvocations(
+				5
 			).build();
 
 		SseUtil.send(
