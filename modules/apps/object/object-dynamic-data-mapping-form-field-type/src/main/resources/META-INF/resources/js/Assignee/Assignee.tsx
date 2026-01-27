@@ -16,6 +16,7 @@ export interface AssigneeValue {
 	externalReferenceCode: string;
 	image?: string;
 	name: string;
+	portrait?: string;
 	type: string;
 }
 
@@ -68,6 +69,7 @@ export default function Assignee({
 				externalReferenceCode: string;
 				image?: string;
 				name: string;
+				portrait?: string;
 				type: string;
 			}[];
 		};
@@ -144,6 +146,7 @@ export default function Assignee({
 					externalReferenceCode: string;
 					image?: string;
 					name: string;
+					portrait?: string;
 					type: string;
 				}) => {
 					return (
@@ -168,7 +171,7 @@ export default function Assignee({
 							}}
 							textValue={item.name}
 						>
-							<Option image={item.image} name={item.name} />
+							<Option name={item.name} portrait={item.portrait || item.image} />
 						</Autocomplete.Item>
 					);
 				}}
