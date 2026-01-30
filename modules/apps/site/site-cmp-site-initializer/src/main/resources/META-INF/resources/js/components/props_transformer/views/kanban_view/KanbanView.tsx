@@ -36,12 +36,10 @@ function mapByStateCode(items: ITask[]): {[key: string]: IColumn} {
 	});
 
 	items.forEach((item: ITask) => {
-		const {
-			state: {key},
-		} = item.embedded;
+		const {state} = item.embedded;
 
-		if (boardData[key]) {
-			boardData[key].tasks.push(item);
+		if (state && boardData[state.key]) {
+			boardData[state.key].tasks.push(item);
 		}
 	});
 

@@ -21,6 +21,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.search.query.BooleanQuery;
+import com.liferay.portal.search.query.Queries;
+import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.searcher.Searcher;
+import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 
 import java.time.LocalDate;
 
@@ -99,7 +105,38 @@ public class TaskStatisticsResourceImpl extends BaseTaskStatisticsResourceImpl {
 	}
 
 	private TaskStatistics _toTaskStatistics(
-		ObjectEntry projectObjectEntry, ObjectDefinition taskObjectDefinition) {
+			ObjectEntry projectObjectEntry,
+			ObjectDefinition taskObjectDefinition)
+		throws Exception {
+
+		long totalCount = _getCount(
+			StringPool.BLANK, projectObjectEntry, taskObjectDefinition);
+
+		if (projectObjectEntry == null) {
+			BooleanQuery booleanQuery = _queries.booleanQuery();
+
+			booleanQuery.addShouldQueryClauses(
+				_queries.wildcard(
+					"assetTagNames.lowercase",
+					taskObjectDefinition.getExternalReferenceCode() +
+						StringPool.STAR));
+
+			SearchResponse searchResponse = _searcher.search(
+				_searchRequestBuilderFactory.builder(
+				).companyId(
+					contextCompany.getCompanyId()
+				).emptySearchEnabled(
+					true
+				).entryClassNames(
+					KaleoTaskInstanceToken.class.getName()
+				).query(
+					booleanQuery
+				).build());
+
+			totalCount = totalCount + searchResponse.getTotalHits();
+		}
+
+		long tasksTotalCount = totalCount;
 
 		return new TaskStatistics() {
 			{
@@ -116,10 +153,7 @@ public class TaskStatisticsResourceImpl extends BaseTaskStatisticsResourceImpl {
 						"dueDate lt " + LocalDate.now() +
 							" and state ne 'done'",
 						projectObjectEntry, taskObjectDefinition));
-				setTotalCount(
-					() -> _getCount(
-						StringPool.BLANK, projectObjectEntry,
-						taskObjectDefinition));
+				setTotalCount(() -> tasksTotalCount);
 			}
 		};
 	}
@@ -137,5 +171,14 @@ public class TaskStatisticsResourceImpl extends BaseTaskStatisticsResourceImpl {
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private Queries _queries;
+
+	@Reference
+	private Searcher _searcher;
+
+	@Reference
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 }

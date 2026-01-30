@@ -16,6 +16,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -55,19 +56,19 @@ public class ViewTasksSectionDisplayContext extends BaseSectionDisplayContext {
 	}
 
 	public String getAPIURL() {
-		StringBundler sb = new StringBundler(11);
+		StringBundler sb = new StringBundler(12);
 
 		sb.append("/o/search/v1.0/search?emptySearch=true");
 
 		if (_assetEntry == null) {
 			sb.append("&entryClassNames=");
-			sb.append(HtmlUtil.escapeURL(taskObjectDefinition.getClassName()));
+			sb.append(HtmlUtil.escapeURL(objectDefinition.getClassName()));
 			sb.append(StringPool.COMMA);
 			sb.append(KaleoTaskInstanceToken.class.getName());
 		}
 
 		sb.append("&filter=(objectDefinitionId eq ");
-		sb.append(taskObjectDefinition.getObjectDefinitionId());
+		sb.append(objectDefinition.getObjectDefinitionId());
 
 		if (_assetEntry != null) {
 			sb.append(" and scopeGroupId eq ");
@@ -75,11 +76,12 @@ public class ViewTasksSectionDisplayContext extends BaseSectionDisplayContext {
 		}
 		else {
 			sb.append(" or keywords/any(k:startswith(k, '");
-			sb.append(taskObjectDefinition.getExternalReferenceCode());
+			sb.append(objectDefinition.getExternalReferenceCode());
 			sb.append("'))");
 		}
 
 		sb.append(StringPool.CLOSE_PARENTHESIS);
+		sb.append("&nestedFields=cmpProjectToCMPTasks,embedded");
 
 		return sb.toString();
 	}
