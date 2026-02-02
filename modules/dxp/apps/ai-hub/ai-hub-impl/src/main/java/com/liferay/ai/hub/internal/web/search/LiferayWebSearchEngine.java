@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.rest.dto.v1_0.SearchResult;
 
@@ -28,6 +29,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,20 @@ public class LiferayWebSearchEngine implements WebSearchEngine {
 		}
 	}
 
+	private String _getAuthorization() throws Exception {
+
+		// TODO replace basic auth with token based authentication
+
+		Base64.Encoder encoder = Base64.getEncoder();
+
+		String userNameAndPassword =
+			"test@liferay.com:" + PropsValues.DEFAULT_ADMIN_PASSWORD;
+
+		return "Basic " +
+			   new String(
+				   encoder.encode(userNameAndPassword.getBytes("UTF-8")), "UTF-8");
+	}
+
 	private WebSearchResults _search(WebSearchRequest webSearchRequest)
 		throws Exception {
 
@@ -66,9 +82,9 @@ public class LiferayWebSearchEngine implements WebSearchEngine {
 
 		Http.Options options = new Http.Options();
 
+		options.addHeader(HttpHeaders.AUTHORIZATION, _getAuthorization());
 		options.addHeader(
 			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
-		options.addHeader("Liferay-AI-Hub-On-Behalf-Of", _userToken);
 
 		// TODO replace http://localhost:8080 with origin's base URL
 
