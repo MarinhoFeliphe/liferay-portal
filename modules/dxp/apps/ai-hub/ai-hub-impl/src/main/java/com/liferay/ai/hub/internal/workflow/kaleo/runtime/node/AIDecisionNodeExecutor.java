@@ -151,7 +151,7 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			).onErrorConsumer(
 				throwable -> vertexAiGeminiStreamingChatModel.close()
 			).systemMessageProviderFunction(
-				object -> VariablesUtil.applyInputVariables(
+				memoryId -> VariablesUtil.applyInputVariables(
 					executionContext, "prompt", kaleoNodeSettingValues)
 			).tools(
 				new Tools()
