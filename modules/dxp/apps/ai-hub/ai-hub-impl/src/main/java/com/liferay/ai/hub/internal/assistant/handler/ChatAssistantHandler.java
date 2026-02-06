@@ -43,7 +43,7 @@ public class ChatAssistantHandler implements AssistantHandler {
 		aiServices.streamingChatModel(
 			assistantHandlerContext.getVertexAiGeminiStreamingChatModel()
 		).systemMessageProvider(
-			assistantHandlerContext.getSystemMessageProvider()
+			assistantHandlerContext.getSystemMessageProviderFunction()
 		).toolProvider(
 			assistantHandlerContext.getToolProvider()
 		).build();
@@ -54,9 +54,9 @@ public class ChatAssistantHandler implements AssistantHandler {
 			assistantHandlerContext.getMemoryId(),
 			assistantHandlerContext.getUserMessage()
 		).onCompleteResponse(
-			assistantHandlerContext.getOnCompleteResponse()
+			assistantHandlerContext.getOnCompleteResponseConsumer()
 		).onError(
-			assistantHandlerContext.getOnError()
+			assistantHandlerContext.getOnErrorConsumer()
 		).start();
 	}
 

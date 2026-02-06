@@ -146,11 +146,11 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 						"executionContext", executionContext,
 						"permissionChecker",
 						PermissionThreadLocal.getPermissionChecker()))
-			).onCompleteResponse(
+			).onCompleteResponseConsumer(
 				response -> vertexAiGeminiStreamingChatModel.close()
-			).onError(
+			).onErrorConsumer(
 				throwable -> vertexAiGeminiStreamingChatModel.close()
-			).systemMessageProvider(
+			).systemMessageProviderFunction(
 				object -> VariablesUtil.applyInputVariables(
 					executionContext, "prompt", kaleoNodeSettingValues)
 			).tools(
