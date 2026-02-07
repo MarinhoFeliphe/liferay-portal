@@ -30,6 +30,7 @@ import selectStructureLocalizedLabel from '../selectors/selectStructureLocalized
 import selectStructureUuid from '../selectors/selectStructureUuid';
 import {
 	ReferencedStructure,
+	RelatedContent,
 	RepeatableGroup,
 	Structure,
 	StructureChild,
@@ -37,6 +38,7 @@ import {
 import {Uuid} from '../types/Uuid';
 import confirmChildrenDeletion from '../utils/confirmChildrenDeletion';
 import {FIELD_TYPE_ICON, FieldType} from '../utils/field';
+import isField from '../utils/isField';
 import isLocked from '../utils/isLocked';
 import isReferenced from '../utils/isReferenced';
 import isRenamable from '../utils/isRenamable';
@@ -61,7 +63,11 @@ type TreeItem = {
 	label: string;
 	locked?: boolean;
 	name?: string;
-	type?: FieldType | ReferencedStructure['type'] | RepeatableGroup['type'];
+	type?:
+		| FieldType
+		| ReferencedStructure['type']
+		| RelatedContent['type']
+		| RepeatableGroup['type'];
 };
 
 export default function StructureTree({search}: {search: string}) {
@@ -223,8 +229,7 @@ export default function StructureTree({search}: {search: string}) {
 						<ClayIcon
 							className={classNames({
 								'structure-builder__tree-node--field-icon':
-									item.type &&
-									item.type !== 'referenced-structure',
+									isField(item),
 								'structure-builder__tree-node--group-icon':
 									item.type === 'repeatable-group',
 								'structure-builder__tree-node--structure-icon':
@@ -279,7 +284,14 @@ export default function StructureTree({search}: {search: string}) {
 								})}
 							>
 								<ClayIcon
-									className="structure-builder__tree-node--field-icon"
+									className={classNames({
+										'structure-builder__tree-node--field-icon':
+											childItem.type !==
+											'related-content',
+										'structure-builder__tree-node--related-content-icon':
+											childItem.type ===
+											'related-content',
+									})}
 									symbol={childItem.icon}
 								/>
 
@@ -497,7 +509,26 @@ function buildItems({
 }): TreeItem[] {
 	return Array.from(children.values()).reduce(
 		(items: TreeItem[], child: StructureChild) => {
-			if (
+			if (child.type === 'related-content') {
+				const label = getLocalizedValue(child.label);
+
+				if (match(label, search)) {
+					items.push({
+						actions: getItemActions({
+							dispatch,
+							item: child,
+							publishedChildren,
+							structure,
+						}),
+						icon: 'select-from-list',
+						id: child.uuid,
+						invalid: invalids.has(child.uuid),
+						label: getLocalizedValue(child.label),
+						type: 'related-content',
+					});
+				}
+			}
+			else if (
 				child.type === 'referenced-structure' ||
 				child.type === 'repeatable-group'
 			) {
@@ -597,11 +628,7 @@ function getItemActions({
 		});
 	}
 
-	if (
-		!isReferenced({item, root: structure}) &&
-		item.type !== 'referenced-structure' &&
-		item.type !== 'repeatable-group'
-	) {
+	if (!isReferenced({item, root: structure}) && isField(item)) {
 		actions.push({
 			label: Liferay.Language.get('create-repeatable-group'),
 			onClick: () =>

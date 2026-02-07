@@ -6,8 +6,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import {BUILD_RESOURCES_PATH} from '../../util/constants.mjs';
 import getFlatName from '../../util/getFlatName.mjs';
+import {BUILD_RESOURCES_PATH} from '../../util/locations.mjs';
 import projectScopeRequire from '../../util/projectScopeRequire.mjs';
 import getNamespacedPackageName from './util/getNamespacedPackageName.mjs';
 import hashPathForVariable from './util/hashPathForVariable.mjs';
@@ -93,7 +93,7 @@ async function writeExportBridge(
 		getPathToRoot(projectExport, modulePath) +
 		projectWebContextPath +
 		'/__liferay__/exports/' +
-		`${getFlatName(projectExport)}.js`;
+		getFlatName(projectExport, 'js');
 
 	const hashedImportPath = hashPathForVariable(importPath);
 

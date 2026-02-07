@@ -72,7 +72,25 @@ public class TaskDefinitionDisplayContext {
 				HttpComponentsUtil.addParameter(
 					_getBaseURL(_themeDisplay.getCompany(), namespace),
 					namespace + "name", "{name}"),
-				"view", "view", "view", "get", null, null));
+				"view", "view", LanguageUtil.get(_httpServletRequest, "view"),
+				"get", null, null),
+			new FDSActionDropdownItem(
+				getAPIURL() + "/{id}/copy", "copy", "copy",
+				LanguageUtil.get(_httpServletRequest, "duplicate"), "post",
+				"copy", "async"),
+			new FDSActionDropdownItem(
+				getAPIURL() + "/{id}", "trash", "delete",
+				LanguageUtil.get(_httpServletRequest, "delete"), "delete",
+				"delete", "async"),
+			new FDSActionDropdownItem(
+				getAPIURL() + "/{id}/update-active?active=false", "block",
+				"deactivate",
+				LanguageUtil.get(_httpServletRequest, "deactivate"), "patch",
+				"deactivate", "async"),
+			new FDSActionDropdownItem(
+				getAPIURL() + "/{id}/update-active?active=true", "logout",
+				"activate", LanguageUtil.get(_httpServletRequest, "activate"),
+				"patch", "activate", "async"));
 	}
 
 	private String _getBaseURL(Company company, String namespace)

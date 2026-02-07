@@ -118,7 +118,7 @@ test(
 					.click();
 			});
 
-			await test.step('Check filters show up grouped together', async () => {
+			await test.step('Check grouped FDS filters visibility', async () => {
 				await expect(
 					page.locator('li.dropdown-subheader', {hasText: 'Group 1'})
 				).toBeVisible();
@@ -126,8 +126,55 @@ test(
 					page.locator('li.dropdown-subheader', {hasText: 'Group 2'})
 				).toBeVisible();
 				await expect(
-					page.locator('li.dropdown-subheader', {hasText: 'Group 2'})
+					page.locator('li.dropdown-subheader', {hasText: 'Group 3'})
 				).toBeVisible();
+				await expect(
+					page.locator('li.dropdown-subheader', {
+						hasText: 'Empty Group',
+					})
+				).not.toBeVisible();
+				await expect(
+					page.locator('li.dropdown-subheader', {
+						hasText: 'Group With Unregistered Filter',
+					})
+				).not.toBeVisible();
+			});
+
+			await test.step('Check grouped FDS filters order', async () => {
+				const filtersDropdownMenu = page.getByLabel('Filters');
+
+				const groupedFilters = filtersDropdownMenu.getByRole('menu');
+
+				await expect(
+					groupedFilters.locator('li.dropdown-subheader')
+				).toHaveText(['Group 1', 'Group 2', 'Group 3']);
+
+				const group1 = groupedFilters.getByRole('group', {
+					name: 'Group 1',
+				});
+
+				await expect(group1.getByRole('menuitem')).toHaveText([
+					'Date Range',
+					'Color',
+				]);
+
+				const group2 = groupedFilters.getByRole('group', {
+					name: 'Group 2',
+				});
+
+				await expect(group2.getByRole('menuitem')).toHaveText([
+					'Client Extension',
+					'Size',
+				]);
+
+				const group3 = groupedFilters.getByRole('group', {
+					name: 'Group 3',
+				});
+
+				await expect(group3.getByRole('menuitem')).toHaveText([
+					'Status',
+					'Title',
+				]);
 			});
 
 			await test.step('Enter a search term "status"', async () => {
@@ -139,6 +186,9 @@ test(
 			});
 
 			await test.step('Check only the "status" filter appears', async () => {
+				await expect(
+					page.getByRole('menuitem', {name: 'Client Extension'})
+				).not.toBeVisible();
 				await expect(
 					page.getByRole('menuitem', {name: 'Color'})
 				).not.toBeVisible();
@@ -167,6 +217,9 @@ test(
 				).toBeVisible();
 				await expect(
 					page.getByRole('menuitem', {name: 'Date Range'})
+				).toBeVisible();
+				await expect(
+					page.getByRole('menuitem', {name: 'Client Extension'})
 				).toBeVisible();
 				await expect(
 					page.getByRole('menuitem', {name: 'Size'})

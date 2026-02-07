@@ -44,9 +44,10 @@ import useFDSDrop from './dnd/useFDSDrop';
 import useFileUploader from './dnd/useFileUploader';
 import EmptyState from './empty_state/EmptyState';
 import {InfoPanel} from './info_panel/InfoPanel';
-
-// @ts-ignore
-
+import {
+	IInlineNotificationComponent,
+	InlineNotification,
+} from './inline_notification/InlineNotification';
 import ManagementBar from './management_bar/ManagementBar';
 import {FILTER_IMPLEMENTATIONS} from './management_bar/controls/filters/Filter';
 
@@ -129,7 +130,7 @@ const getAtom = ({
 const FrontendDataSetContent = ({
 	actionParameterName,
 	activeViewSettings,
-	additionalAPIURLParameters,
+	additionalAPIURLParameters: initialAdditionalAPIURLParameters,
 	apiURL,
 	appURL,
 	atom,
@@ -142,15 +143,16 @@ const FrontendDataSetContent = ({
 	defaultSelectedItems,
 	emptyState,
 	filters: initialFilters,
-	filtersGroups,
 	formId,
 	formName,
+	groupedFilters,
 	header,
 	hideManagementBarInEmptyState = false,
 	id,
 	infoPanelComponent,
 	inlineAddingSettings,
 	inlineEditingSettings,
+	inlineNotificationComponent,
 	items: itemsProp,
 	itemsActions,
 	namespace,
@@ -393,6 +395,8 @@ const FrontendDataSetContent = ({
 
 	const memoizedAtom = useMemo(() => getAtom({atom, id}), [atom, id]);
 
+	const [additionalAPIURLParameters, setAdditionalAPIURLParameters] =
+		useState(initialAdditionalAPIURLParameters);
 	const [globalFDSState, setGlobalFDSState] =
 		useLiferayState<IFDSState>(memoizedAtom);
 
@@ -703,7 +707,7 @@ const FrontendDataSetContent = ({
 		return {
 			activeView,
 			defaultSnapshot,
-			filtersGroups,
+			groupedFilters,
 			modifiedFields: {},
 			pageNumber,
 			paginationDelta,
@@ -1530,6 +1534,27 @@ const FrontendDataSetContent = ({
 		</div>
 	) : null;
 
+	const InlineNotificationWrapper = ({
+		inlineNotificationComponent,
+	}: {
+		inlineNotificationComponent: React.ComponentType<IInlineNotificationComponent>;
+	}) => {
+		return inlineNotificationComponent ? (
+			<div
+				className={classNames(
+					'container-fluid align-items-center inline-notification-bar',
+					style === 'fluid' && 'px-0'
+				)}
+			>
+				<InlineNotification
+					component={inlineNotificationComponent}
+				></InlineNotification>
+			</div>
+		) : (
+			<></>
+		);
+	};
+
 	const view =
 		!dataLoading && !componentLoading ? (
 			<div className="data-set-content-wrapper">
@@ -1927,6 +1952,14 @@ const FrontendDataSetContent = ({
 			});
 	}
 
+	function forceSortsUpdate(sorts: TSort[]) {
+		viewsDispatch(updateActiveSorts(sorts));
+	}
+
+	function updateAdditionalAPIURLParameters(parameters: string) {
+		setAdditionalAPIURLParameters(parameters);
+	}
+
 	const selectable = !!selectionType;
 
 	const {className} = useFDSDrop({
@@ -1945,6 +1978,7 @@ const FrontendDataSetContent = ({
 				customDataRenderers,
 				customRenderers,
 				executeAsyncItemAction,
+				forceSortsUpdate,
 				formId,
 				formName,
 				globalFDSState: unfrozenGlobalFDSState,
@@ -2039,6 +2073,7 @@ const FrontendDataSetContent = ({
 				toggleItemInlineEdit,
 				uniformActionsDisplay,
 				updateActiveSorts,
+				updateAdditionalAPIURLParameters,
 				updateDataSetItems,
 				updateFilters,
 				updateItem,
@@ -2094,6 +2129,14 @@ const FrontendDataSetContent = ({
 								<div className="data-set data-set-inline">
 									{managementBar}
 
+									{inlineNotificationComponent && (
+										<InlineNotificationWrapper
+											inlineNotificationComponent={
+												inlineNotificationComponent
+											}
+										/>
+									)}
+
 									{view}
 
 									{paginationComponent}
@@ -2104,6 +2147,14 @@ const FrontendDataSetContent = ({
 								<div className="data-set data-set-stacked">
 									{managementBar}
 
+									{inlineNotificationComponent && (
+										<InlineNotificationWrapper
+											inlineNotificationComponent={
+												inlineNotificationComponent
+											}
+										/>
+									)}
+
 									{view}
 
 									{paginationComponent}
@@ -2113,6 +2164,14 @@ const FrontendDataSetContent = ({
 							{style === 'fluid' && (
 								<div className="data-set data-set-fluid">
 									{managementBar}
+
+									{inlineNotificationComponent && (
+										<InlineNotificationWrapper
+											inlineNotificationComponent={
+												inlineNotificationComponent
+											}
+										/>
+									)}
 
 									<div className="container-fluid mt-3">
 										{view}

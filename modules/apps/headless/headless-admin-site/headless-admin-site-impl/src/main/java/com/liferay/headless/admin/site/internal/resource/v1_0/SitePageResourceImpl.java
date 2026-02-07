@@ -12,7 +12,9 @@ import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.headless.admin.site.dto.v1_0.ContentPageSettings;
 import com.liferay.headless.admin.site.dto.v1_0.ContentPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.CustomMetaTag;
+import com.liferay.headless.admin.site.dto.v1_0.EmbeddedPageSettings;
 import com.liferay.headless.admin.site.dto.v1_0.ItemExternalReference;
+import com.liferay.headless.admin.site.dto.v1_0.LinkToPagePageSettings;
 import com.liferay.headless.admin.site.dto.v1_0.LinkToURLPageSettings;
 import com.liferay.headless.admin.site.dto.v1_0.OpenGraphSettings;
 import com.liferay.headless.admin.site.dto.v1_0.PageSetPageSettings;
@@ -55,6 +57,7 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -341,8 +344,11 @@ public class SitePageResourceImpl
 				searchContext.setAttribute(
 					Field.TYPE,
 					new String[] {
-						LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_NODE,
-						LayoutConstants.TYPE_PORTLET, LayoutConstants.TYPE_URL
+						LayoutConstants.TYPE_CONTENT,
+						LayoutConstants.TYPE_EMBEDDED,
+						LayoutConstants.TYPE_LINK_TO_LAYOUT,
+						LayoutConstants.TYPE_NODE, LayoutConstants.TYPE_PORTLET,
+						LayoutConstants.TYPE_URL
 					});
 				searchContext.setAttribute(
 					"privateLayout", Boolean.FALSE.toString());
@@ -404,15 +410,25 @@ public class SitePageResourceImpl
 
 		_validateSitePageLayout(layout);
 
-		if ((sitePage.getType() != null) &&
-			!Objects.equals(
-				layout.getType(),
-				SitePageTypeUtil.toInternalType(sitePage.getType()))) {
+		ServiceContext serviceContext = _getServiceContext(
+			layout.getGroupId(), sitePage);
+
+		if (layout.isTypeEmpty()) {
+			layout = _layoutService.convertEmptyLayout(
+				layout.getPlid(), layout.getNameMap(),
+				SitePageTypeUtil.toInternalType(sitePage.getType()),
+				layout.getClassNameId(), layout.getClassPK(),
+				layout.getMasterLayoutPageTemplateEntryERC(), serviceContext);
+		}
+		else if ((sitePage.getType() != null) &&
+				 !Objects.equals(
+					 layout.getType(),
+					 SitePageTypeUtil.toInternalType(sitePage.getType()))) {
 
 			throw new UnsupportedOperationException();
 		}
 
-		return _toSitePage(_updateLayout(layout, sitePage));
+		return _toSitePage(_updateLayout(layout, serviceContext, sitePage));
 	}
 
 	@Override
@@ -493,7 +509,7 @@ public class SitePageResourceImpl
 		}
 
 		UnicodeProperties typeSettingsUnicodeProperties =
-			_getTypeSettingsUnicodeProperties(sitePage);
+			_getTypeSettingsUnicodeProperties(groupId, sitePage);
 
 		Layout layout = null;
 
@@ -515,7 +531,11 @@ public class SitePageResourceImpl
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 		}
 		else if (Objects.equals(
-					sitePage.getType(), SitePage.Type.LINK_TO_URL_PAGE) ||
+					sitePage.getType(), SitePage.Type.EMBEDDED_PAGE) ||
+				 Objects.equals(
+					 sitePage.getType(), SitePage.Type.LINK_TO_PAGE_PAGE) ||
+				 Objects.equals(
+					 sitePage.getType(), SitePage.Type.LINK_TO_URL_PAGE) ||
 				 Objects.equals(
 					 sitePage.getType(), SitePage.Type.PAGE_SET_PAGE)) {
 
@@ -662,6 +682,27 @@ public class SitePageResourceImpl
 			sitePage.getDateModified(), contextUser.getUserId(),
 			sitePage.getUuid());
 
+		if (Objects.equals(sitePage.getType(), SitePage.Type.CONTENT_PAGE)) {
+			if (sitePage.getPageSpecifications() == null) {
+				return serviceContext;
+			}
+
+			PageSpecification[] sortedContentPageSpecifications =
+				PageSpecificationUtil.getSortedContentPageSpecifications(
+					sitePage.getPageSpecifications());
+
+			ContentPageSpecification draftContentPageSpecification =
+				(ContentPageSpecification)sortedContentPageSpecifications[0];
+			ContentPageSpecification publishedContentPageSpecification =
+				(ContentPageSpecification)sortedContentPageSpecifications[1];
+
+			ServiceContextUtil.setContentPageSpecificationsAttributes(
+				draftContentPageSpecification, groupId,
+				publishedContentPageSpecification, serviceContext);
+
+			return serviceContext;
+		}
+
 		if (!(sitePage.getPageSettings() instanceof WidgetPageSettings)) {
 			return serviceContext;
 		}
@@ -712,7 +753,7 @@ public class SitePageResourceImpl
 	}
 
 	private UnicodeProperties _getTypeSettingsUnicodeProperties(
-		SitePage sitePage) {
+		long groupId, SitePage sitePage) {
 
 		PageSettings pageSettings = sitePage.getPageSettings();
 
@@ -722,6 +763,18 @@ public class SitePageResourceImpl
 
 		if ((sitePage.getType() == SitePage.Type.CONTENT_PAGE) &&
 			!(pageSettings instanceof ContentPageSettings)) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		if ((sitePage.getType() == SitePage.Type.EMBEDDED_PAGE) &&
+			!(pageSettings instanceof EmbeddedPageSettings)) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		if ((sitePage.getType() == SitePage.Type.LINK_TO_PAGE_PAGE) &&
+			!(pageSettings instanceof LinkToPagePageSettings)) {
 
 			throw new UnsupportedOperationException();
 		}
@@ -829,6 +882,48 @@ public class SitePageResourceImpl
 			return unicodePropertiesWrapper.build();
 		}
 
+		if (sitePage.getType() == SitePage.Type.EMBEDDED_PAGE) {
+			EmbeddedPageSettings embeddedPageSettings =
+				(EmbeddedPageSettings)pageSettings;
+
+			unicodePropertiesWrapper.setProperty(
+				LayoutTypePortletConstants.EMBEDDED_LAYOUT_URL,
+				embeddedPageSettings.getPageURL());
+
+			return unicodePropertiesWrapper.build();
+		}
+
+		if (sitePage.getType() == SitePage.Type.LINK_TO_PAGE_PAGE) {
+			LinkToPagePageSettings linkToPagePageSettings =
+				(LinkToPagePageSettings)pageSettings;
+
+			String linkToPageExternalReferenceCode =
+				linkToPagePageSettings.getLinkToPageExternalReferenceCode();
+
+			if (Validator.isNull(linkToPageExternalReferenceCode)) {
+				return unicodePropertiesWrapper.build();
+			}
+
+			unicodePropertiesWrapper.setProperty(
+				"linkToLayoutExternalReferenceCode",
+				linkToPageExternalReferenceCode);
+
+			Layout linkToLayout =
+				_layoutLocalService.fetchLayoutByExternalReferenceCode(
+					linkToPageExternalReferenceCode, groupId);
+
+			String linkToLayoutId = null;
+
+			if (linkToLayout != null) {
+				linkToLayoutId = String.valueOf(linkToLayout.getLayoutId());
+			}
+
+			unicodePropertiesWrapper.setProperty(
+				"linkToLayoutId", linkToLayoutId);
+
+			return unicodePropertiesWrapper.build();
+		}
+
 		if (sitePage.getType() == SitePage.Type.LINK_TO_URL_PAGE) {
 			LinkToURLPageSettings linkToURLPageSettings =
 				(LinkToURLPageSettings)pageSettings;
@@ -891,7 +986,8 @@ public class SitePageResourceImpl
 			layout);
 	}
 
-	private Layout _updateLayout(Layout layout, SitePage sitePage)
+	private Layout _updateLayout(
+			Layout layout, ServiceContext serviceContext, SitePage sitePage)
 		throws Exception {
 
 		Map<Locale, String> nameMap = layout.getNameMap();
@@ -925,9 +1021,6 @@ public class SitePageResourceImpl
 				sitePage.getFriendlyUrlPath_i18n());
 		}
 
-		ServiceContext serviceContext = _getServiceContext(
-			layout.getGroupId(), sitePage);
-
 		serviceContext.setAttribute(
 			"hidden",
 			_isHiddenFromNavigation(
@@ -944,11 +1037,16 @@ public class SitePageResourceImpl
 				_cetManager, _fragmentEntryProcessorRegistry,
 				_infoItemServiceRegistry, layout, nameMap, titleMap,
 				descriptionMap, keywordsMap, robotsMap, friendlyURLMap,
-				_getTypeSettingsUnicodeProperties(sitePage),
+				_getTypeSettingsUnicodeProperties(
+					layout.getGroupId(), sitePage),
 				sitePage.getPageSpecifications(), serviceContext);
 		}
 		else if (Objects.equals(
-					sitePage.getType(), SitePage.Type.LINK_TO_URL_PAGE) ||
+					sitePage.getType(), SitePage.Type.EMBEDDED_PAGE) ||
+				 Objects.equals(
+					 sitePage.getType(), SitePage.Type.LINK_TO_PAGE_PAGE) ||
+				 Objects.equals(
+					 sitePage.getType(), SitePage.Type.LINK_TO_URL_PAGE) ||
 				 Objects.equals(
 					 sitePage.getType(), SitePage.Type.PAGE_SET_PAGE)) {
 
@@ -956,13 +1054,17 @@ public class SitePageResourceImpl
 				layout, nameMap, friendlyURLMap,
 				PageSpecificationUtil.getPageSpecification(
 					sitePage.getPageSpecifications()),
-				_getTypeSettingsUnicodeProperties(sitePage), serviceContext);
+				_getTypeSettingsUnicodeProperties(
+					layout.getGroupId(), sitePage),
+				serviceContext);
 		}
 		else {
 			layout = LayoutUtil.updatePortletLayout(
 				_cetManager, layout, nameMap, titleMap, descriptionMap,
 				keywordsMap, robotsMap, friendlyURLMap,
-				_getTypeSettingsUnicodeProperties(sitePage), serviceContext,
+				_getTypeSettingsUnicodeProperties(
+					layout.getGroupId(), sitePage),
+				serviceContext,
 				PageSpecificationUtil.getWidgetPageSpecification(
 					sitePage.getPageSpecifications()));
 		}
@@ -1091,21 +1193,18 @@ public class SitePageResourceImpl
 		if (Objects.equals(sitePage.getType(), SitePage.Type.CONTENT_PAGE) &&
 			(pageSpecifications.length == 2)) {
 
-			ContentPageSpecification publishedContentPageSpecification =
-				(ContentPageSpecification)pageSpecifications[0];
+			PageSpecification[] sortedContentPageSpecifications =
+				PageSpecificationUtil.getSortedContentPageSpecifications(
+					pageSpecifications);
 
-			if (Validator.isNull(
-					publishedContentPageSpecification.
-						getDraftContentPageSpecificationExternalReferenceCode())) {
-
-				publishedContentPageSpecification =
-					(ContentPageSpecification)pageSpecifications[1];
-			}
-
-			publishedPageSpecification = publishedContentPageSpecification;
+			publishedPageSpecification = sortedContentPageSpecifications[1];
 		}
 		else if ((Objects.equals(
-					sitePage.getType(), SitePage.Type.LINK_TO_URL_PAGE) ||
+					sitePage.getType(), SitePage.Type.EMBEDDED_PAGE) ||
+				  Objects.equals(
+					  sitePage.getType(), SitePage.Type.LINK_TO_PAGE_PAGE) ||
+				  Objects.equals(
+					  sitePage.getType(), SitePage.Type.LINK_TO_URL_PAGE) ||
 				  Objects.equals(
 					  sitePage.getType(), SitePage.Type.PAGE_SET_PAGE) ||
 				  Objects.equals(
@@ -1168,6 +1267,9 @@ public class SitePageResourceImpl
 
 	@Reference
 	private InfoItemServiceRegistry _infoItemServiceRegistry;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService

@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -294,15 +295,32 @@ public class GenerateReportsBuildRunner extends BaseBuildRunner<BuildData> {
 				DateTimeFormatter.ofPattern("yyyy-MM"));
 		}
 
+		List<String> jenkinsMasterNames = new ArrayList<>();
+
+		try {
+			String jenkinsLoadBalancerWhitelist =
+				JenkinsResultsParserUtil.getProperty(
+					JenkinsResultsParserUtil.getBuildProperties(),
+					"jenkins.load.balancer.whitelist");
+
+			jenkinsLoadBalancerWhitelist =
+				JenkinsResultsParserUtil.expandSlaveRange(
+					jenkinsLoadBalancerWhitelist);
+
+			Collections.addAll(
+				jenkinsMasterNames, jenkinsLoadBalancerWhitelist.split(","));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+
 		TestrayCloudBucket testrayCloudBucket =
 			TestrayCloudBucket.getInstance();
 
 		List<String> keys = new ArrayList<>();
 
-		String jobName = "test-portal-acceptance-pullrequest(master)";
-
-		for (int i = 1; i <= 40; i++) {
-			String jenkinsMasterName = "test-1-" + i;
+		for (String jenkinsMasterName : jenkinsMasterNames) {
+			String jobName = "test-portal-acceptance-pullrequest(master)";
 
 			keys.addAll(
 				_getTestrayBucketBuildReportJSONFilePaths(

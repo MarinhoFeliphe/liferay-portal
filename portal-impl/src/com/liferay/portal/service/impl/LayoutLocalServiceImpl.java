@@ -776,6 +776,93 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	@Override
+	public Layout convertEmptyLayout(
+			long userId, long plid, Map<Locale, String> nameMap, String type,
+			long classNameId, long classPK,
+			String masterLayoutPageTemplateEntryERC,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		if (Validator.isNull(type)) {
+			throw new IllegalArgumentException("Type is null");
+		}
+
+		if (type.equals(LayoutConstants.TYPE_EMBEDDED) ||
+			type.equals(LayoutConstants.TYPE_LINK_TO_LAYOUT)) {
+
+			throw new LayoutTypeException(
+				type, LayoutTypeException.TYPE_NOT_ALLOWED);
+		}
+
+		Layout layout = layoutLocalService.getLayout(plid);
+
+		if (!layout.isTypeEmpty()) {
+			throw new UnsupportedOperationException();
+		}
+
+		String uuid = serviceContext.getUuid();
+
+		if (Validator.isNotNull(uuid) &&
+			!Objects.equals(layout.getUuid(), uuid)) {
+
+			layout.setUuid(uuid);
+
+			layout = updateLayout(layout);
+		}
+
+		if (Objects.equals(type, LayoutConstants.TYPE_CONTENT)) {
+			layout = layoutLocalService.updateLayout(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), classNameId, classPK);
+		}
+
+		layout = layoutLocalService.updateLayout(
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getParentLayoutId(), nameMap, layout.getTitleMap(),
+			layout.getDescriptionMap(), layout.getKeywordsMap(),
+			layout.getRobotsMap(), type, false, layout.getFriendlyURLMap(),
+			layout.isIconImage(), null, layout.getStyleBookEntryERC(),
+			layout.getFaviconFileEntryERC(),
+			layout.getFaviconFileEntryScopeERC(),
+			masterLayoutPageTemplateEntryERC, serviceContext);
+
+		if (Objects.equals(type, LayoutConstants.TYPE_CONTENT) &&
+			(layout.fetchDraftLayout() == null)) {
+
+			serviceContext.setAttribute(
+				"defaultSegmentsExperienceExternalReferenceCode",
+				serviceContext.getAttribute(
+					"draftLayoutDefaultSegmentsExperienceExternal" +
+						"ReferenceCode"));
+			serviceContext.setAttribute(
+				"defaultSegmentsExperienceUuid",
+				serviceContext.getAttribute(
+					"draftLayoutDefaultSegmentsExperienceUuid"));
+			serviceContext.setAttribute(
+				"layoutSetPrototypeLayoutERC",
+				serviceContext.getAttribute(
+					"draftLayoutLayoutSetPrototypeLayoutERC"));
+			serviceContext.setModifiedDate(new Date());
+
+			layoutLocalService.addLayout(
+				GetterUtil.getString(
+					serviceContext.getAttribute(
+						"draftLayoutExternalReferenceCode"),
+					layout.getExternalReferenceCode() + "-draft"),
+				userId, layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getParentLayoutId(),
+				_classNameLocalService.getClassNameId(Layout.class),
+				layout.getPlid(), nameMap, layout.getTitleMap(),
+				layout.getDescriptionMap(), layout.getKeywordsMap(),
+				layout.getRobotsMap(), type, layout.getTypeSettings(), true,
+				true, Collections.emptyMap(), masterLayoutPageTemplateEntryERC,
+				serviceContext);
+		}
+
+		return layout;
+	}
+
+	@Override
 	public Layout copyLayout(
 			long userId, long groupId, boolean privateLayout,
 			Map<Locale, String> nameMap, boolean hidden, boolean system,
@@ -3160,10 +3247,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setExpandoBridgeAttributes(serviceContext);
 
 		if (layout.getStatus() == WorkflowConstants.STATUS_EMPTY) {
-			layout.setStatus(
-				Objects.equals(type, LayoutConstants.TYPE_CONTENT) ?
-					WorkflowConstants.STATUS_DRAFT :
-						WorkflowConstants.STATUS_APPROVED);
+			layout.setStatus(WorkflowConstants.STATUS_APPROVED);
 		}
 
 		layout = layoutLocalService.updateLayout(layout);

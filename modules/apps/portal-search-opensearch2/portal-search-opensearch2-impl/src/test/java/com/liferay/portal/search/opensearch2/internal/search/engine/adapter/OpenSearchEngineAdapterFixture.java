@@ -9,11 +9,11 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.opensearch2.internal.connection.OpenSearchConnectionManager;
 import com.liferay.portal.search.opensearch2.internal.facet.FacetProcessor;
-import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.cluster.ClusterRequestExecutorFixture;
+import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.cluster.ClusterRequestExecutorTestUtil;
 import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.document.DocumentRequestExecutorFixture;
-import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.index.IndexRequestExecutorFixture;
+import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.index.IndexRequestExecutorTestUtil;
 import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.search.SearchRequestExecutorFixture;
-import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.snapshot.SnapshotRequestExecutorFixture;
+import com.liferay.portal.search.opensearch2.internal.search.engine.adapter.snapshot.SnapshotRequestExecutorTestUtil;
 
 import org.opensearch.client.opensearch.core.SearchRequest;
 
@@ -39,22 +39,8 @@ public class OpenSearchEngineAdapterFixture {
 		OpenSearchConnectionManager openSearchConnectionManager,
 		FacetProcessor<?> facetProcessor) {
 
-		ClusterRequestExecutorFixture clusterRequestExecutorFixture =
-			new ClusterRequestExecutorFixture() {
-				{
-					setOpenSearchConnectionManager(openSearchConnectionManager);
-				}
-			};
-
 		DocumentRequestExecutorFixture documentRequestExecutorFixture =
 			new DocumentRequestExecutorFixture() {
-				{
-					setOpenSearchConnectionManager(openSearchConnectionManager);
-				}
-			};
-
-		IndexRequestExecutorFixture indexRequestExecutorFixture =
-			new IndexRequestExecutorFixture() {
 				{
 					setOpenSearchConnectionManager(openSearchConnectionManager);
 				}
@@ -67,18 +53,8 @@ public class OpenSearchEngineAdapterFixture {
 			}
 		};
 
-		SnapshotRequestExecutorFixture snapshotRequestExecutorFixture =
-			new SnapshotRequestExecutorFixture() {
-				{
-					setOpenSearchConnectionManager(openSearchConnectionManager);
-				}
-			};
-
-		clusterRequestExecutorFixture.setUp();
 		documentRequestExecutorFixture.setUp();
-		indexRequestExecutorFixture.setUp();
 		_searchRequestExecutorFixture.setUp();
-		snapshotRequestExecutorFixture.setUp();
 
 		SearchEngineAdapter searchEngineAdapter =
 			new OpenSearchSearchEngineAdapterImpl() {
@@ -89,19 +65,22 @@ public class OpenSearchEngineAdapterFixture {
 
 		ReflectionTestUtil.setFieldValue(
 			searchEngineAdapter, "_clusterRequestExecutor",
-			clusterRequestExecutorFixture.getClusterRequestExecutor());
+			ClusterRequestExecutorTestUtil.createClusterRequestExecutor(
+				openSearchConnectionManager));
 		ReflectionTestUtil.setFieldValue(
 			searchEngineAdapter, "_documentRequestExecutor",
 			documentRequestExecutorFixture.getDocumentRequestExecutor());
 		ReflectionTestUtil.setFieldValue(
 			searchEngineAdapter, "_indexRequestExecutor",
-			indexRequestExecutorFixture.getIndexRequestExecutor());
+			IndexRequestExecutorTestUtil.createIndexRequestExecutor(
+				openSearchConnectionManager));
 		ReflectionTestUtil.setFieldValue(
 			searchEngineAdapter, "_searchRequestExecutor",
 			_searchRequestExecutorFixture.getSearchRequestExecutor());
 		ReflectionTestUtil.setFieldValue(
 			searchEngineAdapter, "_snapshotRequestExecutor",
-			snapshotRequestExecutorFixture.getSnapshotRequestExecutor());
+			SnapshotRequestExecutorTestUtil.createSnapshotRequestExecutor(
+				openSearchConnectionManager));
 
 		return searchEngineAdapter;
 	}

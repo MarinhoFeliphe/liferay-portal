@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
@@ -59,37 +58,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			_reindexLayout(layout);
 		}
 
-		if (!BatchEngineThreadLocal.isBatchImportInProcess() &&
-			(ExportImportThreadLocal.isImportInProcess() ||
-			 ExportImportThreadLocal.isStagingInProcess())) {
-
-			return;
-		}
-
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		try {
-			SegmentsExperience segmentsExperience =
-				_addDefaultSegmentsExperience(layout, serviceContext);
-
-			_layoutPageTemplateStructureLocalService.
-				addLayoutPageTemplateStructure(
-					layout.getUserId(), layout.getGroupId(), layout.getPlid(),
-					segmentsExperience.getSegmentsExperienceId(),
-					_generateContentLayoutStructure(), serviceContext);
-		}
-		catch (PortalException portalException) {
-			throw new ModelListenerException(portalException);
-		}
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_getLayoutPageTemplateEntry(layout);
-
-		if (layoutPageTemplateEntry != null) {
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> _copyStructure(layoutPageTemplateEntry, layout));
-		}
+		_initializeLayoutPageTemplateStructure(layout);
 	}
 
 	@Override
@@ -124,6 +93,10 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 		throws ModelListenerException {
 
 		if (layout.isTypeContent() && !layout.isTypeUtility()) {
+			if (originalLayout.isTypeEmpty()) {
+				_initializeLayoutPageTemplateStructure(layout);
+			}
+
 			_reindexLayout(layout);
 		}
 	}
@@ -179,12 +152,9 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			return segmentsExperience;
 		}
 
-		String defaultSegmentsExperienceUuid = GetterUtil.getString(
-			serviceContext.getAttribute("defaultSegmentsExperienceUuid"));
-
-		if (Validator.isNotNull(defaultSegmentsExperienceUuid)) {
-			serviceContext.setUuid(defaultSegmentsExperienceUuid);
-		}
+		serviceContext.setUuid(
+			GetterUtil.getString(
+				serviceContext.getAttribute("defaultSegmentsExperienceUuid")));
 
 		return _segmentsExperienceLocalService.addDefaultSegmentsExperience(
 			GetterUtil.getString(
@@ -292,6 +262,47 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 		return _layoutPageTemplateEntryLocalService.
 			fetchLayoutPageTemplateEntry(layout.getClassPK());
+	}
+
+	private void _initializeLayoutPageTemplateStructure(Layout layout) {
+		if (!BatchEngineThreadLocal.isBatchImportInProcess() &&
+			(ExportImportThreadLocal.isImportInProcess() ||
+			 ExportImportThreadLocal.isStagingInProcess())) {
+
+			return;
+		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		String uuid = serviceContext.getUuid();
+
+		try {
+			SegmentsExperience segmentsExperience =
+				_addDefaultSegmentsExperience(layout, serviceContext);
+
+			serviceContext.setUuid(null);
+
+			_layoutPageTemplateStructureLocalService.
+				addLayoutPageTemplateStructure(
+					layout.getUserId(), layout.getGroupId(), layout.getPlid(),
+					segmentsExperience.getSegmentsExperienceId(),
+					_generateContentLayoutStructure(), serviceContext);
+		}
+		catch (PortalException portalException) {
+			throw new ModelListenerException(portalException);
+		}
+		finally {
+			serviceContext.setUuid(uuid);
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_getLayoutPageTemplateEntry(layout);
+
+		if (layoutPageTemplateEntry != null) {
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> _copyStructure(layoutPageTemplateEntry, layout));
+		}
 	}
 
 	private void _reindexLayout(Layout layout) {

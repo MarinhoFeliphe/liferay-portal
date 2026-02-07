@@ -3712,7 +3712,11 @@
 		],
 		"from": "regex:(?<variableName>\\w+)\\.(?<prefixMethodName>get|set)Type(?<suffix>Id)?",
 		"issueKey": "LPD-36750",
-		"to": "${variableName}.${prefixMethodName}ListType${suffix}"
+		"to": "${variableName}.${prefixMethodName}ListType${suffix}",
+		"validExtensions": [
+			"java",
+			"jsp"
+		]
 	},
 	{
 		"classNames": [
@@ -4958,6 +4962,14 @@
 	},
 	{
 		"classNames": [
+			"JournalUtil"
+		],
+		"from": "addRecentArticle(ActionRequest paramName, JournalArticle paramName)",
+		"issueKey": "LPD-58341",
+		"to": ""
+	},
+	{
+		"classNames": [
 			"ProxyModeThreadLocal"
 		],
 		"from": "setForceSync(boolean paramName)",
@@ -5007,11 +5019,149 @@
 	},
 	{
 		"classNames": [
+			"LayoutClassedModelUsageLocalService",
+			"LayoutClassedModelUsageLocalServiceUtil"
+		],
+		"from": "addLayoutClassedModelUsage(long paramName, long paramName, long paramName, String paramName, long paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58438",
+		"to": "addLayoutClassedModelUsage(param#0#, null, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#)"
+	},
+	{
+		"classNames": [
+			"LayoutClassedModelUsageLocalService",
+			"LayoutClassedModelUsageLocalServiceUtil"
+		],
+		"from": "fetchLayoutClassedModelUsage(long paramName, long paramName, String paramName, long paramName, long paramName)",
+		"issueKey": "LPD-58438",
+		"to": "fetchLayoutClassedModelUsage(null, null, param#0#, param#1#, param#2#, param#3#, param#4#)"
+	},
+	{
+		"classNames": [
 			"DLUtil"
 		],
 		"from": "getUniqueFileName(long paramName, long paramName, String paramName)",
 		"issueKey": "LPD-58469",
 		"to": "getUniqueFileName(param#0#, param#1#, param#2#, false)"
+	},
+	{
+		"classNames": [
+			"DLAppLocalService",
+			"DLAppLocalServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, File paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, param#6#, param#7#, param#8#, null, null, null, param#9#)"
+	},
+	{
+		"classNames": [
+			"DLAppLocalService",
+			"DLAppLocalServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, null, param#6#, param#7#, param#8#, param#9#, null, null, null, param#10#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, byte[] paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, null, param#5#, param#6#, param#7#, null, null, null, param#8#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, File paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, null, param#5#, param#6#, param#7#, null, null, null, param#8#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "addFileEntry(long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "addFileEntry(null, param#0#, param#1#, param#2#, param#3#, param#4#, null, param#5#, param#6#, param#7#, param#8#, null, null, null, param#9#)"
+	},
+	{
+		"classNames": [
+			"DLAppLocalService",
+			"DLAppLocalServiceUtil"
+		],
+		"from": "updateFileEntry(long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, File paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntry(param#0#, param#1#, param#2#, param#3#, param#4#, null,  param#5#, param#6#, param#7#, param#8#, null, null, null, param#9#)"
+	},
+	{
+		"classNames": [
+			"DLAppLocalService",
+			"DLAppLocalServiceUtil"
+		],
+		"from": "updateFileEntry(long paramName, long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntry(param#0#, param#1#, param#2#, param#3#, param#4#, null, param#5#, param#6#, param#7#, param#8#, param#9#, null, null, null, param#10#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "updateFileEntry(long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, byte[] paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntry(param#0#, param#1#, param#2#, param#3#, null, param#4#, param#5#, param#6#, param#7#, null, null, null, param#8#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "updateFileEntry(long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, File paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntry(param#0#, param#1#, param#2#, param#3#, null, param#4#, param#5#, param#6#, param#7#, null, null, null, param#8#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "updateFileEntry(long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntry(param#0#, param#1#, param#2#, param#3#, null, param#4#, param#5#, param#6#, param#7#, param#8#, null, null, null, param#9#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "updateFileEntryAndCheckIn(long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, File file, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntryAndCheckIn(param#0#, param#1#, param#2#, param#3#, null, param#4#, param#5#, param#6#, param#7#, null, null, null, param#8#)"
+	},
+	{
+		"classNames": [
+			"DLAppService",
+			"DLAppServiceUtil"
+		],
+		"from": "updateFileEntryAndCheckIn(long paramName, String paramName, String paramName, String paramName, String paramName, String paramName, DLVersionNumberIncrease paramName, InputStream paramName, long paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58470",
+		"to": "updateFileEntryAndCheckIn(param#0#, param#1#, param#2#, param#3#, null, param#4#, param#5#, param#6#, param#7#, param#8#, null, null, null, param#9#)"
+	},
+	{
+		"ClassNames": [
+			"UserLocalService",
+			"UserLocalServiceUtil"
+		],
+		"from": "addUser(long paramName, long paramName, boolean paramName, String paramName, String paramName, boolean paramName, String paramName, String paramName, Locale paramName, String paramName, String paramName, String paramName, long paramName, long paramName, boolean paramName, int paramName, int paramName, int paramName, String paramName, long[] paramName, long[] paramName, long[] paramName, long[] paramName, boolean paramName, ServiceContext paramName)",
+		"issueKey": "LPD-58511",
+		"newImports": [
+			"com.liferay.portal.kernel.model.UserConstants"
+		],
+		"to": "addUser(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, param#16#, param#17#, param#18#, UserConstants.TYPE_REGULAR, param#19#, param#20#, param#21#, param#22#, param#23#, param#24#)"
 	},
 	{
 		"classNames": [
@@ -5062,6 +5212,43 @@
 	},
 	{
 		"classNames": [
+			"CPDefinitionLocalServiceWrapper"
+		],
+		"classStructurePattern": true,
+		"issueKey": "LPD-60627",
+		"methodsToFormat": [
+			{
+				"from": "regex:@Override\\s+public\\s+CPAttachmentFileEntry\\s+getDefaultImage\\(",
+				"to": "@Override\n\tpublic CPAttachmentFileEntry\n\t\tgetDefaultImageCPAttachmentFileEntry("
+			}
+		]
+	},
+	{
+		"classNames": [
+			"CPCompareHelperUtil"
+		],
+		"from": "addCompareProduct(long paramName, long paramName, long paramName, HttpSession paramName)",
+		"hasMessage": true,
+		"issueKey": "LPD-61133"
+	},
+	{
+		"classNames": [
+			"CPCompareHelperUtil"
+		],
+		"from": "getCPDefinitionIds(long paramName, long paramName, HttpSession paramName)",
+		"hasMessage": true,
+		"issueKey": "LPD-61133"
+	},
+	{
+		"classNames": [
+			"CPCompareHelperUtil"
+		],
+		"from": "removeCompareProduct(long paramName, long paramName, long paramName, HttpSession paramName)",
+		"hasMessage": true,
+		"issueKey": "LPD-61133"
+	},
+	{
+		"classNames": [
 			"UserLocalService",
 			"UserLocalServiceUtil"
 		],
@@ -5071,6 +5258,17 @@
 			"com.liferay.portal.kernel.model.UserConstants"
 		],
 		"to": "addUserWithWorkflow(param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, param#16#, param#17#, param#18#, UserConstants.TYPE_REGULAR, param#19#, param#20#, param#21#, param#22#, param#23#, param#24#)"
+	},
+	{
+		"classNames": [
+			"LayoutLocalService",
+			"LayoutLocalServiceUtil",
+			"LayoutService",
+			"LayoutServiceUtil"
+		],
+		"from": "addLayout(long paramName, long paramName, boolean paramName, long paramName, long paramName, long paramName, Map<Locale, String> paramName, Map<Locale, String> paramName, Map<Locale, String> paramName, Map<Locale, String> paramName, Map<Locale, String> paramName, String paramName, String paramName, boolean paramName, boolean paramName, Map<Locale, String> paramName, ServiceContext paramName)",
+		"issueKey": "LPD-61495",
+		"to": "addLayout(null, param#0#, param#1#, param#2#, param#3#, param#4#, param#5#, param#6#, param#7#, param#8#, param#9#, param#10#, param#11#, param#12#, param#13#, param#14#, param#15#, 0, param#16#)"
 	},
 	{
 		"from": "PluginPackage.REPOSITORY_XML_FILENAME_EXTENSION",
@@ -5164,6 +5362,24 @@
 		"to": "fetchCommercePriceEntry(param#1#, null, StringPool.BLANK)"
 	},
 	{
+		"from": "StorageEngineUtil.getFields(long paramName)",
+		"issueKey": "LPD-65038",
+		"newImports": [
+			"com.liferay.dynamic.data.mapping.util.DDMUtil",
+			"com.liferay.portal.kernel.service.ServiceContextThreadLocal"
+		],
+		"to": "DDMUtil.getFields(param#0#, ServiceContextThreadLocal.getServiceContext())"
+	},
+	{
+		"from": "PropsValues.FEATURE_FLAGS_JSON",
+		"issueKey": "LPD-66289",
+		"newImports": [
+			"com.liferay.portal.kernel.json.JSONFactoryUtil",
+			"com.liferay.portal.kernel.util.PropsUtil"
+		],
+		"to": "String.valueOf(JSONFactoryUtil.createJSONObject(PropsUtil.getProperties(\"feature.flag.\", true)))"
+	},
+	{
 		"from": "PropsFiles.CAPTCHA",
 		"issueKey": "LPD-66321",
 		"to": "\"captcha\""
@@ -5233,6 +5449,14 @@
 			"com.liferay.petra.string.StringPool"
 		],
 		"to": "fetchCommercePriceEntry(param#0#, param#1#, param#2#, StringPool.BLANK)"
+	},
+	{
+		"classNames": [
+			"FFDocumentLibraryDDMEditorConfigurationUtil"
+		],
+		"from": "useDataEngineEditor()",
+		"hasMessage": true,
+		"issueKey": "LPD-76458"
 	},
 	{
 		"from": "regex:MultiVMPoolUtil\\s*.\\s*getPortalCache\\(\\s*(?<prefixMethodName>[\\s\\S]*?)\\)",

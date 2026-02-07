@@ -15,8 +15,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.cors.annotation.CORS;
 
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
 import org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService;
@@ -43,6 +46,19 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 @Path("/register")
 public class LiferayDynamicRegistrationService
 	extends DynamicRegistrationService {
+
+	@DELETE
+	@Path("{clientId}")
+	public Response deleteClientRegistration(
+		@PathParam("clientId") String clientId) {
+
+		super.deleteClientRegistration(clientId);
+
+		Response.ResponseBuilder responseBuilder = JAXRSUtils.toResponseBuilder(
+			204);
+
+		return responseBuilder.build();
+	}
 
 	@GET
 	@Override
@@ -73,9 +89,33 @@ public class LiferayDynamicRegistrationService
 		return super.register(liferayClientRegistration);
 	}
 
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{clientId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@PUT
+	public ClientRegistration updateClientRegistration(
+		@PathParam("clientId") String clientId,
+		LiferayClientRegistration liferayClientRegistration) {
+
+		return super.updateClientRegistration(
+			clientId, liferayClientRegistration);
+	}
+
 	@Override
 	protected void checkRegistrationAccessToken(
 		Client client, String accessToken) {
+	}
+
+	@Override
+	protected String createRegAccessToken(Client client) {
+		String registrationAccessToken = OAuthUtils.generateRandomTokenKey();
+
+		Map<String, String> properties = client.getProperties();
+
+		properties.put(
+			"registration_access_token", "reg-" + registrationAccessToken);
+
+		return registrationAccessToken;
 	}
 
 	@Override
@@ -86,6 +126,9 @@ public class LiferayDynamicRegistrationService
 
 		client.setApplicationName(clientRegistration.getClientName());
 
+		clientRegistration.setApplicationType(
+			_getApplicationType(clientRegistration));
+
 		List<String> redirectUris = clientRegistration.getRedirectUris();
 
 		if (redirectUris != null) {
@@ -93,6 +136,9 @@ public class LiferayDynamicRegistrationService
 		}
 
 		Map<String, String> properties = client.getProperties();
+
+		properties.put(
+			"application_type", clientRegistration.getApplicationType());
 
 		String jwks = clientRegistration.getStringProperty("jwks");
 
@@ -229,6 +275,16 @@ public class LiferayDynamicRegistrationService
 		return OAuth2SecureRandomGenerator.generateClientSecret();
 	}
 
+	private String _getApplicationType(ClientRegistration clientRegistration) {
+		String applicationType = clientRegistration.getApplicationType();
+
+		if (applicationType == null) {
+			applicationType = "web";
+		}
+
+		return applicationType;
+	}
+
 	private void _validate(
 		Client client, ClientRegistration clientRegistration) {
 
@@ -241,11 +297,7 @@ public class LiferayDynamicRegistrationService
 		List<String> redirectUris = clientRegistration.getRedirectUris();
 
 		if (redirectUris != null) {
-			String applicationType = clientRegistration.getApplicationType();
-
-			if (applicationType == null) {
-				applicationType = "web";
-			}
+			String applicationType = _getApplicationType(clientRegistration);
 
 			for (String redirectUri : redirectUris) {
 				validateRequestUri(

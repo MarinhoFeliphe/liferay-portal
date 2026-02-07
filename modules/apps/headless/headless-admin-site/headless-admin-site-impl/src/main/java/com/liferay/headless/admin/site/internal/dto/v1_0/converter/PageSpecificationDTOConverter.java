@@ -10,9 +10,11 @@ import com.liferay.client.extension.model.ClientExtensionEntryRel;
 import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
 import com.liferay.headless.admin.site.dto.v1_0.ClientExtension;
 import com.liferay.headless.admin.site.dto.v1_0.ContentPageSpecification;
+import com.liferay.headless.admin.site.dto.v1_0.EmbeddedPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.FavIconClientExtension;
 import com.liferay.headless.admin.site.dto.v1_0.FavIconItemExternalReference;
 import com.liferay.headless.admin.site.dto.v1_0.ItemExternalReference;
+import com.liferay.headless.admin.site.dto.v1_0.LinkToPagePageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.LinkToURLPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.PageExperience;
 import com.liferay.headless.admin.site.dto.v1_0.PageSetPageSpecification;
@@ -77,6 +79,20 @@ public class PageSpecificationDTOConverter
 
 		if (layout.isTypeAssetDisplay() || layout.isTypeContent()) {
 			return _toContentPageSpecification(dtoConverterContext, layout);
+		}
+
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_EMBEDDED)) {
+			return _toPageSpecification(
+				layout, EmbeddedPageSpecification::new,
+				PageSpecification.Type.EMBEDDED_PAGE_SPECIFICATION);
+		}
+
+		if (Objects.equals(
+				layout.getType(), LayoutConstants.TYPE_LINK_TO_LAYOUT)) {
+
+			return _toPageSpecification(
+				layout, LinkToPagePageSpecification::new,
+				PageSpecification.Type.LINK_TO_PAGE_PAGE_SPECIFICATION);
 		}
 
 		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_NODE)) {

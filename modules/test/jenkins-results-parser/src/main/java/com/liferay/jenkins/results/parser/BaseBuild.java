@@ -739,6 +739,11 @@ public abstract class BaseBuild implements Build {
 	}
 
 	@Override
+	public Element getGitHubMessageUpstreamJobFailureElement() {
+		return upstreamJobFailureMessageElement;
+	}
+
+	@Override
 	public Map<String, String> getInjectedEnvironmentVariablesMap()
 		throws IOException {
 
@@ -1724,6 +1729,12 @@ public abstract class BaseBuild implements Build {
 		_statusDurations.put(
 			_previousStatus, _statusModifiedTime - previousStatusModifiedTime);
 
+		String buildURL = getBuildURL();
+
+		if (!JenkinsResultsParserUtil.isURL(buildURL)) {
+			return;
+		}
+
 		BuildDatabase buildDatabase = getBuildDatabase();
 
 		Properties properties = buildDatabase.getProperties(
@@ -1731,7 +1742,7 @@ public abstract class BaseBuild implements Build {
 
 		Set<String> cachedBuildURLs = properties.stringPropertyNames();
 
-		if (!cachedBuildURLs.contains(getBuildURL()) && different &&
+		if (!cachedBuildURLs.contains(buildURL) && different &&
 			isParentBuildRoot()) {
 
 			System.out.println(getBuildMessage());
@@ -3150,6 +3161,7 @@ public abstract class BaseBuild implements Build {
 	protected String gitRepositoryName;
 	protected Long invokedTime;
 	protected Long startTime;
+	protected Element upstreamJobFailureMessageElement;
 
 	private void _archive(String content, boolean required, String urlSuffix) {
 		boolean readyToArchive = true;

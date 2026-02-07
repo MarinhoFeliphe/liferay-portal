@@ -8,7 +8,6 @@ import {AssigneeValue} from '@liferay/object-dynamic-data-mapping-form-field-typ
 import React from 'react';
 
 import {patchTaskById} from '../../utils/api';
-import {DISPLAY_TYPES} from '../../utils/constants';
 import {
 	displayAssignSuccessToast,
 	displayStateSuccessToast,
@@ -18,6 +17,8 @@ import InfoSummary from '../InfoSummary';
 import StateSelector, {State} from '../StateSelector';
 
 import '../AssigneeTrigger.scss';
+
+import {DateRenderer} from '@liferay/frontend-data-set-web';
 
 interface TaskInfoSummaryProps {
 	assignTo: AssigneeValue;
@@ -38,10 +39,6 @@ export default function TaskInfoSummary({
 	taskId,
 	title,
 }: TaskInfoSummaryProps) {
-	const displayTypes = DISPLAY_TYPES.filter(
-		(displayType) => displayType !== 'unstyled'
-	);
-
 	return (
 		<InfoSummary
 			defaultOpen={true}
@@ -87,22 +84,16 @@ export default function TaskInfoSummary({
 						/>
 					),
 				},
-				{label: 'Due Date', value: dueDate},
+				{
+					label: 'Due Date',
+					value: DateRenderer({value: dueDate}) ?? '',
+				},
 				{
 					label: 'Tags',
 					value: (
 						<div>
-							{tags.map((tag, index) => (
-								<Label
-									displayType={
-										displayTypes[
-											index % displayTypes.length
-										]
-									}
-									key={tag}
-								>
-									{tag}
-								</Label>
+							{tags.map((tag) => (
+								<Label key={tag}>{tag}</Label>
 							))}
 						</div>
 					),

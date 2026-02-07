@@ -151,11 +151,6 @@ export enum FieldTypes {
 	String = 'Text'
 }
 
-export enum SegmentActivationFrequencyTypes {
-	Batch = 'BATCH',
-	RealTime = 'REAL_TIME'
-}
-
 export enum GDPRRequestStatuses {
 	Completed = 'COMPLETED',
 	Error = 'ERROR',
@@ -246,6 +241,11 @@ export enum RangeKeyTimeRanges {
 }
 
 export enum SegmentActivationScheduleTypes {
+	Batch = 'BATCH',
+	RealTime = 'REAL_TIME'
+}
+
+export enum SegmentActivationFrequencyTypes {
 	Between = 'BETWEEN',
 	Indefinitely = 'INDEFINITELY'
 }
@@ -401,6 +401,10 @@ export const ENABLE_ASSET_CARD = false;
 // LRAC-13649 Hide the keywords blocklist screen from Settings>Definitions
 
 export const ENABLE_BLOCKLIST_KEYWORDS = false;
+
+// LPD-75612 Display known, unknown and total values in the new individuals screen
+
+export const ENABLE_CDP = false;
 
 // LRAC-11651 Disable temporarily CSV File
 

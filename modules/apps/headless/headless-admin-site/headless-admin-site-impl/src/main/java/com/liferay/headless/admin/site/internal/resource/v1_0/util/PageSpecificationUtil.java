@@ -6,6 +6,8 @@
 package com.liferay.headless.admin.site.internal.resource.v1_0.util;
 
 import com.liferay.headless.admin.site.dto.v1_0.ContentPageSpecification;
+import com.liferay.headless.admin.site.dto.v1_0.EmbeddedPageSpecification;
+import com.liferay.headless.admin.site.dto.v1_0.LinkToPagePageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.LinkToURLPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.PageSetPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.PageSpecification;
@@ -34,7 +36,9 @@ public class PageSpecificationUtil {
 
 		PageSpecification pageSpecification = pageSpecifications[0];
 
-		if ((!(pageSpecification instanceof LinkToURLPageSpecification) &&
+		if ((!(pageSpecification instanceof EmbeddedPageSpecification) &&
+			 !(pageSpecification instanceof LinkToPagePageSpecification) &&
+			 !(pageSpecification instanceof LinkToURLPageSpecification) &&
 			 !(pageSpecification instanceof PageSetPageSpecification) &&
 			 !(pageSpecification instanceof WidgetPageSpecification)) ||
 			!Objects.equals(
@@ -58,16 +62,11 @@ public class PageSpecificationUtil {
 			throw new UnsupportedOperationException();
 		}
 
+		PageSpecification[] sortedContentPageSpecifications =
+			getSortedContentPageSpecifications(pageSpecifications);
+
 		ContentPageSpecification publishedContentPageSpecification =
-			(ContentPageSpecification)pageSpecifications[0];
-
-		if (Validator.isNull(
-				publishedContentPageSpecification.
-					getDraftContentPageSpecificationExternalReferenceCode())) {
-
-			publishedContentPageSpecification =
-				(ContentPageSpecification)pageSpecifications[1];
-		}
+			(ContentPageSpecification)sortedContentPageSpecifications[1];
 
 		if (Objects.equals(
 				publishedContentPageSpecification.getStatus(),
@@ -77,6 +76,50 @@ public class PageSpecificationUtil {
 		}
 
 		return WorkflowConstants.STATUS_DRAFT;
+	}
+
+	public static PageSpecification[] getSortedContentPageSpecifications(
+		PageSpecification[] pageSpecifications) {
+
+		if (pageSpecifications == null) {
+			return null;
+		}
+
+		if (pageSpecifications.length != 2) {
+			throw new UnsupportedOperationException();
+		}
+
+		ContentPageSpecification draftContentPageSpecification;
+		ContentPageSpecification publishedContentPageSpecification =
+			(ContentPageSpecification)pageSpecifications[0];
+
+		if (Validator.isNull(
+				publishedContentPageSpecification.
+					getDraftContentPageSpecificationExternalReferenceCode())) {
+
+			draftContentPageSpecification = publishedContentPageSpecification;
+			publishedContentPageSpecification =
+				(ContentPageSpecification)pageSpecifications[1];
+		}
+		else {
+			draftContentPageSpecification =
+				(ContentPageSpecification)pageSpecifications[1];
+		}
+
+		if (Validator.isNull(
+				publishedContentPageSpecification.
+					getDraftContentPageSpecificationExternalReferenceCode()) ||
+			!Objects.equals(
+				draftContentPageSpecification.getExternalReferenceCode(),
+				publishedContentPageSpecification.
+					getDraftContentPageSpecificationExternalReferenceCode())) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		return new PageSpecification[] {
+			draftContentPageSpecification, publishedContentPageSpecification
+		};
 	}
 
 	public static WidgetPageSpecification getWidgetPageSpecification(

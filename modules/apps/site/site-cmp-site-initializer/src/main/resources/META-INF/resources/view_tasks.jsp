@@ -14,7 +14,7 @@ ViewTasksSectionDisplayContext viewTasksSectionDisplayContext = (ViewTasksSectio
 <div>
 	<react:component
 		module="{TasksQuickFilters} from site-cmp-site-initializer"
-		props="<%= viewTasksSectionDisplayContext.getSearchURLProperties() %>"
+		props="<%= viewTasksSectionDisplayContext.getTasksQuickFiltersProperties() %>"
 	/>
 </div>
 
@@ -31,5 +31,6 @@ ViewTasksSectionDisplayContext viewTasksSectionDisplayContext = (ViewTasksSectio
 		itemsPerPage="<%= 20 %>"
 		propsTransformer="{TasksFDSPropsTransformer} from site-cmp-site-initializer"
 		selectedItemsKey="embedded.id"
+		selectionType="multiple"
 	/>
 </div>

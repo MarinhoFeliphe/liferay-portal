@@ -138,6 +138,7 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			AssistantHandlerContext.builder(
 			).contentRetriever(
 				ContentRetrieverUtil.createContentRetriever(
+					GetterUtil.getString(workflowContext.get("accessToken")),
 					kaleoNodeSettingValues,
 					GetterUtil.getString(workflowContext.get("userToken")))
 			).invocationParameters(
@@ -146,12 +147,14 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 						"executionContext", executionContext,
 						"permissionChecker",
 						PermissionThreadLocal.getPermissionChecker()))
-			).onCompleteResponse(
+			).memoryId(
+				GetterUtil.getString(workflowContext.get("memoryId"))
+			).onCompleteResponseConsumer(
 				response -> vertexAiGeminiStreamingChatModel.close()
-			).onError(
+			).onErrorConsumer(
 				throwable -> vertexAiGeminiStreamingChatModel.close()
-			).systemMessageProvider(
-				object -> VariablesUtil.applyInputVariables(
+			).systemMessageProviderFunction(
+				memoryId -> VariablesUtil.applyInputVariables(
 					executionContext, "prompt", kaleoNodeSettingValues)
 			).tools(
 				new Tools()
@@ -167,8 +170,7 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 					executionContext, "userMessage", kaleoNodeSettingValues)
 			).vertexAiGeminiStreamingChatModel(
 				vertexAiGeminiStreamingChatModel
-			).build(),
-			"default");
+			).build());
 	}
 
 	@Override

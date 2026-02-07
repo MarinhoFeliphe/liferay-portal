@@ -14,12 +14,16 @@ export class StyleBooksPage {
 	readonly page: Page;
 	readonly searchButton: Locator;
 	readonly searchInput: Locator;
+	readonly framePreview: FrameLocator;
 	readonly importFrame: FrameLocator;
 
 	constructor(page: Page) {
 		this.page = page;
 		this.searchButton = this.page.getByTitle('Search for', {exact: true});
 		this.searchInput = page.getByPlaceholder('Search for');
+		this.framePreview = page.frameLocator(
+			'iframe.style-book-editor__page-preview-frame'
+		);
 		this.importFrame = page.frameLocator('iframe[title*="Import"]');
 	}
 
@@ -53,10 +57,17 @@ export class StyleBooksPage {
 		await waitForAlert(this.page);
 	}
 
+	getStyleBookCard(styleBookName: string) {
+		return this.page.locator('.card').filter({
+			has: this.page.getByText(styleBookName),
+		});
+	}
+
 	async previewFragmentCollection(collectionName: string) {
 		await this.page
 			.getByRole('button', {name: 'Fragments'})
 			.or(this.page.getByRole('button', {name: 'Pages'}))
+			.or(this.page.getByRole('button', {name: 'Page Templates'}))
 			.click();
 
 		await this.page.getByRole('menuitem', {name: 'Fragments'}).click();
@@ -124,10 +135,29 @@ export class StyleBooksPage {
 			.click();
 	}
 
-	async publish() {
+	async clickOnPublishAction(action: string) {
 		await this.page.getByRole('button', {name: 'Publish'}).click();
 
 		await this.page
+			.getByRole('dialog')
+			.getByRole('button', {name: action})
+			.click();
+	}
+
+	async publish() {
+		await this.clickOnPublishAction('Publish');
+
+		await waitForAlert(this.page);
+	}
+
+	async cancelPublish() {
+		await this.clickOnPublishAction('Cancel');
+	}
+
+	async continuePublish() {
+		await this.clickOnPublishAction('Continue');
+
+		this.page
 			.getByRole('dialog')
 			.getByRole('button', {name: 'Publish'})
 			.click();
@@ -161,7 +191,8 @@ export class StyleBooksPage {
 		const input = parentElement
 			.locator('.form-group')
 			.filter({hasText: label})
-			.locator('input');
+			.locator('input')
+			.first();
 
 		if (section && (await input.isHidden())) {
 			await this.page.getByRole('button', {name: section}).click();

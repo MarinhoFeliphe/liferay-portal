@@ -6,7 +6,9 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.liferay;
 
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
+import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
+import com.liferay.oauth2.provider.constants.OAuth2ApplicationConstants;
 import com.liferay.oauth2.provider.constants.OAuth2AuthorizationConstants;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
@@ -48,12 +50,14 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -82,6 +86,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
@@ -102,6 +107,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -342,10 +348,34 @@ public class LiferayOAuthDataProvider
 
 	@Override
 	public List<ServerAccessToken> getAccessTokens(
-			Client client, UserSubject subject)
+			Client client, UserSubject userSubject)
 		throws OAuthServiceException {
 
-		throw new UnsupportedOperationException();
+		List<ServerAccessToken> serverAccessTokens = new ArrayList<>();
+
+		OAuth2Application oAuth2Application = resolveOAuth2Application(client);
+
+		List<OAuth2Authorization> oAuth2Authorizations =
+			_oAuth2AuthorizationLocalService.getOAuth2Authorizations(
+				oAuth2Application.getOAuth2ApplicationId(), QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+		for (OAuth2Authorization oAuth2Authorization : oAuth2Authorizations) {
+			try {
+				serverAccessTokens.add(
+					_populateAccessToken(oAuth2Authorization));
+			}
+			catch (PortalException portalException) {
+				_log.error(
+					"Unable to populate access token for OAuth 2 application " +
+						oAuth2Authorization.getOAuth2ApplicationId(),
+					portalException);
+
+				throw new OAuthServiceException(portalException);
+			}
+		}
+
+		return serverAccessTokens;
 	}
 
 	public BearerTokenProvider getBearerTokenProvider(
@@ -676,6 +706,74 @@ public class LiferayOAuthDataProvider
 	}
 
 	@Override
+	public Client removeClient(String clientId) {
+		Client client = doGetClient(clientId);
+
+		OAuth2Application oAuth2Application = resolveOAuth2Application(client);
+
+		if (oAuth2Application == null) {
+			throw ExceptionUtils.toNotAuthorizedException(null, null);
+		}
+
+		if (StringUtil.equals(
+				oAuth2Application.getName(),
+				OAuth2ApplicationConstants.NAME_DYNAMIC_REGISTRATOR)) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to delete client with OAuth 2 client ID  " +
+						client.getClientId());
+			}
+
+			throw ExceptionUtils.toForbiddenException(null, null);
+		}
+
+		String[] authorizationParts = AuthorizationUtils.getAuthorizationParts(
+			getMessageContext(), Collections.singleton("Bearer"));
+
+		OAuth2Authorization oAuth2Authorization =
+			_oAuth2AuthorizationLocalService.
+				fetchOAuth2AuthorizationByAccessTokenContent(
+					authorizationParts[1]);
+
+		if (oAuth2Authorization == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to delete client with OAuth 2 client ID  " +
+						client.getClientId());
+			}
+
+			throw ExceptionUtils.toForbiddenException(null, null);
+		}
+
+		OAuth2Application dynamicRegistrationOAuth2Application =
+			_oAuth2ApplicationLocalService.fetchOAuth2Application(
+				oAuth2Authorization.getOAuth2ApplicationId());
+
+		if (!StringUtil.equals(
+				dynamicRegistrationOAuth2Application.getClientId(),
+				oAuth2Application.getClientId()) &&
+			!StringUtil.equals(
+				dynamicRegistrationOAuth2Application.getName(),
+				OAuth2ApplicationConstants.NAME_DYNAMIC_REGISTRATOR)) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to delete client with OAuth 2 client ID  " +
+						client.getClientId());
+			}
+
+			throw ExceptionUtils.toForbiddenException(null, null);
+		}
+
+		removeClientTokens(client);
+
+		doRemoveClient(client);
+
+		return client;
+	}
+
+	@Override
 	public ServerAuthorizationCodeGrant removeCodeGrant(String code)
 		throws OAuthServiceException {
 
@@ -724,11 +822,31 @@ public class LiferayOAuthDataProvider
 			_oAuth2ApplicationLocalService.fetchOAuth2Application(
 				companyId, client.getClientId());
 
-		if (oAuth2Application != null) {
+		Map<String, String> properties = client.getProperties();
+
+		OAuth2Application existingOAuth2Application =
+			_oAuth2ApplicationLocalService.
+				fetchOAuth2ApplicationByExternalReferenceCode(
+					properties.get("software_id"), companyId);
+
+		if ((oAuth2Application == null) &&
+			(existingOAuth2Application != null)) {
+
 			OAuth2ErrorUtil.reportInvalidRequestError(
 				"OAuth 2 application with client ID " + client.getClientId() +
 					" already exists",
 				OAuthConstants.INVALID_CLIENT, Response.Status.CONFLICT);
+		}
+
+		String clientId = client.getClientId();
+		String clientSecret = client.getClientSecret();
+		String externalReferenceCode = properties.get("software_id");
+
+		if (oAuth2Application != null) {
+			clientId = oAuth2Application.getClientId();
+			clientSecret = oAuth2Application.getClientSecret();
+			externalReferenceCode =
+				oAuth2Application.getExternalReferenceCode();
 		}
 
 		try {
@@ -740,24 +858,58 @@ public class LiferayOAuthDataProvider
 			User user = _userLocalService.getUser(
 				GetterUtil.getLong(principal.getName()));
 
-			Map<String, String> properties = client.getProperties();
-
 			String jwks = properties.get("jwks");
 
 			if (jwks == null) {
 				jwks = _extractJwksFromJwksUri(properties.get("jwks_uri"));
 			}
 
-			_oAuth2ApplicationLocalService.addOAuth2Application(
-				companyId, user.getUserId(),
-				user.getScreenName() + "_dynamic_registered",
-				_getAllowedGrantTypes(client),
-				client.getTokenEndpointAuthMethod(), user.getUserId(),
-				client.getClientId(), 0, client.getClientSecret(), null, null,
-				client.getApplicationWebUri(), 0, jwks,
-				client.getApplicationName(), properties.get("tos_uri"),
-				client.getRedirectUris(), false, client.getRegisteredScopes(),
-				false, new ServiceContext());
+			oAuth2Application =
+				_oAuth2ApplicationLocalService.addOrUpdateOAuth2Application(
+					externalReferenceCode, user.getUserId(),
+					user.getScreenName() + "_dynamic_registered",
+					_getAllowedGrantTypes(client),
+					client.getTokenEndpointAuthMethod(), user.getUserId(),
+					clientId, ClientProfile.WEB_APPLICATION.id(), clientSecret,
+					null, null, client.getApplicationWebUri(), 0, jwks,
+					client.getApplicationName(), properties.get("tos_uri"),
+					client.getRedirectUris(), false,
+					client.getRegisteredScopes(), false, new ServiceContext());
+
+			String registrationAccessToken = properties.get(
+				"registration_access_token");
+
+			if (!Validator.isBlank(registrationAccessToken)) {
+				OAuth2Authorization oAuth2Authorization =
+					_oAuth2AuthorizationLocalService.
+						fetchOAuth2AuthorizationByAccessTokenContent(
+							registrationAccessToken);
+
+				if (oAuth2Authorization == null) {
+					String remoteAddr = properties.get(
+						OAuth2ProviderRESTEndpointConstants.
+							PROPERTY_KEY_CLIENT_REMOTE_ADDR);
+					String remoteHost = properties.get(
+						OAuth2ProviderRESTEndpointConstants.
+							PROPERTY_KEY_CLIENT_REMOTE_HOST);
+
+					_oAuth2AuthorizationLocalService.addOAuth2Authorization(
+						oAuth2Application.getCompanyId(), user.getUserId(),
+						user.getScreenName(),
+						oAuth2Application.getOAuth2ApplicationId(),
+						oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
+						registrationAccessToken, DateUtil.newDate(),
+						DateUtil.newDate(
+							System.currentTimeMillis() + Time.YEAR),
+						remoteHost, remoteAddr, null, null, null);
+				}
+			}
+
+			if (Validator.isBlank(properties.get("software_id"))) {
+				properties.put(
+					"software_id",
+					oAuth2Application.getExternalReferenceCode());
+			}
 		}
 		catch (PortalException portalException) {
 			_log.error(
@@ -981,7 +1133,21 @@ public class LiferayOAuthDataProvider
 
 	@Override
 	protected void doRemoveClient(Client client) {
-		throw new UnsupportedOperationException();
+		OAuth2Application oAuth2Application = resolveOAuth2Application(client);
+
+		try {
+			_oAuth2ApplicationLocalService.deleteOAuth2Application(
+				oAuth2Application);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to delete OAuth 2 application", portalException);
+			}
+
+			throw ExceptionUtils.toInternalServerErrorException(
+				portalException, null);
+		}
 	}
 
 	@Override

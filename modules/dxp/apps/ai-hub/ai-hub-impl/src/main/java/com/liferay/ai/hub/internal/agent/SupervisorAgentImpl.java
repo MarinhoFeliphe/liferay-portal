@@ -6,22 +6,26 @@
 package com.liferay.ai.hub.internal.agent;
 
 import com.liferay.ai.hub.agent.AgentContext;
+import com.liferay.ai.hub.agent.AgentsFactory;
 import com.liferay.ai.hub.agent.SupervisorAgent;
-import com.liferay.ai.hub.rest.manager.v1_0.TaskDefinitionManager;
+import com.liferay.ai.hub.internal.memory.ChatMemoryProviderUtil;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
+import com.liferay.petra.concurrent.NoticeableExecutorService;
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.CompanyInheritableThreadLocalCallable;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 
 import dev.langchain4j.agentic.AgenticServices;
+import dev.langchain4j.agentic.supervisor.SupervisorContextStrategy;
 import dev.langchain4j.agentic.supervisor.SupervisorResponseStrategy;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
 
-import java.util.concurrent.ExecutorService;
-
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -33,37 +37,45 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 
 	@Override
 	public void invoke(AgentContext agentContext) {
-		ExecutorService executorService =
-			_portalExecutorManager.getPortalExecutor(
-				SupervisorAgentImpl.class.getName());
+		Object[] agents = _agentsFactory.create(agentContext);
 
-		AgentsFactory agentsFactory = new AgentsFactory(
-			agentContext, _taskDefinitionManager, _workflowInstanceManager);
+		_noticeableExecutorService.submit(
+			new CompanyInheritableThreadLocalCallable<>(
+				() -> {
+					try (VertexAiGeminiChatModel vertexAiGeminiChatModel =
+							VertexAiGeminiChatModel.builder(
+							).location(
+								"us-central1"
+							).modelName(
+								"gemini-2.5-flash-lite"
+							).project(
+								"ai-hub-liferay"
+							).build()) {
 
-		Object[] agents = agentsFactory.create();
+						_invoke(agentContext, agents, vertexAiGeminiChatModel);
+					}
+					catch (Exception exception) {
+						_log.error(exception);
 
-		executorService.submit(
-			() -> {
-				try (VertexAiGeminiChatModel vertexAiGeminiChatModel =
-						VertexAiGeminiChatModel.builder(
-						).location(
-							"us-central1"
-						).modelName(
-							"gemini-2.5-flash-lite"
-						).project(
-							"ai-hub-liferay"
-						).build()) {
+						SseUtil.send(
+							"I cannot fulfill this request.",
+							"Chat Message Sent", null,
+							agentContext.getSseEventSinkKey());
+					}
 
-					_invoke(agentContext, agents, vertexAiGeminiChatModel);
-				}
-				catch (Exception exception) {
-					_log.error(exception);
+					return null;
+				}));
+	}
 
-					SseUtil.send(
-						"I cannot fulfill this request.", "Chat Message Sent",
-						agentContext.getSseEventSinkKey());
-				}
-			});
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_noticeableExecutorService = _portalExecutorManager.getPortalExecutor(
+			SupervisorAgentImpl.class.getName());
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_noticeableExecutorService.shutdown();
 	}
 
 	private void _invoke(
@@ -72,8 +84,13 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 
 		dev.langchain4j.agentic.supervisor.SupervisorAgent supervisorAgent =
 			AgenticServices.supervisorBuilder(
+			).chatMemoryProvider(
+				id -> ChatMemoryProviderUtil.provide(
+					agentContext.getSseEventSinkKey())
 			).chatModel(
 				vertexAiGeminiChatModel
+			).contextGenerationStrategy(
+				SupervisorContextStrategy.CHAT_MEMORY_AND_SUMMARIZATION
 			).maxAgentsInvocations(
 				5
 			).subAgents(
@@ -85,19 +102,18 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 		SseUtil.send(
 			supervisorAgent.invoke(
 				MapUtil.getString(agentContext.getInput(), "message")),
-			"Chat Message Sent", agentContext.getSseEventSinkKey());
+			"Chat Message Sent", null, agentContext.getSseEventSinkKey());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SupervisorAgentImpl.class);
 
 	@Reference
+	private AgentsFactory _agentsFactory;
+
+	private NoticeableExecutorService _noticeableExecutorService;
+
+	@Reference
 	private PortalExecutorManager _portalExecutorManager;
-
-	@Reference
-	private TaskDefinitionManager _taskDefinitionManager;
-
-	@Reference
-	private WorkflowInstanceManager _workflowInstanceManager;
 
 }

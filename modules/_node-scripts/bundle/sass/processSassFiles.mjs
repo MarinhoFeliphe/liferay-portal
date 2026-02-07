@@ -13,10 +13,10 @@ import {
 	BUILD_RESOURCES_PATH,
 	BUILD_SASS_CACHE_PATH,
 	SRC_PATH,
-} from '../../util/constants.mjs';
+} from '../../util/locations.mjs';
 import projectScopeRequire from '../../util/projectScopeRequire.mjs';
 import calculateFileHash from '../util/calculateFileHash.mjs';
-import runSass from './runSass.mjs';
+import runSass from './util/runSass.mjs';
 
 const CSS_IMPORT_REGEX = /@import\s+url\s*\(\s*['"]?(.+?\.css)/g;
 const SASS_EXCLUDE = [

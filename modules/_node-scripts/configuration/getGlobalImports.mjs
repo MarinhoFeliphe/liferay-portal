@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import path from 'path';
-
-import {getRootDir} from '../util/constants.mjs';
+import {GLOBAL_NODE_SCRIPTS_CONFIG_FILE} from '../util/locations.mjs';
 import projectScopeRequire from '../util/projectScopeRequire.mjs';
 
 /**
@@ -15,20 +13,16 @@ import projectScopeRequire from '../util/projectScopeRequire.mjs';
  * {
  *   'dom-align': {
  *      external: true,
- *		webContextPath: 'frontend-js-dependencies-web'
+ *		webContextPath: '/frontend-js-dependencies-web'
  *	 },
  *   '@liferay/frontend-js-dependencies-web': {
  *      external: false,
- *		webContextPath: 'frontend-js-dependencies-web',
+ *		webContextPath: '/frontend-js-dependencies-web',
  *	  }
  * }
  */
 export default async function getGlobalImports() {
-	const rootDir = await getRootDir();
-
-	const {imports} = projectScopeRequire(
-		path.join(rootDir, 'node-scripts.config.js')
-	);
+	const {imports} = projectScopeRequire(GLOBAL_NODE_SCRIPTS_CONFIG_FILE);
 
 	const externalImports = {};
 	const rawProjectImports = {};
@@ -48,7 +42,7 @@ export default async function getGlobalImports() {
 			}
 
 			externalImports[packageName] = {
-				external: true,
+				external: !submodule,
 				submodule,
 				webContextPath: getWebContextPath(providerName),
 			};
@@ -75,8 +69,8 @@ function getWebContextPath(packageName) {
 	//
 
 	if (packageName.startsWith('@liferay')) {
-		return packageName.replace('@liferay/', '');
+		packageName = packageName.replace('@liferay/', '');
 	}
 
-	return packageName;
+	return `/${packageName}`;
 }

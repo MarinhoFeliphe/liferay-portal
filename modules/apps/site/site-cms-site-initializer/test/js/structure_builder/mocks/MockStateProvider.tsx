@@ -29,9 +29,9 @@ const DEFAULT_STRUCTURE: Structure = {
 
 const DEFAULT_STATE: State = {
 	history: {
-		deletedChildren: false,
+		deletedChildren: [],
 		deletedGroupERCs: [],
-		deletedRelationshipERCs: [],
+		deletedRelationships: [],
 		modifiedNames: new Set(),
 	},
 	invalids: new Map(),

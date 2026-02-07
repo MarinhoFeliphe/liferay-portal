@@ -18,6 +18,7 @@ import {Workflow} from '../../common/types/Workflow';
 import getLocalizedValue from '../../common/utils/getLocalizedValue';
 import {
 	ReferencedStructure,
+	RelatedContent,
 	RepeatableGroup,
 	Structure,
 	StructureChild,
@@ -35,10 +36,12 @@ import {
 import findAvailableFieldName from '../utils/findAvailableFieldName';
 import findChild from '../utils/findChild';
 import {getChildrenUuids} from '../utils/getChildrenUuids';
+import getHistory from '../utils/getHistory';
 import getRandomId from '../utils/getRandomId';
 import getRandomName from '../utils/getRandomName';
 import getUuid from '../utils/getUuid';
 import insertChild from '../utils/insertChild';
+import isField from '../utils/isField';
 import isLocked from '../utils/isLocked';
 import isReferenced from '../utils/isReferenced';
 import normalizeString from '../utils/normalizeString';
@@ -51,6 +54,7 @@ import {
 	ValidationError,
 	ValidationProperty,
 	validateField,
+	validateRelatedContent,
 	validateRepeatableGroup,
 	validateStructure,
 } from '../utils/validation';
@@ -58,9 +62,12 @@ import {
 type UndeletableReason = 'is-locked' | 'is-referenced' | 'causes-invalid-group';
 
 type History = {
-	deletedChildren: boolean;
+	deletedChildren: Array<StructureChild>;
 	deletedGroupERCs: Array<RepeatableGroup['erc']>;
-	deletedRelationshipERCs: Array<string>;
+	deletedRelationships: Array<{
+		relationshipERC: string;
+		structureERC: string;
+	}>;
 	modifiedNames: Set<Uuid>;
 };
 
@@ -76,9 +83,9 @@ export type State = {
 
 const INITIAL_STATE: State = {
 	history: {
-		deletedChildren: false,
+		deletedChildren: [],
 		deletedGroupERCs: [],
-		deletedRelationshipERCs: [],
+		deletedRelationships: [],
 		modifiedNames: new Set(),
 	},
 	invalids: new Map(),
@@ -104,6 +111,11 @@ type AddFieldAction = {field: Field; parentUuid?: Uuid; type: 'add-field'};
 type AddReferencedStructuresAction = {
 	referencedStructures: ReferencedStructure[];
 	type: 'add-referenced-structures';
+};
+
+type AddRelatedContentAction = {
+	relatedContent: RelatedContent;
+	type: 'add-related-content';
 };
 
 type AddRepeatableGroupAction = {
@@ -187,6 +199,15 @@ type UpdateFieldAction = {
 	uuid: Uuid;
 };
 
+type UpdateRelatedContentAction = {
+	erc?: string;
+	label?: Liferay.Language.LocalizedValue<string>;
+	multiselection?: boolean;
+	relatedStructureERC?: string;
+	type: 'update-related-content';
+	uuid: Uuid;
+};
+
 type UpdateRepeatableGroupAction = {
 	label: Liferay.Language.LocalizedValue<string>;
 	type: 'update-repeatable-group';
@@ -210,6 +231,7 @@ type ValidateAction = {
 export type Action =
 	| AddFieldAction
 	| AddReferencedStructuresAction
+	| AddRelatedContentAction
 	| AddRepeatableGroupAction
 	| AddErrorAction
 	| ClearErrorsAction
@@ -226,6 +248,7 @@ export type Action =
 	| SetWorkflowAction
 	| UngroupAction
 	| UpdateFieldAction
+	| UpdateRelatedContentAction
 	| UpdateRepeatableGroupAction
 	| UpdateStructureAction
 	| ValidateAction;
@@ -253,7 +276,11 @@ function reducer(state: State, action: Action): State {
 
 			const nextField = {
 				...field,
-				name: findAvailableFieldName(parent.children, field.name),
+				name: findAvailableFieldName(
+					parent.children,
+					state.history.deletedChildren,
+					field.name
+				),
 			};
 
 			const children = insertChild({
@@ -304,6 +331,23 @@ function reducer(state: State, action: Action): State {
 				...state,
 				publishedChildren: nextPublishedChildren,
 				selection,
+				structure: {...structure, children: sortedChildren},
+			};
+		}
+		case 'add-related-content': {
+			const {relatedContent} = action;
+
+			const {structure} = state;
+
+			const children = new Map(structure.children);
+
+			children.set(relatedContent.uuid, relatedContent);
+
+			const sortedChildren = sortChildren(children);
+
+			return {
+				...state,
+				selection: [relatedContent.uuid],
 				structure: {...structure, children: sortedChildren},
 			};
 		}
@@ -471,14 +515,17 @@ function reducer(state: State, action: Action): State {
 				return state;
 			}
 
-			const nextChildren = deleteChildren({
-				root: structure,
-				uuids: [child.uuid],
-			});
+			const {deletedChildrenUuids, updatedChildren: nextChildren} =
+				deleteChildren({
+					root: structure,
+					uuids: [child.uuid],
+				});
 
 			const invalids = new Map(state.invalids);
 
-			invalids.delete(uuid);
+			for (const deletedChild of deletedChildrenUuids) {
+				invalids.delete(deletedChild);
+			}
 
 			let nextState: State = {
 				...state,
@@ -493,41 +540,15 @@ function reducer(state: State, action: Action): State {
 				};
 			}
 
-			if (state.publishedChildren.has(uuid)) {
-				nextState = {
-					...nextState,
-					history: {...nextState.history, deletedChildren: true},
-				};
-
-				if (
-					child.type === 'repeatable-group' ||
-					child.type === 'referenced-structure'
-				) {
-					nextState = {
-						...nextState,
-						history: {
-							...nextState.history,
-							deletedRelationshipERCs: [
-								...nextState.history.deletedRelationshipERCs,
-								child.relationshipERC,
-							],
-						},
-					};
-				}
-
-				if (child.type === 'repeatable-group') {
-					nextState = {
-						...nextState,
-						history: {
-							...nextState.history,
-							deletedGroupERCs: [
-								...nextState.history.deletedGroupERCs,
-								child.erc,
-							],
-						},
-					};
-				}
-			}
+			nextState = {
+				...nextState,
+				history: getHistory({
+					deletedChildrenUuids,
+					initialHistory: nextState.history,
+					publishedChildren: state.publishedChildren,
+					structure,
+				}),
+			};
 
 			return nextState;
 		}
@@ -551,66 +572,26 @@ function reducer(state: State, action: Action): State {
 				});
 			}
 
-			const nextChildren = deleteChildren({
-				root: structure,
-				uuids: selection.filter((uuid) => !undeletables.has(uuid)),
-			});
+			const {deletedChildrenUuids, updatedChildren: nextChildren} =
+				deleteChildren({
+					root: structure,
+					uuids: selection.filter((uuid) => !undeletables.has(uuid)),
+				});
 
-			let nextState = {
+			return {
 				...state,
+				history: getHistory({
+					deletedChildrenUuids,
+					initialHistory: state.history,
+					publishedChildren: state.publishedChildren,
+					structure,
+				}),
 				selection: [...undeletables.keys()],
 				structure: {
 					...structure,
 					children: nextChildren,
 				},
 			};
-
-			for (const uuid of selection) {
-				const child = findChild({root: structure, uuid});
-
-				if (!child) {
-					continue;
-				}
-
-				if (state.publishedChildren.has(uuid)) {
-					nextState = {
-						...nextState,
-						history: {...nextState.history, deletedChildren: true},
-					};
-
-					if (
-						child.type === 'repeatable-group' ||
-						child.type === 'referenced-structure'
-					) {
-						nextState = {
-							...nextState,
-							history: {
-								...nextState.history,
-								deletedRelationshipERCs: [
-									...nextState.history
-										.deletedRelationshipERCs,
-									child.relationshipERC,
-								],
-							},
-						};
-					}
-
-					if (child.type === 'repeatable-group') {
-						nextState = {
-							...nextState,
-							history: {
-								...nextState.history,
-								deletedGroupERCs: [
-									...nextState.history.deletedGroupERCs,
-									child.erc,
-								],
-							},
-						};
-					}
-				}
-			}
-
-			return nextState;
 		}
 		case 'duplicate-child': {
 			const {structure} = state;
@@ -645,7 +626,11 @@ function reducer(state: State, action: Action): State {
 			}
 			else {
 				copy.erc = getRandomId();
-				copy.name = findAvailableFieldName(parent.children, child.name);
+				copy.name = findAvailableFieldName(
+					parent.children,
+					state.history.deletedChildren,
+					child.name
+				);
 			}
 
 			// Insert the copy
@@ -876,6 +861,7 @@ function reducer(state: State, action: Action): State {
 					...data,
 					name: nextName,
 				},
+				deletedChildren: state.history.deletedChildren,
 				uuid: nextField.uuid,
 			});
 
@@ -896,6 +882,69 @@ function reducer(state: State, action: Action): State {
 				},
 				invalids,
 				selection: [nextField.uuid],
+				structure: {
+					...structure,
+					children: nextChildren,
+				},
+			};
+		}
+		case 'update-related-content': {
+			const {erc, label, multiselection, relatedStructureERC, uuid} =
+				action;
+
+			const {structure} = state;
+
+			const relatedContent = findChild({
+				root: structure,
+				uuid,
+			}) as RelatedContent;
+
+			if (!relatedContent) {
+				return state;
+			}
+
+			// Prepare updated field
+
+			const nextRelatedContent: RelatedContent = {
+				...relatedContent,
+				erc: erc ?? relatedContent.erc,
+				label: label ?? relatedContent.label,
+				multiselection: multiselection ?? relatedContent.multiselection,
+				relatedStructureERC:
+					relatedStructureERC ?? relatedContent.relatedStructureERC,
+			};
+
+			const nextChildren = updateChild({
+				child: nextRelatedContent,
+				root: structure,
+			});
+
+			// Validate the data sent in the action
+
+			const invalids = new Map(state.invalids);
+
+			const errors = validateRelatedContent({
+				currentErrors: invalids.get(nextRelatedContent.uuid),
+				data: {
+					erc,
+					label,
+					relatedStructureERC,
+				},
+			});
+
+			if (errors.size) {
+				invalids.set(nextRelatedContent.uuid, errors);
+			}
+			else {
+				invalids.delete(nextRelatedContent.uuid);
+			}
+
+			// Return new state
+
+			return {
+				...state,
+				invalids,
+				selection: [nextRelatedContent.uuid],
 				structure: {
 					...structure,
 					children: nextChildren,
@@ -1179,16 +1228,10 @@ function getUndeletableItems(
 
 		if (parent?.type === 'repeatable-group') {
 			const groupFields = Array.from(parent.children.values()).filter(
-				(child) =>
-					child.type !== 'referenced-structure' &&
-					child.type !== 'repeatable-group'
+				(child) => isField(child)
 			);
 
-			const fields = items.filter(
-				(item) =>
-					item.type !== 'referenced-structure' &&
-					item.type !== 'repeatable-group'
-			);
+			const fields = items.filter((item) => isField(item));
 
 			if (
 				groupFields.every(({uuid}) =>

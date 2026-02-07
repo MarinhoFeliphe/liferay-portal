@@ -76,6 +76,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+
 /**
  * @author Feliphe Marinho
  */
@@ -427,8 +430,14 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		Assert.assertEquals(lines.toString(), 4, lines.size());
 		Assert.assertEquals("event: Fix Spelling and Grammar", lines.get(2));
-		Assert.assertEquals(
-			"data: {\"data\":\"This text is wrong.\"}", lines.get(3));
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"data", "This text is wrong."
+			).put(
+				"nodeName", "fixSpellingAndGrammar"
+			).toString(),
+			StringUtil.removeSubstring(lines.get(3), "data: "),
+			JSONCompareMode.LENIENT);
 
 		IdempotentRetryAssert.retryAssert(
 			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
@@ -490,6 +499,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		String response = StringUtil.toLowerCase(lines.get(3));
 
 		Assert.assertFalse(response, response.contains("brazilian barbecue"));
+		Assert.assertTrue(response, response.contains("\"nodename\":\"llm\""));
 
 		_objectEntryLocalService.addObjectEntry(
 			0L, TestPropsValues.getUserId(),
@@ -529,6 +539,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		response = StringUtil.toLowerCase(lines.get(5));
 
 		Assert.assertTrue(response, response.contains("brazilian barbecue"));
+		Assert.assertTrue(response, response.contains("\"nodename\":\"llm\""));
 
 		SseUtil.closeAll();
 	}
@@ -606,6 +617,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 				Assert.assertFalse(
 					response, response.contains("brazilian barbecue"));
+				Assert.assertTrue(
+					response, response.contains("\"nodename\":\"llm\""));
 
 				Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
 
@@ -647,6 +660,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 				Assert.assertTrue(
 					response, response.contains("brazilian barbecue"));
+				Assert.assertTrue(
+					response, response.contains("\"nodename\":\"llm\""));
 			}
 		);
 
@@ -684,6 +699,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		String response = StringUtil.toLowerCase(lines.get(3));
 
+		Assert.assertTrue(response, response.contains("\"nodename\":\"llm\""));
 		Assert.assertTrue(response, response.contains("yes"));
 
 		SseUtil.closeAll();

@@ -4,10 +4,10 @@
  */
 
 import Label from '@clayui/label';
+import {DateRenderer} from '@liferay/frontend-data-set-web';
 import React from 'react';
 
 import {patchProjectById} from '../../utils/api';
-import {DISPLAY_TYPES} from '../../utils/constants';
 import {displayStateSuccessToast} from '../../utils/toastUtil';
 import InfoSummary from '../InfoSummary';
 import StateSelector, {State} from '../StateSelector';
@@ -32,10 +32,6 @@ export default function ProjectInfoSummary({
 	states,
 	tags,
 }: ProjectInfoSummaryProps) {
-	const displayTypes = DISPLAY_TYPES.filter(
-		(displayType) => displayType !== 'unstyled'
-	);
-
 	return (
 		<InfoSummary
 			defaultOpen={true}
@@ -61,22 +57,16 @@ export default function ProjectInfoSummary({
 				},
 				{label: 'Manager', value: <User {...manager} />},
 				{label: 'Sponsor', value: <User {...sponsor} />},
-				{label: 'Due Date', value: dueDate},
+				{
+					label: 'Due Date',
+					value: DateRenderer({value: dueDate}) ?? '',
+				},
 				{
 					label: 'Tags',
 					value: (
 						<div>
-							{tags.map((tag, index) => (
-								<Label
-									displayType={
-										displayTypes[
-											index % displayTypes.length
-										]
-									}
-									key={tag}
-								>
-									{tag}
-								</Label>
+							{tags.map((tag) => (
+								<Label key={tag}>{tag}</Label>
 							))}
 						</div>
 					),

@@ -128,37 +128,12 @@ public class LayoutUtil {
 				serviceContext);
 		}
 
-		if (pageSpecifications.length != 2) {
-			throw new UnsupportedOperationException();
-		}
+		PageSpecification[] sortedContentPageSpecifications =
+			PageSpecificationUtil.getSortedContentPageSpecifications(
+				pageSpecifications);
 
-		ContentPageSpecification draftContentPageSpecification;
 		ContentPageSpecification publishedContentPageSpecification =
-			(ContentPageSpecification)pageSpecifications[0];
-
-		if (Validator.isNull(
-				publishedContentPageSpecification.
-					getDraftContentPageSpecificationExternalReferenceCode())) {
-
-			draftContentPageSpecification = publishedContentPageSpecification;
-			publishedContentPageSpecification =
-				(ContentPageSpecification)pageSpecifications[1];
-		}
-		else {
-			draftContentPageSpecification =
-				(ContentPageSpecification)pageSpecifications[1];
-		}
-
-		if (Validator.isNull(
-				publishedContentPageSpecification.
-					getDraftContentPageSpecificationExternalReferenceCode()) ||
-			!Objects.equals(
-				draftContentPageSpecification.getExternalReferenceCode(),
-				publishedContentPageSpecification.
-					getDraftContentPageSpecificationExternalReferenceCode())) {
-
-			throw new UnsupportedOperationException();
-		}
+			(ContentPageSpecification)sortedContentPageSpecifications[1];
 
 		Settings settings = publishedContentPageSpecification.getSettings();
 
@@ -226,52 +201,17 @@ public class LayoutUtil {
 			}
 		}
 
-		PageExperience defaultPageExperience =
-			PageExperienceUtil.getDefaultPageExperience(
-				publishedContentPageSpecification.getPageExperiences());
+		ContentPageSpecification draftContentPageSpecification =
+			(ContentPageSpecification)sortedContentPageSpecifications[0];
 
-		serviceContext.setAttribute(
-			"defaultSegmentsExperienceExternalReferenceCode",
-			defaultPageExperience.getExternalReferenceCode());
-		serviceContext.setAttribute(
-			"defaultSegmentsExperienceUuid", defaultPageExperience.getUuid());
+		ServiceContextUtil.setContentPageSpecificationsAttributes(
+			draftContentPageSpecification, groupId,
+			publishedContentPageSpecification, serviceContext);
 
-		defaultPageExperience = PageExperienceUtil.getDefaultPageExperience(
-			draftContentPageSpecification.getPageExperiences());
-
-		serviceContext.setAttribute(
-			"draftLayoutDefaultSegmentsExperienceExternalReferenceCode",
-			defaultPageExperience.getExternalReferenceCode());
-		serviceContext.setAttribute(
-			"draftLayoutDefaultSegmentsExperienceUuid",
-			defaultPageExperience.getUuid());
-
-		serviceContext.setAttribute(
-			"draftLayoutExternalReferenceCode",
-			draftContentPageSpecification.getExternalReferenceCode());
-
-		ServiceContextUtil.setLayoutSetPrototypeLayoutERC(
-			groupId, publishedContentPageSpecification, serviceContext,
-			publishedContentPageSpecification.
-				getSiteTemplatePageSpecificationExternalReferenceCode());
-
-		ServiceContextUtil.setLayoutSetPrototypeLayoutERC(
-			groupId, draftContentPageSpecification, serviceContext,
-			draftContentPageSpecification.
-				getSiteTemplatePageSpecificationExternalReferenceCode());
-
-		if (Objects.equals(
-				publishedContentPageSpecification.getStatus(),
-				PageSpecification.Status.APPROVED)) {
-
-			serviceContext.setAttribute("published", Boolean.TRUE.toString());
-
+		if (GetterUtil.getBoolean(serviceContext.getAttribute("published"))) {
 			typeSettingsUnicodeProperties.setProperty(
 				LayoutTypeSettingsConstants.KEY_PUBLISHED,
 				Boolean.TRUE.toString());
-		}
-		else {
-			serviceContext.setAttribute("published", Boolean.FALSE.toString());
 		}
 
 		Layout layout = LayoutServiceUtil.addLayout(
@@ -496,26 +436,14 @@ public class LayoutUtil {
 				serviceContext);
 		}
 
-		if (pageSpecifications.length != 2) {
-			throw new UnsupportedOperationException();
-		}
+		PageSpecification[] sortedContentPageSpecifications =
+			PageSpecificationUtil.getSortedContentPageSpecifications(
+				pageSpecifications);
 
-		ContentPageSpecification draftContentPageSpecification;
+		ContentPageSpecification draftContentPageSpecification =
+			(ContentPageSpecification)sortedContentPageSpecifications[0];
 		ContentPageSpecification publishedContentPageSpecification =
-			(ContentPageSpecification)pageSpecifications[0];
-
-		if (Objects.equals(
-				layout.getExternalReferenceCode(),
-				publishedContentPageSpecification.getExternalReferenceCode())) {
-
-			draftContentPageSpecification =
-				(ContentPageSpecification)pageSpecifications[1];
-		}
-		else {
-			draftContentPageSpecification = publishedContentPageSpecification;
-			publishedContentPageSpecification =
-				(ContentPageSpecification)pageSpecifications[1];
-		}
+			(ContentPageSpecification)sortedContentPageSpecifications[1];
 
 		Layout draftLayout = layout.fetchDraftLayout();
 
@@ -524,11 +452,7 @@ public class LayoutUtil {
 				draftContentPageSpecification.getExternalReferenceCode()) ||
 			!Objects.equals(
 				layout.getExternalReferenceCode(),
-				publishedContentPageSpecification.getExternalReferenceCode()) ||
-			!Objects.equals(
-				publishedContentPageSpecification.
-					getDraftContentPageSpecificationExternalReferenceCode(),
-				draftContentPageSpecification.getExternalReferenceCode())) {
+				publishedContentPageSpecification.getExternalReferenceCode())) {
 
 			throw new UnsupportedOperationException();
 		}

@@ -4,6 +4,7 @@
  */
 
 export {default as FrontendDataSet} from './FrontendDataSet';
+export {default as DateRenderer} from './cell_renderers/DateRenderer';
 export {default as DateTimeRenderer} from './cell_renderers/DateTimeRenderer';
 
 export {INTERNAL_CELL_RENDERERS as FDS_INTERNAL_CELL_RENDERERS} from './cell_renderers/InternalCellRenderer';
@@ -21,6 +22,11 @@ export {
 	FDS_NESTED_FIELD_NAME_DELIMITER,
 	FDS_NESTED_FIELD_NAME_PARENT_SUFFIX,
 } from './constants';
+
+export {
+	IInlineNotificationComponent,
+	InlineNotification,
+} from './inline_notification/InlineNotification';
 
 export {ACTION_ITEM_TARGETS} from './utils/actionItems/constants';
 
@@ -46,5 +52,4 @@ export {
 	IView,
 	TOnFileDrop,
 } from './utils/types';
-
 export {Card} from './views/cards/Cards';
