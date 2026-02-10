@@ -5,6 +5,7 @@
 
 import {ClayCheckbox, ClayRadio} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
+import ClayLabel from '@clayui/label';
 import ClayLayout from '@clayui/layout';
 import ClayList from '@clayui/list';
 import ClaySticker from '@clayui/sticker';
@@ -21,6 +22,7 @@ import useFDSDrop from '../../dnd/useFDSDrop';
 import {getLocalizedValue} from '../../utils/getLocalizedValue';
 import {
 	IHeader,
+	IListLabelSchema,
 	IListSchema,
 	IListTitleRenderer,
 	IView,
@@ -83,6 +85,7 @@ const ListItem = forwardRef<HTMLLIElement, any>(
 		const {
 			description,
 			image,
+			labels,
 			sticker,
 			symbol,
 			title,
@@ -180,6 +183,23 @@ const ListItem = forwardRef<HTMLLIElement, any>(
 						<ClayList.ItemText>
 							{getLocalizedValue(item, description)?.value}
 						</ClayList.ItemText>
+					)}
+
+					{labels && (
+						<ClayLayout.ContentRow className="mt-1">
+							{item[labels]?.map(
+								(label: IListLabelSchema, index: number) => (
+									<ClayLabel
+										className="text-uppercase"
+										displayType={label.displayType}
+										key={index}
+										large
+									>
+										{label.value}
+									</ClayLabel>
+								)
+							)}
+						</ClayLayout.ContentRow>
 					)}
 				</ClayList.ItemField>
 

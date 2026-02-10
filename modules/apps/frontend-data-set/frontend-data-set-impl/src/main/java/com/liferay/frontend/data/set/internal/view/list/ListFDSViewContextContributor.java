@@ -48,6 +48,8 @@ public class ListFDSViewContextContributor
 			).put(
 				"image", baseListFDSView.getImage()
 			).put(
+				"labels", baseListFDSView.getLabel()
+			).put(
 				"sticker", baseListFDSView.getSticker()
 			).put(
 				"symbol", baseListFDSView.getSymbol()

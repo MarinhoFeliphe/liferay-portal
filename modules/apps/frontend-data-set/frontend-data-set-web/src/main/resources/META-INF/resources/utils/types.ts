@@ -250,6 +250,11 @@ export interface IHeader {
 	title?: string;
 }
 
+export type IListLabelSchema = {
+	displayType: DisplayType;
+	value: string;
+};
+
 export interface IListTitleRenderer {
 	component: ({itemData}: {itemData: any}) => JSX.Element;
 }
@@ -257,6 +262,7 @@ export interface IListTitleRenderer {
 export interface IListSchema {
 	description: string;
 	image?: string;
+	labels?: string;
 	sticker?: string;
 	symbol?: string;
 	title: string;
