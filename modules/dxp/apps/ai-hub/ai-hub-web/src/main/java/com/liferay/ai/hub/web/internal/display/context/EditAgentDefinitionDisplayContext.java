@@ -22,10 +22,7 @@ import java.util.Map;
 public class EditAgentDefinitionDisplayContext {
 
 	public EditAgentDefinitionDisplayContext(
-		HttpServletRequest httpServletRequest, Portal portal) {
-
-		_httpServletRequest = httpServletRequest;
-		_portal = portal;
+		HttpServletRequest httpServletRequest) {
 
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -35,22 +32,20 @@ public class EditAgentDefinitionDisplayContext {
 		return "/o/ai-hub/v1.0/create-agent";
 	}
 
-	public String getBackURL(Company company) throws Exception {
-		String basePortalURL = company.getPortalURL(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID);
-		String path = "/web/ai-hub/ai-tasks";
-
-		return basePortalURL + path;
-	}
-
 	public Map<String, Object> getReactData() throws Exception {
 		return HashMapBuilder.<String, Object>put(
-			"backURL", getBackURL(_themeDisplay.getCompany())
+			"backURL",
+			() -> {
+				Company company = _themeDisplay.getCompany();
+
+				String backURL = company.getPortalURL(
+					GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
+				return backURL + "/web/ai-hub/agents";
+			}
 		).build();
 	}
 
-	private final HttpServletRequest _httpServletRequest;
-	private final Portal _portal;
 	private final ThemeDisplay _themeDisplay;
 
 }

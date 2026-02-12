@@ -1,6 +1,5 @@
 {
 	"pageElement": {
-		"id": "7d9457a5-d37f-dad1-d409-391be6cff534",
 		"pageElements": [
 			{
 				"definition": {
@@ -13,7 +12,6 @@
 					],
 					"indexed": true
 				},
-				"id": "7dae1d9f-3bf1-4883-8f80-deb5a320d77f",
 				"type": "Fragment"
 			},
 			{
@@ -35,7 +33,6 @@
 						]
 					}
 				},
-				"id": "2392e8c1-3805-8e93-f3f7-9836cfa64177",
 				"type": "DropZone"
 			}
 		],

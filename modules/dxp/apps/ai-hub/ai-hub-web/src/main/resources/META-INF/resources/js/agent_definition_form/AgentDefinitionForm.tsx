@@ -166,25 +166,25 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 										id="input-variables"
 										name="inputVariables"
 										onChange={handleInputChange}
-										placeholder='[{"name":"tone", "type":"string"}]'
+										placeholder='inputVariable1,inputVariable2'
 										rows={4}
 										value={formData.inputVariables}
 									/>
 								</ClayForm.Group>
 
 								<ClayForm.Group>
-									<label htmlFor="output-variables">
+									<label htmlFor="output-variable">
 										{Liferay.Language.get(
-											'output-variables'
+											'output-variable'
 										)}
 									</label>
 
 									<textarea
 										className="form-control"
-										id="output-variables"
-										name="outputVariables"
+										id="output-variable"
+										name="outputVariable"
 										onChange={handleInputChange}
-										placeholder='[{"name":"tone", "type":"string"}]'
+										placeholder='outputVariable'
 										rows={4}
 										value={formData.outputVariables}
 									/>
@@ -208,37 +208,6 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 											)}
 										</option>
 									</select>
-								</ClayForm.Group>
-							</ClayPanel.Body>
-						</ClayPanel>
-					</ClayLayout.Col>
-				</ClayLayout.Row>
-
-				<ClayLayout.Row>
-					<ClayLayout.Col md={12}>
-						<ClayPanel
-							className="agent-definition-data-sources"
-							collapsable={false}
-							title={Liferay.Language.get('data-sources')}
-						>
-							<ClayPanel.Body>
-								<h2>{Liferay.Language.get('data-sources')}</h2>
-
-								<ClayForm.Group>
-									<label htmlFor="assignedSources">
-										{Liferay.Language.get(
-											'assigned-sources'
-										)}
-									</label>
-
-									<ClayInput
-										component="input"
-										id="assignedSources"
-										name="assignedSources"
-										onChange={handleInputChange}
-										type="text"
-										value={formData.assignedSources}
-									/>
 								</ClayForm.Group>
 							</ClayPanel.Body>
 						</ClayPanel>

@@ -48,8 +48,7 @@ public class EditAgentDefinitionFragmentRenderer implements FragmentRenderer {
 
 			EditAgentDefinitionDisplayContext
 				editAgentDefinitionDisplayContext =
-					new EditAgentDefinitionDisplayContext(
-						httpServletRequest, _portal);
+					new EditAgentDefinitionDisplayContext(httpServletRequest);
 
 			Class<?> clazz = editAgentDefinitionDisplayContext.getClass();
 
@@ -65,15 +64,6 @@ public class EditAgentDefinitionFragmentRenderer implements FragmentRenderer {
 			throw new IOException(exception);
 		}
 	}
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private Portal _portal;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=" + AIHubWebConstants.BUNDLE_SYMBOLIC_NAME + ")"

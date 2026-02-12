@@ -48,9 +48,6 @@ public class AgentDefinitionDisplayContext {
 	}
 
 	public CreationMenu getCreationMenu() throws Exception {
-		String namespace = _portal.getPortletNamespace(
-			WorkflowPortletKeys.KALEO_DESIGNER);
-
 		return CreationMenuBuilder.addDropdownItem(
 			dropdownItem -> {
 				dropdownItem.setHref(
@@ -115,11 +112,10 @@ public class AgentDefinitionDisplayContext {
 	}
 
 	private String getCreateAgentURL(Company company) throws Exception {
-		String basePortalURL = company.getPortalURL(
+		String portalURL = company.getPortalURL(
 			GroupConstants.DEFAULT_PARENT_GROUP_ID);
-		String path = "/web/ai-hub/create-agent";
 
-		return basePortalURL + path;
+		return portalURL + "/web/ai-hub/create-agent";
 	}
 
 	private final HttpServletRequest _httpServletRequest;
