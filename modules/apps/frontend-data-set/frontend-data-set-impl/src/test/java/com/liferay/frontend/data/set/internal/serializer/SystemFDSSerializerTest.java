@@ -1576,6 +1576,14 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 					).put(
 						"image", IMAGES[1]
 					).put(
+						"labels",
+						JSONUtil.putAll(
+							JSONUtil.put(
+								"displayType", DISPLAY_TYPE_KEYS[0]
+							).put(
+								"value", DISPLAY_TYPE_VALUES[0]
+							))
+					).put(
 						"sticker", STICKERS[1]
 					).put(
 						"symbol", SYMBOLS[1]
