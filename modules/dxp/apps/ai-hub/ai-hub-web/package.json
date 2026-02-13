@@ -9,6 +9,8 @@
 		"@clayui/panel": "*",
 		"@clayui/provider": "*",
 		"@clayui/toolbar": "*",
+		"@liferay/object-js-components-web": "*",
+		"frontend-js-web": "*",
 		"react": "18.2.0",
 		"react-dom": "18.2.0"
 	},
