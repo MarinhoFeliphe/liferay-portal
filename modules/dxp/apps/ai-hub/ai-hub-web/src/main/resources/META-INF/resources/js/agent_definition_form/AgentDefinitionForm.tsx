@@ -14,23 +14,21 @@ import Button from '@clayui/button';
 import Icon from '@clayui/icon';
 import Link from '@clayui/link';
 import {Provider} from '@clayui/provider';
+import {openToast} from '@liferay/object-js-components-web';
 
 import Toolbar from './components/ToolBar';
+import { postAgentDefinition } from './services/agentDefinitionService';
+import { AgentDefinition } from './types/AgentDefinition';
 
 export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 
-	const [isAgentEnabled, setIsAgentEnabled] = useState(false);
-	const [formData, setFormData] = useState({
-		assignedSources: '',
-		category: '',
-		description: '',
-		inputVariables: '',
-		name: '',
-		outputVariables: '',
-	});
+	const [formData, setFormData] = useState<AgentDefinition>({} as AgentDefinition);
 
 	const handleToggleAgent = () => {
-		setIsAgentEnabled(!isAgentEnabled);
+		setFormData((prev) => ({
+			...prev,
+			active: !prev.active,
+		}));
 	};
 
 	const handleInputChange = (
@@ -39,15 +37,36 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 		>
 	) => {
 		const {name, value} = event.target;
-		setFormData((prev) => ({
-			...prev,
-			[name]: value,
-		}));
+		if (name === 'title') {
+			setFormData((prev) => ({
+				...prev,
+				title_i18n: {
+					...(prev.title_i18n || {}),
+					en: value,
+				},
+			}));
+		} else {
+			setFormData((prev) => ({
+				...prev,
+				[name]: value,
+			}));
+		}
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 
-		console.log('Form Data:', formData);
+		const response = await postAgentDefinition(formData);
+
+		if (response.status.label === 'approved') {
+			openToast({
+				message: Liferay.Language.get('agent-definition-created-successfully'),
+				type: 'success',
+			});
+			
+			setTimeout(() => {
+				window.location.href = backURL;
+			}, 1000);
+		}
 	}
 
 	return (
@@ -87,12 +106,12 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 				<div className="agent-definition-header">
 					<ClayToggle
 						label={Liferay.Language.get('enable-agent')}
-						name="showWidget"
+						name="toggle-agent"
 						onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
 							event.stopPropagation();
 						}}
 						onToggle={handleToggleAgent}
-						toggled={isAgentEnabled}
+						toggled={formData.active}
 					/>
 
 					<Provider spritemap={Liferay.Icons.spritemap}>
@@ -117,8 +136,8 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 								<h2>{Liferay.Language.get('details')}</h2>
 
 								<ClayForm.Group>
-									<label htmlFor="name">
-										{Liferay.Language.get('name')}
+									<label htmlFor="title">
+										{Liferay.Language.get('title')}
 
 										<span className="ml-1 reference-mark text-warning">
 											<Icon symbol="asterisk" />
@@ -126,19 +145,43 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 									</label>
 
 									<ClayInput
-										id="name"
-										name="name"
+										id="title"
+										name="title"
 										onChange={handleInputChange}
-										placeholder={Liferay.Language.get('add-an-agent-name')}
+										placeholder={Liferay.Language.get('title')}
 										required={true}
 										type="text"
-										value={formData.name}
+										value={formData.title_i18n?.en || ''}
+									/>
+								</ClayForm.Group>
+
+								<ClayForm.Group>
+									<label htmlFor="externalReferenceCode">
+										{Liferay.Language.get('external-reference-code')}
+
+										<span className="ml-1 reference-mark text-warning">
+											<Icon symbol="asterisk" />
+										</span>
+									</label>
+
+									<ClayInput
+										id="externalReferenceCode"
+										name="externalReferenceCode"
+										onChange={handleInputChange}
+										placeholder={Liferay.Language.get('external-reference-code')}
+										required={true}
+										type="text"
+										value={formData.externalReferenceCode}
 									/>
 								</ClayForm.Group>
 
 								<ClayForm.Group>
 									<label htmlFor="description">
 										{Liferay.Language.get('description')}
+
+										<span className="ml-1 reference-mark text-warning">
+											<Icon symbol="asterisk" />
+										</span>
 									</label>
 
 									<textarea
@@ -159,6 +202,10 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 										{Liferay.Language.get(
 											'input-variables'
 										)}
+
+										<span className="ml-1 reference-mark text-warning">
+											<Icon symbol="asterisk" />
+										</span>
 									</label>
 
 									<textarea
@@ -177,6 +224,10 @@ export default function AgentDefinitionForm({backURL}: {backURL: string}) {
 										{Liferay.Language.get(
 											'output-variable'
 										)}
+
+										<span className="ml-1 reference-mark text-warning">
+											<Icon symbol="asterisk" />
+										</span>
 									</label>
 
 									<textarea
