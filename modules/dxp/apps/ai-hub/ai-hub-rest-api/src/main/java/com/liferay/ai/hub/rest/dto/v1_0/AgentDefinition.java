@@ -297,29 +297,29 @@ public class AgentDefinition implements Serializable {
 
 	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
-	public LabelsList[] getLabelsList() {
-		if (_labelsListSupplier != null) {
-			labelsList = _labelsListSupplier.get();
+	public Label[] getLabels() {
+		if (_labelsSupplier != null) {
+			labels = _labelsSupplier.get();
 
-			_labelsListSupplier = null;
+			_labelsSupplier = null;
 		}
 
-		return labelsList;
+		return labels;
 	}
 
-	public void setLabelsList(LabelsList[] labelsList) {
-		this.labelsList = labelsList;
+	public void setLabels(Label[] labels) {
+		this.labels = labels;
 
-		_labelsListSupplier = null;
+		_labelsSupplier = null;
 	}
 
 	@JsonIgnore
-	public void setLabelsList(
-		UnsafeSupplier<LabelsList[], Exception> labelsListUnsafeSupplier) {
+	public void setLabels(
+		UnsafeSupplier<Label[], Exception> labelsUnsafeSupplier) {
 
-		_labelsListSupplier = () -> {
+		_labelsSupplier = () -> {
 			try {
-				return labelsListUnsafeSupplier.get();
+				return labelsUnsafeSupplier.get();
 			}
 			catch (RuntimeException runtimeException) {
 				throw runtimeException;
@@ -332,10 +332,10 @@ public class AgentDefinition implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected LabelsList[] labelsList;
+	protected Label[] labels;
 
 	@JsonIgnore
-	private Supplier<LabelsList[]> _labelsListSupplier;
+	private Supplier<Label[]> _labelsSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
@@ -620,21 +620,21 @@ public class AgentDefinition implements Serializable {
 			sb.append("]");
 		}
 
-		LabelsList[] labelsList = getLabelsList();
+		Label[] labels = getLabels();
 
-		if (labelsList != null) {
+		if (labels != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"labelsList\": ");
+			sb.append("\"labels\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < labelsList.length; i++) {
-				sb.append(String.valueOf(labelsList[i]));
+			for (int i = 0; i < labels.length; i++) {
+				sb.append(String.valueOf(labels[i]));
 
-				if ((i + 1) < labelsList.length) {
+				if ((i + 1) < labels.length) {
 					sb.append(", ");
 				}
 			}

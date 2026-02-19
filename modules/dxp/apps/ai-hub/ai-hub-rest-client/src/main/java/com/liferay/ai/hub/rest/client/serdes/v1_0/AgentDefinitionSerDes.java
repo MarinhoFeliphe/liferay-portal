@@ -6,7 +6,7 @@
 package com.liferay.ai.hub.rest.client.serdes.v1_0;
 
 import com.liferay.ai.hub.rest.client.dto.v1_0.AgentDefinition;
-import com.liferay.ai.hub.rest.client.dto.v1_0.LabelsList;
+import com.liferay.ai.hub.rest.client.dto.v1_0.Label;
 import com.liferay.ai.hub.rest.client.dto.v1_0.Variable;
 import com.liferay.ai.hub.rest.client.json.BaseJSONParser;
 
@@ -129,19 +129,19 @@ public class AgentDefinitionSerDes {
 			sb.append("]");
 		}
 
-		if (agentDefinition.getLabelsList() != null) {
+		if (agentDefinition.getLabels() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"labelsList\": ");
+			sb.append("\"labels\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < agentDefinition.getLabelsList().length; i++) {
-				sb.append(String.valueOf(agentDefinition.getLabelsList()[i]));
+			for (int i = 0; i < agentDefinition.getLabels().length; i++) {
+				sb.append(String.valueOf(agentDefinition.getLabels()[i]));
 
-				if ((i + 1) < agentDefinition.getLabelsList().length) {
+				if ((i + 1) < agentDefinition.getLabels().length) {
 					sb.append(", ");
 				}
 			}
@@ -264,12 +264,11 @@ public class AgentDefinitionSerDes {
 				String.valueOf(agentDefinition.getInputVariables()));
 		}
 
-		if (agentDefinition.getLabelsList() == null) {
-			map.put("labelsList", null);
+		if (agentDefinition.getLabels() == null) {
+			map.put("labels", null);
 		}
 		else {
-			map.put(
-				"labelsList", String.valueOf(agentDefinition.getLabelsList()));
+			map.put("labels", String.valueOf(agentDefinition.getLabels()));
 		}
 
 		if (agentDefinition.getOutputVariable() == null) {
@@ -342,7 +341,7 @@ public class AgentDefinitionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "inputVariables")) {
 				return false;
 			}
-			else if (Objects.equals(jsonParserFieldName, "labelsList")) {
+			else if (Objects.equals(jsonParserFieldName, "labels")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "outputVariable")) {
@@ -415,20 +414,20 @@ public class AgentDefinitionSerDes {
 					agentDefinition.setInputVariables(inputVariablesArray);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "labelsList")) {
+			else if (Objects.equals(jsonParserFieldName, "labels")) {
 				if (jsonParserFieldValue != null) {
 					Object[] jsonParserFieldValues =
 						(Object[])jsonParserFieldValue;
 
-					LabelsList[] labelsListArray =
-						new LabelsList[jsonParserFieldValues.length];
+					Label[] labelsArray =
+						new Label[jsonParserFieldValues.length];
 
-					for (int i = 0; i < labelsListArray.length; i++) {
-						labelsListArray[i] = LabelsListSerDes.toDTO(
+					for (int i = 0; i < labelsArray.length; i++) {
+						labelsArray[i] = LabelSerDes.toDTO(
 							(String)jsonParserFieldValues[i]);
 					}
 
-					agentDefinition.setLabelsList(labelsListArray);
+					agentDefinition.setLabels(labelsArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "outputVariable")) {

@@ -5,7 +5,7 @@
 
 package com.liferay.ai.hub.rest.client.serdes.v1_0;
 
-import com.liferay.ai.hub.rest.client.dto.v1_0.LabelsList;
+import com.liferay.ai.hub.rest.client.dto.v1_0.Label;
 import com.liferay.ai.hub.rest.client.json.BaseJSONParser;
 
 import jakarta.annotation.Generated;
@@ -21,22 +21,22 @@ import java.util.TreeMap;
  * @generated
  */
 @Generated("")
-public class LabelsListSerDes {
+public class LabelSerDes {
 
-	public static LabelsList toDTO(String json) {
-		LabelsListJSONParser labelsListJSONParser = new LabelsListJSONParser();
+	public static Label toDTO(String json) {
+		LabelJSONParser labelJSONParser = new LabelJSONParser();
 
-		return labelsListJSONParser.parseToDTO(json);
+		return labelJSONParser.parseToDTO(json);
 	}
 
-	public static LabelsList[] toDTOs(String json) {
-		LabelsListJSONParser labelsListJSONParser = new LabelsListJSONParser();
+	public static Label[] toDTOs(String json) {
+		LabelJSONParser labelJSONParser = new LabelJSONParser();
 
-		return labelsListJSONParser.parseToDTOs(json);
+		return labelJSONParser.parseToDTOs(json);
 	}
 
-	public static String toJSON(LabelsList labelsList) {
-		if (labelsList == null) {
+	public static String toJSON(Label label) {
+		if (label == null) {
 			return "null";
 		}
 
@@ -44,7 +44,7 @@ public class LabelsListSerDes {
 
 		sb.append("{");
 
-		if (labelsList.getDisplayType() != null) {
+		if (label.getDisplayType() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
@@ -53,12 +53,12 @@ public class LabelsListSerDes {
 
 			sb.append("\"");
 
-			sb.append(_escape(labelsList.getDisplayType()));
+			sb.append(_escape(label.getDisplayType()));
 
 			sb.append("\"");
 		}
 
-		if (labelsList.getValue() != null) {
+		if (label.getValue() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
@@ -67,7 +67,7 @@ public class LabelsListSerDes {
 
 			sb.append("\"");
 
-			sb.append(_escape(labelsList.getValue()));
+			sb.append(_escape(label.getValue()));
 
 			sb.append("\"");
 		}
@@ -78,46 +78,45 @@ public class LabelsListSerDes {
 	}
 
 	public static Map<String, Object> toMap(String json) {
-		LabelsListJSONParser labelsListJSONParser = new LabelsListJSONParser();
+		LabelJSONParser labelJSONParser = new LabelJSONParser();
 
-		return labelsListJSONParser.parseToMap(json);
+		return labelJSONParser.parseToMap(json);
 	}
 
-	public static Map<String, String> toMap(LabelsList labelsList) {
-		if (labelsList == null) {
+	public static Map<String, String> toMap(Label label) {
+		if (label == null) {
 			return null;
 		}
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (labelsList.getDisplayType() == null) {
+		if (label.getDisplayType() == null) {
 			map.put("displayType", null);
 		}
 		else {
-			map.put("displayType", String.valueOf(labelsList.getDisplayType()));
+			map.put("displayType", String.valueOf(label.getDisplayType()));
 		}
 
-		if (labelsList.getValue() == null) {
+		if (label.getValue() == null) {
 			map.put("value", null);
 		}
 		else {
-			map.put("value", String.valueOf(labelsList.getValue()));
+			map.put("value", String.valueOf(label.getValue()));
 		}
 
 		return map;
 	}
 
-	public static class LabelsListJSONParser
-		extends BaseJSONParser<LabelsList> {
+	public static class LabelJSONParser extends BaseJSONParser<Label> {
 
 		@Override
-		protected LabelsList createDTO() {
-			return new LabelsList();
+		protected Label createDTO() {
+			return new Label();
 		}
 
 		@Override
-		protected LabelsList[] createDTOArray(int size) {
-			return new LabelsList[size];
+		protected Label[] createDTOArray(int size) {
+			return new Label[size];
 		}
 
 		@Override
@@ -134,17 +133,17 @@ public class LabelsListSerDes {
 
 		@Override
 		protected void setField(
-			LabelsList labelsList, String jsonParserFieldName,
+			Label label, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
 			if (Objects.equals(jsonParserFieldName, "displayType")) {
 				if (jsonParserFieldValue != null) {
-					labelsList.setDisplayType((String)jsonParserFieldValue);
+					label.setDisplayType((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					labelsList.setValue((String)jsonParserFieldValue);
+					label.setValue((String)jsonParserFieldValue);
 				}
 			}
 		}

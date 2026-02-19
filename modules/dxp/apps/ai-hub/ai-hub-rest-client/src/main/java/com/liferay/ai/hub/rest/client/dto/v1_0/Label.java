@@ -6,7 +6,7 @@
 package com.liferay.ai.hub.rest.client.dto.v1_0;
 
 import com.liferay.ai.hub.rest.client.function.UnsafeSupplier;
-import com.liferay.ai.hub.rest.client.serdes.v1_0.LabelsListSerDes;
+import com.liferay.ai.hub.rest.client.serdes.v1_0.LabelSerDes;
 
 import jakarta.annotation.Generated;
 
@@ -19,10 +19,10 @@ import java.util.Objects;
  * @generated
  */
 @Generated("")
-public class LabelsList implements Cloneable, Serializable {
+public class Label implements Cloneable, Serializable {
 
-	public static LabelsList toDTO(String json) {
-		return LabelsListSerDes.toDTO(json);
+	public static Label toDTO(String json) {
+		return LabelSerDes.toDTO(json);
 	}
 
 	public String getDisplayType() {
@@ -68,8 +68,8 @@ public class LabelsList implements Cloneable, Serializable {
 	protected String value;
 
 	@Override
-	public LabelsList clone() throws CloneNotSupportedException {
-		return (LabelsList)super.clone();
+	public Label clone() throws CloneNotSupportedException {
+		return (Label)super.clone();
 	}
 
 	@Override
@@ -78,13 +78,13 @@ public class LabelsList implements Cloneable, Serializable {
 			return true;
 		}
 
-		if (!(object instanceof LabelsList)) {
+		if (!(object instanceof Label)) {
 			return false;
 		}
 
-		LabelsList labelsList = (LabelsList)object;
+		Label label = (Label)object;
 
-		return Objects.equals(toString(), labelsList.toString());
+		return Objects.equals(toString(), label.toString());
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class LabelsList implements Cloneable, Serializable {
 	}
 
 	public String toString() {
-		return LabelsListSerDes.toJSON(this);
+		return LabelSerDes.toJSON(this);
 	}
 
 }

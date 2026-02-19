@@ -33,17 +33,17 @@ import java.util.function.Supplier;
  * @generated
  */
 @Generated("")
-@GraphQLName("LabelsList")
+@GraphQLName("Label")
 @JsonFilter("Liferay.Vulcan")
-@XmlRootElement(name = "LabelsList")
-public class LabelsList implements Serializable {
+@XmlRootElement(name = "Label")
+public class Label implements Serializable {
 
-	public static LabelsList toDTO(String json) {
-		return ObjectMapperUtil.readValue(LabelsList.class, json);
+	public static Label toDTO(String json) {
+		return ObjectMapperUtil.readValue(Label.class, json);
 	}
 
-	public static LabelsList unsafeToDTO(String json) {
-		return ObjectMapperUtil.unsafeReadValue(LabelsList.class, json);
+	public static Label unsafeToDTO(String json) {
+		return ObjectMapperUtil.unsafeReadValue(Label.class, json);
 	}
 
 	@io.swagger.v3.oas.annotations.media.Schema
@@ -134,13 +134,13 @@ public class LabelsList implements Serializable {
 			return true;
 		}
 
-		if (!(object instanceof LabelsList)) {
+		if (!(object instanceof Label)) {
 			return false;
 		}
 
-		LabelsList labelsList = (LabelsList)object;
+		Label label = (Label)object;
 
-		return Objects.equals(toString(), labelsList.toString());
+		return Objects.equals(toString(), label.toString());
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class LabelsList implements Serializable {
 
 	@io.swagger.v3.oas.annotations.media.Schema(
 		accessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY,
-		defaultValue = "com.liferay.ai.hub.rest.dto.v1_0.LabelsList",
+		defaultValue = "com.liferay.ai.hub.rest.dto.v1_0.Label",
 		name = "x-class-name"
 	)
 	public String xClassName;
