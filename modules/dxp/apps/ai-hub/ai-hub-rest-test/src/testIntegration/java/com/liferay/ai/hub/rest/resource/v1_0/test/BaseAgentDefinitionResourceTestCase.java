@@ -805,6 +805,14 @@ public abstract class BaseAgentDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("labelsList", additionalAssertFieldName)) {
+				if (agentDefinition.getLabelsList() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("outputVariable", additionalAssertFieldName)) {
 				if (agentDefinition.getOutputVariable() == null) {
 					valid = false;
@@ -1022,6 +1030,17 @@ public abstract class BaseAgentDefinitionResourceTestCase {
 				if (!Objects.deepEquals(
 						agentDefinition1.getInputVariables(),
 						agentDefinition2.getInputVariables())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("labelsList", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						agentDefinition1.getLabelsList(),
+						agentDefinition2.getLabelsList())) {
 
 					return false;
 				}
@@ -1291,6 +1310,11 @@ public abstract class BaseAgentDefinitionResourceTestCase {
 		}
 
 		if (entityFieldName.equals("inputVariables")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("labelsList")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}

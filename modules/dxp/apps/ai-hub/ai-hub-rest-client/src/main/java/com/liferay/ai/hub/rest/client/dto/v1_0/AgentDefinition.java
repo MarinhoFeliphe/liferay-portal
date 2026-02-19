@@ -151,6 +151,27 @@ public class AgentDefinition implements Cloneable, Serializable {
 
 	protected Variable[] inputVariables;
 
+	public LabelsList[] getLabelsList() {
+		return labelsList;
+	}
+
+	public void setLabelsList(LabelsList[] labelsList) {
+		this.labelsList = labelsList;
+	}
+
+	public void setLabelsList(
+		UnsafeSupplier<LabelsList[], Exception> labelsListUnsafeSupplier) {
+
+		try {
+			labelsList = labelsListUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected LabelsList[] labelsList;
+
 	public Variable getOutputVariable() {
 		return outputVariable;
 	}

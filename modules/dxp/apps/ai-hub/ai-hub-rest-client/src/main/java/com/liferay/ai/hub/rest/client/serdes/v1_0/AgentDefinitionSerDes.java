@@ -6,6 +6,7 @@
 package com.liferay.ai.hub.rest.client.serdes.v1_0;
 
 import com.liferay.ai.hub.rest.client.dto.v1_0.AgentDefinition;
+import com.liferay.ai.hub.rest.client.dto.v1_0.LabelsList;
 import com.liferay.ai.hub.rest.client.dto.v1_0.Variable;
 import com.liferay.ai.hub.rest.client.json.BaseJSONParser;
 
@@ -128,6 +129,26 @@ public class AgentDefinitionSerDes {
 			sb.append("]");
 		}
 
+		if (agentDefinition.getLabelsList() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"labelsList\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < agentDefinition.getLabelsList().length; i++) {
+				sb.append(String.valueOf(agentDefinition.getLabelsList()[i]));
+
+				if ((i + 1) < agentDefinition.getLabelsList().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (agentDefinition.getOutputVariable() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -243,6 +264,14 @@ public class AgentDefinitionSerDes {
 				String.valueOf(agentDefinition.getInputVariables()));
 		}
 
+		if (agentDefinition.getLabelsList() == null) {
+			map.put("labelsList", null);
+		}
+		else {
+			map.put(
+				"labelsList", String.valueOf(agentDefinition.getLabelsList()));
+		}
+
 		if (agentDefinition.getOutputVariable() == null) {
 			map.put("outputVariable", null);
 		}
@@ -313,6 +342,9 @@ public class AgentDefinitionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "inputVariables")) {
 				return false;
 			}
+			else if (Objects.equals(jsonParserFieldName, "labelsList")) {
+				return false;
+			}
 			else if (Objects.equals(jsonParserFieldName, "outputVariable")) {
 				return false;
 			}
@@ -381,6 +413,22 @@ public class AgentDefinitionSerDes {
 					}
 
 					agentDefinition.setInputVariables(inputVariablesArray);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "labelsList")) {
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					LabelsList[] labelsListArray =
+						new LabelsList[jsonParserFieldValues.length];
+
+					for (int i = 0; i < labelsListArray.length; i++) {
+						labelsListArray[i] = LabelsListSerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					agentDefinition.setLabelsList(labelsListArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "outputVariable")) {
