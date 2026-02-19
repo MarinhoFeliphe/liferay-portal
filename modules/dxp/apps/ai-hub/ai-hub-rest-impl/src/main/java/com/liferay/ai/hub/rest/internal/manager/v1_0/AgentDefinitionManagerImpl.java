@@ -6,7 +6,7 @@
 package com.liferay.ai.hub.rest.internal.manager.v1_0;
 
 import com.liferay.ai.hub.rest.dto.v1_0.AgentDefinition;
-import com.liferay.ai.hub.rest.dto.v1_0.LabelsList;
+import com.liferay.ai.hub.rest.dto.v1_0.Label;
 import com.liferay.ai.hub.rest.dto.v1_0.Variable;
 import com.liferay.ai.hub.rest.internal.resource.v1_0.AgentDefinitionResourceImpl;
 import com.liferay.ai.hub.rest.manager.v1_0.AgentDefinitionManager;
@@ -226,22 +226,12 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 			dtoConverterContext.getUriInfo());
 	}
 
-	private LabelsList[] _getAgentDefinitionLabelsList(
-		DTOConverterContext dtoConverterContext,
-		WorkflowDefinition workflowDefinition) {
+	private Label[] _getAgentDefinitionLabels(
+		Locale locale, WorkflowDefinition workflowDefinition) {
 
-		List<LabelsList> labelsList = new ArrayList<>();
+		List<Label> labelsList = new ArrayList<>();
 
-		Locale locale;
-
-		if (dtoConverterContext != null) {
-			locale = dtoConverterContext.getLocale();
-		}
-		else {
-			locale = null;
-		}
-
-		LabelsList statusLabel = new LabelsList();
+		Label statusLabel = new Label();
 
 		if (workflowDefinition.isActive()) {
 			statusLabel.setDisplayType(() -> "success");
@@ -254,20 +244,20 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 
 		labelsList.add(statusLabel);
 
-		LabelsList systemLabel = new LabelsList();
+		Label systemLabel = new Label();
 
 		if (workflowDefinition.isSystem()) {
-			systemLabel.setDisplayType(() -> "info");
+			systemLabel.setDisplayType(() -> "secondary");
 			systemLabel.setValue(() -> LanguageUtil.get(locale, "system"));
 		}
 		else {
-			systemLabel.setDisplayType(() -> "secondary");
+			systemLabel.setDisplayType(() -> "info");
 			systemLabel.setValue(() -> LanguageUtil.get(locale, "custom"));
 		}
 
 		labelsList.add(systemLabel);
 
-		return labelsList.toArray(new LabelsList[0]);
+		return new Label[] {statusLabel, systemLabel};
 	}
 
 	private ObjectDefinition _getObjectDefinition(long companyId)
@@ -354,9 +344,19 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 									"inputVariables"))),
 						inputVariable -> _toVariable(inputVariable),
 						Variable.class));
-				setLabelsList(
-					() -> _getAgentDefinitionLabelsList(
-						dtoConverterContext, workflowDefinition));
+				setLabels(
+					() -> {
+						if (dtoConverterContext == null) {
+							return _getAgentDefinitionLabels(
+								LanguageUtil.getLocale(
+									objectEntry.getDefaultLanguageId()),
+								workflowDefinition);
+						}
+
+						return _getAgentDefinitionLabels(
+							dtoConverterContext.getLocale(),
+							workflowDefinition);
+					});
 				setOutputVariable(
 					() -> _toVariable(
 						GetterUtil.getString(

@@ -27,7 +27,7 @@ public class AgentDefinitionListFDSView extends BaseListFDSView {
 
 	@Override
 	public String getLabel() {
-		return "labelsList";
+		return "labels";
 	}
 
 	@Override
