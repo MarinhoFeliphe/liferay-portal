@@ -9,19 +9,15 @@ import com.liferay.ai.hub.web.internal.constants.AIHubWebConstants;
 import com.liferay.ai.hub.web.internal.display.context.EditAgentDefinitionDisplayContext;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.Portal;
-
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import java.io.IOException;
 
 /**
  * @author Davyson Melo
@@ -48,7 +44,8 @@ public class EditAgentDefinitionFragmentRenderer implements FragmentRenderer {
 
 			EditAgentDefinitionDisplayContext
 				editAgentDefinitionDisplayContext =
-					new EditAgentDefinitionDisplayContext(httpServletRequest);
+					new EditAgentDefinitionDisplayContext(
+						httpServletRequest, _portal);
 
 			Class<?> clazz = editAgentDefinitionDisplayContext.getClass();
 
@@ -64,6 +61,9 @@ public class EditAgentDefinitionFragmentRenderer implements FragmentRenderer {
 			throw new IOException(exception);
 		}
 	}
+
+	@Reference
+	private Portal _portal;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=" + AIHubWebConstants.BUNDLE_SYMBOLIC_NAME + ")"

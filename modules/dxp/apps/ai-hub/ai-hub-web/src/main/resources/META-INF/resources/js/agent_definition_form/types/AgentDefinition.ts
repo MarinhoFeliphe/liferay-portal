@@ -4,14 +4,14 @@
  */
 
 export type AgentDefinition = {
-    active: boolean;
-    category?: string;
-    description: string;
-    externalReferenceCode: string;
-    inputVariables: string;
-    outputVariables: string;
-    title_i18n: {
-        [key: string]: string;
-    };
-    workflowDefinitionName?: string;
-}
+	active: boolean;
+	category?: string;
+	description: string;
+	externalReferenceCode: string;
+	inputVariables: string;
+	outputVariables: string;
+	title_i18n: {
+		[key: string]: string;
+	};
+	workflowDefinitionName?: string;
+};
