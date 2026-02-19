@@ -24,14 +24,9 @@ components:
                     items:
                         $ref: "#/components/schemas/Variable"
                     type: array
-                labelsList:
+                labels:
                     items:
-                        properties:
-                            displayType:
-                                type: string
-                            value:
-                                type: string
-                        type: object
+                        $ref: "#/components/schemas/Label"
                     type: array
                 outputVariable:
                     $ref: "#/components/schemas/Variable"
@@ -46,6 +41,13 @@ components:
         Chat:
             properties:
                 externalReferenceCode:
+                    type: string
+            type: object
+        Label:
+            properties:
+                displayType:
+                    type: string
+                value:
                     type: string
             type: object
         Message:
