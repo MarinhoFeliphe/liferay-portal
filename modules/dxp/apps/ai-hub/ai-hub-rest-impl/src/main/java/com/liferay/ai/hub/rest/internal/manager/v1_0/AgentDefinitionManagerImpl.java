@@ -247,11 +247,11 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 		Label systemLabel = new Label();
 
 		if (workflowDefinition.isSystem()) {
-			systemLabel.setDisplayType(() -> "secondary");
+			systemLabel.setDisplayType(() -> "info");
 			systemLabel.setValue(() -> LanguageUtil.get(locale, "system"));
 		}
 		else {
-			systemLabel.setDisplayType(() -> "info");
+			systemLabel.setDisplayType(() -> "warning");
 			systemLabel.setValue(() -> LanguageUtil.get(locale, "custom"));
 		}
 
