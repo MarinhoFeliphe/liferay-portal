@@ -24,6 +24,15 @@ components:
                     items:
                         $ref: "#/components/schemas/Variable"
                     type: array
+                labelsList:
+                    items:
+                        properties:
+                            displayType:
+                                type: string
+                            value:
+                                type: string
+                        type: object
+                    type: array
                 outputVariable:
                     $ref: "#/components/schemas/Variable"
                 title:
