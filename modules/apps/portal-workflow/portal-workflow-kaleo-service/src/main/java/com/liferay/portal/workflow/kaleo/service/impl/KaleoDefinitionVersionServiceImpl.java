@@ -37,11 +37,15 @@ public class KaleoDefinitionVersionServiceImpl
 			long companyId, String name, String version)
 		throws PortalException {
 
-		_kaleoDefinitionModelResourcePermission.check(
-			getPermissionChecker(), null, ActionKeys.VIEW);
+		KaleoDefinitionVersion kaleoDefinitionVersion =
+			_kaleoDefinitionVersionLocalService.getKaleoDefinitionVersion(
+				companyId, name, version);
 
-		return _kaleoDefinitionVersionLocalService.getKaleoDefinitionVersion(
-			companyId, name, version);
+		_kaleoDefinitionModelResourcePermission.check(
+			getPermissionChecker(), kaleoDefinitionVersion.getKaleoDefinition(),
+			ActionKeys.VIEW);
+
+		return kaleoDefinitionVersion;
 	}
 
 	@Override
@@ -49,11 +53,19 @@ public class KaleoDefinitionVersionServiceImpl
 			long companyId, String name)
 		throws PortalException {
 
-		_kaleoDefinitionModelResourcePermission.check(
-			getPermissionChecker(), null, ActionKeys.VIEW);
+		List<KaleoDefinitionVersion> kaleoDefinitionVersions =
+			_kaleoDefinitionVersionLocalService.getKaleoDefinitionVersions(
+				companyId, name);
 
-		return _kaleoDefinitionVersionLocalService.getKaleoDefinitionVersions(
-			companyId, name);
+		for (KaleoDefinitionVersion kaleoDefinitionVersion :
+				kaleoDefinitionVersions) {
+
+			_kaleoDefinitionModelResourcePermission.check(
+				getPermissionChecker(),
+				kaleoDefinitionVersion.getKaleoDefinition(), ActionKeys.VIEW);
+		}
+
+		return kaleoDefinitionVersions;
 	}
 
 	@Reference(
