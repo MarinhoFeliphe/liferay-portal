@@ -16,6 +16,7 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -32,8 +33,6 @@ import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -226,38 +225,26 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 			dtoConverterContext.getUriInfo());
 	}
 
-	private Label[] _getAgentDefinitionLabels(
+	private Label[] _getLabels(
 		Locale locale, WorkflowDefinition workflowDefinition) {
 
-		List<Label> labelsList = new ArrayList<>();
-
-		Label statusLabel = new Label();
+		Label[] labels = new Label[2];
 
 		if (workflowDefinition.isActive()) {
-			statusLabel.setDisplayType(() -> "success");
-			statusLabel.setValue(() -> LanguageUtil.get(locale, "active"));
+			labels[0] = _toLabel("success", locale, "active");
 		}
 		else {
-			statusLabel.setDisplayType(() -> "danger");
-			statusLabel.setValue(() -> LanguageUtil.get(locale, "inactive"));
+			labels[0] = _toLabel("danger", locale, "inactive");
 		}
-
-		labelsList.add(statusLabel);
-
-		Label systemLabel = new Label();
 
 		if (workflowDefinition.isSystem()) {
-			systemLabel.setDisplayType(() -> "info");
-			systemLabel.setValue(() -> LanguageUtil.get(locale, "system"));
+			labels[1] = _toLabel("info", locale, "system");
 		}
 		else {
-			systemLabel.setDisplayType(() -> "warning");
-			systemLabel.setValue(() -> LanguageUtil.get(locale, "custom"));
+			labels[1] = _toLabel("warning", locale, "custom");
 		}
 
-		labelsList.add(systemLabel);
-
-		return new Label[] {statusLabel, systemLabel};
+		return labels;
 	}
 
 	private ObjectDefinition _getObjectDefinition(long companyId)
@@ -347,13 +334,10 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 				setLabels(
 					() -> {
 						if (dtoConverterContext == null) {
-							return _getAgentDefinitionLabels(
-								LanguageUtil.getLocale(
-									objectEntry.getDefaultLanguageId()),
-								workflowDefinition);
+							return null;
 						}
 
-						return _getAgentDefinitionLabels(
+						return _getLabels(
 							dtoConverterContext.getLocale(),
 							workflowDefinition);
 					});
@@ -370,6 +354,15 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 		};
 	}
 
+	private Label _toLabel(String displayType, Locale locale, String value) {
+		Label label = new Label();
+
+		label.setDisplayType(() -> displayType);
+		label.setValue(() -> _language.get(locale, value));
+
+		return label;
+	}
+
 	private Variable _toVariable(String variableName) {
 		return new Variable() {
 			{
@@ -384,6 +377,9 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 	)
 	private ModelResourcePermission<KaleoDefinition>
 		_kaleoDefinitionModelResourcePermission;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;

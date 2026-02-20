@@ -12,9 +12,9 @@ AgentDefinitionDisplayContext agentDefinitionDisplayContext = (AgentDefinitionDi
 %>
 
 <div class="ai-hub-agent-definitions__list-container align-items-center container-fluid d-flex ml-2">
-    <div class="p-3">
-       <h2><liferay-ui:message key="agents" /></h2>
-    </div>
+	<div class="p-3">
+		<h2><liferay-ui:message key="agents" /></h2>
+	</div>
 </div>
 
 <frontend-data-set:headless-display
