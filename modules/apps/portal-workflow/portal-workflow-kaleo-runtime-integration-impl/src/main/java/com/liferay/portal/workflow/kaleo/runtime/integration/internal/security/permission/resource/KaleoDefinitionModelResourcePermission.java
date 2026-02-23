@@ -66,6 +66,8 @@ public class KaleoDefinitionModelResourcePermission
 			KaleoDefinition kaleoDefinition, String actionId)
 		throws PortalException {
 
+		// TODO check if the user has access to the account here as well
+
 		if (permissionChecker.isOmniadmin() ||
 			((StringUtil.equals(actionId, ActionKeys.VIEW) ||
 			  _companyAdministratorCanPublish) &&

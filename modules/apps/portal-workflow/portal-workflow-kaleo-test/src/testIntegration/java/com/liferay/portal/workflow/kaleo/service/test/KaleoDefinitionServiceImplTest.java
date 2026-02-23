@@ -67,6 +67,8 @@ import org.osgi.service.cm.ConfigurationAdmin;
 @RunWith(Arquillian.class)
 public class KaleoDefinitionServiceImplTest {
 
+	// TODO Create tests for account restriction
+
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =

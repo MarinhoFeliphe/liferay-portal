@@ -5,9 +5,11 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.integration.internal.security.permission.resource;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.util.AccountEntryPermissionUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -64,28 +66,14 @@ public class WorkflowPortletResourcePermission
 	public boolean contains(
 		PermissionChecker permissionChecker, long groupId, String actionId) {
 
-		if (permissionChecker.isOmniadmin() ||
-			(_companyAdministratorCanPublish &&
-			 permissionChecker.isCompanyAdmin())) {
-
-			return true;
+		try {
+			return _contains(permissionChecker, groupId);
 		}
+		catch (PortalException portalException) {
+			_log.error(portalException);
 
-		Group group = _groupLocalService.fetchGroup(groupId);
-
-		if (group == null) {
 			return false;
 		}
-
-		AccountEntry accountEntry =
-			_accountEntryLocalService.fetchUserAccountEntry(
-				permissionChecker.getUserId(), group.getClassPK());
-
-		if (accountEntry != null) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override
@@ -104,8 +92,30 @@ public class WorkflowPortletResourcePermission
 			workflowDefinitionConfiguration.companyAdministratorCanPublish();
 	}
 
-	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private boolean _contains(PermissionChecker permissionChecker, long groupId)
+		throws PortalException {
+
+		if (permissionChecker.isOmniadmin() ||
+			(_companyAdministratorCanPublish &&
+			 permissionChecker.isCompanyAdmin())) {
+
+			return true;
+		}
+
+		if (groupId == 0) {
+			return false;
+		}
+
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		// TODO check if the account is not L_AI_HUB
+
+		return AccountEntryPermissionUtil.hasAccessToAccountEntry(
+			group.getClassPK(), permissionChecker.getUserId());
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		WorkflowPortletResourcePermission.class);
 
 	private volatile boolean _companyAdministratorCanPublish;
 
