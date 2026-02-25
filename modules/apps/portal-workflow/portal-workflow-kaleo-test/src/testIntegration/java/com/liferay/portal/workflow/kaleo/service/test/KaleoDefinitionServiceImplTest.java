@@ -7,6 +7,7 @@ package com.liferay.portal.workflow.kaleo.service.test;
 
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
+import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
@@ -21,8 +22,8 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
 import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
@@ -47,12 +48,15 @@ import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
+import com.liferay.site.initializer.SiteInitializer;
+import com.liferay.site.initializer.SiteInitializerRegistry;
 
 import java.io.InputStream;
 
 import java.util.Collections;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -90,6 +94,26 @@ public class KaleoDefinitionServiceImplTest {
 		_configuration = _configurationAdmin.getConfiguration(
 			WorkflowDefinitionConfiguration.class.getName(),
 			StringPool.QUESTION);
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
+
+		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
+
+		ServiceContextThreadLocal.pushServiceContext(
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId()));
+
+		SiteInitializer siteInitializer =
+			_siteInitializerRegistry.getSiteInitializer(
+				"com.liferay.ai.hub.site.initializer");
+
+		siteInitializer.initialize(TestPropsValues.getGroupId());
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		ServiceContextThreadLocal.popServiceContext();
 	}
 
 	@Before
@@ -127,7 +151,34 @@ public class KaleoDefinitionServiceImplTest {
 				" permission for null "),
 			this::_addKaleoDefinition);
 
-		AccountEntry accountEntry = _accountEntryLocalService.addAccountEntry(
+		AccountEntry accountEntry =
+			_accountEntryLocalService.getAccountEntryByExternalReferenceCode(
+				"L_AI_HUB", TestPropsValues.getCompanyId());
+
+		AccountEntryUserRel accountEntryUserRel =
+			_accountEntryUserRelLocalService.addAccountEntryUserRel(
+				accountEntry.getAccountEntryId(),
+				_companyAdminUser.getUserId());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(accountEntry.getAccountEntryGroupId());
+		serviceContext.setUserId(_companyAdminUser.getUserId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must have ",
+				"ADD_DEFINITION, ", WorkflowConstants.RESOURCE_NAME,
+				" permission for null "),
+			() -> _kaleoDefinitionService.addKaleoDefinition(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				_read(), WorkflowDefinitionConstants.SCOPE_AI, 1,
+				serviceContext));
+
+		accountEntry = _accountEntryLocalService.addAccountEntry(
 			StringPool.BLANK, _companyAdminUser.getUserId(),
 			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
 			RandomTestUtil.randomString(), null, null,
@@ -135,16 +186,20 @@ public class KaleoDefinitionServiceImplTest {
 			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
 			WorkflowConstants.STATUS_APPROVED, _serviceContext);
 
-		long originalServiceContextGroupId = _serviceContext.getScopeGroupId();
-
-		_serviceContext.setScopeGroupId(accountEntry.getAccountEntryGroupId());
-
 		_accountEntryUserRelLocalService.addAccountEntryUserRel(
 			accountEntry.getAccountEntryId(), _companyAdminUser.getUserId());
 
-		Assert.assertNotNull(_addKaleoDefinition());
+		serviceContext.setScopeGroupId(accountEntry.getAccountEntryGroupId());
 
-		_serviceContext.setScopeGroupId(originalServiceContextGroupId);
+		Assert.assertNotNull(
+			_kaleoDefinitionService.addKaleoDefinition(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				_read(), WorkflowDefinitionConstants.SCOPE_AI, 1,
+				serviceContext));
+
+		_accountEntryUserRelLocalService.deleteAccountEntryUserRel(
+			accountEntryUserRel.getAccountEntryUserRelId());
 
 		// Administrator with "company.administrator.can.publish" enabled
 
@@ -173,26 +228,14 @@ public class KaleoDefinitionServiceImplTest {
 			() -> _kaleoDefinitionService.getKaleoDefinition(
 				kaleoDefinition.getKaleoDefinitionId()));
 
-		AccountEntry accountEntry = _accountEntryLocalService.addAccountEntry(
-			StringPool.BLANK, _companyAdminUser.getUserId(),
-			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
-			RandomTestUtil.randomString(), null, null,
-			RandomTestUtil.randomString() + "@liferay.com", null, null,
-			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
-			WorkflowConstants.STATUS_APPROVED, _serviceContext);
-
-		long originalServiceContextGroupId = _serviceContext.getScopeGroupId();
-
-		_serviceContext.setScopeGroupId(accountEntry.getAccountEntryGroupId());
-
-		_accountEntryUserRelLocalService.addAccountEntryUserRel(
-			accountEntry.getAccountEntryId(), _companyAdminUser.getUserId());
-
-		Assert.assertNotNull(
-			_kaleoDefinitionService.getKaleoDefinition(
-				kaleoDefinition.getKaleoDefinitionId()));
-
-		_serviceContext.setScopeGroupId(originalServiceContextGroupId);
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", user.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.getKaleoDefinition(
+				WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_CHANGE_TONE,
+				TestPropsValues.getCompanyId()));
 
 		_setUpPermissionThreadLocal(_companyAdminUser);
 
@@ -208,6 +251,14 @@ public class KaleoDefinitionServiceImplTest {
 
 		_setUpPermissionThreadLocal(user);
 
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", user.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.getScopeKaleoDefinitions(
+				WorkflowDefinitionConstants.SCOPE_AI, true, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null, _serviceContext));
 		AssertUtils.assertFailure(
 			PrincipalException.MustBeCompanyAdmin.class,
 			StringBundler.concat(
@@ -253,16 +304,71 @@ public class KaleoDefinitionServiceImplTest {
 		_setUpPermissionThreadLocal(_companyAdminUser);
 
 		AssertUtils.assertFailure(
-			PrincipalException.MustHavePermission.class,
+			PrincipalException.MustBeCompanyAdmin.class,
 			StringBundler.concat(
-				"User ", _companyAdminUser.getUserId(), " must have ",
-				"ADD_DEFINITION, ", WorkflowConstants.RESOURCE_NAME,
-				" permission for null "),
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
 			() -> _kaleoDefinitionService.updateKaleoDefinition(
 				kaleoDefinition.getExternalReferenceCode(),
 				kaleoDefinition.getKaleoDefinitionId(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				kaleoDefinition.getContent(), _serviceContext));
+
+		AccountEntry accountEntry =
+			_accountEntryLocalService.getAccountEntryByExternalReferenceCode(
+				"L_AI_HUB", TestPropsValues.getCompanyId());
+
+		AccountEntryUserRel accountEntryUserRel =
+			_accountEntryUserRelLocalService.addAccountEntryUserRel(
+				accountEntry.getAccountEntryId(),
+				_companyAdminUser.getUserId());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(accountEntry.getAccountEntryGroupId());
+		serviceContext.setUserId(_companyAdminUser.getUserId());
+
+		KaleoDefinition changeToneKaleoDefinition =
+			_kaleoDefinitionLocalService.
+				fetchKaleoDefinitionByExternalReferenceCode(
+					WorkflowDefinitionConstants.
+						EXTERNAL_REFERENCE_CODE_CHANGE_TONE,
+					TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.updateKaleoDefinition(
+				WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_CHANGE_TONE,
+				changeToneKaleoDefinition.getKaleoDefinitionId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				changeToneKaleoDefinition.getContent(), serviceContext));
+
+		accountEntry = _accountEntryLocalService.addAccountEntry(
+			StringPool.BLANK, _companyAdminUser.getUserId(),
+			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
+			RandomTestUtil.randomString(), null, null,
+			RandomTestUtil.randomString() + "@liferay.com", null, null,
+			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+			WorkflowConstants.STATUS_APPROVED, _serviceContext);
+
+		_accountEntryUserRelLocalService.addAccountEntryUserRel(
+			accountEntry.getAccountEntryId(), _companyAdminUser.getUserId());
+
+		serviceContext.setScopeGroupId(accountEntry.getAccountEntryGroupId());
+
+		Assert.assertNotNull(
+			_kaleoDefinitionService.updateKaleoDefinition(
+				WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_CHANGE_TONE,
+				changeToneKaleoDefinition.getKaleoDefinitionId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				changeToneKaleoDefinition.getContent(), serviceContext));
+
+		_accountEntryUserRelLocalService.deleteAccountEntryUserRel(
+			accountEntryUserRel.getAccountEntryUserRelId());
 
 		// Administrator with "company.administrator.can.publish" enabled
 
@@ -324,13 +430,13 @@ public class KaleoDefinitionServiceImplTest {
 	private static ConfigurationAdmin _configurationAdmin;
 
 	@Inject
+	private static SiteInitializerRegistry _siteInitializerRegistry;
+
+	@Inject
 	private AccountEntryLocalService _accountEntryLocalService;
 
 	@Inject
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
-
-	@Inject
-	private GroupLocalService _groupLocalService;
 
 	@Inject
 	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;

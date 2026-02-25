@@ -91,14 +91,11 @@ public class KaleoDefinitionModelResourcePermission
 		AccountEntry accountEntry = _accountEntryLocalService.fetchAccountEntry(
 			group.getClassPK());
 
-		if (accountEntry == null){
-			return false;
-		}
-
-		if (Objects.equals(
+		if ((accountEntry == null) ||
+			Objects.equals(
 				accountEntry.getExternalReferenceCode(), "L_AI_HUB")) {
 
-			return true;
+			return false;
 		}
 
 		return AccountEntryPermissionUtil.hasAccessToAccountEntry(
