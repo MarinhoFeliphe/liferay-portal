@@ -5,6 +5,8 @@
 
 package com.liferay.headless.admin.workflow.internal.resource.v1_0;
 
+import com.liferay.account.model.AccountEntry;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.headless.admin.workflow.dto.v1_0.Node;
 import com.liferay.headless.admin.workflow.dto.v1_0.Transition;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
@@ -17,9 +19,11 @@ import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -29,6 +33,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -216,8 +221,12 @@ public class WorkflowDefinitionResourceImpl
 		return _toWorkflowDefinition(
 			_workflowDefinitionManager.deployWorkflowDefinition(
 				workflowDefinition.getExternalReferenceCode(),
-				contextCompany.getCompanyId(), contextUser.getUserId(),
-				_getTitle(workflowDefinition), workflowDefinition.getName(),
+				contextCompany.getCompanyId(),
+				_getGroupId(
+					workflowDefinition.getGroupExternalReferenceCode(),
+					workflowDefinition.getName()),
+				contextUser.getUserId(), _getTitle(workflowDefinition),
+				workflowDefinition.getName(),
 				GetterUtil.getString(
 					workflowDefinition.getScope(),
 					WorkflowDefinitionConstants.SCOPE_ALL),
@@ -234,8 +243,12 @@ public class WorkflowDefinitionResourceImpl
 		return _toWorkflowDefinition(
 			_workflowDefinitionManager.saveWorkflowDefinition(
 				workflowDefinition.getExternalReferenceCode(),
-				contextCompany.getCompanyId(), contextUser.getUserId(),
-				_getTitle(workflowDefinition), workflowDefinition.getName(),
+				contextCompany.getCompanyId(),
+				_getGroupId(
+					workflowDefinition.getGroupExternalReferenceCode(),
+					workflowDefinition.getName()),
+				contextUser.getUserId(), _getTitle(workflowDefinition),
+				workflowDefinition.getName(),
 				GetterUtil.getString(
 					workflowDefinition.getScope(),
 					WorkflowDefinitionConstants.SCOPE_ALL),
@@ -262,6 +275,31 @@ public class WorkflowDefinitionResourceImpl
 			contextCompany.getCompanyId(), workflowDefinition.getName());
 
 		return postWorkflowDefinitionDeploy(workflowDefinition);
+	}
+
+	private long _getGroupId(String externalReferenceCode, String name)
+		throws Exception {
+
+		if (ArrayUtil.contains(
+				WorkflowDefinitionConstants.SYSTEM_WORKFLOW_DEFINITION_NAMES,
+				name)) {
+
+			AccountEntry accountEntry =
+				_accountEntryLocalService.
+					getAccountEntryByExternalReferenceCode(
+						"L_AI_HUB", contextCompany.getCompanyId());
+
+			return accountEntry.getAccountEntryGroupId();
+		}
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return 0;
+		}
+
+		Group group = _groupLocalService.getGroupByExternalReferenceCode(
+			externalReferenceCode, contextCompany.getCompanyId());
+
+		return group.getGroupId();
 	}
 
 	private String _getTitle(WorkflowDefinition workflowDefinition)
@@ -357,6 +395,8 @@ public class WorkflowDefinitionResourceImpl
 				setDescription(workflowDefinition::getDescription);
 				setExternalReferenceCode(
 					workflowDefinition::getExternalReferenceCode);
+				setGroupExternalReferenceCode(
+					workflowDefinition::getGroupExternalReferenceCode);
 				setId(workflowDefinition::getWorkflowDefinitionId);
 				setName(workflowDefinition::getName);
 				setNodes(
@@ -409,6 +449,12 @@ public class WorkflowDefinitionResourceImpl
 
 	private static final EntityModel _entityModel =
 		new WorkflowDefinitionEntityModel();
+
+	@Reference
+	private AccountEntryLocalService _accountEntryLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private Language _language;

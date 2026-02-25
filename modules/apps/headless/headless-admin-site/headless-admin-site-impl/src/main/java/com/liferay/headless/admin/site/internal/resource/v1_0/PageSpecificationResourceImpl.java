@@ -33,6 +33,7 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
 import com.liferay.layout.utility.page.service.LayoutUtilityPageEntryService;
 import com.liferay.portal.kernel.exception.LockedLayoutException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -46,6 +47,9 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
 import com.liferay.portal.vulcan.pagination.Page;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.List;
 import java.util.Objects;
@@ -66,12 +70,17 @@ public class PageSpecificationResourceImpl
 	extends BasePageSpecificationResourceImpl {
 
 	@Override
+	@Tags({@Tag(description = "[DEV]", name = "PageSpecification")})
 	public void deleteSitePageSpecification(
 			String siteExternalReferenceCode,
 			String pageSpecificationExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		Layout layout = _getLayout(
 			GroupUtil.getGroupId(
@@ -281,7 +290,11 @@ public class PageSpecificationResourceImpl
 			PageSpecification pageSpecification)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getGroupId(
 			true, true, contextCompany.getCompanyId(),

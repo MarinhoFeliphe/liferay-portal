@@ -5,9 +5,15 @@
 
 package com.liferay.ai.hub.web.internal.display.context;
 
+import com.liferay.account.model.AccountEntry;
+import com.liferay.account.util.AccountEntryPermissionUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
@@ -22,7 +28,9 @@ import jakarta.portlet.WindowState;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Davyson Melo
@@ -30,8 +38,10 @@ import java.util.Map;
 public class EditAgentDefinitionDisplayContext {
 
 	public EditAgentDefinitionDisplayContext(
+		GroupLocalService groupLocalService,
 		HttpServletRequest httpServletRequest, Portal portal) {
 
+		_groupLocalService = groupLocalService;
 		_httpServletRequest = httpServletRequest;
 		_portal = portal;
 
@@ -45,7 +55,19 @@ public class EditAgentDefinitionDisplayContext {
 		String portalURL = company.getPortalURL(
 			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
+		AccountEntry accountEntry = _fetchAccountEntry();
+
+		String accountEntryExternalReferenceCode = StringPool.BLANK;
+
+		if (accountEntry != null) {
+			accountEntryExternalReferenceCode =
+				accountEntry.getExternalReferenceCode();
+		}
+
 		return HashMapBuilder.<String, Object>put(
+			"accountEntryExternalReferenceCode",
+			accountEntryExternalReferenceCode
+		).put(
 			"backURL", portalURL + "/web/ai-hub/agents"
 		).put(
 			"externalReferenceCode",
@@ -56,23 +78,18 @@ public class EditAgentDefinitionDisplayContext {
 				String namespace = _portal.getPortletNamespace(
 					WorkflowPortletKeys.KALEO_DESIGNER);
 
-				String url = StringBundler.concat(
-					portalURL,
-					PropsValues.
-						LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING,
-					GroupConstants.CONTROL_PANEL_FRIENDLY_URL,
-					PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
-
-				String workflowDefinitionName =
-					_httpServletRequest.getParameter("workflowDefinitionName");
-
-				if (workflowDefinitionName != null) {
-					url = HttpComponentsUtil.addParameter(
-						url, namespace + "name", workflowDefinitionName);
-				}
+				String url = _addNameParameter(
+					namespace,
+					StringBundler.concat(
+						portalURL,
+						PropsValues.
+							LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING,
+						GroupConstants.CONTROL_PANEL_FRIENDLY_URL,
+						PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL));
 
 				return HttpComponentsUtil.addParameters(
-					url, "p_p_id", WorkflowPortletKeys.KALEO_DESIGNER,
+					_addGroupExternalReferenceCodeParameter(namespace, url),
+					"p_p_id", WorkflowPortletKeys.KALEO_DESIGNER,
 					"p_p_lifecycle", "0", "p_p_state",
 					WindowState.MAXIMIZED.toString(), "p_p_mode",
 					PortletMode.VIEW.toString(), namespace + "mvcPath",
@@ -86,6 +103,56 @@ public class EditAgentDefinitionDisplayContext {
 		).build();
 	}
 
+	private String _addGroupExternalReferenceCodeParameter(
+			String namespace, String url)
+		throws PortalException {
+
+		AccountEntry accountEntry = _fetchAccountEntry();
+
+		if (accountEntry == null) {
+			return url;
+		}
+
+		Group group = _groupLocalService.getGroup(
+			accountEntry.getAccountEntryGroupId());
+
+		return HttpComponentsUtil.addParameter(
+			url, namespace + "groupExternalReferenceCode",
+			group.getExternalReferenceCode());
+	}
+
+	private String _addNameParameter(String namespace, String url) {
+		String workflowDefinitionName = _httpServletRequest.getParameter(
+			"workflowDefinitionName");
+
+		if (workflowDefinitionName == null) {
+			return url;
+		}
+
+		return HttpComponentsUtil.addParameter(
+			url, namespace + "name", workflowDefinitionName);
+	}
+
+	private AccountEntry _fetchAccountEntry() throws PortalException {
+		List<AccountEntry> accountEntries =
+			AccountEntryPermissionUtil.getUserAccountEntries(
+				_themeDisplay.getUserId());
+
+		if (accountEntries.isEmpty()) {
+			return null;
+		}
+
+		return accountEntries.stream(
+		).filter(
+			tempAccountEntry -> !Objects.equals(
+				tempAccountEntry.getExternalReferenceCode(), "L_AI_HUB")
+		).findFirst(
+		).orElse(
+			null
+		);
+	}
+
+	private final GroupLocalService _groupLocalService;
 	private final HttpServletRequest _httpServletRequest;
 	private final Portal _portal;
 	private final ThemeDisplay _themeDisplay;

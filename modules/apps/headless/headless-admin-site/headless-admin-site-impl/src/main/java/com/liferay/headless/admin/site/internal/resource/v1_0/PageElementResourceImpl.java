@@ -11,7 +11,6 @@ import com.liferay.headless.admin.site.internal.dto.v1_0.util.DTOConverterContex
 import com.liferay.headless.admin.site.internal.resource.v1_0.layout.structure.item.importer.context.LayoutStructureItemImporterContext;
 import com.liferay.headless.admin.site.internal.resource.v1_0.util.GroupUtil;
 import com.liferay.headless.admin.site.internal.resource.v1_0.util.LayoutStructureUtil;
-import com.liferay.headless.admin.site.internal.util.EnabledUtil;
 import com.liferay.headless.admin.site.resource.v1_0.PageElementResource;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
@@ -21,6 +20,7 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructureItemUtil;
 import com.liferay.layout.util.structure.exception.NoSuchLayoutStructureItemException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -30,6 +30,9 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,6 +48,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class PageElementResourceImpl extends BasePageElementResourceImpl {
 
 	@Override
+	@Tags({@Tag(description = "[DEV]", name = "PageElement")})
 	public void deleteSitePageSpecificationPageExperiencePageElement(
 			String siteExternalReferenceCode,
 			String pageSpecificationExternalReferenceCode,
@@ -52,7 +56,11 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 			String pageElementExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -107,7 +115,11 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 			String pageElementExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -161,7 +173,11 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 				String pageElementExternalReferenceCode, Boolean flatten)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -214,7 +230,11 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 				String pageExperienceExternalReferenceCode, Boolean flatten)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -262,7 +282,11 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 			String pageExperienceExternalReferenceCode, PageElement pageElement)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -313,7 +337,11 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 			String pageElementExternalReferenceCode, PageElement pageElement)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-74328")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);

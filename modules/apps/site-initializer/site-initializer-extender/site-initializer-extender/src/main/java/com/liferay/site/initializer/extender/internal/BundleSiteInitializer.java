@@ -5419,7 +5419,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		).put(
 			addUserRolesR, _dependsOn(addOrUpdateRolesR, addUserAccountsR)
 		).put(
-			addWorkflowDefinitionsR, _dependsOn(addOrUpdateRolesR)
+			addWorkflowDefinitionsR,
+			_dependsOn(addAccountsR, addOrUpdateRolesR)
 		).put(
 			publishObjectDefinitionsR, _dependsOn(addOrUpdateObjectFieldsR)
 		).put(
