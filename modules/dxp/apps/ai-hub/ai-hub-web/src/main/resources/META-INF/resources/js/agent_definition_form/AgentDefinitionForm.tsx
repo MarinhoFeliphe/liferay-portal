@@ -388,7 +388,7 @@ export default function AgentDefinitionForm({
 												'workflow-definition'
 											)}
 											required={true}
-											value={
+											selectedKey={
 												formData.workflowDefinitionName
 											}
 										>
