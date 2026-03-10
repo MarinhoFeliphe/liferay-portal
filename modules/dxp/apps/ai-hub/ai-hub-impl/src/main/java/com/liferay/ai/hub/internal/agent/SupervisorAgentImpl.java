@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyInheritableThreadLocalCallable;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalRunMode;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -28,6 +30,8 @@ import dev.langchain4j.agentic.AgenticServices;
 import dev.langchain4j.agentic.internal.InternalAgent;
 import dev.langchain4j.agentic.supervisor.SupervisorContextStrategy;
 import dev.langchain4j.agentic.supervisor.SupervisorResponseStrategy;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
 
 import org.osgi.service.component.annotations.Activate;
@@ -49,19 +53,10 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 		_noticeableExecutorService.submit(
 			new CompanyInheritableThreadLocalCallable<>(
 				() -> {
-					try (VertexAiGeminiChatModel vertexAiGeminiChatModel =
-							VertexAiGeminiChatModel.builder(
-							).location(
-								"us-central1"
-							).modelName(
-								"gemini-2.5-flash-lite"
-							).project(
-								"ai-hub-liferay"
-							).build()) {
+					ChatModel chatModel = _createChatModel();
 
-						_invoke(
-							agentContext, internalAgents,
-							vertexAiGeminiChatModel);
+					try {
+						_invoke(agentContext, internalAgents, chatModel);
 					}
 					catch (Exception exception) {
 						_log.error(exception);
@@ -85,6 +80,24 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 	@Deactivate
 	protected void deactivate() {
 		_noticeableExecutorService.shutdown();
+	}
+
+	private ChatModel _createChatModel() {
+		if (PortalRunMode.isTestMode()) {
+			return OllamaChatModel.builder(
+			).modelName(
+				"tinyllama"
+			).build();
+		}
+
+		return VertexAiGeminiChatModel.builder(
+		).location(
+			PropsValues.AI_HUB_VERTEX_AI_LOCATION
+		).modelName(
+			PropsValues.AI_HUB_VERTEX_AI_MODEL_NAME
+		).project(
+			PropsValues.AI_HUB_VERTEX_AI_PROJECT
+		).build();
 	}
 
 	private InternalAgent[] _createInternalAgents(AgentContext agentContext) {
@@ -114,7 +127,7 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 
 	private void _invoke(
 		AgentContext agentContext, InternalAgent[] internalAgents,
-		VertexAiGeminiChatModel vertexAiGeminiChatModel) {
+		ChatModel chatModel) {
 
 		dev.langchain4j.agentic.supervisor.SupervisorAgent supervisorAgent =
 			AgenticServices.supervisorBuilder(
@@ -122,7 +135,7 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 				memoryId -> ChatMemoryProviderUtil.provide(
 					agentContext.getSseEventSinkKey())
 			).chatModel(
-				vertexAiGeminiChatModel
+				chatModel
 			).contextGenerationStrategy(
 				SupervisorContextStrategy.CHAT_MEMORY_AND_SUMMARIZATION
 			).maxAgentsInvocations(
