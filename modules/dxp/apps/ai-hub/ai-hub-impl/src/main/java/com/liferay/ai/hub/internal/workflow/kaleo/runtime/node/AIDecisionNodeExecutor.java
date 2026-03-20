@@ -9,9 +9,9 @@ import com.liferay.ai.hub.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.internal.mcp.tool.provider.MCPToolProviderUtil;
 import com.liferay.ai.hub.internal.model.VertexAiGeminiStreamingChatModelUtil;
-import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ContentRetrieverUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.KaleoLogUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
+import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
@@ -159,11 +160,6 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 
 		AssistantHandlerUtil.handle(
 			AssistantHandlerContext.builder(
-			).contentRetriever(
-				ContentRetrieverUtil.createContentRetriever(
-					GetterUtil.getString(workflowContext.get("accessToken")),
-					kaleoNodeSettingValues,
-					GetterUtil.getString(workflowContext.get("userToken")))
 			).invocationParameters(
 				InvocationParameters.from(
 					Map.of(
@@ -193,6 +189,12 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 
 					_log.error(throwable);
 				}
+			).retrievalAugmentor(
+				RetrievalAugmentorUtil.createRetrievalAugmentor(
+					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
+					kaleoNodeSettingValues, serviceContext.getLocale(),
+					_objectEntryManager, _searchEngineAdapter,
+					serviceContext.getUserId(), workflowContext)
 			).systemMessageProviderFunction(
 				memoryId -> prompt
 			).tools(
@@ -253,6 +255,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 		target = "(object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
 	)
 	private ObjectEntryManager _objectEntryManager;
+
+	@Reference
+	private SearchEngineAdapter _searchEngineAdapter;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;
