@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
@@ -160,8 +161,11 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			).contentRetriever(
 				ContentRetrieverUtil.createContentRetriever(
 					GetterUtil.getString(workflowContext.get("accessToken")),
-					kaleoNodeSettingValues,
-					GetterUtil.getString(workflowContext.get("userToken")))
+					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
+					kaleoNodeSettingValues, serviceContext.getLocale(),
+					_objectEntryManager, _searchEngineAdapter,
+					GetterUtil.getString(workflowContext.get("userToken")),
+					serviceContext.getUserId())
 			).invocationParameters(
 				InvocationParameters.from(
 					Map.of(
@@ -251,6 +255,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 		target = "(object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
 	)
 	private ObjectEntryManager _objectEntryManager;
+
+	@Reference
+	private SearchEngineAdapter _searchEngineAdapter;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;

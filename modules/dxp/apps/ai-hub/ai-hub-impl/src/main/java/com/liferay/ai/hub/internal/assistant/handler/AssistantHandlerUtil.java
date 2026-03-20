@@ -9,6 +9,8 @@ import com.liferay.ai.hub.internal.memory.ChatMemoryProviderUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import dev.langchain4j.invocation.InvocationParameters;
+import dev.langchain4j.rag.DefaultRetrievalAugmentor;
+import dev.langchain4j.rag.query.router.DefaultQueryRouter;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.TokenStream;
@@ -33,8 +35,12 @@ public class AssistantHandlerUtil {
 		}
 
 		if (assistantHandlerContext.getContentRetriever() != null) {
-			aiServices.contentRetriever(
-				assistantHandlerContext.getContentRetriever());
+			aiServices.retrievalAugmentor(
+				DefaultRetrievalAugmentor.builder(
+				).queryRouter(
+					new DefaultQueryRouter(
+						assistantHandlerContext.getContentRetriever())
+				).build());
 		}
 
 		Assistant assistant = aiServices.streamingChatModel(
