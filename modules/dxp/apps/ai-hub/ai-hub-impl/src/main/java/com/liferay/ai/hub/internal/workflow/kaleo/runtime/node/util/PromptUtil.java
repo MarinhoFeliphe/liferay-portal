@@ -79,8 +79,19 @@ public class PromptUtil {
 
 			List<String> instructions = TransformUtil.transform(
 				page.getItems(),
-				objectEntry -> GetterUtil.getString(
-					objectEntry.getPropertyValue("instruction")));
+				objectEntry -> {
+					String instruction = GetterUtil.getString(
+						objectEntry.getPropertyValue("instruction"));
+					String whenToUse = GetterUtil.getString(
+						objectEntry.getPropertyValue("whenToUse"));
+
+					if (Validator.isNull(whenToUse)) {
+						return instruction;
+					}
+
+					return StringBundler.concat(
+						instruction, " (Context: ", whenToUse, ")");
+				});
 
 			if (ListUtil.isEmpty(instructions)) {
 				return StringPool.BLANK;
