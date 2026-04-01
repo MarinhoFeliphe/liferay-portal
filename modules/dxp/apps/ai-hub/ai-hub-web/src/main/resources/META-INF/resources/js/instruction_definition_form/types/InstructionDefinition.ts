@@ -13,4 +13,5 @@ export type InstructionDefinition = {
 	title_i18n: {
 		[key: string]: string;
 	};
+	whenToUse: string;
 };

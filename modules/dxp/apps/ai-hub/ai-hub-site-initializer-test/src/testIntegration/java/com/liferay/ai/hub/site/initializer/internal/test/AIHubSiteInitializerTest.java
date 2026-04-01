@@ -107,6 +107,8 @@ public class AIHubSiteInitializerTest {
 				fetchListTypeDefinitionByExternalReferenceCode(
 					externalReferenceCode, TestPropsValues.getCompanyId());
 
+		Assert.assertTrue(listTypeDefinition.isSystem());
+
 		ListTypeEntry listTypeEntry =
 			_listTypeEntryLocalService.getListTypeEntry(
 				listTypeDefinition.getListTypeDefinitionId(), "clickToChat");

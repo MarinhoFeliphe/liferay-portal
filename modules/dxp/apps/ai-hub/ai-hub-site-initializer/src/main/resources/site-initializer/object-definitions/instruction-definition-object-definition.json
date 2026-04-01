@@ -108,6 +108,19 @@
 			"required": true,
 			"system": true,
 			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "LongText",
+			"externalReferenceCode": "WHEN_TO_USE",
+			"indexed": true,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "When to Use"
+			},
+			"name": "whenToUse",
+			"system": true,
+			"type": "String"
 		}
 	],
 	"objectFolderExternalReferenceCode": "default",

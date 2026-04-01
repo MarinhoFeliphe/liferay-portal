@@ -11,6 +11,7 @@ import com.liferay.ai.hub.internal.mcp.tool.provider.MCPToolProviderUtil;
 import com.liferay.ai.hub.internal.model.VertexAiGeminiStreamingChatModelUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ContentRetrieverUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.KaleoLogUtil;
+import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUtil;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
@@ -94,12 +95,15 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 				kaleoNodeSetting.getName(), kaleoNodeSetting.getValue());
 		}
 
-		String prompt = VariablesUtil.applyInputVariables(
-			executionContext, "prompt", kaleoNodeSettingValues);
+		ServiceContext serviceContext = executionContext.getServiceContext();
+
+		String prompt = PromptUtil.composePrompt(
+			kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
+			executionContext, kaleoNodeSettingValues, _objectEntryManager,
+			serviceContext);
+
 		String userMessage = VariablesUtil.applyInputVariables(
 			executionContext, "userMessage", kaleoNodeSettingValues);
-
-		ServiceContext serviceContext = executionContext.getServiceContext();
 
 		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
 			VertexAiGeminiStreamingChatModelUtil.create();
