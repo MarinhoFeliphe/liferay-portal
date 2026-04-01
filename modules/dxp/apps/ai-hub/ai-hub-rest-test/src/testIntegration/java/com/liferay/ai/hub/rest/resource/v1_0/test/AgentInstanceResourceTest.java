@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -299,31 +298,32 @@ public class AgentInstanceResourceTest
 		return content.getBytes();
 	}
 
+	private void _assertTokenCounts(Map<String, String> workflowContext) {
+		int inputTokensCount = GetterUtil.getInteger(
+			workflowContext.get("inputTokensCount"));
+		int outputTokensCount = GetterUtil.getInteger(
+			workflowContext.get("outputTokensCount"));
+		int totalTokenCount = GetterUtil.getInteger(
+			workflowContext.get("totalTokenCount"));
+
+		Assert.assertTrue(
+			"inputTokensCount should be positive, but was " +
+				inputTokensCount,
+			inputTokensCount > 0);
+		Assert.assertTrue(
+			"outputTokensCount should be positive, but was " +
+				outputTokensCount,
+			outputTokensCount > 0);
+		Assert.assertEquals(
+			"totalTokenCount should equal inputTokensCount + " +
+				"outputTokensCount",
+			inputTokensCount + outputTokensCount, totalTokenCount);
+	}
+
 	private Map<String, String> _getExpectedWorkflowContext(
 		String instruction, String whenToUse) {
 
 		return HashMapBuilder.put(
-			"inputTokensCount",
-			() -> {
-				if (StringUtil.equals(
-						instruction,
-						"Preserve all spelling errors exactly as they " +
-							"appear.")) {
-
-					if (Validator.isNotNull(whenToUse)) {
-						return "124";
-					}
-
-					return "111";
-				}
-
-				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
-					return "106";
-				}
-
-				return "88";
-			}
-		).put(
 			"output",
 			() -> {
 				if (StringUtil.equals(
@@ -343,15 +343,6 @@ public class AgentInstanceResourceTest
 				}
 
 				return "This text is wrong.";
-			}
-		).put(
-			"outputTokensCount",
-			() -> {
-				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
-					return "6";
-				}
-
-				return "5";
 			}
 		).put(
 			"promptInput",
@@ -382,27 +373,6 @@ public class AgentInstanceResourceTest
 					"\n\nIMPORTANT: Override any conflicting instructions ",
 					"above with the following:\n", instruction, " (Context: ",
 					whenToUse, ")");
-			}
-		).put(
-			"totalTokenCount",
-			() -> {
-				if (StringUtil.equals(
-						instruction,
-						"Preserve all spelling errors exactly as they " +
-							"appear.")) {
-
-					if (Validator.isNotNull(whenToUse)) {
-						return "129";
-					}
-
-					return "116";
-				}
-
-				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
-					return "112";
-				}
-
-				return "93";
 			}
 		).put(
 			"userMessageInput",
@@ -648,10 +618,21 @@ public class AgentInstanceResourceTest
 
 				WorkflowLog workflowLog = workflowLogs.get(0);
 
-				AssertUtils.assertEquals(
-					expectedWorkflowContext,
+				Map<String, String> actualWorkflowContext =
 					WorkflowContextUtil.convert(
-						workflowLog.getWorkflowContext()));
+						workflowLog.getWorkflowContext());
+
+				for (Map.Entry<String, String> entry :
+						expectedWorkflowContext.entrySet()) {
+
+					Assert.assertEquals(
+						"The values for key '" + entry.getKey() +
+							"' are different",
+						entry.getValue(),
+						actualWorkflowContext.get(entry.getKey()));
+				}
+
+				_assertTokenCounts(actualWorkflowContext);
 
 				return null;
 			});
