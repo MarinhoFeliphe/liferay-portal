@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
@@ -299,73 +300,110 @@ public class AgentInstanceResourceTest
 	}
 
 	private Map<String, String> _getExpectedWorkflowContext(
-		boolean active, String instruction) {
-
-		String expectedPromptInput = StringBundler.concat(
-			"You are an expert linguistic editor. Your sole task is to ",
-			"correct all grammatical, spelling, and punctuation errors in the ",
-			"provided text while preserving its meaning, tone, and style. Do ",
-			"not alter structure or wording beyond what is necessary for ",
-			"grammatical precision and natural fluency. Output only the ",
-			"corrected text, with no explanations or commentary. If the text ",
-			"is already correct, return it unchanged.");
-
-		if (active &&
-			StringUtil.equals(
-				instruction,
-				"Preserve all spelling errors exactly as they appear.")) {
-
-			return HashMapBuilder.put(
-				"inputTokensCount", "111"
-			).put(
-				"output", "Thi text ix wrong."
-			).put(
-				"outputTokensCount", "5"
-			).put(
-				"promptInput",
-				StringBundler.concat(
-					expectedPromptInput,
-					"\n\nIMPORTANT: Override any conflicting instructions ",
-					"above with the following:\n", instruction)
-			).put(
-				"totalTokenCount", "116"
-			).put(
-				"userMessageInput",
-				"This is the text to be fixed: Thi text ix wrong."
-			).build();
-		}
-
-		if (active && StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
-			return HashMapBuilder.put(
-				"inputTokensCount", "106"
-			).put(
-				"output", "THIS TEXT IS WRONG."
-			).put(
-				"outputTokensCount", "6"
-			).put(
-				"promptInput",
-				StringBundler.concat(
-					expectedPromptInput,
-					"\n\nIMPORTANT: Override any conflicting instructions ",
-					"above with the following:\n", instruction)
-			).put(
-				"totalTokenCount", "112"
-			).put(
-				"userMessageInput",
-				"This is the text to be fixed: Thi text ix wrong."
-			).build();
-		}
+		String instruction, String whenToUse) {
 
 		return HashMapBuilder.put(
-			"inputTokensCount", "88"
+			"inputTokensCount",
+			() -> {
+				if (StringUtil.equals(
+						instruction,
+						"Preserve all spelling errors exactly as they " +
+							"appear.")) {
+
+					if (Validator.isNotNull(whenToUse)) {
+						return "124";
+					}
+
+					return "111";
+				}
+
+				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
+					return "106";
+				}
+
+				return "88";
+			}
 		).put(
-			"output", "This text is wrong."
+			"output",
+			() -> {
+				if (StringUtil.equals(
+						instruction,
+						"Preserve all spelling errors exactly as they " +
+							"appear.")) {
+
+					if (Validator.isNotNull(whenToUse)) {
+						return "This text is wrong.";
+					}
+
+					return "Thi text ix wrong.";
+				}
+
+				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
+					return "THIS TEXT IS WRONG.";
+				}
+
+				return "This text is wrong.";
+			}
 		).put(
-			"outputTokensCount", "5"
+			"outputTokensCount",
+			() -> {
+				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
+					return "6";
+				}
+
+				return "5";
+			}
 		).put(
-			"promptInput", expectedPromptInput
+			"promptInput",
+			() -> {
+				String promptInput = StringBundler.concat(
+					"You are an expert linguistic editor. Your sole task is ",
+					"to correct all grammatical, spelling, and punctuation ",
+					"errors in the provided text while preserving its ",
+					"meaning, tone, and style. Do not alter structure or ",
+					"wording beyond what is necessary for grammatical ",
+					"precision and natural fluency. Output only the corrected ",
+					"text, with no explanations or commentary. If the text is ",
+					"already correct, return it unchanged.");
+
+				if (Validator.isNull(instruction)) {
+					return promptInput;
+				}
+
+				if (Validator.isNull(whenToUse)) {
+					return StringBundler.concat(
+						promptInput,
+						"\n\nIMPORTANT: Override any conflicting instructions ",
+						"above with the following:\n", instruction);
+				}
+
+				return StringBundler.concat(
+					promptInput,
+					"\n\nIMPORTANT: Override any conflicting instructions ",
+					"above with the following:\n", instruction, " (Context: ",
+					whenToUse, ")");
+			}
 		).put(
-			"totalTokenCount", "93"
+			"totalTokenCount",
+			() -> {
+				if (StringUtil.equals(
+						instruction,
+						"Preserve all spelling errors exactly as they " +
+							"appear.")) {
+
+					if (Validator.isNotNull(whenToUse)) {
+						return "129";
+					}
+
+					return "116";
+				}
+
+				if (StringUtil.equals(instruction, "Respond in ALL CAPS.")) {
+					return "112";
+				}
+
+				return "93";
+			}
 		).put(
 			"userMessageInput",
 			"This is the text to be fixed: Thi text ix wrong."
@@ -522,16 +560,19 @@ public class AgentInstanceResourceTest
 		throws Exception {
 
 		_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction(
-			true, "Preserve all spelling errors exactly as they appear.");
+			true, "Preserve all spelling errors exactly as they appear.", null);
 		_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction(
-			true, "Respond in ALL CAPS.");
+			true, "Preserve all spelling errors exactly as they appear.",
+			"When the text is a poem or song lyrics.");
 		_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction(
-			false, "Respond in ALL CAPS.");
+			true, "Respond in ALL CAPS.", null);
+		_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction(
+			false, "Respond in ALL CAPS.", null);
 	}
 
 	private void
 			_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction(
-				boolean active, String instruction)
+				boolean active, String instruction, String whenToUse)
 		throws Exception {
 
 		_objectEntryLocalService.addOrUpdateObjectEntry(
@@ -549,6 +590,8 @@ public class AgentInstanceResourceTest
 			).put(
 				"title_i18n",
 				(Serializable)RandomTestUtil.randomLanguageIdStringMap()
+			).put(
+				"whenToUse", whenToUse
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
@@ -568,7 +611,7 @@ public class AgentInstanceResourceTest
 		Assert.assertEquals("event: Fix Spelling and Grammar", lines.get(2));
 
 		Map<String, String> expectedWorkflowContext =
-			_getExpectedWorkflowContext(active, instruction);
+			_getExpectedWorkflowContext(active ? instruction : null, whenToUse);
 
 		JSONAssert.assertEquals(
 			JSONUtil.put(
