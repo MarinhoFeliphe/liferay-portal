@@ -102,6 +102,7 @@ export default function InstructionDefinitionForm({
 						accountEntryExternalReferenceCode,
 					scope: '',
 					title_i18n: {},
+					whenToUse: '',
 				});
 
 				return;
@@ -122,6 +123,7 @@ export default function InstructionDefinitionForm({
 						instructionDefinition.r_accountToAIHubInstructionDefinitions_accountEntryERC,
 					scope: instructionDefinition.scope?.key || '',
 					title_i18n: instructionDefinition.title_i18n,
+					whenToUse: instructionDefinition.whenToUse || '',
 				});
 			}
 			catch (error) {
@@ -362,6 +364,33 @@ export default function InstructionDefinitionForm({
 												</Option>
 											)}
 										</Picker>
+									</ClayForm.Group>
+
+									<ClayForm.Group>
+										<label htmlFor="whenToUse">
+											{Liferay.Language.get(
+												'when-to-use'
+											)}
+
+											<span
+												className="ml-1"
+												data-tooltip-align="bottom"
+												title={Liferay.Language.get(
+													'specify-when-to-apply-this-instruction'
+												)}
+											>
+												<Icon symbol="question-circle-full" />
+											</span>
+										</label>
+
+										<textarea
+											className="form-control"
+											id="whenToUse"
+											name="whenToUse"
+											onChange={handleInputChange}
+											rows={2}
+											value={formData.whenToUse}
+										/>
 									</ClayForm.Group>
 								</ClayPanel.Body>
 							</ClayPanel>
