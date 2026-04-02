@@ -220,10 +220,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 		DTOConverterContext dtoConverterContext, String methodName,
 		WorkflowDefinition workflowDefinition) {
 
-		if (!Objects.equals(
-				methodName, "postAgentDefinitionByExternalReferenceCodeCopy") &&
-			workflowDefinition.isSystem()) {
-
+		if (workflowDefinition.isSystem()) {
 			return null;
 		}
 
@@ -288,11 +285,12 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 							}
 						).put(
 							"copy",
-							_addAction(
-								dtoConverterContext,
-								"postAgentDefinitionByExternalReferenceCode" +
-									"Copy",
-								workflowDefinition)
+							ActionUtil.addAction(
+								ActionKeys.VIEW, AgentDefinitionResourceImpl.class,
+								workflowDefinition.getWorkflowDefinitionId(),
+								"postAgentDefinitionByExternalReferenceCodeCopy",
+								_kaleoDefinitionModelResourcePermission, (Long)null,
+								dtoConverterContext.getUriInfo())
 						).put(
 							"deactivate",
 							() -> {
