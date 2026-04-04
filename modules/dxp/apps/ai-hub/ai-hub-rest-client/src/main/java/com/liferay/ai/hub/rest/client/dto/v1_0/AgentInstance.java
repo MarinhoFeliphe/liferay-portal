@@ -26,6 +26,32 @@ public class AgentInstance implements Cloneable, Serializable {
 		return AgentInstanceSerDes.toDTO(json);
 	}
 
+	public String getAgentDefinitionExternalReferenceCode() {
+		return agentDefinitionExternalReferenceCode;
+	}
+
+	public void setAgentDefinitionExternalReferenceCode(
+		String agentDefinitionExternalReferenceCode) {
+
+		this.agentDefinitionExternalReferenceCode =
+			agentDefinitionExternalReferenceCode;
+	}
+
+	public void setAgentDefinitionExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			agentDefinitionExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			agentDefinitionExternalReferenceCode =
+				agentDefinitionExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String agentDefinitionExternalReferenceCode;
+
 	public Map<String, ?> getContext() {
 		return context;
 	}

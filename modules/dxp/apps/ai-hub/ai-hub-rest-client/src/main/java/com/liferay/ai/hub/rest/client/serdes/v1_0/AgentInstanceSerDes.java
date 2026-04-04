@@ -46,6 +46,22 @@ public class AgentInstanceSerDes {
 
 		sb.append("{");
 
+		if (agentInstance.getAgentDefinitionExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"agentDefinitionExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				_escape(
+					agentInstance.getAgentDefinitionExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (agentInstance.getContext() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -117,6 +133,16 @@ public class AgentInstanceSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		if (agentInstance.getAgentDefinitionExternalReferenceCode() == null) {
+			map.put("agentDefinitionExternalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"agentDefinitionExternalReferenceCode",
+				String.valueOf(
+					agentInstance.getAgentDefinitionExternalReferenceCode()));
+		}
+
 		if (agentInstance.getContext() == null) {
 			map.put("context", null);
 		}
@@ -167,7 +193,13 @@ public class AgentInstanceSerDes {
 
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
-			if (Objects.equals(jsonParserFieldName, "context")) {
+			if (Objects.equals(
+					jsonParserFieldName,
+					"agentDefinitionExternalReferenceCode")) {
+
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "context")) {
 				return true;
 			}
 			else if (Objects.equals(
@@ -190,7 +222,16 @@ public class AgentInstanceSerDes {
 			AgentInstance agentInstance, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "context")) {
+			if (Objects.equals(
+					jsonParserFieldName,
+					"agentDefinitionExternalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					agentInstance.setAgentDefinitionExternalReferenceCode(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "context")) {
 				if (jsonParserFieldValue != null) {
 					agentInstance.setContext(
 						(Map<String, ?>)jsonParserFieldValue);

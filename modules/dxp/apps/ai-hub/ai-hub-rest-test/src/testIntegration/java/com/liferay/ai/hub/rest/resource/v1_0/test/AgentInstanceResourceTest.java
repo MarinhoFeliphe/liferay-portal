@@ -98,7 +98,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -291,15 +290,15 @@ public class AgentInstanceResourceTest
 	@Override
 	@Test
 	public void testPostAgentInstance() throws Exception {
-		/*_testPostAgentInstance();
+		_testPostAgentInstance();
 		_testPostAgentInstanceWithTypeAIDecisionNodeWithToolWorkflowDefinition();
 		_testPostAgentInstanceWithTypeAIDecisionNodeWorkflowDefinition();
 		_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction();
 		_testPostAgentInstanceWithTypeLLMNodeWithRAGWorkflowDefinition();
-		_testPostAgentInstanceWithTypeLLMNodeWithRAGWorkflowDefinitionWithRestrictedUser();*/
+		_testPostAgentInstanceWithTypeLLMNodeWithRAGWorkflowDefinitionWithRestrictedUser();
 		_testPostAgentInstanceWithTypeLiferaySearch();
-		/*_testPostAgentInstanceWithTypeLLMNodeWithToolWorkflowDefinition();
-		_testPostAgentInstanceWithTypeMakeShorter();*/
+		_testPostAgentInstanceWithTypeLLMNodeWithToolWorkflowDefinition();
+		_testPostAgentInstanceWithTypeMakeShorter();
 	}
 
 	private static byte[] _getContentBytes(String fileName) throws Exception {
@@ -353,10 +352,22 @@ public class AgentInstanceResourceTest
 			String type)
 		throws Exception {
 
+		return _postAgentInstance(
+			null, inputText, inputVariable, sseEventSinkKey, type);
+	}
+
+	private JSONObject _postAgentInstance(
+			String agentDefinitionExternalReferenceCode, String inputText,
+			String inputVariable, String sseEventSinkKey, String type)
+		throws Exception {
+
 		JSONObject tokenJSONObject = TokenTestUtil.postToken();
 
 		return HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
+				"agentDefinitionExternalReferenceCode",
+				agentDefinitionExternalReferenceCode
+			).put(
 				"context", JSONUtil.put(inputVariable, inputText)
 			).put(
 				"sseEventSinkKey", sseEventSinkKey
@@ -642,8 +653,6 @@ public class AgentInstanceResourceTest
 				new ContentRetriever() {
 					{
 						setCrawlDate(new Date());
-						setType("crawlTarget");
-						setUrl("http://localhost:8080");
 					}
 				},
 				new DefaultDTOConverterContext(
@@ -704,8 +713,9 @@ public class AgentInstanceResourceTest
 			List.of(countDownLatch), lines, "agent-instances/subscribe");
 
 		_postAgentInstance(
+			WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_LIFERAY_SEARCH,
 			"What do you know about Feliphe?", "request", sseEventSinkKey,
-			"Liferay Search");
+			null);
 
 		Assert.assertTrue(countDownLatch.await(30, TimeUnit.SECONDS));
 

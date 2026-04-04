@@ -49,6 +49,52 @@ public class AgentInstance implements Serializable {
 	}
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	public String getAgentDefinitionExternalReferenceCode() {
+		if (_agentDefinitionExternalReferenceCodeSupplier != null) {
+			agentDefinitionExternalReferenceCode =
+				_agentDefinitionExternalReferenceCodeSupplier.get();
+
+			_agentDefinitionExternalReferenceCodeSupplier = null;
+		}
+
+		return agentDefinitionExternalReferenceCode;
+	}
+
+	public void setAgentDefinitionExternalReferenceCode(
+		String agentDefinitionExternalReferenceCode) {
+
+		this.agentDefinitionExternalReferenceCode =
+			agentDefinitionExternalReferenceCode;
+
+		_agentDefinitionExternalReferenceCodeSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setAgentDefinitionExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			agentDefinitionExternalReferenceCodeUnsafeSupplier) {
+
+		_agentDefinitionExternalReferenceCodeSupplier = () -> {
+			try {
+				return agentDefinitionExternalReferenceCodeUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String agentDefinitionExternalReferenceCode;
+
+	@JsonIgnore
+	private Supplier<String> _agentDefinitionExternalReferenceCodeSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
 	public Map<String, ?> getContext() {
 		if (_contextSupplier != null) {
@@ -237,6 +283,23 @@ public class AgentInstance implements Serializable {
 		StringBundler sb = new StringBundler();
 
 		sb.append("{");
+
+		String agentDefinitionExternalReferenceCode =
+			getAgentDefinitionExternalReferenceCode();
+
+		if (agentDefinitionExternalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"agentDefinitionExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(agentDefinitionExternalReferenceCode));
+
+			sb.append("\"");
+		}
 
 		Map<String, ?> context = getContext();
 

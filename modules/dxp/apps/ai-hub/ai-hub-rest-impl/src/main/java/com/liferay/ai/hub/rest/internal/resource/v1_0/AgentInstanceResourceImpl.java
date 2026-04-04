@@ -14,7 +14,6 @@ import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.ai.hub.util.AccountEntryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
-import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -54,17 +53,6 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 		SseUtil.initialize(_sse, sseEventSink);
 	}
 
-	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
-
-	private DTOConverterContext _createDTOConverterContext() {
-		return new DefaultDTOConverterContext(
-			contextAcceptLanguage.isAcceptAllLanguages(), null,
-			_dtoConverterRegistry, contextHttpServletRequest, null,
-			contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
-			contextUser);
-	}
-
 	@Override
 	public AgentInstance postAgentInstance(AgentInstance agentInstance)
 		throws Exception {
@@ -75,15 +63,8 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		AgentDefinition agentDefinition =
-			_agentDefinitionManager.getAgentDefinition(
-				contextCompany.getCompanyId(), _createDTOConverterContext(),
-				agentInstance.getType());
-
-		WorkflowDefinition workflowDefinition =
-			_workflowDefinitionManager.getLatestWorkflowDefinition(
-				contextCompany.getCompanyId(),
-				agentDefinition.getWorkflowDefinitionName());
+		WorkflowDefinition workflowDefinition = _getWorkflowDefinition(
+			agentInstance);
 
 		Map<String, Serializable> workflowContext =
 			WorkflowContextUtil.toWorkflowContext(
@@ -93,6 +74,9 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 		workflowContext.put(
 			"accessToken",
 			contextHttpServletRequest.getHeader("Authorization"));
+		workflowContext.put(
+			"agentDefinitionExternalReferenceCode",
+			agentInstance.getAgentDefinitionExternalReferenceCode());
 		workflowContext.put("outBoundEventName", workflowDefinition.getName());
 		workflowContext.put(
 			"userToken",
@@ -104,7 +88,7 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 				contextCompany.getCompanyId(),
 				AccountEntryUtil.getUserAccountEntryGroupId(
 					contextUser.getUserId()),
-				contextUser.getUserId(), agentInstance.getType(),
+				contextUser.getUserId(), workflowDefinition.getName(),
 				workflowDefinition.getVersion(), null, workflowContext);
 
 		return new AgentInstance() {
@@ -117,18 +101,38 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 		};
 	}
 
+	private DTOConverterContext _createDTOConverterContext() {
+		return new DefaultDTOConverterContext(
+			contextAcceptLanguage.isAcceptAllLanguages(), null,
+			_dtoConverterRegistry, contextHttpServletRequest, null,
+			contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
+			contextUser);
+	}
+
 	private WorkflowDefinition _getWorkflowDefinition(
-		String agentDefinitionType) throws WorkflowException {
+			AgentInstance agentInstance)
+		throws Exception {
 
-		WorkflowDefinition workflowDefinition =
-			_workflowDefinitionManager.getLatestWorkflowDefinition(
-				contextCompany.getCompanyId(), agentDefinitionType);
+		if (agentInstance.getType() != null) {
+			return _workflowDefinitionManager.getLatestWorkflowDefinition(
+				contextCompany.getCompanyId(), agentInstance.getType());
+		}
 
-		return null;
+		AgentDefinition agentDefinition =
+			_agentDefinitionManager.getAgentDefinition(
+				contextCompany.getCompanyId(), _createDTOConverterContext(),
+				agentInstance.getAgentDefinitionExternalReferenceCode());
+
+		return _workflowDefinitionManager.getLatestWorkflowDefinition(
+			contextCompany.getCompanyId(),
+			agentDefinition.getWorkflowDefinitionName());
 	}
 
 	@Reference
 	private AgentDefinitionManager _agentDefinitionManager;
+
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Context
 	private Sse _sse;

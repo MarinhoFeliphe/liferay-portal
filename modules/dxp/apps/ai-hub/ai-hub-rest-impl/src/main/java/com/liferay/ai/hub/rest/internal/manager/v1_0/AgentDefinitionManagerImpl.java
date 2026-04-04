@@ -51,18 +51,6 @@ import org.osgi.service.component.annotations.Reference;
 public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 
 	@Override
-	public AgentDefinition getAgentDefinition(
-		long companyId, DTOConverterContext dtoConverterContext,
-		String externalReferenceCode) throws Exception {
-
-		return _toAgentDefinition(
-			companyId, dtoConverterContext,
-			_objectEntryManager.getObjectEntry(
-				companyId, dtoConverterContext, externalReferenceCode,
-				_getObjectDefinition(companyId), null));
-	}
-
-	@Override
 	public void deleteAgentDefinition(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode)
@@ -91,6 +79,19 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 		_workflowDefinitionManager.undeployWorkflowDefinition(
 			workflowDefinition.getCompanyId(), workflowDefinition.getName(),
 			dtoConverterContext.getUserId(), workflowDefinition.getVersion());
+	}
+
+	@Override
+	public AgentDefinition getAgentDefinition(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode)
+		throws Exception {
+
+		return _toAgentDefinition(
+			companyId, dtoConverterContext,
+			_objectEntryManager.getObjectEntry(
+				companyId, dtoConverterContext, externalReferenceCode,
+				_getObjectDefinition(companyId), null));
 	}
 
 	@Override

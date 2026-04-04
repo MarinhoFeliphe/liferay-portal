@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.UserServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
@@ -71,7 +72,7 @@ public class RetrievalAugmentorUtil {
 		}
 
 		contentRetriever = _createLiferayWebSearchContentRetriever(
-			kaleoNodeSettingValues, workflowContext);
+			companyId, kaleoNodeSettingValues, workflowContext);
 
 		if (contentRetriever != null) {
 			contentRetrievers.add(contentRetriever);
@@ -100,15 +101,20 @@ public class RetrievalAugmentorUtil {
 					1, List.of("agentDefinitionsToContentRetrievers")));
 
 		try {
+			String agentDefinitionExternalReferenceCode = GetterUtil.getString(
+				workflowContext.get("agentDefinitionExternalReferenceCode"));
+
+			if (Validator.isNull(agentDefinitionExternalReferenceCode)) {
+				return null;
+			}
+
 			ObjectEntry agentDefinitionObjectEntry =
 				objectEntryManager.getObjectEntry(
 					companyId,
 					new DefaultDTOConverterContext(
 						false, Map.of(), dtoConverterRegistry, null, locale,
 						null, UserServiceUtil.getUserById(userId)),
-					GetterUtil.getString(
-						workflowContext.get(
-							"agentDefinitionExternalReferenceCode")),
+					agentDefinitionExternalReferenceCode,
 					ObjectDefinitionLocalServiceUtil.
 						fetchObjectDefinitionByExternalReferenceCode(
 							"L_AI_HUB_AGENT_DEFINITION", companyId),
@@ -142,7 +148,7 @@ public class RetrievalAugmentorUtil {
 	}
 
 	private static ContentRetriever _createLiferayWebSearchContentRetriever(
-		Map<String, String> kaleoNodeSettingValues,
+		long companyId, Map<String, String> kaleoNodeSettingValues,
 		Map<String, Serializable> workflowContext) {
 
 		if (kaleoNodeSettingValues.get("rag") == null) {
@@ -166,6 +172,7 @@ public class RetrievalAugmentorUtil {
 							workflowContext.get("accessToken")),
 						contentRetrieverJSONObject.getString(
 							"blueprintExternalReferenceCode"),
+						companyId,
 						GetterUtil.getString(workflowContext.get("userToken")))
 				).build();
 			}
