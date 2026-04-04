@@ -17,6 +17,10 @@ import com.liferay.portal.vulcan.pagination.Pagination;
  */
 public interface AgentDefinitionManager {
 
+	public AgentDefinition getAgentDefinition(
+		long companyId, DTOConverterContext dtoConverterContext,
+		String externalReferenceCode) throws Exception;
+
 	public void deleteAgentDefinition(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode)

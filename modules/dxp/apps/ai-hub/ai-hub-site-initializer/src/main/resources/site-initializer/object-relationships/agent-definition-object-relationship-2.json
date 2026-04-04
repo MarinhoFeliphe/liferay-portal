@@ -1,13 +1,13 @@
 {
 	"deletionType": "cascade",
-	"externalReferenceCode": "L_AI_HUB_AGENT_DEFINITIONS_TO_L_AI_HUB_CONTENT_RETRIEVERS",
+	"externalReferenceCode": "L_AI_HUB_AGENT_DEFINITIONS_TO_L_AI_HUB_CHATBOTS",
 	"label": {
-		"en_US": "Agent Definitions to Content Retrievers"
+		"en_US": "Agent Definitions to Chatbots"
 	},
-	"name": "agentDefinitionsToContentRetrievers",
+	"name": "agentDefinitionsToChatbots",
 	"objectDefinitionId1": "[$OBJECT_DEFINITION_ID:AIHubAgentDefinition$]",
-	"objectDefinitionId2": "[$OBJECT_DEFINITION_ID:AIHubContentRetriever$]",
-	"objectDefinitionName2": "AIHubContentRetriever",
+	"objectDefinitionId2": "[$OBJECT_DEFINITION_ID:AIHubChatbot$]",
+	"objectDefinitionName2": "AIHubChatbot",
 	"system": true,
 	"type": "manyToMany"
 }

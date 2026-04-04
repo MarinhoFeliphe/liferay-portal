@@ -5,15 +5,21 @@
 
 package com.liferay.ai.hub.rest.internal.resource.v1_0;
 
+import com.liferay.ai.hub.rest.dto.v1_0.AgentDefinition;
 import com.liferay.ai.hub.rest.dto.v1_0.AgentInstance;
 import com.liferay.ai.hub.rest.internal.resource.v1_0.util.WorkflowContextUtil;
+import com.liferay.ai.hub.rest.manager.v1_0.AgentDefinitionManager;
 import com.liferay.ai.hub.rest.resource.v1_0.AgentInstanceResource;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.ai.hub.util.AccountEntryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
+import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import jakarta.ws.rs.core.Context;
@@ -48,6 +54,17 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 		SseUtil.initialize(_sse, sseEventSink);
 	}
 
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
+
+	private DTOConverterContext _createDTOConverterContext() {
+		return new DefaultDTOConverterContext(
+			contextAcceptLanguage.isAcceptAllLanguages(), null,
+			_dtoConverterRegistry, contextHttpServletRequest, null,
+			contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
+			contextUser);
+	}
+
 	@Override
 	public AgentInstance postAgentInstance(AgentInstance agentInstance)
 		throws Exception {
@@ -58,9 +75,15 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 			throw new UnsupportedOperationException();
 		}
 
+		AgentDefinition agentDefinition =
+			_agentDefinitionManager.getAgentDefinition(
+				contextCompany.getCompanyId(), _createDTOConverterContext(),
+				agentInstance.getType());
+
 		WorkflowDefinition workflowDefinition =
 			_workflowDefinitionManager.getLatestWorkflowDefinition(
-				contextCompany.getCompanyId(), agentInstance.getType());
+				contextCompany.getCompanyId(),
+				agentDefinition.getWorkflowDefinitionName());
 
 		Map<String, Serializable> workflowContext =
 			WorkflowContextUtil.toWorkflowContext(
@@ -70,7 +93,7 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 		workflowContext.put(
 			"accessToken",
 			contextHttpServletRequest.getHeader("Authorization"));
-		workflowContext.put("outBoundEventName", agentInstance.getType());
+		workflowContext.put("outBoundEventName", workflowDefinition.getName());
 		workflowContext.put(
 			"userToken",
 			contextHttpServletRequest.getHeader(
@@ -93,6 +116,19 @@ public class AgentInstanceResourceImpl extends BaseAgentInstanceResourceImpl {
 			}
 		};
 	}
+
+	private WorkflowDefinition _getWorkflowDefinition(
+		String agentDefinitionType) throws WorkflowException {
+
+		WorkflowDefinition workflowDefinition =
+			_workflowDefinitionManager.getLatestWorkflowDefinition(
+				contextCompany.getCompanyId(), agentDefinitionType);
+
+		return null;
+	}
+
+	@Reference
+	private AgentDefinitionManager _agentDefinitionManager;
 
 	@Context
 	private Sse _sse;

@@ -6,6 +6,7 @@
 package com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util;
 
 import com.liferay.ai.hub.internal.web.search.LiferayWebSearchEngine;
+import com.liferay.ai.hub.model.VertexAIEmbeddingModel;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
@@ -28,9 +29,6 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 
-import dev.langchain4j.data.embedding.Embedding;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.vertexai.VertexAiEmbeddingModel;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
 import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.rag.content.Content;
@@ -57,6 +55,7 @@ public class RetrievalAugmentorUtil {
 		Map<String, String> kaleoNodeSettingValues, Locale locale,
 		ObjectEntryManager objectEntryManager,
 		SearchEngineAdapter searchEngineAdapter, long userId,
+		VertexAIEmbeddingModel vertexAIEmbeddingModel,
 		Map<String, Serializable> workflowContext) {
 
 		List<ContentRetriever> contentRetrievers = new ArrayList<>();
@@ -64,7 +63,8 @@ public class RetrievalAugmentorUtil {
 		ContentRetriever contentRetriever =
 			_createElasticsearchContentRetriever(
 				companyId, dtoConverterRegistry, locale, objectEntryManager,
-				searchEngineAdapter, userId, workflowContext);
+				searchEngineAdapter, userId, vertexAIEmbeddingModel,
+				workflowContext);
 
 		if (contentRetriever != null) {
 			contentRetrievers.add(contentRetriever);
@@ -91,6 +91,7 @@ public class RetrievalAugmentorUtil {
 		long companyId, DTOConverterRegistry dtoConverterRegistry,
 		Locale locale, ObjectEntryManager objectEntryManager,
 		SearchEngineAdapter searchEngineAdapter, long userId,
+		VertexAIEmbeddingModel vertexAIEmbeddingModel,
 		Map<String, Serializable> workflowContext) {
 
 		NestedFieldsContext nestedFieldsContext =
@@ -127,7 +128,7 @@ public class RetrievalAugmentorUtil {
 					contentRetriever -> GetterUtil.getString(
 						contentRetriever.getPropertyValue("indexName")),
 					String.class),
-				query, searchEngineAdapter);
+				query, searchEngineAdapter, vertexAIEmbeddingModel);
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -180,19 +181,8 @@ public class RetrievalAugmentorUtil {
 
 	private static List<Content> _search(
 		String[] indexNames, Query query,
-		SearchEngineAdapter searchEngineAdapter) {
-
-		VertexAiEmbeddingModel vertexAiEmbeddingModel =
-			VertexAiEmbeddingModel.builder(
-			).location(
-				"europe-central2"
-			).modelName(
-				"gemini-embedding-001"
-			).project(
-				"ai-hub-liferay"
-			).publisher(
-				"google"
-			).build();
+		SearchEngineAdapter searchEngineAdapter,
+		VertexAIEmbeddingModel vertexAIEmbeddingModel) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 		).put(
@@ -206,14 +196,8 @@ public class RetrievalAugmentorUtil {
 				"num_candidates", 100
 			).put(
 				"query_vector",
-				() -> {
-					Embedding embedding = vertexAiEmbeddingModel.embed(
-						TextSegment.from(query.text())
-					).content();
-
-					return JSONFactoryUtil.createJSONArray(
-						embedding.vectorAsList());
-				}
+				() -> JSONFactoryUtil.createJSONArray(
+					vertexAIEmbeddingModel.embed(query.text()))
 			)
 		);
 

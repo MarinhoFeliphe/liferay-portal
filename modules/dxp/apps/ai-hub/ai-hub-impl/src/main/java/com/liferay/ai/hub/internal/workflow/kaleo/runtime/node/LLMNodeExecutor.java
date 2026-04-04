@@ -14,6 +14,7 @@ import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUtil;
+import com.liferay.ai.hub.model.VertexAIEmbeddingModel;
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
@@ -166,7 +167,8 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
 					kaleoNodeSettingValues, serviceContext.getLocale(),
 					_objectEntryManager, _searchEngineAdapter,
-					serviceContext.getUserId(), workflowContext)
+					serviceContext.getUserId(), _vertexAIEmbeddingModel,
+					workflowContext)
 			).systemMessageProviderFunction(
 				memoryId -> prompt
 			).toolProvider(
@@ -279,6 +281,9 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
+
+	@Reference
+	private VertexAIEmbeddingModel _vertexAIEmbeddingModel;
 
 	@Reference
 	private WorkflowNodeManager _workflowNodeManager;
