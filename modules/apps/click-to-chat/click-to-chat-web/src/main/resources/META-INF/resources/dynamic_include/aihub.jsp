@@ -24,6 +24,7 @@
 
 		scriptElement.id = 'aihub-chatbot-widget-script';
 		scriptElement.src = 'https://ai.hub.liferay.com/index-js';
+		scriptElement.setAttribute('ai-hub-url', 'http://localhost:8080');
 		scriptElement.setAttribute(
 			'chatbot-external-reference-code',
 			'<%= clickToChatChatProviderAccountId %>'
