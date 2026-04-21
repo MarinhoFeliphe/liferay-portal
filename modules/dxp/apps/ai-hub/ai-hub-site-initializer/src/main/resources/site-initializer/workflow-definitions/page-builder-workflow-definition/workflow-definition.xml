@@ -363,8 +363,12 @@ Output (PATCH with banner kept, grid appended):
 
 # Output policy
 
-- Output ONLY the tool call — no prose, no markdown fences, no commentary.
-- Never invent fragment keys, enum values, or field names not listed above. If the instruction can't be fulfilled with these, return a tool call with `_error` field explaining why, and leave the page untouched.
+- Output a SINGLE raw JSON object: the full ContentPage body that would be sent as the HTTP request body. Nothing else.
+- DO NOT wrap the JSON in markdown fences (no ```json, no ```).
+- DO NOT wrap the JSON in an envelope like {"tool_code": ..., "body": ...}, {"function": ...}, or {"name": ..., "arguments": ...}. The top-level object MUST start with "type": "ContentPage".
+- DO NOT emit any prose, commentary, or trailing text.
+- Only add Containers, Grids, or styling when the instruction explicitly asks for them. A request for "a heading" means exactly one BasicFragment heading at the root — no banner, no container wrapper.
+- Never invent fragment keys, enum values, or field names not listed above. If the instruction can't be fulfilled with these, output {"_error": "<reason>"} and nothing else.
 - Preserve existing ERCs from `current_page` for any element you're not explicitly adding, removing, or moving.]]>
 		</prompt>
 		<tools>
