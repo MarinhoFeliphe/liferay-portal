@@ -61,14 +61,17 @@ public class SitePageTools {
 	}
 
 	@Tool(
-		"Update a site page. The body must be the full ContentPage JSON " +
-			"payload; pageSpecifications is replaced wholesale."
+		"Update the draft of a site page. The body must be the full " +
+			"ContentPageSpecification JSON payload for the draft; the draft " +
+				"layout is replaced wholesale and the published version is " +
+					"left untouched."
 	)
 	public String updateSitePage(
 		@P("Site external reference code") String siteExternalReferenceCode,
 		@P("Site page external reference code") String
 			sitePageExternalReferenceCode,
-		@P("Full ContentPage JSON payload to persist") String body) {
+		@P("Full ContentPageSpecification JSON payload for the draft")
+			String body) {
 
 		try (SafeCloseable safeCloseable =
 				CompanyThreadLocal.setCompanyIdWithSafeCloseable(_companyId)) {
@@ -149,7 +152,13 @@ public class SitePageTools {
 		if (value instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject)value;
 
-			for (String key : _readOnlyKeys) {
+			Set<String> readOnlyKeys = Set.of(
+				"configuration", "css", "customFields", "datePropagated",
+				"draftFragmentInstanceExternalReferenceCode", "html", "indexed",
+				"js", "namespace", "pageSpecificationExternalReferenceCode",
+				"taxonomyCategoryBriefs", "uuid");
+
+			for (String key : readOnlyKeys) {
 				jsonObject.remove(key);
 			}
 
@@ -198,13 +207,10 @@ public class SitePageTools {
 
 		body = _stripMarkdownFences(body);
 
-		String location = _getSitePageLocation(
-			siteExternalReferenceCode, sitePageExternalReferenceCode);
-
-		location = HttpComponentsUtil.addParameter(
-			location, "nestedFields", "pageSpecifications");
-		location = HttpComponentsUtil.addParameter(
-			location, "privateLayout", false);
+		String location = StringBundler.concat(
+			_getSitePageLocation(
+				siteExternalReferenceCode, sitePageExternalReferenceCode),
+			"/page-specifications");
 
 		Http.Options options = new Http.Options();
 
@@ -213,12 +219,13 @@ public class SitePageTools {
 		options.addHeader("Liferay-AI-Hub-Cell-On-Behalf-Of", _userToken);
 		options.setBody(body, ContentTypes.APPLICATION_JSON, "UTF-8");
 		options.setLocation(location);
-		options.setMethod(Http.Method.PATCH);
+		options.setMethod(Http.Method.POST);
 
 		String responseBody = HttpUtil.URLtoString(options);
 
-		int responseCode = options.getResponse(
-		).getResponseCode();
+		Http.Response response = options.getResponse();
+
+		int responseCode = response.getResponseCode();
 
 		if ((responseCode < 200) || (responseCode >= 300)) {
 			_log.error(
@@ -229,25 +236,17 @@ public class SitePageTools {
 					". Response body: ", responseBody));
 
 			return StringBundler.concat(
-				"HTTP ", responseCode, _RETRY_HINT_PREFIX, body,
+				"HTTP ", responseCode,
+				". The server rejected the request. Compare the body you sent ",
+				"with the error response below, correct the body, and call ",
+				"updateSitePage again.\n\nRequest body sent:\n", body,
 				"\n\nError response:\n", responseBody);
 		}
 
 		return responseBody;
 	}
 
-	private static final String _RETRY_HINT_PREFIX =
-		". The server rejected the request. Compare the body you sent with " +
-			"the error response below, correct the body, and call " +
-				"updateSitePage again.\n\nRequest body sent:\n";
-
 	private static final Log _log = LogFactoryUtil.getLog(SitePageTools.class);
-
-	private static final Set<String> _readOnlyKeys = Set.of(
-		"configuration", "css", "customFields", "datePropagated",
-		"draftFragmentInstanceExternalReferenceCode", "html", "indexed", "js",
-		"namespace", "pageSpecificationExternalReferenceCode",
-		"taxonomyCategoryBriefs", "uuid");
 
 	private final String _accessToken;
 	private final long _companyId;
