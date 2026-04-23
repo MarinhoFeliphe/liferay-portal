@@ -61,15 +61,36 @@ public class SitePageTools {
 	}
 
 	@Tool(
-		"Update the draft of a site page. The body must be the full " +
-			"ContentPageSpecification JSON payload for the draft; the draft " +
-				"layout is replaced wholesale and the published version is " +
-					"left untouched."
+		"Retrieve a single page specification (draft or published) of a site " +
+			"page by its external reference code."
+	)
+	public String getSitePageSpecification(
+		@P("Site external reference code") String siteExternalReferenceCode,
+		@P("Page specification external reference code") String
+			pageSpecificationExternalReferenceCode) {
+
+		try (SafeCloseable safeCloseable =
+				CompanyThreadLocal.setCompanyIdWithSafeCloseable(_companyId)) {
+
+			return _getSitePageSpecification(
+				pageSpecificationExternalReferenceCode,
+				siteExternalReferenceCode);
+		}
+		catch (Exception exception) {
+			return ReflectionUtil.throwException(exception);
+		}
+	}
+
+	@Tool(
+		"Update the draft page specification of a site page. The body must " +
+			"be the full ContentPageSpecification JSON payload for the " +
+				"draft; the draft layout is replaced wholesale and the " +
+					"published version is left untouched."
 	)
 	public String updateSitePage(
 		@P("Site external reference code") String siteExternalReferenceCode,
-		@P("Site page external reference code") String
-			sitePageExternalReferenceCode,
+		@P("Page specification external reference code") String
+			pageSpecificationExternalReferenceCode,
 		@P("Full ContentPageSpecification JSON payload for the draft")
 			String body) {
 
@@ -77,7 +98,8 @@ public class SitePageTools {
 				CompanyThreadLocal.setCompanyIdWithSafeCloseable(_companyId)) {
 
 			return _updateSitePage(
-				body, siteExternalReferenceCode, sitePageExternalReferenceCode);
+				body, pageSpecificationExternalReferenceCode,
+				siteExternalReferenceCode);
 		}
 		catch (Exception exception) {
 			return ReflectionUtil.throwException(exception);
@@ -121,11 +143,7 @@ public class SitePageTools {
 		return jsonObject.toString();
 	}
 
-	private String _getSitePageLocation(
-			String siteExternalReferenceCode,
-			String sitePageExternalReferenceCode)
-		throws Exception {
-
+	private String _getHomePageURL() throws Exception {
 		if (Validator.isNull(_accessToken) ||
 			!_accessToken.startsWith("Bearer ")) {
 
@@ -141,11 +159,53 @@ public class SitePageTools {
 			OAuth2ApplicationLocalServiceUtil.getOAuth2Application(
 				oAuth2Authorization.getOAuth2ApplicationId());
 
+		return oAuth2Application.getHomePageURL();
+	}
+
+	private String _getSitePageLocation(
+			String siteExternalReferenceCode,
+			String sitePageExternalReferenceCode)
+		throws Exception {
+
 		return StringBundler.concat(
-			oAuth2Application.getHomePageURL(),
-			"/o/headless-admin-site/v1.0/sites/",
+			_getHomePageURL(), "/o/headless-admin-site/v1.0/sites/",
 			URLCodec.encodeURL(siteExternalReferenceCode), "/site-pages/",
 			URLCodec.encodeURL(sitePageExternalReferenceCode));
+	}
+
+	private String _getSitePageSpecification(
+			String pageSpecificationExternalReferenceCode,
+			String siteExternalReferenceCode)
+		throws Exception {
+
+		String location = StringBundler.concat(
+			_getHomePageURL(), "/o/headless-admin-site/v1.0/sites/",
+			URLCodec.encodeURL(siteExternalReferenceCode),
+			"/page-specifications/",
+			URLCodec.encodeURL(pageSpecificationExternalReferenceCode));
+
+		Http.Options options = new Http.Options();
+
+		options.addHeader(
+			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+		options.addHeader("Liferay-AI-Hub-Cell-On-Behalf-Of", _userToken);
+		options.setLocation(location);
+		options.setMethod(Http.Method.GET);
+
+		String responseBody = HttpUtil.URLtoString(options);
+
+		int responseCode = options.getResponse(
+		).getResponseCode();
+
+		if ((responseCode < 200) || (responseCode >= 300)) {
+			return responseBody;
+		}
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(responseBody);
+
+		_pruneReadOnlyFields(jsonObject);
+
+		return jsonObject.toString();
 	}
 
 	private void _pruneReadOnlyFields(Object value) {
@@ -201,16 +261,17 @@ public class SitePageTools {
 	}
 
 	private String _updateSitePage(
-			String body, String siteExternalReferenceCode,
-			String sitePageExternalReferenceCode)
+			String body, String pageSpecificationExternalReferenceCode,
+			String siteExternalReferenceCode)
 		throws Exception {
 
 		body = _stripMarkdownFences(body);
 
 		String location = StringBundler.concat(
-			_getSitePageLocation(
-				siteExternalReferenceCode, sitePageExternalReferenceCode),
-			"/page-specifications");
+			_getHomePageURL(), "/o/headless-admin-site/v1.0/sites/",
+			URLCodec.encodeURL(siteExternalReferenceCode),
+			"/page-specifications/",
+			URLCodec.encodeURL(pageSpecificationExternalReferenceCode));
 
 		Http.Options options = new Http.Options();
 
@@ -219,7 +280,7 @@ public class SitePageTools {
 		options.addHeader("Liferay-AI-Hub-Cell-On-Behalf-Of", _userToken);
 		options.setBody(body, ContentTypes.APPLICATION_JSON, "UTF-8");
 		options.setLocation(location);
-		options.setMethod(Http.Method.POST);
+		options.setMethod(Http.Method.PUT);
 
 		String responseBody = HttpUtil.URLtoString(options);
 
@@ -231,9 +292,10 @@ public class SitePageTools {
 			_log.error(
 				StringBundler.concat(
 					"updateSitePage failed with HTTP ", responseCode,
-					" for site ", siteExternalReferenceCode, " and site page ",
-					sitePageExternalReferenceCode, ". Request body: ", body,
-					". Response body: ", responseBody));
+					" for site ", siteExternalReferenceCode,
+					" and page specification ",
+					pageSpecificationExternalReferenceCode, ". Request body: ",
+					body, ". Response body: ", responseBody));
 
 			return StringBundler.concat(
 				"HTTP ", responseCode,
