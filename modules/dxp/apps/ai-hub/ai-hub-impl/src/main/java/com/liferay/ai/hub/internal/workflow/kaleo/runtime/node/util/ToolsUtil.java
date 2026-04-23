@@ -5,7 +5,7 @@
 
 package com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util;
 
-import com.liferay.ai.hub.internal.assistant.tool.SitePageTools;
+import com.liferay.ai.hub.internal.assistant.tool.PageSpecificationTools;
 import com.liferay.ai.hub.internal.assistant.tool.WorkflowNodeTools;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
@@ -16,7 +16,6 @@ import java.io.Serializable;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author Feliphe Marinho
@@ -34,9 +33,11 @@ public class ToolsUtil {
 			return new Object[] {new WorkflowNodeTools(workflowNodeManager)};
 		}
 
-		if (_sitePageToolsNodeNames.contains(currentKaleoNode.getName())) {
+		if (Objects.equals("pageFetcher", currentKaleoNode.getName()) ||
+			Objects.equals("pageUpdater", currentKaleoNode.getName())) {
+
 			return new Object[] {
-				new SitePageTools(
+				new PageSpecificationTools(
 					GetterUtil.getString(workflowContext.get("accessToken")),
 					companyId,
 					GetterUtil.getString(workflowContext.get("userToken")))
@@ -45,8 +46,5 @@ public class ToolsUtil {
 
 		return new Object[0];
 	}
-
-	private static final Set<String> _sitePageToolsNodeNames = Set.of(
-		"pageFetcher", "pageUpdater");
 
 }
