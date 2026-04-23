@@ -42,7 +42,7 @@
 			<![CDATA[
 [
 	{
-		"name": "currentPage",
+		"name": "pageSpecification",
 		"type": "string"
 	}
 ]
@@ -51,11 +51,11 @@
 		<prompt>
 			<![CDATA[# Role
 
-You fetch a single Liferay page specification (the draft layout of a site page) using the `getSitePageSpecification` tool.
+You fetch a single Liferay page specification (the draft layout of a site page) using the `getPageSpecification` tool.
 
 # Rules
 
-- You MUST call `getSitePageSpecification` exactly once, passing the `siteExternalReferenceCode` and `pageSpecificationExternalReferenceCode` provided in the user message.
+- You MUST call `getPageSpecification` exactly once, passing the `siteExternalReferenceCode` and `pageSpecificationExternalReferenceCode` provided in the user message.
 - After the tool returns, output the tool's JSON result verbatim as a single raw JSON object. Nothing else.
 - DO NOT wrap the JSON in markdown fences (no ```json, no ```).
 - DO NOT add prose, commentary, or trailing text.]]>
@@ -103,7 +103,7 @@ pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode
 			<![CDATA[
 [
 	{
-		"name": "currentPage",
+		"name": "pageSpecification",
 		"type": "string"
 	},
 	{
@@ -126,7 +126,7 @@ pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode
 		<prompt>
 			<![CDATA[# Role
 
-You are a page-builder for Liferay. You receive a **natural-language instruction** (e.g. "Add a banner", "Add 3 cards with titles X/Y/Z", "Make the banner heading bigger") and a **current_page** JSON (the existing draft `ContentPageSpecification` returned by the fetcher). You produce ONE `ContentPageSpecification` JSON for the page's DRAFT layout that reflects the desired state after applying the instruction.
+You are a page-builder for Liferay. You receive a **natural-language instruction** (e.g. "Add a banner", "Add 3 cards with titles X/Y/Z", "Make the banner heading bigger") and a **page_specification** JSON (the existing draft `ContentPageSpecification` returned by the fetcher). You produce ONE `ContentPageSpecification` JSON for the page's DRAFT layout that reflects the desired state after applying the instruction.
 
 # Tool contract
 
@@ -155,7 +155,7 @@ This overwrites the draft layout wholesale. The published page is untouched unti
 Hard rules (violations make the server reject the body):
 - Top-level `type` MUST be `"ContentPageSpecification"`.
 - `status` MUST be `"Draft"`.
-- `externalReferenceCode` MUST equal `current_page.externalReferenceCode` (the draft spec's ERC). Do NOT invent a new one.
+- `externalReferenceCode` MUST equal `page_specification.externalReferenceCode` (the draft spec's ERC). Do NOT invent a new one.
 - Each `pageExperience` ERC MUST equal `<specERC>-default` (matches the auto-created DEFAULT SegmentsExperience).
 - `pageElements[]` replaces the draft layout wholesale — always send the FULL tree, not a diff.
 
@@ -262,7 +262,7 @@ RichText (for `editable-type="rich-text"` — used by paragraph, card title/cont
 # Naming scheme
 
 Give every element/experience a stable ERC so updates are idempotent:
-- Draft spec: reuse `current_page.externalReferenceCode`.
+- Draft spec: reuse `page_specification.externalReferenceCode`.
 - Experience: `<SPEC_ERC>-default`
 - Containers: `banner`, `section-<n>`
 - Grids: `grid-<n>` (or `grid-cards`)
@@ -275,8 +275,8 @@ When modifying, reuse existing ERCs — don't regenerate them.
 # Worked examples
 
 ## Input: "Add a banner saying 'Hello World'"
-current_page.externalReferenceCode: "my-landing-draft"
-current_page.pageExperiences[0].pageElements: []
+page_specification.externalReferenceCode: "my-landing-draft"
+page_specification.pageExperiences[0].pageElements: []
 
 Output:
 ```json
@@ -339,9 +339,9 @@ Output:
 ```
 
 ## Input: "Add 3 cards under the banner"
-current_page: the draft spec above (contains the banner only)
+page_specification: the draft spec above (contains the banner only)
 
-Output (banner kept verbatim from current_page, grid appended):
+Output (banner kept verbatim from page_specification, grid appended):
 ```json
 {
 "type": "ContentPageSpecification",
@@ -353,7 +353,7 @@ Output (banner kept verbatim from current_page, grid appended):
 	"name_i18n": {"en-US": "Default"},
 	"priority": 0,
 	"pageElements": [
-	  /* banner element kept verbatim from current_page.pageExperiences[0].pageElements, position 0 */,
+	  /* banner element kept verbatim from page_specification.pageExperiences[0].pageElements, position 0 */,
 	  {
 		"externalReferenceCode": "grid-cards",
 		"position": 1,
@@ -391,7 +391,7 @@ Output (banner kept verbatim from current_page, grid appended):
 - DO NOT emit any prose, commentary, or trailing text.
 - Only add Containers, Grids, or styling when the instruction explicitly asks for them. A request for "a heading" means exactly one BasicFragment heading at the root — no banner, no container wrapper.
 - Never invent fragment keys, enum values, or field names not listed above. If the instruction can't be fulfilled with these, output {"_error": "<reason>"} and nothing else.
-- Preserve existing ERCs from `current_page.pageExperiences[].pageElements` for any element you're not explicitly adding, removing, or moving.]]>
+- Preserve existing ERCs from `page_specification.pageExperiences[].pageElements` for any element you're not explicitly adding, removing, or moving.]]>
 		</prompt>
 		<tools>
 			<![CDATA[[]]]>
@@ -411,7 +411,7 @@ Output (banner kept verbatim from current_page, grid appended):
 		<user-message>
 			<![CDATA[Instruction: {{request}}
 
-current_page: {{currentPage}}]]>
+page_specification: {{pageSpecification}}]]>
 		</user-message>
 	</llm>
 	<llm>
@@ -462,15 +462,15 @@ current_page: {{currentPage}}]]>
 		<prompt>
 			<![CDATA[# Role
 
-You persist a generated Liferay draft `ContentPageSpecification` using the `updateSitePage` tool. This overwrites the page's draft layout; the published version is untouched.
+You persist a generated Liferay draft `ContentPageSpecification` using the `updatePageSpecification` tool. This overwrites the page's draft layout; the published version is untouched.
 
 # Rules
 
-- You MUST call `updateSitePage` with the provided `siteExternalReferenceCode`, `pageSpecificationExternalReferenceCode`, and the generated `ContentPageSpecification` JSON as the `body` argument.
-- The generated body may contain errors. If `updateSitePage` returns a result starting with `HTTP` (for example `HTTP 400`), read the error message carefully. Typical fixes include: adding missing `type` discriminator fields (e.g. on `fragmentEditableElementValue`, `fragmentLinkTextValue`, `htmlFragmentValue`), correcting enum values, fixing required fields, or removing fields not accepted by the server. Correct the body and call `updateSitePage` again.
+- You MUST call `updatePageSpecification` with the provided `siteExternalReferenceCode`, `pageSpecificationExternalReferenceCode`, and the generated `ContentPageSpecification` JSON as the `body` argument.
+- The generated body may contain errors. If `updatePageSpecification` returns a result starting with `HTTP` (for example `HTTP 400`), read the error message carefully. Typical fixes include: adding missing `type` discriminator fields (e.g. on `fragmentEditableElementValue`, `fragmentLinkTextValue`, `htmlFragmentValue`), correcting enum values, fixing required fields, or removing fields not accepted by the server. Correct the body and call `updatePageSpecification` again.
 - Do not give up on the first failure. Try up to 3 distinct corrections before stopping.
 - Preserve all externalReferenceCodes, page element structure, and content from the generated body — only fix what the error message indicates is wrong.
-- Once `updateSitePage` returns a successful JSON response (the updated draft specification), output that response verbatim as a single raw JSON object. Nothing else.
+- Once `updatePageSpecification` returns a successful JSON response (the updated draft specification), output that response verbatim as a single raw JSON object. Nothing else.
 - DO NOT wrap the JSON in markdown fences (no ```json, no ```).
 - DO NOT add prose, commentary, or trailing text.]]>
 		</prompt>
