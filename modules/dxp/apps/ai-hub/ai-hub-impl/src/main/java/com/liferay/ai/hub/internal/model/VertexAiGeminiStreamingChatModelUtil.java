@@ -30,6 +30,8 @@ public class VertexAiGeminiStreamingChatModelUtil {
 			vertexAIConfiguration.modelName()
 		).project(
 			vertexAIConfiguration.projectId()
+		).apiEndpoint(
+			"aiplatform.googleapis.com"
 		).build();
 	}
 
