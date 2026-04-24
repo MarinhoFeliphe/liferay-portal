@@ -8,88 +8,13 @@
 	<name>Page Builder</name>
 	<version>1</version>
 	<llm>
-		<name>pageFetcher</name>
-		<metadata>
-			<![CDATA[
-				{
-					"xy": [
-						276,
-						133
-					]
-				}
-			]]>
-		</metadata>
-		<labels>
-			<label language-id="en_US">
-				Page Fetcher
-			</label>
-		</labels>
-		<input-variables>
-			<![CDATA[
-[
-	{
-		"name": "pageSpecificationExternalReferenceCode",
-		"type": "string"
-	},
-	{
-		"name": "siteExternalReferenceCode",
-		"type": "string"
-	}
-]
-]]>
-		</input-variables>
-		<output-variables>
-			<![CDATA[
-[
-	{
-		"name": "pageSpecification",
-		"type": "string"
-	}
-]
-]]>
-		</output-variables>
-		<prompt>
-			<![CDATA[# Role
-
-You fetch a single Liferay page specification (the draft layout of a site page) using the `getPageSpecification` tool.
-
-# Rules
-
-- You MUST call `getPageSpecification` exactly once, passing the `siteExternalReferenceCode` and `pageSpecificationExternalReferenceCode` provided in the user message.
-- After the tool returns, output the tool's JSON result verbatim as a single raw JSON object. Nothing else.
-- DO NOT wrap the JSON in markdown fences (no ```json, no ```).
-- DO NOT add prose, commentary, or trailing text.]]>
-		</prompt>
-		<tools>
-			<![CDATA[[]]]>
-		</tools>
-		<transitions>
-			<transition>
-				<labels>
-					<label language-id="en_US">
-						Page Builder
-					</label>
-				</labels>
-				<name>pageBuilder</name>
-				<target>pageBuilder</target>
-				<default>true</default>
-			</transition>
-		</transitions>
-		<user-message>
-			<![CDATA[Fetch the page specification.
-
-siteExternalReferenceCode: {{siteExternalReferenceCode}}
-pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode}}]]>
-		</user-message>
-	</llm>
-	<llm>
 		<name>pageBuilder</name>
 		<metadata>
 			<![CDATA[
 				{
 					"xy": [
 						276,
-						242
+						188
 					]
 				}
 			]]>
@@ -103,11 +28,15 @@ pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode
 			<![CDATA[
 [
 	{
-		"name": "pageSpecification",
+		"name": "pageSpecificationExternalReferenceCode",
 		"type": "string"
 	},
 	{
 		"name": "request",
+		"type": "string"
+	},
+	{
+		"name": "siteExternalReferenceCode",
 		"type": "string"
 	}
 ]
@@ -126,7 +55,11 @@ pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode
 		<prompt>
 			<![CDATA[# Role
 
-You are a page-builder for Liferay. You receive a **natural-language instruction** (e.g. "Add a banner", "Add 3 cards with titles X/Y/Z", "Make the banner heading bigger") and a **page_specification** JSON (the existing draft `ContentPageSpecification` returned by the fetcher). You produce ONE `ContentPageSpecification` JSON for the page's DRAFT layout that reflects the desired state after applying the instruction.
+You are a page-builder for Liferay. You receive a **natural-language instruction** (e.g. "Add a banner", "Add 3 cards with titles X/Y/Z", "Make the banner heading bigger") together with the identifiers of the target page specification.
+
+You MUST do the following:
+1. Call `getPageSpecification` exactly once, passing the `siteExternalReferenceCode` and `pageSpecificationExternalReferenceCode` provided in the user message. The tool returns the existing draft `ContentPageSpecification` — in the rules and examples below this value is referred to as `page_specification`.
+2. Produce ONE `ContentPageSpecification` JSON for the page's DRAFT layout that reflects the desired state after applying the instruction.
 
 # Tool contract
 
@@ -411,7 +344,8 @@ Output (banner kept verbatim from page_specification, grid appended):
 		<user-message>
 			<![CDATA[Instruction: {{request}}
 
-page_specification: {{pageSpecification}}]]>
+siteExternalReferenceCode: {{siteExternalReferenceCode}}
+pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode}}]]>
 		</user-message>
 	</llm>
 	<llm>
@@ -521,11 +455,11 @@ body:
 			<transition>
 				<labels>
 					<label language-id="en_US">
-						Page Fetcher
+						Page Builder
 					</label>
 				</labels>
-				<name>pageFetcher</name>
-				<target>pageFetcher</target>
+				<name>pageBuilder</name>
+				<target>pageBuilder</target>
 				<default>true</default>
 			</transition>
 		</transitions>
