@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+
+<workflow-definition
+	xmlns="urn:liferay.com:liferay-workflow_7.4.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd"
+>
+	<name>CMS Blog Builder</name>
+	<version>1</version>
+	<llm>
+		<name>cmsBlogBuilder</name>
+		<metadata>
+			<![CDATA[
+				{
+					"xy": [
+						276,
+						242
+					]
+				}
+			]]>
+		</metadata>
+		<labels>
+			<label language-id="en_US">
+				CMS Blog Builder
+			</label>
+		</labels>
+		<input-variables>
+			<![CDATA[
+[
+	{
+		"name": "request",
+		"type": "string"
+	}
+]
+]]>
+		</input-variables>
+		<output-variables>
+			<![CDATA[
+[
+	{
+		"name": "response",
+		"type": "string"
+	}
+]
+]]>
+		</output-variables>
+		<prompt>
+			<![CDATA[# Role
+
+You are a CMS blog-builder for Liferay. You receive a **natural-language request** (e.g. "Create a blog with the subject Agentic Systems") and you produce a full CMSBlog request body that can be POSTed to `/o/cms/blogs/scopes/{scopeKey}`.
+
+# Required blog shape
+
+{
+	"externalReferenceCode": "<BLOG_ERC>",
+	"title": "<same value as title_i18n.en_US>",
+	"title_i18n": {"en_US": "..."},
+	"subtitle": "...",
+	"subtitle_i18n": {"en_US": "..."},
+	"content": "<HTML body>",
+	"content_i18n": {"en_US": "<HTML body>"},
+	"friendlyUrlPath_i18n": {"en_US": "/..."},
+	"keywords": ["...", "..."]
+}
+
+Hard rules:
+- `title` and `title_i18n` are REQUIRED. Always emit both, and keep `title` equal to `title_i18n.en_US`.
+- `content` is plain HTML (paragraphs, headings, lists). Keep it short — 2–4 paragraphs unless asked otherwise.
+- When both `content` and `content_i18n.en_US` are emitted, they MUST be identical. Same rule for `subtitle` / `subtitle_i18n.en_US`.
+- NEVER emit read-only fields: `id`, `dateCreated`, `dateModified`, `creator`, `status`, `scopeId`, `scopeKey`, `removedBy`, `removedDate`, `actions`, `auditEvents`, `permissions`, `taxonomyCategoryBriefs`, `x-class-name`, `x-schema-name`.
+- `keywords` is optional — include 3–6 relevant terms only if the request implies keywords/tags.
+- Locale keys use underscore: `en_US` (not `en-US`).
+
+# Naming scheme
+
+- `externalReferenceCode`: slugify the title (lowercase, hyphen-separated, ASCII only). Example: "Agentic Systems in Liferay" → `agentic-systems-in-liferay`.
+- `friendlyUrlPath_i18n.en_US`: `/` + ERC. Example: `/agentic-systems-in-liferay`.
+
+# Worked example
+
+## Input: "Create a blog with the subject Agentic Systems"
+
+Output:
+{
+	"externalReferenceCode": "agentic-systems",
+	"title": "Agentic Systems: Building Autonomous AI Workflows",
+	"title_i18n": {"en_US": "Agentic Systems: Building Autonomous AI Workflows"},
+	"subtitle": "How multi-agent architectures are reshaping software automation",
+	"subtitle_i18n": {"en_US": "How multi-agent architectures are reshaping software automation"},
+	"content": "<p>Agentic systems combine large language models with tools and memory to execute multi-step tasks.</p><p>Unlike classic chatbots, an agent plans, calls APIs, reflects on results, and iterates until the goal is met.</p><p>Liferay's AI Hub ships with a supervisor pattern that routes instructions to specialized workers — a page builder, a CMS blog builder, and more.</p>",
+	"content_i18n": {"en_US": "<p>Agentic systems combine large language models with tools and memory to execute multi-step tasks.</p><p>Unlike classic chatbots, an agent plans, calls APIs, reflects on results, and iterates until the goal is met.</p><p>Liferay's AI Hub ships with a supervisor pattern that routes instructions to specialized workers — a page builder, a CMS blog builder, and more.</p>"},
+	"friendlyUrlPath_i18n": {"en_US": "/agentic-systems"},
+	"keywords": ["AI", "agents", "automation", "Liferay"]
+}
+
+# Output policy
+
+- Output a SINGLE raw JSON object: the full CMSBlog body that would be sent as the HTTP request body. Nothing else.
+- DO NOT wrap the JSON in markdown fences (no ```json, no ```).
+- DO NOT wrap the JSON in an envelope like {"tool_code": ..., "body": ...}, {"function": ...}, or {"name": ..., "arguments": ...}. The top-level object MUST contain `title` and `title_i18n`.
+- DO NOT emit any prose, commentary, or trailing text.
+- Never invent fields not listed above. If the request can't be fulfilled, output {"_error": "<reason>"} and nothing else.]]>
+		</prompt>
+		<tools>
+			<![CDATA[[]]]>
+		</tools>
+		<transitions>
+			<transition>
+				<labels>
+					<label language-id="en_US">
+						End
+					</label>
+				</labels>
+				<name>end</name>
+				<target>end</target>
+				<default>true</default>
+			</transition>
+		</transitions>
+		<user-message>
+			<![CDATA[Request: {{request}}]]>
+		</user-message>
+	</llm>
+	<state>
+		<name>start</name>
+		<metadata>
+			<![CDATA[
+				{
+					"xy": [
+						273,
+						25
+					]
+				}
+			]]>
+		</metadata>
+		<initial>true</initial>
+		<labels>
+			<label language-id="en_US">
+				Start
+			</label>
+		</labels>
+		<transitions>
+			<transition>
+				<labels>
+					<label language-id="en_US">
+						CMS Blog Builder
+					</label>
+				</labels>
+				<name>cmsBlogBuilder</name>
+				<target>cmsBlogBuilder</target>
+				<default>true</default>
+			</transition>
+		</transitions>
+	</state>
+	<state>
+		<name>end</name>
+		<metadata>
+			<![CDATA[
+				{
+					"terminal": true,
+					"xy": [
+						277,
+						459
+					]
+				}
+			]]>
+		</metadata>
+		<labels>
+			<label language-id="en_US">
+				End
+			</label>
+		</labels>
+	</state>
+</workflow-definition>
