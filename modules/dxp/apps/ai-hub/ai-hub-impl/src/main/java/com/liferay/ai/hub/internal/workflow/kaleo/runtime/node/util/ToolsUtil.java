@@ -33,9 +33,7 @@ public class ToolsUtil {
 			return new Object[] {new WorkflowNodeTools(workflowNodeManager)};
 		}
 
-		if (Objects.equals("pageBuilder", currentKaleoNode.getName()) ||
-			Objects.equals("pageUpdater", currentKaleoNode.getName())) {
-
+		if (Objects.equals(currentKaleoNode.getName(), "pageBuilder")) {
 			return new Object[] {
 				new PageSpecificationTools(
 					GetterUtil.getString(workflowContext.get("accessToken")),

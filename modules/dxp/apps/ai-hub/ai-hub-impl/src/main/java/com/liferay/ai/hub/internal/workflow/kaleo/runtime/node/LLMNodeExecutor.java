@@ -8,7 +8,7 @@ package com.liferay.ai.hub.internal.workflow.kaleo.runtime.node;
 import com.liferay.ai.hub.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.internal.mcp.tool.provider.MCPToolProviderUtil;
-import com.liferay.ai.hub.internal.model.VertexAiGeminiStreamingChatModelUtil;
+import com.liferay.ai.hub.internal.model.VertexAiAnthropicStreamingChatModelUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.KaleoLogUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
@@ -48,8 +48,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoNodeSettingLocalService;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
+import dev.langchain4j.model.vertexai.anthropic.VertexAiAnthropicStreamingChatModel;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.HashMap;
@@ -107,9 +108,10 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 		ServiceContext serviceContext = executionContext.getServiceContext();
 
-		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
-			VertexAiGeminiStreamingChatModelUtil.create(
-				serviceContext.getCompanyId());
+		VertexAiAnthropicStreamingChatModel
+			vertexAiAnthropicStreamingChatModel =
+				VertexAiAnthropicStreamingChatModelUtil.create(
+					serviceContext.getCompanyId());
 
 		Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
@@ -147,21 +149,26 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 					try {
 						completeResponseCallable.call();
+
+						vertexAiAnthropicStreamingChatModel.close();
 					}
 					catch (Exception exception) {
 						throw new RuntimeException(exception);
 					}
 					finally {
 						MCPToolProviderUtil.close(sseEventSinkKey);
-
-						vertexAiGeminiStreamingChatModel.close();
 					}
 				}
 			).onErrorConsumer(
 				throwable -> {
 					MCPToolProviderUtil.close(sseEventSinkKey);
 
-					vertexAiGeminiStreamingChatModel.close();
+					try {
+						vertexAiAnthropicStreamingChatModel.close();
+					}
+					catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 
 					_log.error(throwable);
 				}
@@ -188,8 +195,8 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 					workflowContext, _workflowNodeManager)
 			).userMessage(
 				userMessage
-			).vertexAiGeminiStreamingChatModel(
-				vertexAiGeminiStreamingChatModel
+			).vertexAiAnthropicStreamingChatModel(
+				vertexAiAnthropicStreamingChatModel
 			).build());
 	}
 

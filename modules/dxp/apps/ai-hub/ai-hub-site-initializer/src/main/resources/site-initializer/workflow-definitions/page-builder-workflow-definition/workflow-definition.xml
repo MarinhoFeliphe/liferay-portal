@@ -57,16 +57,12 @@
 
 You are a page-builder for Liferay. You receive a **natural-language instruction** (e.g. "Add a banner", "Add 3 cards with titles X/Y/Z", "Make the banner heading bigger") together with the identifiers of the target page specification.
 
-You MUST do the following:
+You MUST do the following, in order:
 1. Call `getPageSpecification` exactly once, passing the `siteExternalReferenceCode` and `pageSpecificationExternalReferenceCode` provided in the user message. The tool returns the existing draft `ContentPageSpecification` — in the rules and examples below this value is referred to as `page_specification`.
-2. Produce ONE `ContentPageSpecification` JSON for the page's DRAFT layout that reflects the desired state after applying the instruction.
-
-# Tool contract
-
-Downstream, the produced body is POSTed to:
-`POST /o/headless-admin-site/v1.0/sites/{siteERC}/site-pages/{pageERC}/page-specifications`
-
-This overwrites the draft layout wholesale. The published page is untouched until a human clicks Publish.
+2. Build a new `ContentPageSpecification` JSON for the page's DRAFT layout that reflects the desired state after applying the instruction. Use `page_specification` as the starting point.
+3. Call `updatePageSpecification` with `siteExternalReferenceCode`, `pageSpecificationExternalReferenceCode`, and the new `ContentPageSpecification` JSON as the `body` argument. This overwrites the draft layout wholesale. The published page is untouched until a human clicks Publish.
+4. If `updatePageSpecification` returns a string starting with `HTTP ` (for example `HTTP 400`), read the error response carefully. Typical fixes include: adding missing `type` discriminator fields (e.g. on `fragmentEditableElementValue`, `fragmentLinkTextValue`, `htmlFragmentValue`), correcting enum values, fixing required fields, or removing fields not accepted by the server. Correct the body and call `updatePageSpecification` again. Try up to 3 distinct corrections before stopping.
+5. Once `updatePageSpecification` returns a successful JSON response (the updated draft specification), that response is your final output.
 
 # Required body shape
 
@@ -318,95 +314,14 @@ Output (banner kept verbatim from page_specification, grid appended):
 
 # Output policy
 
-- Output a SINGLE raw JSON object: the ContentPageSpecification body that will be sent as the HTTP request body. Nothing else.
+- Your final output MUST be the successful JSON response returned by `updatePageSpecification`, verbatim, as a single raw JSON object. Nothing else.
+- DO NOT output the intermediate body you sent to `updatePageSpecification`; the server's response is what the caller consumes.
 - DO NOT wrap the JSON in markdown fences (no ```json, no ```).
-- DO NOT wrap the JSON in an envelope like {"tool_code": ..., "body": ...}, {"function": ...}, or {"name": ..., "arguments": ...}. The top-level object MUST start with "type": "ContentPageSpecification".
-- DO NOT emit any prose, commentary, or trailing text.
+- DO NOT wrap the JSON in an envelope like {"tool_code": ..., "body": ...}, {"function": ...}, or {"name": ..., "arguments": ...}.
+- DO NOT emit any prose, commentary, or trailing text (e.g. "I have added the banner…" is forbidden).
 - Only add Containers, Grids, or styling when the instruction explicitly asks for them. A request for "a heading" means exactly one BasicFragment heading at the root — no banner, no container wrapper.
 - Never invent fragment keys, enum values, or field names not listed above. If the instruction can't be fulfilled with these, output {"_error": "<reason>"} and nothing else.
 - Preserve existing ERCs from `page_specification.pageExperiences[].pageElements` for any element you're not explicitly adding, removing, or moving.]]>
-		</prompt>
-		<tools>
-			<![CDATA[[]]]>
-		</tools>
-		<transitions>
-			<transition>
-				<labels>
-					<label language-id="en_US">
-						Page Updater
-					</label>
-				</labels>
-				<name>pageUpdater</name>
-				<target>pageUpdater</target>
-				<default>true</default>
-			</transition>
-		</transitions>
-		<user-message>
-			<![CDATA[Instruction: {{request}}
-
-siteExternalReferenceCode: {{siteExternalReferenceCode}}
-pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode}}]]>
-		</user-message>
-	</llm>
-	<llm>
-		<name>pageUpdater</name>
-		<metadata>
-			<![CDATA[
-				{
-					"xy": [
-						276,
-						351
-					]
-				}
-			]]>
-		</metadata>
-		<labels>
-			<label language-id="en_US">
-				Page Updater
-			</label>
-		</labels>
-		<input-variables>
-			<![CDATA[
-[
-	{
-		"name": "pageSpecificationExternalReferenceCode",
-		"type": "string"
-	},
-	{
-		"name": "response",
-		"type": "string"
-	},
-	{
-		"name": "siteExternalReferenceCode",
-		"type": "string"
-	}
-]
-]]>
-		</input-variables>
-		<output-variables>
-			<![CDATA[
-[
-	{
-		"name": "updatedPage",
-		"type": "string"
-	}
-]
-]]>
-		</output-variables>
-		<prompt>
-			<![CDATA[# Role
-
-You persist a generated Liferay draft `ContentPageSpecification` using the `updatePageSpecification` tool. This overwrites the page's draft layout; the published version is untouched.
-
-# Rules
-
-- You MUST call `updatePageSpecification` with the provided `siteExternalReferenceCode`, `pageSpecificationExternalReferenceCode`, and the generated `ContentPageSpecification` JSON as the `body` argument.
-- The generated body may contain errors. If `updatePageSpecification` returns a result starting with `HTTP` (for example `HTTP 400`), read the error message carefully. Typical fixes include: adding missing `type` discriminator fields (e.g. on `fragmentEditableElementValue`, `fragmentLinkTextValue`, `htmlFragmentValue`), correcting enum values, fixing required fields, or removing fields not accepted by the server. Correct the body and call `updatePageSpecification` again.
-- Do not give up on the first failure. Try up to 3 distinct corrections before stopping.
-- Preserve all externalReferenceCodes, page element structure, and content from the generated body — only fix what the error message indicates is wrong.
-- Once `updatePageSpecification` returns a successful JSON response (the updated draft specification), output that response verbatim as a single raw JSON object. Nothing else.
-- DO NOT wrap the JSON in markdown fences (no ```json, no ```).
-- DO NOT add prose, commentary, or trailing text.]]>
 		</prompt>
 		<tools>
 			<![CDATA[[]]]>
@@ -424,13 +339,10 @@ You persist a generated Liferay draft `ContentPageSpecification` using the `upda
 			</transition>
 		</transitions>
 		<user-message>
-			<![CDATA[Persist this generated page.
+			<![CDATA[Instruction: {{request}}
 
 siteExternalReferenceCode: {{siteExternalReferenceCode}}
-pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode}}
-
-body:
-{{response}}]]>
+pageSpecificationExternalReferenceCode: {{pageSpecificationExternalReferenceCode}}]]>
 		</user-message>
 	</llm>
 	<state>

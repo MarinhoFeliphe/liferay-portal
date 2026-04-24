@@ -43,7 +43,6 @@ import java.util.List;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -109,11 +108,6 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 	protected void activate() {
 		_noticeableExecutorService = _portalExecutorManager.getPortalExecutor(
 			SupervisorAgentImpl.class.getName());
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_noticeableExecutorService.shutdown();
 	}
 
 	private InternalAgent[] _createInternalAgents(AgentContext agentContext) {

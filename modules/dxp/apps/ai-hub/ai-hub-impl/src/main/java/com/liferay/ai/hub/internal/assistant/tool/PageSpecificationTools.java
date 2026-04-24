@@ -75,8 +75,8 @@ public class PageSpecificationTools {
 		@P("Site external reference code") String siteExternalReferenceCode,
 		@P("Page specification external reference code") String
 			pageSpecificationExternalReferenceCode,
-		@P("Full ContentPageSpecification JSON payload for the draft")
-			String body) {
+		@P("Full ContentPageSpecification JSON payload for the draft") String
+			body) {
 
 		try (SafeCloseable safeCloseable =
 				CompanyThreadLocal.setCompanyIdWithSafeCloseable(_companyId)) {
