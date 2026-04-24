@@ -79,6 +79,8 @@ public class SupervisorAgentImpl implements SupervisorAgent {
 								vertexAIConfiguration.modelName()
 							).project(
 								vertexAIConfiguration.projectId()
+							).apiEndpoint(
+								"aiplatform.googleapis.com"
 							).build()) {
 
 						PermissionThreadLocal.setPermissionChecker(
