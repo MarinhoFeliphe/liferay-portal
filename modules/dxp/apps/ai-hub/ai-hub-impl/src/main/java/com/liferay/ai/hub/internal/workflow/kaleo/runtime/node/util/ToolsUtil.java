@@ -33,7 +33,7 @@ public class ToolsUtil {
 			return new Object[] {new WorkflowNodeTools(workflowNodeManager)};
 		}
 
-		if (Objects.equals("pageFetcher", currentKaleoNode.getName()) ||
+		if (Objects.equals("pageBuilder", currentKaleoNode.getName()) ||
 			Objects.equals("pageUpdater", currentKaleoNode.getName())) {
 
 			return new Object[] {
