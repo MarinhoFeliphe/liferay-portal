@@ -9,6 +9,7 @@ import com.liferay.ai.hub.internal.assistant.handler.AssistantHandlerContext;
 import com.liferay.ai.hub.internal.assistant.handler.AssistantHandlerUtil;
 import com.liferay.ai.hub.internal.mcp.tool.provider.MCPToolProviderUtil;
 import com.liferay.ai.hub.internal.model.VertexAiGeminiStreamingChatModelUtil;
+import com.liferay.ai.hub.internal.tools.WorkflowNodeTools;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.KaleoLogUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
@@ -16,13 +17,11 @@ import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolProvider
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -43,8 +42,6 @@ import com.liferay.portal.workflow.kaleo.runtime.node.BaseNodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
 import com.liferay.portal.workflow.kaleo.service.KaleoNodeSettingLocalService;
 
-import dev.langchain4j.agent.tool.P;
-import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.invocation.InvocationParameters;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 
@@ -66,54 +63,6 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 	@Override
 	public NodeType getNodeType() {
 		return NodeType.AI_DECISION;
-	}
-
-	public class Tools {
-
-		@Tool(
-			"Complete the workflow node by proceeding to the chosen transition"
-		)
-		public void completeWorkflowNode(
-				InvocationParameters invocationParameters,
-				@P(
-					"A brief, one-sentence justification for the chosen transition."
-				)
-				String reason,
-				@P("Transition name") String transitionName)
-			throws PortalException {
-
-			PermissionChecker permissionChecker =
-				PermissionThreadLocal.getPermissionChecker();
-
-			try (SafeCloseable safeCloseable =
-					CompanyThreadLocal.setCompanyIdWithSafeCloseable(
-						invocationParameters.get("companyId"))) {
-
-				PermissionThreadLocal.setPermissionChecker(
-					invocationParameters.get("permissionChecker"));
-
-				ExecutionContext executionContext = invocationParameters.get(
-					"executionContext");
-
-				KaleoInstanceToken kaleoInstanceToken =
-					executionContext.getKaleoInstanceToken();
-
-				Map<String, Serializable> workflowContext =
-					executionContext.getWorkflowContext();
-
-				workflowContext.put("reason", reason);
-
-				_workflowNodeManager.completeWorkflowNode(
-					kaleoInstanceToken.getCompanyId(),
-					kaleoInstanceToken.getUserId(),
-					kaleoInstanceToken.getKaleoInstanceTokenId(),
-					transitionName, workflowContext, false);
-			}
-			finally {
-				PermissionThreadLocal.setPermissionChecker(permissionChecker);
-			}
-		}
-
 	}
 
 	@Override
@@ -202,7 +151,7 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			).systemMessageProviderFunction(
 				memoryId -> prompt
 			).tools(
-				new Tools()
+				new WorkflowNodeTools(_workflowNodeManager)
 			).toolProvider(
 				MCPToolProviderUtil.create(
 					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
