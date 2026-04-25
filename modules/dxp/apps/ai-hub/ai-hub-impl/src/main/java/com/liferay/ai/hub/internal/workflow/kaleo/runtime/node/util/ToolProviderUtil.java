@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * @author Feliphe Marinho
  */
-public class ToolsUtil {
+public class ToolProviderUtil {
 
 	public static List<String> getMCPServerExternalReferenceCodes(
 		JSONFactory jsonFactory, Map<String, String> kaleoNodeSettingValues) {
@@ -44,6 +44,7 @@ public class ToolsUtil {
 		return mcpServerExternalReferenceCodes;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(ToolsUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ToolProviderUtil.class);
 
 }
