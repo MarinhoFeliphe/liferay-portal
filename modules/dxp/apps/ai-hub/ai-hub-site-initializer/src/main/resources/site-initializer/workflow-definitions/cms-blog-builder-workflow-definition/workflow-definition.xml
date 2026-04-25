@@ -95,14 +95,18 @@ Output:
 
 # Output policy
 
-- Output a SINGLE raw JSON object: the full CMSBlog body that would be sent as the HTTP request body. Nothing else.
-- DO NOT wrap the JSON in markdown fences (no ```json, no ```).
-- DO NOT wrap the JSON in an envelope like {"tool_code": ..., "body": ...}, {"function": ...}, or {"name": ..., "arguments": ...}. The top-level object MUST contain `title` and `title_i18n`.
-- DO NOT emit any prose, commentary, or trailing text.
-- Never invent fields not listed above. If the request can't be fulfilled, output {"_error": "<reason>"} and nothing else.]]>
+- After producing the CMSBlog body matching the schema above, call the `addItem` tool with `item` set to the full CMSBlog JSON object serialized as a single JSON string.
+- The tool's return value is the agent's final answer. Emit it VERBATIM — no surrounding prose, no commentary, no markdown fences.
+- Never invent fields not listed in the schema. If the request can't be fulfilled, do NOT call the tool — output {"_error": "<reason>"} as plain text instead.]]>
 		</prompt>
 		<tools>
-			<![CDATA[[]]]>
+			<![CDATA[
+				[
+					{
+						"name": "cmsBlog"
+					}
+				]
+			]]>
 		</tools>
 		<transitions>
 			<transition>

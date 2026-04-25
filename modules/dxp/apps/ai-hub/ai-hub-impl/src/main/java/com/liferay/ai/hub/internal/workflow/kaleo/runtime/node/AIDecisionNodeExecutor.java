@@ -15,6 +15,7 @@ import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolProviderUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
+import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolsConfigUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
@@ -157,8 +158,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 				MCPToolProviderUtil.create(
 					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
 					kaleoInstanceToken.getGroupId(), serviceContext.getLocale(),
-					ToolProviderUtil.getMCPServerExternalReferenceCodes(
-						_jsonFactory, kaleoNodeSettingValues),
+					ToolsConfigUtil.getValues(
+						_jsonFactory, kaleoNodeSettingValues,
+						"mcpServerExternalReferenceCode"),
 					_objectEntryManager, sseEventSinkKey,
 					serviceContext.getUserId())
 			).userMessage(
