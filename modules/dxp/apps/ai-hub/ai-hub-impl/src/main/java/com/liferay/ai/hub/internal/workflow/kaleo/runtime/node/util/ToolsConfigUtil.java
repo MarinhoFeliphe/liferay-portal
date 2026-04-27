@@ -1,13 +1,5 @@
 /**
-<<<<<<< HEAD:modules/dxp/apps/ai-hub/ai-hub-impl/src/main/java/com/liferay/ai/hub/internal/workflow/kaleo/runtime/node/util/ToolProviderUtil.java
-<<<<<<< HEAD
  * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
-=======
- * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
->>>>>>> a6baa77 (LPD-87444 refactor: rename ToolsUtil to ToolProviderUtil)
-=======
- * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
->>>>>>> 85da61a (LPD-87444 feat: register named Tools classes via LLM workflow tools array):modules/dxp/apps/ai-hub/ai-hub-impl/src/main/java/com/liferay/ai/hub/internal/workflow/kaleo/runtime/node/util/ToolsConfigUtil.java
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
