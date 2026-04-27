@@ -97,6 +97,180 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 		executorService.submit(() -> _runCommit(companyId, userId, runId));
 	}
 
+	private boolean _awaitTerminal(String phaseLabel, List<Long> taskIds)
+		throws InterruptedException {
+
+		if (taskIds.isEmpty()) {
+			return true;
+		}
+
+		long deadline = System.currentTimeMillis() + _TIMEOUT_MS;
+
+		while (System.currentTimeMillis() < deadline) {
+			Thread.sleep(_POLL_INTERVAL_MS);
+
+			boolean anyFailed = false;
+			boolean allTerminal = true;
+
+			for (long taskId : taskIds) {
+				BatchEngineImportTask task =
+					_batchEngineImportTaskLocalService.
+						fetchBatchEngineImportTask(taskId);
+
+				if (task == null) {
+					allTerminal = false;
+
+					continue;
+				}
+
+				String status = task.getExecuteStatus();
+
+				if (Objects.equals(
+						BatchEngineTaskExecuteStatus.FAILED.name(), status)) {
+
+					anyFailed = true;
+				}
+				else if (!Objects.equals(
+							BatchEngineTaskExecuteStatus.COMPLETED.name(),
+							status)) {
+
+					allTerminal = false;
+				}
+			}
+
+			if (allTerminal) {
+				return !anyFailed;
+			}
+		}
+
+		_log.error(
+			StringBundler.concat(
+				"Phase ", phaseLabel, " timed out after ", _TIMEOUT_MS, "ms"));
+
+		return false;
+	}
+
+	private String _envelopeClassName(Map<String, Serializable> values) {
+		String json = GetterUtil.getString(values.get("json"));
+
+		if (json.isEmpty()) {
+			return null;
+		}
+
+		try {
+			JSONObject envelope = JSONFactoryUtil.createJSONObject(json);
+
+			JSONObject configuration = envelope.getJSONObject("configuration");
+
+			if (configuration == null) {
+				return null;
+			}
+
+			return configuration.getString("className");
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to read envelope className: " +
+						exception.getMessage());
+			}
+
+			return null;
+		}
+	}
+
+	private JSONArray _envelopeItems(Map<String, Serializable> values)
+		throws Exception {
+
+		String json = GetterUtil.getString(values.get("json"));
+
+		if (json.isEmpty()) {
+			return null;
+		}
+
+		JSONObject envelope = JSONFactoryUtil.createJSONObject(json);
+
+		return envelope.getJSONArray("items");
+	}
+
+	private void _finalizeRun(
+		long userId, long runId, boolean failed, String failureReason,
+		String resultingSiteERC) {
+
+		try {
+			Map<String, Serializable> updates = new HashMap<>(
+				_objectEntryLocalService.getValues(runId));
+
+			if (failed) {
+				updates.put("runStatus", _RUN_STATUS_FAILED);
+
+				if (failureReason != null) {
+					updates.put("failureReason", failureReason);
+				}
+			}
+			else {
+				updates.put("committedAt", new Date());
+				updates.put("failureReason", "");
+				updates.put("runStatus", _RUN_STATUS_COMMITTED);
+
+				if (resultingSiteERC != null) {
+					updates.put("resultingSiteERC", resultingSiteERC);
+				}
+			}
+
+			_objectEntryLocalService.updateObjectEntry(
+				userId, runId, 0L, updates, new ServiceContext());
+		}
+		catch (Exception exception) {
+			_log.error(
+				StringBundler.concat(
+					"Unable to finalize run ", runId, " (failed=", failed, ")"),
+				exception);
+		}
+	}
+
+	private String _findCreatedSiteERC(
+			long companyId, List<ObjectEntry> siteArtifacts,
+			Map<Long, Map<String, Serializable>> artifactValues)
+		throws Exception {
+
+		for (ObjectEntry artifact : siteArtifacts) {
+			JSONArray items = _envelopeItems(
+				artifactValues.get(artifact.getObjectEntryId()));
+
+			if (items == null) {
+				continue;
+			}
+
+			for (int i = 0; i < items.length(); i++) {
+				JSONObject item = items.getJSONObject(i);
+
+				String externalReferenceCode = item.getString(
+					"externalReferenceCode");
+
+				if (Validator.isNull(externalReferenceCode)) {
+					continue;
+				}
+
+				Group group =
+					_groupLocalService.fetchGroupByExternalReferenceCode(
+						externalReferenceCode, companyId);
+
+				if (group != null) {
+					return externalReferenceCode;
+				}
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Site phase reported success but no Group found " +
+							"for ERC " + externalReferenceCode);
+				}
+			}
+		}
+
+		return null;
+	}
+
 	private void _runCommit(long companyId, long userId, long runId) {
 		try {
 			ObjectEntry runObjectEntry =
@@ -207,9 +381,7 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 				if (_SITE_CLASS_NAME.equals(envelopeClassName)) {
 					siteArtifacts.add(artifact);
 				}
-				else if (_SPACE_PHASE_CLASS_NAMES.contains(
-							envelopeClassName)) {
-
+				else if (_SPACE_PHASE_CLASS_NAMES.contains(envelopeClassName)) {
 					spaceArtifacts.add(artifact);
 				}
 				else {
@@ -227,8 +399,7 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 			// 6. Site phase.
 
 			if (!_runPhase(
-					"site", companyId, userId, siteArtifacts,
-					artifactValues)) {
+					"site", companyId, userId, siteArtifacts, artifactValues)) {
 
 				_finalizeRun(
 					userId, runId, true,
@@ -275,14 +446,12 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 			// 9. Content phase. Pages, CMS object entries, fragments, etc.
 
 			boolean contentSucceeded = _runPhase(
-				"content", companyId, userId, contentArtifacts,
-				artifactValues);
+				"content", companyId, userId, contentArtifacts, artifactValues);
 
 			_finalizeRun(
 				userId, runId, !contentSucceeded,
-				contentSucceeded
-					? null
-					: "Content phase failed; see batch engine task errors",
+				contentSucceeded ? null :
+					"Content phase failed; see batch engine task errors",
 				contentSucceeded ? siteExternalReferenceCode : null);
 		}
 		catch (Exception exception) {
@@ -300,40 +469,46 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 		}
 	}
 
-	private void _finalizeRun(
-		long userId, long runId, boolean failed, String failureReason,
-		String resultingSiteERC) {
+	private boolean _runPhase(
+			String phaseLabel, long companyId, long userId,
+			List<ObjectEntry> phaseArtifacts,
+			Map<Long, Map<String, Serializable>> artifactValues)
+		throws Exception {
 
-		try {
-			Map<String, Serializable> updates = new HashMap<>(
-				_objectEntryLocalService.getValues(runId));
-
-			if (failed) {
-				updates.put("runStatus", _RUN_STATUS_FAILED);
-
-				if (failureReason != null) {
-					updates.put("failureReason", failureReason);
-				}
-			}
-			else {
-				updates.put("committedAt", new Date());
-				updates.put("failureReason", "");
-				updates.put("runStatus", _RUN_STATUS_COMMITTED);
-
-				if (resultingSiteERC != null) {
-					updates.put("resultingSiteERC", resultingSiteERC);
-				}
-			}
-
-			_objectEntryLocalService.updateObjectEntry(
-				userId, runId, 0L, updates, new ServiceContext());
+		if (phaseArtifacts.isEmpty()) {
+			return true;
 		}
-		catch (Exception exception) {
-			_log.error(
-				StringBundler.concat(
-					"Unable to finalize run ", runId, " (failed=", failed, ")"),
-				exception);
+
+		List<Long> taskIds = new ArrayList<>(phaseArtifacts.size());
+
+		for (ObjectEntry artifact : phaseArtifacts) {
+			Map<String, Serializable> values = artifactValues.get(
+				artifact.getObjectEntryId());
+
+			String fileName = GetterUtil.getString(values.get("fileName"));
+			String json = GetterUtil.getString(values.get("json"));
+
+			if (json.isEmpty()) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Skipping artifact " + fileName +
+							" due to missing envelope");
+				}
+
+				continue;
+			}
+
+			BatchEngineImportTask batchEngineImportTask = _submitEnvelope(
+				companyId, userId, fileName, json);
+
+			if (batchEngineImportTask == null) {
+				continue;
+			}
+
+			taskIds.add(batchEngineImportTask.getBatchEngineImportTaskId());
 		}
+
+		return _awaitTerminal(phaseLabel, taskIds);
 	}
 
 	private BatchEngineImportTask _submitEnvelope(
@@ -374,7 +549,8 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 		JSONArray items = envelope.getJSONArray("items");
 
 		if ((items == null) || (items.length() == 0)) {
-			_log.warn("Skipping artifact " + fileName + " because items is empty");
+			_log.warn(
+				"Skipping artifact " + fileName + " because items is empty");
 
 			return null;
 		}
@@ -396,7 +572,8 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 			_batchEngineImportTaskLocalService.addBatchEngineImportTask(
 				null, companyId, userId, 100, null, className,
 				_zipJSON(fileName, items.toString()), "JSON",
-				BatchEngineTaskExecuteStatus.INITIAL.name(), fieldNameMappingMap,
+				BatchEngineTaskExecuteStatus.INITIAL.name(),
+				fieldNameMappingMap,
 				BatchEngineImportTaskConstants.IMPORT_STRATEGY_ON_ERROR_FAIL,
 				"CREATE", parameters, taskItemDelegateName);
 
@@ -458,186 +635,6 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 		return byteArrayOutputStream.toByteArray();
 	}
 
-	private boolean _awaitTerminal(String phaseLabel, List<Long> taskIds)
-		throws InterruptedException {
-
-		if (taskIds.isEmpty()) {
-			return true;
-		}
-
-		long deadline = System.currentTimeMillis() + _TIMEOUT_MS;
-
-		while (System.currentTimeMillis() < deadline) {
-			Thread.sleep(_POLL_INTERVAL_MS);
-
-			boolean anyFailed = false;
-			boolean allTerminal = true;
-
-			for (long taskId : taskIds) {
-				BatchEngineImportTask task =
-					_batchEngineImportTaskLocalService.
-						fetchBatchEngineImportTask(taskId);
-
-				if (task == null) {
-					allTerminal = false;
-
-					continue;
-				}
-
-				String status = task.getExecuteStatus();
-
-				if (Objects.equals(
-						BatchEngineTaskExecuteStatus.FAILED.name(), status)) {
-
-					anyFailed = true;
-				}
-				else if (!Objects.equals(
-							BatchEngineTaskExecuteStatus.COMPLETED.name(),
-							status)) {
-
-					allTerminal = false;
-				}
-			}
-
-			if (allTerminal) {
-				return !anyFailed;
-			}
-		}
-
-		_log.error(
-			StringBundler.concat(
-				"Phase ", phaseLabel, " timed out after ", _TIMEOUT_MS, "ms"));
-
-		return false;
-	}
-
-	private String _findCreatedSiteERC(
-			long companyId, List<ObjectEntry> siteArtifacts,
-			Map<Long, Map<String, Serializable>> artifactValues)
-		throws Exception {
-
-		for (ObjectEntry artifact : siteArtifacts) {
-			JSONArray items = _envelopeItems(
-				artifactValues.get(artifact.getObjectEntryId()));
-
-			if (items == null) {
-				continue;
-			}
-
-			for (int i = 0; i < items.length(); i++) {
-				JSONObject item = items.getJSONObject(i);
-
-				String externalReferenceCode = item.getString(
-					"externalReferenceCode");
-
-				if (Validator.isNull(externalReferenceCode)) {
-					continue;
-				}
-
-				Group group =
-					_groupLocalService.fetchGroupByExternalReferenceCode(
-						externalReferenceCode, companyId);
-
-				if (group != null) {
-					return externalReferenceCode;
-				}
-
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Site phase reported success but no Group found " +
-							"for ERC " + externalReferenceCode);
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private String _envelopeClassName(Map<String, Serializable> values) {
-		String json = GetterUtil.getString(values.get("json"));
-
-		if (json.isEmpty()) {
-			return null;
-		}
-
-		try {
-			JSONObject envelope = JSONFactoryUtil.createJSONObject(json);
-
-			JSONObject configuration = envelope.getJSONObject("configuration");
-
-			if (configuration == null) {
-				return null;
-			}
-
-			return configuration.getString("className");
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to read envelope className: " +
-						exception.getMessage());
-			}
-
-			return null;
-		}
-	}
-
-	private JSONArray _envelopeItems(Map<String, Serializable> values)
-		throws Exception {
-
-		String json = GetterUtil.getString(values.get("json"));
-
-		if (json.isEmpty()) {
-			return null;
-		}
-
-		JSONObject envelope = JSONFactoryUtil.createJSONObject(json);
-
-		return envelope.getJSONArray("items");
-	}
-
-	private boolean _runPhase(
-			String phaseLabel, long companyId, long userId,
-			List<ObjectEntry> phaseArtifacts,
-			Map<Long, Map<String, Serializable>> artifactValues)
-		throws Exception {
-
-		if (phaseArtifacts.isEmpty()) {
-			return true;
-		}
-
-		List<Long> taskIds = new ArrayList<>(phaseArtifacts.size());
-
-		for (ObjectEntry artifact : phaseArtifacts) {
-			Map<String, Serializable> values = artifactValues.get(
-				artifact.getObjectEntryId());
-
-			String fileName = GetterUtil.getString(values.get("fileName"));
-			String json = GetterUtil.getString(values.get("json"));
-
-			if (json.isEmpty()) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Skipping artifact " + fileName +
-							" due to missing envelope");
-				}
-
-				continue;
-			}
-
-			BatchEngineImportTask batchEngineImportTask = _submitEnvelope(
-				companyId, userId, fileName, json);
-
-			if (batchEngineImportTask == null) {
-				continue;
-			}
-
-			taskIds.add(batchEngineImportTask.getBatchEngineImportTaskId());
-		}
-
-		return _awaitTerminal(phaseLabel, taskIds);
-	}
-
 	private static final String
 		_ARTIFACT_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE = "L_CSG_ARTIFACT";
 
@@ -646,18 +643,18 @@ public class CommitContentSiteGeneratorRunObjectActionExecutor
 
 	private static final long _POLL_INTERVAL_MS = 2_000L;
 
+	private static final String _RUN_STATUS_COMMITTED = "committed";
+
+	private static final String _RUN_STATUS_FAILED = "failed";
+
+	private static final String _RUN_STATUS_GENERATING = "generating";
+
 	private static final String _SITE_CLASS_NAME =
 		"com.liferay.headless.admin.site.dto.v1_0.Site";
 
 	private static final List<String> _SPACE_PHASE_CLASS_NAMES = List.of(
 		"com.liferay.headless.asset.library.dto.v1_0.AssetLibrary",
 		"com.liferay.headless.asset.library.dto.v1_0.ConnectedSite");
-
-	private static final String _RUN_STATUS_COMMITTED = "committed";
-
-	private static final String _RUN_STATUS_FAILED = "failed";
-
-	private static final String _RUN_STATUS_GENERATING = "generating";
 
 	private static final long _TIMEOUT_MS = 10L * 60L * 1_000L;
 

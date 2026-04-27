@@ -75,35 +75,11 @@ public class ViewContentSitesDisplayContext {
 		return HashMapBuilder.<String, Object>put(
 			"description",
 			LanguageUtil.get(
-				_httpServletRequest,
-				"create-a-new-generator-to-get-started")
+				_httpServletRequest, "create-a-new-generator-to-get-started")
 		).put(
 			"title",
 			LanguageUtil.get(_httpServletRequest, "no-content-sites-yet")
 		).build();
-	}
-
-	public String getRefineStepURL() {
-		return PortletURLBuilder.createRenderURL(
-			_liferayPortletResponse
-		).setMVCPath(
-			"/view_refine_step.jsp"
-		).buildString();
-	}
-
-	public long getRunId() {
-		return GetterUtil.getLong(
-			PortalUtil.getOriginalServletRequest(
-				_httpServletRequest
-			).getParameter("runId"));
-	}
-
-	public String getReviewStepURL() {
-		return PortletURLBuilder.createRenderURL(
-			_liferayPortletResponse
-		).setMVCPath(
-			"/view_review_step.jsp"
-		).buildString();
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
@@ -118,6 +94,31 @@ public class ViewContentSitesDisplayContext {
 				getAPIURL() + "/{id}", "trash", "delete",
 				LanguageUtil.get(_httpServletRequest, "delete"), "delete",
 				"delete", "async"));
+	}
+
+	public String getRefineStepURL() {
+		return PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCPath(
+			"/view_refine_step.jsp"
+		).buildString();
+	}
+
+	public String getReviewStepURL() {
+		return PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCPath(
+			"/view_review_step.jsp"
+		).buildString();
+	}
+
+	public long getRunId() {
+		return GetterUtil.getLong(
+			PortalUtil.getOriginalServletRequest(
+				_httpServletRequest
+			).getParameter(
+				"runId"
+			));
 	}
 
 	private final HttpServletRequest _httpServletRequest;

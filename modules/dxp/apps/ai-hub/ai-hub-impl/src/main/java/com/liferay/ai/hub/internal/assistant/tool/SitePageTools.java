@@ -65,8 +65,8 @@ public class SitePageTools {
 		@P("Site external reference code") String siteExternalReferenceCode,
 		@P("Site page external reference code") String
 			sitePageExternalReferenceCode,
-		@P("Full ContentPageSpecification JSON payload to persist")
-			String body) {
+		@P("Full ContentPageSpecification JSON payload to persist") String
+			body) {
 
 		try (SafeCloseable safeCloseable =
 				CompanyThreadLocal.setCompanyIdWithSafeCloseable(_companyId)) {
@@ -76,6 +76,43 @@ public class SitePageTools {
 		}
 		catch (Exception exception) {
 			return ReflectionUtil.throwException(exception);
+		}
+	}
+
+	private void _alignExternalReferenceCodes(
+		Object node, String oldERC, String newERC) {
+
+		if (node instanceof JSONObject) {
+			JSONObject jsonObject = (JSONObject)node;
+
+			for (String key : new HashSet<>(jsonObject.keySet())) {
+				Object value = jsonObject.get(key);
+
+				if (key.endsWith("ExternalReferenceCode") &&
+					(value instanceof String)) {
+
+					String stringValue = (String)value;
+
+					if (stringValue.equals(oldERC)) {
+						jsonObject.put(key, newERC);
+					}
+					else if (stringValue.startsWith(oldERC + "-")) {
+						jsonObject.put(
+							key,
+							newERC + stringValue.substring(oldERC.length()));
+					}
+				}
+				else {
+					_alignExternalReferenceCodes(value, oldERC, newERC);
+				}
+			}
+		}
+		else if (node instanceof JSONArray) {
+			JSONArray jsonArray = (JSONArray)node;
+
+			for (int i = 0; i < jsonArray.length(); i++) {
+				_alignExternalReferenceCodes(jsonArray.get(i), oldERC, newERC);
+			}
 		}
 	}
 
@@ -186,45 +223,6 @@ public class SitePageTools {
 		}
 
 		return body.trim();
-	}
-
-	private void _alignExternalReferenceCodes(
-		Object node, String oldERC, String newERC) {
-
-		if (node instanceof JSONObject) {
-			JSONObject jsonObject = (JSONObject)node;
-
-			for (String key : new HashSet<>(jsonObject.keySet())) {
-				Object value = jsonObject.get(key);
-
-				if (key.endsWith("ExternalReferenceCode") &&
-					(value instanceof String)) {
-
-					String stringValue = (String)value;
-
-					if (stringValue.equals(oldERC)) {
-						jsonObject.put(key, newERC);
-					}
-					else if (stringValue.startsWith(oldERC + "-")) {
-						jsonObject.put(
-							key,
-							newERC +
-								stringValue.substring(oldERC.length()));
-					}
-				}
-				else {
-					_alignExternalReferenceCodes(value, oldERC, newERC);
-				}
-			}
-		}
-		else if (node instanceof JSONArray) {
-			JSONArray jsonArray = (JSONArray)node;
-
-			for (int i = 0; i < jsonArray.length(); i++) {
-				_alignExternalReferenceCodes(
-					jsonArray.get(i), oldERC, newERC);
-			}
-		}
 	}
 
 	private String _updatePageSpecification(

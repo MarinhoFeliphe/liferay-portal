@@ -81,6 +81,28 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 			() -> _runStubbedAgent(companyId, userId, runId));
 	}
 
+	private static String _envelope(
+		String className, String parametersJSON, String itemsJSONArray) {
+
+		return _envelope(className, parametersJSON, "DEFAULT", itemsJSONArray);
+	}
+
+	private static String _envelope(
+		String className, String parametersJSON, String taskItemDelegateName,
+		String itemsJSONArray) {
+
+		String parametersFragment = "";
+
+		if (parametersJSON != null) {
+			parametersFragment = ",\"parameters\":" + parametersJSON;
+		}
+
+		return StringBundler.concat(
+			"{\"configuration\":{\"className\":\"", className,
+			"\",\"taskItemDelegateName\":\"", taskItemDelegateName, "\"",
+			parametersFragment, "},\"items\":", itemsJSONArray, "}");
+	}
+
 	private void _addArtifact(
 			long userId, long artifactObjectDefinitionId, long runId,
 			String fileName, String className, String json, int loadOrder)
@@ -89,6 +111,8 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 		_objectEntryLocalService.addObjectEntry(
 			0L, userId, artifactObjectDefinitionId, 0L, "en_US",
 			HashMapBuilder.<String, Serializable>put(
+				_ARTIFACT_RUN_FK_FIELD, runId
+			).put(
 				"className", className
 			).put(
 				"fileName", fileName
@@ -96,8 +120,6 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"json", json
 			).put(
 				"loadOrder", loadOrder
-			).put(
-				_ARTIFACT_RUN_FK_FIELD, runId
 			).build(),
 			new ServiceContext());
 	}
@@ -150,8 +172,7 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 		}
 		catch (Exception exception) {
 			_log.error(
-				StringBundler.concat(
-					"Stubbed agent failed for run ", runId),
+				StringBundler.concat("Stubbed agent failed for run ", runId),
 				exception);
 
 			try {
@@ -189,9 +210,8 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 	private static final String _RUN_STATUS_READY = "ready";
 
 	private static final List<Map<String, String>> _SEED_ARTIFACTS = List.of(
-		HashMapBuilder.<String, String>put(
-			"className",
-			"com.liferay.headless.admin.site.dto.v1_0.Site"
+		HashMapBuilder.put(
+			"className", "com.liferay.headless.admin.site.dto.v1_0.Site"
 		).put(
 			"fileName", "site.json"
 		).put(
@@ -201,10 +221,10 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"{\"createStrategy\":\"UPSERT\"}",
 				"[{\"externalReferenceCode\":\"csg-site-${runId}\"," +
 					"\"name\":\"CSG Site ${runId}\"," +
-					"\"friendlyUrlPath\":\"/csg-${runId}\"," +
-					"\"membershipType\":\"open\"}]")
+						"\"friendlyUrlPath\":\"/csg-${runId}\"," +
+							"\"membershipType\":\"open\"}]")
 		).build(),
-		HashMapBuilder.<String, String>put(
+		HashMapBuilder.put(
 			"className",
 			"com.liferay.headless.asset.library.dto.v1_0.AssetLibrary"
 		).put(
@@ -215,10 +235,9 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"com.liferay.headless.asset.library.dto.v1_0.AssetLibrary",
 				"{\"createStrategy\":\"UPSERT\"}",
 				"[{\"externalReferenceCode\":\"csg-space-${runId}\"," +
-					"\"name\":\"CSG Space ${runId}\"," +
-					"\"type\":\"Space\"}]")
+					"\"name\":\"CSG Space ${runId}\"," + "\"type\":\"Space\"}]")
 		).build(),
-		HashMapBuilder.<String, String>put(
+		HashMapBuilder.put(
 			"className",
 			"com.liferay.headless.asset.library.dto.v1_0.ConnectedSite"
 		).put(
@@ -229,13 +248,12 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"com.liferay.headless.asset.library.dto.v1_0.ConnectedSite",
 				"{\"createStrategy\":\"UPSERT\"," +
 					"\"assetLibraryExternalReferenceCode\":" +
-					"\"csg-space-${runId}\"}",
+						"\"csg-space-${runId}\"}",
 				"[{\"externalReferenceCode\":\"csg-site-${runId}\"," +
 					"\"searchable\":true}]")
 		).build(),
-		HashMapBuilder.<String, String>put(
-			"className",
-			"com.liferay.headless.admin.site.dto.v1_0.SitePage"
+		HashMapBuilder.put(
+			"className", "com.liferay.headless.admin.site.dto.v1_0.SitePage"
 		).put(
 			"fileName", "site-page-home.json"
 		).put(
@@ -244,15 +262,14 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"com.liferay.headless.admin.site.dto.v1_0.SitePage",
 				"{\"createStrategy\":\"UPSERT\"," +
 					"\"privateLayout\":\"false\"," +
-					"\"siteExternalReferenceCode\":" +
-					"\"csg-site-${runId}\"}",
+						"\"siteExternalReferenceCode\":" +
+							"\"csg-site-${runId}\"}",
 				"[{\"externalReferenceCode\":\"csg-page-home-${runId}\"," +
 					"\"name_i18n\":{\"en_US\":\"Home\"}," +
-					"\"friendlyUrlPath_i18n\":{\"en_US\":\"/home\"}}]")
+						"\"friendlyUrlPath_i18n\":{\"en_US\":\"/home\"}}]")
 		).build(),
-		HashMapBuilder.<String, String>put(
-			"className",
-			"com.liferay.headless.admin.site.dto.v1_0.SitePage"
+		HashMapBuilder.put(
+			"className", "com.liferay.headless.admin.site.dto.v1_0.SitePage"
 		).put(
 			"fileName", "site-page-about.json"
 		).put(
@@ -261,15 +278,14 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"com.liferay.headless.admin.site.dto.v1_0.SitePage",
 				"{\"createStrategy\":\"UPSERT\"," +
 					"\"privateLayout\":\"false\"," +
-					"\"siteExternalReferenceCode\":" +
-					"\"csg-site-${runId}\"}",
+						"\"siteExternalReferenceCode\":" +
+							"\"csg-site-${runId}\"}",
 				"[{\"externalReferenceCode\":\"csg-page-about-${runId}\"," +
 					"\"name_i18n\":{\"en_US\":\"About\"}," +
-					"\"friendlyUrlPath_i18n\":{\"en_US\":\"/about\"}}]")
+						"\"friendlyUrlPath_i18n\":{\"en_US\":\"/about\"}}]")
 		).build(),
-		HashMapBuilder.<String, String>put(
-			"className",
-			"com.liferay.object.rest.dto.v1_0.ObjectEntry"
+		HashMapBuilder.put(
+			"className", "com.liferay.object.rest.dto.v1_0.ObjectEntry"
 		).put(
 			"fileName", "cms-blog-welcome.json"
 		).put(
@@ -279,51 +295,25 @@ public class AnalyzeContentSiteGeneratorRunObjectActionExecutor
 				"{\"scopeKey\":\"csg-space-${runId}\"}", "CMSBlog",
 				"[{\"externalReferenceCode\":\"csg-cms-blog-welcome-" +
 					"${runId}\"," +
-					"\"title\":\"Welcome to your generated site\"," +
-					"\"subtitle\":\"A first look at what was generated\"," +
-					"\"content\":\"<p>This blog entry was created by the " +
-						"Content Site Generator.</p>\"}]")
+						"\"title\":\"Welcome to your generated site\"," +
+							"\"subtitle\":\"A first look at what was generated\"," +
+								"\"content\":\"<p>This blog entry was created by the " +
+									"Content Site Generator.</p>\"}]")
 		).build(),
-		HashMapBuilder.<String, String>put(
-			"className",
-			"com.liferay.object.rest.dto.v1_0.ObjectEntry"
+		HashMapBuilder.put(
+			"className", "com.liferay.object.rest.dto.v1_0.ObjectEntry"
 		).put(
 			"fileName", "cms-basic-web-content-about.json"
 		).put(
 			"json",
 			_envelope(
 				"com.liferay.object.rest.dto.v1_0.ObjectEntry",
-				"{\"scopeKey\":\"csg-space-${runId}\"}",
-				"CMSBasicWebContent",
+				"{\"scopeKey\":\"csg-space-${runId}\"}", "CMSBasicWebContent",
 				"[{\"externalReferenceCode\":\"csg-cms-basic-about-" +
-					"${runId}\"," +
-					"\"title\":\"About this site\"," +
-					"\"content\":\"<p>This piece of basic web content " +
-						"was created by the Content Site Generator.</p>\"}]")
+					"${runId}\"," + "\"title\":\"About this site\"," +
+						"\"content\":\"<p>This piece of basic web content " +
+							"was created by the Content Site Generator.</p>\"}]")
 		).build());
-
-	private static String _envelope(
-		String className, String parametersJSON, String itemsJSONArray) {
-
-		return _envelope(
-			className, parametersJSON, "DEFAULT", itemsJSONArray);
-	}
-
-	private static String _envelope(
-		String className, String parametersJSON, String taskItemDelegateName,
-		String itemsJSONArray) {
-
-		String parametersFragment = "";
-
-		if (parametersJSON != null) {
-			parametersFragment = ",\"parameters\":" + parametersJSON;
-		}
-
-		return StringBundler.concat(
-			"{\"configuration\":{\"className\":\"", className,
-			"\",\"taskItemDelegateName\":\"", taskItemDelegateName, "\"",
-			parametersFragment, "},\"items\":", itemsJSONArray, "}");
-	}
 
 	private static final long _SIMULATED_AGENT_MS = 3_000L;
 
