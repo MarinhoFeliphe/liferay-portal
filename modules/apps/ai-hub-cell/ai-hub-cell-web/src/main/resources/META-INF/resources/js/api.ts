@@ -8,6 +8,11 @@ import {fetch} from 'frontend-js-web';
 
 const AI_HUB_ENDPOINT = '/o/ai-hub/v1.0';
 
+export interface ChatContext {
+	context: Record<string, unknown>;
+	instructionDefinitionScope: string;
+}
+
 export async function createEventSource() {
 	const authorizationToken = await postAuthorizationToken();
 
@@ -27,6 +32,41 @@ export async function createEventSource() {
 					}),
 				}),
 			withCredentials: true,
+		}
+	);
+}
+
+export async function postChatByExternalReferenceCodeMessage({
+	chatContext,
+	eventSourceReference,
+	message,
+}: {
+	chatContext: ChatContext;
+	eventSourceReference: string;
+	message: string;
+}) {
+	const authorizationToken = await postAuthorizationToken();
+
+	if (!authorizationToken) {
+		return;
+	}
+
+	return await fetch(
+		`${authorizationToken.serviceURL}${AI_HUB_ENDPOINT}/chats/by-external-reference-code/${eventSourceReference}/messages`,
+		{
+			body: JSON.stringify({
+				context: chatContext.context,
+				instructionDefinitionScope: chatContext.instructionDefinitionScope,
+				text: message,
+			}),
+			headers: new Headers({
+				'Accept': 'application/json',
+				'Authorization': `Bearer ${authorizationToken.accessToken}`,
+				'Content-Type': 'application/json',
+				'Liferay-AI-Hub-Cell-On-Behalf-Of':
+					authorizationToken.userToken,
+			}),
+			method: 'POST',
 		}
 	);
 }

@@ -11,7 +11,7 @@ import {EventSource} from 'eventsource';
 import {fetch as liferayFetch} from 'frontend-js-web';
 import React, {useEffect, useRef, useState} from 'react';
 
-import {createEventSource} from './api';
+import {createEventSource, postChatByExternalReferenceCodeMessage} from './api';
 import MultiStepProgress from './components/MultiStepProgress';
 import {Example} from './types/Example';
 
@@ -50,18 +50,11 @@ interface IProps {
 
 const RUNS_URL = '/o/content-site-generator/runs';
 
-const POLL_INTERVAL_MS = 1500;
-
-const POLL_TIMEOUT_MS = 5 * 60 * 1000;
-
 const buildRunName = (prompt: string) => {
 	const trimmed = prompt.trim().split(/\s+/).slice(0, 6).join(' ');
 
 	return trimmed.length > 60 ? `${trimmed.slice(0, 57)}...` : trimmed;
 };
-
-const sleep = (ms: number) =>
-	new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export default function ContentSiteGenerator({refineStepURL}: IProps) {
 	const [prompt, setPrompt] = useState('');
@@ -88,18 +81,8 @@ export default function ContentSiteGenerator({refineStepURL}: IProps) {
 		});
 	}
 
-	function closeAIAssistantChatConnection() {
-		eventSourceRef.current?.close();
-
-		eventSourceRef.current = null;
-	}
-
 	useEffect(() => {
 		openAIAssistantChatConnection();
-
-		return () => {
-			closeAIAssistantChatConnection();
-		};
 	}, []);
 
 	const handleAnalyze = async () => {
@@ -134,64 +117,24 @@ export default function ContentSiteGenerator({refineStepURL}: IProps) {
 			// TODO: upload attachments via POST /o/content-site-generator/attachments
 			// (multipart with FK r_attachments_l_contentGeneratorRunId).
 
-			const analyzeResponse = await liferayFetch(
-				`${RUNS_URL}/${runId}/object-actions/analyze`,
-				{
-					headers: {'Content-Type': 'application/json'},
-					method: 'PUT',
-				}
-			);
-
-			if (!analyzeResponse.ok) {
-				throw new Error(
-					`Failed to start analysis (${analyzeResponse.status})`
-				);
+			if (eventSourceReference.current) {
+				postChatByExternalReferenceCodeMessage({
+					chatContext: {
+						context: {},
+						instructionDefinitionScope: '',
+					},
+					eventSourceReference: eventSourceReference.current,
+					message: prompt,
+				});
 			}
 
-			const deadline = Date.now() + POLL_TIMEOUT_MS;
+			if (refineStepURL) {
+				const separator = refineStepURL.includes('?') ? '&' : '?';
 
-			while (Date.now() < deadline) {
-				await sleep(POLL_INTERVAL_MS);
-
-				const pollResponse = await liferayFetch(
-					`${RUNS_URL}/${runId}`
+				Liferay.Util.navigate(
+					`${refineStepURL}${separator}runId=${runId}`
 				);
-
-				if (!pollResponse.ok) {
-					throw new Error(
-						`Failed to poll run (${pollResponse.status})`
-					);
-				}
-
-				const pollRun = await pollResponse.json();
-				const status = pollRun?.runStatus?.key;
-
-				if (status === 'ready') {
-					if (refineStepURL) {
-						const separator = refineStepURL.includes('?')
-							? '&'
-							: '?';
-
-						Liferay.Util.navigate(
-							`${refineStepURL}${separator}runId=${runId}`
-						);
-					}
-
-					return;
-				}
-
-				if (status === 'failed') {
-					throw new Error(
-						Liferay.Language.get(
-							'analysis-failed-please-try-again'
-						)
-					);
-				}
 			}
-
-			throw new Error(
-				Liferay.Language.get('analysis-timed-out-please-try-again')
-			);
 		}
 		catch (exception) {
 			setError(
