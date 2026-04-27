@@ -34,12 +34,14 @@ import java.util.Map;
 public class CMSBlogTools {
 
 	@Tool(
-		"Add a single CMSBlog item to the current chat's pending import. Returns the saved item's externalReferenceCode."
+		"Add a batch of CMSBlog items to the current chat's pending import. Accepts a JSON array of CMSBlog DTOs and persists the whole batch as a single artifact. Returns the saved artifact's externalReferenceCode."
 	)
-	public String addItem(
+	public String addItems(
 			InvocationParameters invocationParameters,
-			@P("A string containing the JSON of a single CMSBlog DTO to import")
-				String item)
+			@P(
+				"A string containing a JSON array of CMSBlog DTOs to import (e.g. [{...}, {...}])"
+			)
+			String items)
 		throws Exception {
 
 		ExecutionContext executionContext = invocationParameters.get(
@@ -73,15 +75,22 @@ public class CMSBlogTools {
 			GetterUtil.getString(workflowContext.get("userToken")));
 		options.setBody(
 			JSONUtil.put(
-				"json", item
+				"className",
+				"com.liferay.object.rest.dto.v1_0.ObjectEntry"
 			).put(
-				"r_compositionToArtifacts_contentComposerCompositionERC",
-				"0cfe4050-40ca-3cdb-f042-83e1e207ef67"
+				"fileName", "blogs-batch.json"
+			).put(
+				"json", items
+			).put(
+				"loadOrder", 0
+			).put(
+				"r_artifacts_l_contentGeneratorRunERC",
+				GetterUtil.getString(workflowContext.get("sseEventSinkKey"))
 			).toString(),
 			ContentTypes.APPLICATION_JSON, "UTF-8");
 		options.setLocation(
 			oAuth2Application.getHomePageURL() +
-				"/o/content-composer/artifacts");
+				"/o/content-site-generator/artifacts/");
 		options.setMethod(Http.Method.POST);
 
 		JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(

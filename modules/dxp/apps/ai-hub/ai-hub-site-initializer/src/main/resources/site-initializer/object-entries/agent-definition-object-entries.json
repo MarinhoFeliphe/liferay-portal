@@ -86,7 +86,7 @@
 		},
 		{
 			"active": true,
-			"description": "This agent builds or updates Liferay CMS Blogs from natural-language instructions, producing a full CMSBlog payload that can be persisted via the headless-delivery cms/blogs API.",
+			"description": "This agent builds or updates Liferay CMS Blogs from natural-language instructions, producing a JSON array of CMSBlog payloads (one or many) that can be persisted via the headless-delivery cms/blogs API.",
 			"externalReferenceCode": "L_CMS_BLOG_BUILDER",
 			"inputVariables": "request",
 			"outputVariable": "response",
