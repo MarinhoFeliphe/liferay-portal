@@ -13,6 +13,7 @@
 		"@clayui/pagination-bar": "^3.161.0",
 		"@clayui/panel": "^3.161.0",
 		"@clayui/table": "^3.161.0",
+		"eventsource": "^4.0.0",
 		"frontend-js-components-web": "*",
 		"frontend-js-web": "*",
 		"react": "18.2.0"

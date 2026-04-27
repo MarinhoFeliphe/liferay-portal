@@ -7,9 +7,11 @@ import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
+import {EventSource} from 'eventsource';
 import {fetch as liferayFetch} from 'frontend-js-web';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
+import {createEventSource} from './api';
 import MultiStepProgress from './components/MultiStepProgress';
 import {Example} from './types/Example';
 
@@ -66,9 +68,39 @@ export default function ContentSiteGenerator({refineStepURL}: IProps) {
 	const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
+	const eventSourceRef = useRef<EventSource | null>(null);
+	const eventSourceReference = useRef<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const hasText = !!prompt.trim().length;
+
+	function openAIAssistantChatConnection() {
+		createEventSource().then((eventSource) => {
+			if (!eventSource) {
+				return;
+			}
+
+			eventSourceRef.current = eventSource;
+
+			eventSourceRef.current.addEventListener('Subscribe', (event) => {
+				eventSourceReference.current = event.data;
+			});
+		});
+	}
+
+	function closeAIAssistantChatConnection() {
+		eventSourceRef.current?.close();
+
+		eventSourceRef.current = null;
+	}
+
+	useEffect(() => {
+		openAIAssistantChatConnection();
+
+		return () => {
+			closeAIAssistantChatConnection();
+		};
+	}, []);
 
 	const handleAnalyze = async () => {
 		if (!hasText || loading) {
@@ -81,6 +113,7 @@ export default function ContentSiteGenerator({refineStepURL}: IProps) {
 		try {
 			const createResponse = await liferayFetch(RUNS_URL, {
 				body: JSON.stringify({
+					externalReferenceCode: eventSourceReference.current,
 					name: buildRunName(prompt) || 'Generator',
 					prompt,
 					runStatus: 'refining',
