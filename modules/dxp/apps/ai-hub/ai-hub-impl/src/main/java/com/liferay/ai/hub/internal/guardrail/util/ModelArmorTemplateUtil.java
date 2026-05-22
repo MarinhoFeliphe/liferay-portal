@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.ai.hub.rest.internal.guardrail.util;
+package com.liferay.ai.hub.internal.guardrail.util;
 
 import com.google.api.gax.rpc.NotFoundException;
 import com.google.cloud.modelarmor.v1.LocationName;
@@ -11,7 +11,7 @@ import com.google.cloud.modelarmor.v1.ModelArmorClient;
 import com.google.cloud.modelarmor.v1.Template;
 import com.google.protobuf.FieldMask;
 
-import com.liferay.ai.hub.rest.internal.guardrail.ModelArmorTemplateConfig;
+import com.liferay.ai.hub.internal.guardrail.ModelArmorTemplateConfig;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

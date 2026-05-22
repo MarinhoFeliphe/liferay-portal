@@ -8,10 +8,6 @@ package com.liferay.ai.hub.rest.internal.manager.v1_0;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.ai.hub.configuration.VertexAIConfiguration;
 import com.liferay.ai.hub.rest.dto.v1_0.ModelArmorTemplate;
-import com.liferay.ai.hub.rest.internal.guardrail.ModelArmorTemplateConfig;
-import com.liferay.ai.hub.rest.internal.guardrail.ModelArmorTemplateConfigFactory;
-import com.liferay.ai.hub.rest.internal.guardrail.util.ModelArmorClientUtil;
-import com.liferay.ai.hub.rest.internal.guardrail.util.ModelArmorTemplateUtil;
 import com.liferay.ai.hub.rest.manager.v1_0.ModelArmorTemplateManager;
 import com.liferay.ai.hub.util.AccountEntryUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -51,13 +47,13 @@ public class ModelArmorTemplateManagerImpl
 			_configurationProvider.getCompanyConfiguration(
 				VertexAIConfiguration.class, companyId);
 
-		ModelArmorTemplateUtil.deleteModelArmorTemplate(
+		/*ModelArmorTemplateUtil.deleteModelArmorTemplate(
 			vertexAIConfiguration.projectId(),
 			ModelArmorClientUtil.getModelArmorClient(
 				companyId,
 				GetterUtil.getString(objectEntry.getPropertyValue("location"))),
 			GetterUtil.getString(objectEntry.getPropertyValue("location")),
-			externalReferenceCode);
+			externalReferenceCode);*/
 
 		_objectEntryManager.deleteObjectEntry(
 			companyId, dtoConverterContext, externalReferenceCode,
@@ -86,7 +82,7 @@ public class ModelArmorTemplateManagerImpl
 			accountEntry.getAccountEntryId(), companyId, dtoConverterContext,
 			externalReferenceCode, modelArmorTemplate, objectDefinition);
 
-		ModelArmorTemplateConfig modelArmorTemplateConfig =
+		/*ModelArmorTemplateConfig modelArmorTemplateConfig =
 			ModelArmorTemplateConfigFactory.get(
 				externalReferenceCode, savedObjectEntry.getProperties());
 
@@ -107,7 +103,7 @@ public class ModelArmorTemplateManagerImpl
 				ModelArmorClientUtil.getModelArmorClient(
 					companyId, modelArmorTemplateConfig.getLocation()),
 				modelArmorTemplateConfig);
-		}
+		}*/
 
 		return new ModelArmorTemplate() {
 			{
