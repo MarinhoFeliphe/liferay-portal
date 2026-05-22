@@ -47,13 +47,7 @@ public class ModelArmorTemplateManagerImpl
 			_configurationProvider.getCompanyConfiguration(
 				VertexAIConfiguration.class, companyId);
 
-		/*ModelArmorTemplateUtil.deleteModelArmorTemplate(
-			vertexAIConfiguration.projectId(),
-			ModelArmorClientUtil.getModelArmorClient(
-				companyId,
-				GetterUtil.getString(objectEntry.getPropertyValue("location"))),
-			GetterUtil.getString(objectEntry.getPropertyValue("location")),
-			externalReferenceCode);*/
+		/*_modelArmorTemplateHandler.deleteModelArmorTemplate(...*/
 
 		_objectEntryManager.deleteObjectEntry(
 			companyId, dtoConverterContext, externalReferenceCode,
@@ -82,27 +76,12 @@ public class ModelArmorTemplateManagerImpl
 			accountEntry.getAccountEntryId(), companyId, dtoConverterContext,
 			externalReferenceCode, modelArmorTemplate, objectDefinition);
 
-		/*ModelArmorTemplateConfig modelArmorTemplateConfig =
-			ModelArmorTemplateConfigFactory.get(
-				externalReferenceCode, savedObjectEntry.getProperties());
-
-		VertexAIConfiguration vertexAIConfiguration =
-			_configurationProvider.getCompanyConfiguration(
-				VertexAIConfiguration.class, companyId);
-
+		/*
 		if (existingObjectEntry == null) {
-			ModelArmorTemplateUtil.createModelArmorTemplate(
-				vertexAIConfiguration.projectId(),
-				ModelArmorClientUtil.getModelArmorClient(
-					companyId, modelArmorTemplateConfig.getLocation()),
-				modelArmorTemplateConfig);
+			_modelArmorTemplateHandler.createModelArmorTemplate(...
 		}
 		else {
-			ModelArmorTemplateUtil.updateModelArmorTemplate(
-				vertexAIConfiguration.projectId(),
-				ModelArmorClientUtil.getModelArmorClient(
-					companyId, modelArmorTemplateConfig.getLocation()),
-				modelArmorTemplateConfig);
+			_modelArmorTemplateHandler.updateModelArmorTemplate(...
 		}*/
 
 		return new ModelArmorTemplate() {
