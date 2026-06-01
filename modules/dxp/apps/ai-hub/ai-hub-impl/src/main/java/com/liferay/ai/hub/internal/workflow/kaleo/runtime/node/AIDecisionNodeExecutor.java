@@ -12,6 +12,7 @@ import com.liferay.ai.hub.internal.model.VertexAiGeminiUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.KaleoLogUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.QuotaUtil;
+import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RequestUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.ToolsUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUtil;
@@ -20,6 +21,7 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -153,68 +155,90 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			return;
 		}
 
-		VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
-			VertexAiGeminiUtil.createVertexAiGeminiStreamingChatModel(
-				serviceContext.getCompanyId());
+		Lock lock = RequestUtil.tryAcquire(
+			serviceContext.getCompanyId(), currentKaleoNode.getName(),
+			workflowContext, kaleoInstanceToken.getKaleoInstanceId(),
+			serviceContext.getUserId());
 
-		String sseEventSinkKey = GetterUtil.getString(
-			workflowContext.get("sseEventSinkKey"));
+		if (lock == null) {
+			return;
+		}
 
-		AssistantHandlerUtil.handle(
-			AssistantHandlerContext.builder(
-			).invocationParameters(
-				InvocationParameters.from(
-					Map.of(
-						"companyId", CompanyThreadLocal.getCompanyId(),
-						"executionContext", executionContext))
-			).memoryId(
-				GetterUtil.getString(workflowContext.get("memoryId"))
-			).onCompleteResponseConsumer(
-				response -> {
-					MCPToolProviderUtil.close(sseEventSinkKey);
+		try {
+			VertexAiGeminiStreamingChatModel vertexAiGeminiStreamingChatModel =
+				VertexAiGeminiUtil.createVertexAiGeminiStreamingChatModel(
+					serviceContext.getCompanyId());
 
-					vertexAiGeminiStreamingChatModel.close();
+			String sseEventSinkKey = GetterUtil.getString(
+				workflowContext.get("sseEventSinkKey"));
 
-					KaleoLogUtil.addNodeUsageKaleoLog(
-						response, kaleoInstanceToken,
-						GetterUtil.getString(workflowContext.get("reason")),
-						prompt, executionContext.getServiceContext(),
-						userMessage);
+			AssistantHandlerUtil.handle(
+				AssistantHandlerContext.builder(
+				).invocationParameters(
+					InvocationParameters.from(
+						Map.of(
+							"companyId", CompanyThreadLocal.getCompanyId(),
+							"executionContext", executionContext))
+				).memoryId(
+					GetterUtil.getString(workflowContext.get("memoryId"))
+				).onCompleteResponseConsumer(
+					response -> {
+						MCPToolProviderUtil.close(sseEventSinkKey);
 
-					QuotaUtil.updateUsage(response, serviceContext);
-				}
-			).onErrorConsumer(
-				throwable -> {
-					MCPToolProviderUtil.close(sseEventSinkKey);
+						vertexAiGeminiStreamingChatModel.close();
 
-					vertexAiGeminiStreamingChatModel.close();
+						KaleoLogUtil.addNodeUsageKaleoLog(
+							response, kaleoInstanceToken,
+							GetterUtil.getString(workflowContext.get("reason")),
+							prompt, executionContext.getServiceContext(),
+							userMessage);
 
-					_log.error(throwable);
-				}
-			).retrievalAugmentor(
-				RetrievalAugmentorUtil.createRetrievalAugmentor(
-					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
-					_fieldConfigBuilderFactory, _highlightBuilderFactory,
-					kaleoNodeSettingValues, serviceContext.getLocale(),
-					_objectEntryManager, _searchEngineAdapter,
-					serviceContext.getUserId(), workflowContext)
-			).systemMessageProviderFunction(
-				memoryId -> prompt
-			).tools(
-				new Tools()
-			).toolProvider(
-				MCPToolProviderUtil.create(
-					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
-					kaleoInstanceToken.getGroupId(), serviceContext.getLocale(),
-					ToolsUtil.getMCPServerExternalReferenceCodes(
-						_jsonFactory, kaleoNodeSettingValues),
-					_objectEntryManager, sseEventSinkKey,
-					serviceContext.getUserId(), workflowContext)
-			).userMessage(
-				userMessage
-			).vertexAiGeminiStreamingChatModel(
-				vertexAiGeminiStreamingChatModel
-			).build());
+						QuotaUtil.updateUsage(response, serviceContext);
+
+						RequestUtil.release(lock);
+					}
+				).onErrorConsumer(
+					throwable -> {
+						MCPToolProviderUtil.close(sseEventSinkKey);
+
+						vertexAiGeminiStreamingChatModel.close();
+
+						RequestUtil.release(lock);
+
+						_log.error(throwable);
+					}
+				).retrievalAugmentor(
+					RetrievalAugmentorUtil.createRetrievalAugmentor(
+						kaleoInstanceToken.getCompanyId(),
+						_dtoConverterRegistry, _fieldConfigBuilderFactory,
+						_highlightBuilderFactory, kaleoNodeSettingValues,
+						serviceContext.getLocale(), _objectEntryManager,
+						_searchEngineAdapter, serviceContext.getUserId(),
+						workflowContext)
+				).systemMessageProviderFunction(
+					memoryId -> prompt
+				).tools(
+					new Tools()
+				).toolProvider(
+					MCPToolProviderUtil.create(
+						kaleoInstanceToken.getCompanyId(),
+						_dtoConverterRegistry, kaleoInstanceToken.getGroupId(),
+						serviceContext.getLocale(),
+						ToolsUtil.getMCPServerExternalReferenceCodes(
+							_jsonFactory, kaleoNodeSettingValues),
+						_objectEntryManager, sseEventSinkKey,
+						serviceContext.getUserId(), workflowContext)
+				).userMessage(
+					userMessage
+				).vertexAiGeminiStreamingChatModel(
+					vertexAiGeminiStreamingChatModel
+				).build());
+		}
+		catch (Exception exception) {
+			RequestUtil.release(lock);
+
+			throw exception;
+		}
 	}
 
 	@Override
