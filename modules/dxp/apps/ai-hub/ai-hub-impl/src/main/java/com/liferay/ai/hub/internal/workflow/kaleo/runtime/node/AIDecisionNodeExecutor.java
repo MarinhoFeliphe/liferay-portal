@@ -13,7 +13,7 @@ import com.liferay.ai.hub.internal.guardrail.listener.OutputGuardrailExecutedLis
 import com.liferay.ai.hub.internal.mcp.tool.provider.MCPToolProviderUtil;
 import com.liferay.ai.hub.internal.model.VertexAiGeminiUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.GuardrailsUtil;
-import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.KaleoLogUtil;
+import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.MessageUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.PromptUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.QuotaUtil;
 import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.RetrievalAugmentorUtil;
@@ -216,14 +216,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 
 					vertexAiGeminiStreamingChatModel.close();
 
-					KaleoLogUtil.addNodeUsageKaleoLog(
-						response, kaleoInstanceToken,
-						GetterUtil.getString(workflowContext.get("reason")),
-						prompt, executionContext.getServiceContext(),
-						userMessage);
-
-					QuotaUtil.updateUsage(
-						response, _quotaManager, serviceContext);
+					MessageUtil.sendMessage(
+						response, kaleoInstanceToken, prompt,
+						executionContext.getServiceContext(), userMessage);
 				}
 			).onErrorConsumer(
 				throwable -> {

@@ -11,6 +11,15 @@ package com.liferay.ai.hub.internal.audit.constants;
  */
 public interface AIHubEventTypes {
 
+	public static final String AI_HUB_AGENT_INSTANCE_COMPLETE =
+		"AI_HUB_AGENT_INSTANCE_COMPLETE";
+
+	public static final String AI_HUB_AGENT_INSTANCE_PARTIALLY_COMPLETE =
+		"AI_HUB_AGENT_INSTANCE_PARTIALLY_COMPLETE";
+
+	public static final String AI_HUB_AGENT_INSTANCE_START =
+		"AI_HUB_AGENT_INSTANCE_START";
+
 	public static final String AI_HUB_GUARDRAIL_VIOLATION =
 		"AI_HUB_GUARDRAIL_VIOLATION";
 

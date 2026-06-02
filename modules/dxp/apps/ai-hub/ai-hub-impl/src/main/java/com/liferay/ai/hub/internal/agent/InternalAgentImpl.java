@@ -135,6 +135,7 @@ public class InternalAgentImpl implements InternalAgent, InvocationHandler {
 					_agentContext.getCompanyId(), _workflowDefinitionName);
 
 			return AgentUtil.getOutput(
+				_agentContext.getUserId(),
 				_workflowInstanceManager.startWorkflowInstance(
 					_agentContext.getCompanyId(), _agentContext.getGroupId(),
 					_agentContext.getUserId(), _workflowDefinitionName,
