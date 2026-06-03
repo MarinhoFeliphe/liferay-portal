@@ -48,6 +48,7 @@ public class InternalAgentFactory {
 					String.class, inputVariable)));
 		internalAgentImpl.setDescription(
 			GetterUtil.getString(objectEntry.getPropertyValue("description")));
+		internalAgentImpl.setMemoryId(_agentContext.getSseEventSinkKey());
 		internalAgentImpl.setName(
 			GetterUtil.getString(
 				objectEntry.getPropertyValue("externalReferenceCode")));
