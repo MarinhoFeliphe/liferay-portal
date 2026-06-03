@@ -7,7 +7,11 @@ package com.liferay.ai.hub.internal.agent;
 
 import com.liferay.ai.hub.agent.AgentContext;
 import com.liferay.ai.hub.internal.agent.util.AgentUtil;
+import com.liferay.ai.hub.internal.audit.constants.AIHubEventTypes;
+import com.liferay.ai.hub.internal.constants.AIHubDestinationNames;
 import com.liferay.portal.kernel.encryptor.EncryptorUtil;
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -31,6 +35,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -129,12 +134,24 @@ public class InternalAgentImpl implements InternalAgent, InvocationHandler {
 					_agentContext.getUserId(), _workflowDefinitionName,
 					workflowDefinition.getVersion(), null, workflowContext);
 
+			Message message = new Message();
+
+			message.put(
+				"eventType", AIHubEventTypes.AI_HUB_AGENT_INSTANCE_START);
+			message.put("metadata", inputObjects);
+			message.put("timestamp", new Date());
+			message.put("userId", _agentContext.getUserId());
+			message.put(
+				"workflowInstanceId", workflowInstance.getWorkflowInstanceId());
+
+			MessageBusUtil.sendMessage(
+				AIHubDestinationNames.AI_HUB_AGENT_INSTANCE, message);
+
 			if (async()) {
 				return workflowInstance.getWorkflowInstanceId();
 			}
 
-			return AgentUtil.getOutput(
-				_agentContext.getUserId(), workflowInstance);
+			return AgentUtil.getOutput(workflowInstance);
 		}
 		catch (UnsupportedOperationException unsupportedOperationException) {
 			throw unsupportedOperationException;
