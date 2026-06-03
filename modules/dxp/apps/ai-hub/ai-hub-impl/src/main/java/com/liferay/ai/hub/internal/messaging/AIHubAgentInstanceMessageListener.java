@@ -8,7 +8,6 @@ package com.liferay.ai.hub.internal.messaging;
 import com.liferay.ai.hub.internal.audit.AuditRouterUtil;
 import com.liferay.ai.hub.internal.constants.AIHubDestinationNames;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationConfiguration;
@@ -17,8 +16,6 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
-
-import java.io.Serializable;
 
 import java.util.Date;
 import java.util.Map;
@@ -37,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = "destination.name=" + AIHubDestinationNames.AI_HUB_AGENT_INSTANCE,
 	service = MessageListener.class
 )
-public class AgentInstanceMessageListener extends BaseMessageListener {
+public class AIHubAgentInstanceMessageListener extends BaseMessageListener {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -59,24 +56,11 @@ public class AgentInstanceMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
-		).put(
-			"workflowInstanceId", message.getLong("workflowInstanceId")
-		);
-
-		Map<String, Serializable> metadata =
-			(Map<String, Serializable>)message.get("metadata");
-
-		if (metadata != null) {
-			for (Map.Entry<String, Serializable> entry : metadata.entrySet()) {
-				jsonObject.put(entry.getKey(), entry.getValue());
-			}
-		}
-
 		AuditRouterUtil.route(
 			WorkflowInstance.class.getName(),
 			message.getLong("workflowInstanceId"),
-			message.getString("eventType"), jsonObject,
+			message.getString("eventType"),
+			_jsonFactory.createJSONObject((Map<?, ?>)message.get("metadata")),
 			(Date)message.get("timestamp"), message.getLong("userId"));
 	}
 

@@ -211,14 +211,18 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 			).memoryId(
 				GetterUtil.getString(workflowContext.get("memoryId"))
 			).onCompleteResponseConsumer(
-				response -> {
+				chatResponse -> {
 					MCPToolProviderUtil.close(sseEventSinkKey);
 
 					vertexAiGeminiStreamingChatModel.close();
 
 					MessageUtil.sendMessage(
-						response, kaleoInstanceToken, prompt,
+						chatResponse, kaleoInstanceToken, prompt,
 						executionContext.getServiceContext(), userMessage);
+
+					QuotaUtil.updateUsage(
+						chatResponse, _quotaManager,
+						executionContext.getServiceContext());
 				}
 			).onErrorConsumer(
 				throwable -> {
