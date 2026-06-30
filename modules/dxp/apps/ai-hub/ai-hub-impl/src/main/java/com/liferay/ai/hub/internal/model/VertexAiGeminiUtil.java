@@ -11,13 +11,16 @@ import com.liferay.ai.hub.quota.QuotaManager;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import dev.langchain4j.model.vertexai.gemini.HarmCategory;
 import dev.langchain4j.model.vertexai.gemini.SafetyThreshold;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiChatModel;
 import dev.langchain4j.model.vertexai.gemini.VertexAiGeminiStreamingChatModel;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -34,22 +37,40 @@ public class VertexAiGeminiUtil {
 			ConfigurationProviderUtil.getCompanyConfiguration(
 				VertexAIConfiguration.class, serviceContext.getCompanyId());
 
+		String location = PropsUtil.get(PropsKeys.VERTEX_AI_LOCATION);
+
+		if (Validator.isNotNull(vertexAIConfiguration.location())) {
+			location = vertexAIConfiguration.location();
+		}
+
+		String modelName = PropsUtil.get(PropsKeys.VERTEX_AI_MODEL_NAME);
+
+		if (Validator.isNotNull(vertexAIConfiguration.modelName())) {
+			modelName = vertexAIConfiguration.modelName();
+		}
+
+		String projectId = PropsUtil.get(PropsKeys.VERTEX_AI_PROJECT_ID);
+
+		if (Validator.isNotNull(vertexAIConfiguration.projectId())) {
+			projectId = vertexAIConfiguration.projectId();
+		}
+
 		VertexAiGeminiChatModel.VertexAiGeminiChatModelBuilder builder =
 			VertexAiGeminiChatModel.builder();
 
-		if (Objects.equals(vertexAIConfiguration.location(), "global")) {
+		if (Objects.equals(location, "global")) {
 			builder.apiEndpoint("aiplatform.googleapis.com");
 		}
 
 		return builder.listeners(
-			Collections.singletonList(
+			List.of(
 				new AIHubChatModelListenerImpl(quotaManager, serviceContext))
 		).location(
-			vertexAIConfiguration.location()
+			location
 		).modelName(
-			vertexAIConfiguration.modelName()
+			modelName
 		).project(
-			vertexAIConfiguration.projectId()
+			projectId
 		).safetySettings(
 			_safetyThresholds
 		).build();
@@ -64,22 +85,40 @@ public class VertexAiGeminiUtil {
 			ConfigurationProviderUtil.getCompanyConfiguration(
 				VertexAIConfiguration.class, serviceContext.getCompanyId());
 
+		String location = PropsUtil.get(PropsKeys.VERTEX_AI_LOCATION);
+
+		if (Validator.isNotNull(vertexAIConfiguration.location())) {
+			location = vertexAIConfiguration.location();
+		}
+
+		String modelName = PropsUtil.get(PropsKeys.VERTEX_AI_MODEL_NAME);
+
+		if (Validator.isNotNull(vertexAIConfiguration.modelName())) {
+			modelName = vertexAIConfiguration.modelName();
+		}
+
+		String projectId = PropsUtil.get(PropsKeys.VERTEX_AI_PROJECT_ID);
+
+		if (Validator.isNotNull(vertexAIConfiguration.projectId())) {
+			projectId = vertexAIConfiguration.projectId();
+		}
+
 		VertexAiGeminiStreamingChatModel.VertexAiGeminiStreamingChatModelBuilder
 			builder = VertexAiGeminiStreamingChatModel.builder();
 
-		if (Objects.equals(vertexAIConfiguration.location(), "global")) {
+		if (Objects.equals(location, "global")) {
 			builder.apiEndpoint("aiplatform.googleapis.com");
 		}
 
 		return builder.listeners(
-			Collections.singletonList(
+			List.of(
 				new AIHubChatModelListenerImpl(quotaManager, serviceContext))
 		).location(
-			vertexAIConfiguration.location()
+			location
 		).modelName(
-			vertexAIConfiguration.modelName()
+			modelName
 		).project(
-			vertexAIConfiguration.projectId()
+			projectId
 		).safetySettings(
 			_safetyThresholds
 		).build();

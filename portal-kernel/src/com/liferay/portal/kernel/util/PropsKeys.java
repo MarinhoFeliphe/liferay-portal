@@ -2894,6 +2894,12 @@ public interface PropsKeys {
 	public static final String VERIFY_DATABASE_TRANSACTIONS_DISABLED =
 		"verify.database.transactions.disabled";
 
+	public static final String VERTEX_AI_LOCATION = "vertex.ai.location";
+
+	public static final String VERTEX_AI_MODEL_NAME = "vertex.ai.model.name";
+
+	public static final String VERTEX_AI_PROJECT_ID = "vertex.ai.project.id";
+
 	public static final String VIRTUAL_HOSTS_DEFAULT_SITE_NAME =
 		"virtual.hosts.default.site.name";
 
