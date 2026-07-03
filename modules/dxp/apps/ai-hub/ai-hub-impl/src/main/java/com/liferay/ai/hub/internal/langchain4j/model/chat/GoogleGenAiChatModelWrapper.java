@@ -5,6 +5,10 @@
 
 package com.liferay.ai.hub.internal.langchain4j.model.chat;
 
+import com.liferay.ai.hub.internal.model.GoogleGenAiUtil;
+import com.liferay.ai.hub.quota.QuotaManager;
+import com.liferay.portal.kernel.service.ServiceContext;
+
 import dev.langchain4j.model.ModelProvider;
 import dev.langchain4j.model.chat.Capability;
 import dev.langchain4j.model.chat.ChatModel;
@@ -20,10 +24,18 @@ import java.util.Set;
 /**
  * @author Iliyan Peychev
  */
-public class PromptResponseFormatChatModel implements ChatModel {
+public class GoogleGenAiChatModelWrapper implements ChatModel {
 
-	public PromptResponseFormatChatModel(ChatModel chatModel) {
-		_chatModel = chatModel;
+	public GoogleGenAiChatModelWrapper(
+		QuotaManager quotaManager, ServiceContext serviceContext) {
+
+		try {
+			_chatModel = GoogleGenAiUtil.createGoogleGenAiChatModel(
+				quotaManager, serviceContext);
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
 	}
 
 	@Override
