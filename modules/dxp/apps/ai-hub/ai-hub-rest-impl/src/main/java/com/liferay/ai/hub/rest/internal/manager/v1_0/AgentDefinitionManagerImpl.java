@@ -267,7 +267,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 
 	private Map<String, String> _addAction(
 		DTOConverterContext dtoConverterContext, String methodName,
-		WorkflowDefinition workflowDefinition) {
+		ObjectEntry objectEntry, WorkflowDefinition workflowDefinition) {
 
 		if (Objects.equals(
 				methodName, "postAgentDefinitionByExternalReferenceCodeCopy")) {
@@ -279,7 +279,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 				dtoConverterContext.getUriInfo());
 		}
 
-		if (workflowDefinition.isSystem()) {
+		if (GetterUtil.getBoolean(objectEntry.getPropertyValue("system"))) {
 			return null;
 		}
 
@@ -307,8 +307,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 	}
 
 	private Status _getStatus(
-		DTOConverterContext dtoConverterContext,
-		WorkflowDefinition workflowDefinition) {
+		DTOConverterContext dtoConverterContext, ObjectEntry objectEntry) {
 
 		if (dtoConverterContext == null) {
 			return null;
@@ -316,7 +315,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 
 		Locale locale = dtoConverterContext.getLocale();
 
-		if (workflowDefinition.isActive()) {
+		if (GetterUtil.getBoolean(objectEntry.getPropertyValue("active"))) {
 			return _toStatus("active", locale);
 		}
 
@@ -345,7 +344,10 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 						return HashMapBuilder.put(
 							"activate",
 							() -> {
-								if (workflowDefinition.isActive()) {
+								if (GetterUtil.getBoolean(
+										objectEntry.getPropertyValue(
+											"active"))) {
+
 									return null;
 								}
 
@@ -353,7 +355,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 									dtoConverterContext,
 									"patchAgentDefinitionByExternalReference" +
 										"CodeUpdateActive",
-									workflowDefinition);
+									objectEntry, workflowDefinition);
 							}
 						).put(
 							"copy",
@@ -361,11 +363,14 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 								dtoConverterContext,
 								"postAgentDefinitionByExternalReferenceCode" +
 									"Copy",
-								workflowDefinition)
+								objectEntry, workflowDefinition)
 						).put(
 							"deactivate",
 							() -> {
-								if (!workflowDefinition.isActive()) {
+								if (!GetterUtil.getBoolean(
+										objectEntry.getPropertyValue(
+											"active"))) {
+
 									return null;
 								}
 
@@ -373,14 +378,14 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 									dtoConverterContext,
 									"patchAgentDefinitionByExternalReference" +
 										"CodeUpdateActive",
-									workflowDefinition);
+									objectEntry, workflowDefinition);
 							}
 						).put(
 							"delete",
 							() -> _addAction(
 								dtoConverterContext,
 								"deleteAgentDefinitionByExternalReferenceCode",
-								workflowDefinition)
+								objectEntry, workflowDefinition)
 						).put(
 							"permissions",
 							() -> {
@@ -420,8 +425,7 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 					() -> _toVariable(
 						GetterUtil.getString(
 							objectEntry.getPropertyValue("outputVariable"))));
-				setStatus(
-					() -> _getStatus(dtoConverterContext, workflowDefinition));
+				setStatus(() -> _getStatus(dtoConverterContext, objectEntry));
 				setSystem(
 					() -> GetterUtil.getBoolean(
 						objectEntry.getPropertyValue("system")));
@@ -429,7 +433,10 @@ public class AgentDefinitionManagerImpl implements AgentDefinitionManager {
 					() -> GetterUtil.getString(
 						objectEntry.getPropertyValue("title")));
 				setVersion(workflowDefinition::getVersion);
-				setWorkflowDefinitionName(workflowDefinition::getName);
+				setWorkflowDefinitionName(
+					() -> GetterUtil.getString(
+						objectEntry.getPropertyValue(
+							"workflowDefinitionName")));
 			}
 		};
 	}
