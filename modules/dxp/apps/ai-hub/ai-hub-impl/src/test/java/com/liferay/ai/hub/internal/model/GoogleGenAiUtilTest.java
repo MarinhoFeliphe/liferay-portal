@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import dev.langchain4j.model.chat.request.ChatRequestParameters;
+import dev.langchain4j.model.chat.request.ResponseFormat;
 import dev.langchain4j.model.google.genai.GoogleGenAiChatModel;
 import dev.langchain4j.model.google.genai.GoogleGenAiStreamingChatModel;
 
@@ -54,21 +55,21 @@ public class GoogleGenAiUtilTest {
 	@Before
 	public void setUp() throws Exception {
 		Mockito.when(
-			_vertexAIConfiguration.location()
-		).thenReturn(
-			RandomTestUtil.randomString()
-		);
-
-		Mockito.when(
-			_vertexAIConfiguration.modelName()
-		).thenReturn(
-			_MODEL_NAME
-		);
-
-		Mockito.when(
 			_vertexAIConfiguration.projectId()
 		).thenReturn(
 			RandomTestUtil.randomString()
+		);
+
+		Mockito.when(
+			_vertexAIConfiguration.textModelLocation()
+		).thenReturn(
+			RandomTestUtil.randomString()
+		);
+
+		Mockito.when(
+			_vertexAIConfiguration.textModelName()
+		).thenReturn(
+			_MODEL_NAME
 		);
 
 		_configurationProviderUtilMockedStatic.when(
@@ -104,6 +105,8 @@ public class GoogleGenAiUtilTest {
 			googleGenAiChatModel.defaultRequestParameters();
 
 		Assert.assertEquals(_MODEL_NAME, defaultRequestParameters.modelName());
+		Assert.assertEquals(
+			ResponseFormat.JSON, defaultRequestParameters.responseFormat());
 
 		_assertSafetySettings(
 			ReflectionTestUtil.getFieldValue(
@@ -121,6 +124,7 @@ public class GoogleGenAiUtilTest {
 			googleGenAiStreamingChatModel.defaultRequestParameters();
 
 		Assert.assertEquals(_MODEL_NAME, defaultRequestParameters.modelName());
+		Assert.assertNull(defaultRequestParameters.responseFormat());
 
 		_assertSafetySettings(
 			ReflectionTestUtil.getFieldValue(

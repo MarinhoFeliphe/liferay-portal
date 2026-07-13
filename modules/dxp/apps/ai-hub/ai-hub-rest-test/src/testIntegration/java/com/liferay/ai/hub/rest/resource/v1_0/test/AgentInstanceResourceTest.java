@@ -306,13 +306,14 @@ public class AgentInstanceResourceTest
 						TestPropsValues.getCompanyId(),
 						VertexAIConfiguration.class.getName(),
 						HashMapDictionaryBuilder.<String, Object>put(
-							"location", TestPropsUtil.get("vertex.ai.location")
-						).put(
-							"modelName",
-							TestPropsUtil.get("vertex.ai.model.name")
-						).put(
 							"projectId",
 							TestPropsUtil.get("vertex.ai.project.id")
+						).put(
+							"textModelLocation",
+							TestPropsUtil.get("vertex.ai.text.model.location")
+						).put(
+							"textModelName",
+							TestPropsUtil.get("vertex.ai.text.model.name")
 						).build())) {
 
 			_testPostAgentInstance();
@@ -320,6 +321,7 @@ public class AgentInstanceResourceTest
 			_testPostAgentInstanceWithTypeAIDecisionNodeWorkflowDefinition();
 			_testPostAgentInstanceWithTypeAutoCategorize();
 			_testPostAgentInstanceWithTypeFixSpellingAndGrammarWithInstruction();
+			_testPostAgentInstanceWithTypeGenerateContent();
 			_testPostAgentInstanceWithTypeGenerateTags();
 			_testPostAgentInstanceWithTypeHTTPRequestNodeWithLLMNodeWorkflowDefinition();
 			_testPostAgentInstanceWithTypeLLMNodeWithRAGWorkflowDefinition();
@@ -817,6 +819,42 @@ public class AgentInstanceResourceTest
 			});
 
 		SseUtil.closeAll();
+	}
+
+	private void _testPostAgentInstanceWithTypeGenerateContent()
+		throws Exception {
+
+		String data = _postAndAwaitAgentInstance(
+			"L_GENERATE_CONTENT",
+			JSONUtil.put(
+				"brief", "Liferay DXP"
+			).put(
+				"count", "1"
+			).put(
+				"objectDefinitionName", _objectDefinition.getName()
+			).put(
+				"objectFields",
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"businessType", "LongText"
+					).put(
+						"name", "description"
+					).put(
+						"readOnly", "false"
+					),
+					JSONUtil.put(
+						"businessType", "Text"
+					).put(
+						"name", "name"
+					).put(
+						"readOnly", "false"
+					)
+				).toString()
+			).put(
+				"spaceId", String.valueOf(TestPropsValues.getGroupId())
+			));
+
+		_assertContains(data, "AI-generated", "L_CONTENTS", "Liferay");
 	}
 
 	private void _testPostAgentInstanceWithTypeGenerateTags() throws Exception {

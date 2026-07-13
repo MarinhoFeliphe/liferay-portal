@@ -11,11 +11,13 @@ import com.google.genai.types.SafetySetting;
 
 import com.liferay.ai.hub.configuration.VertexAIConfiguration;
 import com.liferay.ai.hub.internal.langchain4j.model.chat.listener.AIHubChatModelListenerImpl;
+import com.liferay.ai.hub.internal.langchain4j.model.image.GoogleGenAiImageModel;
 import com.liferay.ai.hub.quota.QuotaManager;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import dev.langchain4j.model.chat.request.ResponseFormat;
 import dev.langchain4j.model.google.genai.GoogleGenAiChatModel;
 import dev.langchain4j.model.google.genai.GoogleGenAiStreamingChatModel;
 
@@ -42,14 +44,24 @@ public class GoogleGenAiUtil {
 			Collections.singletonList(
 				new AIHubChatModelListenerImpl(quotaManager, serviceContext))
 		).location(
-			vertexAIConfiguration.location()
+			vertexAIConfiguration.textModelLocation()
 		).modelName(
-			vertexAIConfiguration.modelName()
+			vertexAIConfiguration.textModelName()
 		).projectId(
 			vertexAIConfiguration.projectId()
+		).responseFormat(
+			ResponseFormat.JSON
 		).safetySettings(
 			_safetySettings
 		).build();
+	}
+
+	public static GoogleGenAiImageModel createGoogleGenAiImageModel(
+			QuotaManager quotaManager, ServiceContext serviceContext)
+		throws ConfigurationException {
+
+		return new GoogleGenAiImageModel(
+			quotaManager, _safetySettings, serviceContext);
 	}
 
 	public static GoogleGenAiStreamingChatModel
@@ -69,9 +81,9 @@ public class GoogleGenAiUtil {
 			Collections.singletonList(
 				new AIHubChatModelListenerImpl(quotaManager, serviceContext))
 		).location(
-			vertexAIConfiguration.location()
+			vertexAIConfiguration.textModelLocation()
 		).modelName(
-			vertexAIConfiguration.modelName()
+			vertexAIConfiguration.textModelName()
 		).projectId(
 			vertexAIConfiguration.projectId()
 		).safetySettings(

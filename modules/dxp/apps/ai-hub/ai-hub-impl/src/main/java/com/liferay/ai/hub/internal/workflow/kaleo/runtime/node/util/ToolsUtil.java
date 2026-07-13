@@ -5,12 +5,17 @@
 
 package com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util;
 
+import com.liferay.ai.hub.internal.tools.ImageGenerationTools;
+import com.liferay.ai.hub.internal.tools.WorkflowNodeTools;
+import com.liferay.ai.hub.quota.QuotaManager;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.workflow.WorkflowNodeManager;
+import com.liferay.portal.workflow.kaleo.definition.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +29,46 @@ public class ToolsUtil {
 	public static List<String> getMCPServerExternalReferenceCodes(
 		JSONFactory jsonFactory, Map<String, String> kaleoNodeSettingValues) {
 
-		List<String> mcpServerExternalReferenceCodes = new ArrayList<>();
+		return _getExternalReferenceCodes(
+			jsonFactory, kaleoNodeSettingValues, "mcpServer");
+	}
+
+	public static Object[] getTools(
+		JSONFactory jsonFactory, Map<String, String> kaleoNodeSettingValues,
+		NodeType nodeType, QuotaManager quotaManager,
+		WorkflowNodeManager workflowNodeManager) {
+
+		if (nodeType == NodeType.AI_DECISION) {
+			return new Object[] {new WorkflowNodeTools(workflowNodeManager)};
+		}
+
+		List<String> externalReferenceCodes = _getExternalReferenceCodes(
+			jsonFactory, kaleoNodeSettingValues, "tool");
+
+		if (externalReferenceCodes.contains("L_IMAGE_GENERATION")) {
+			return new Object[] {new ImageGenerationTools(quotaManager)};
+		}
+
+		return new Object[0];
+	}
+
+	private static List<String> _getExternalReferenceCodes(
+		JSONFactory jsonFactory, Map<String, String> kaleoNodeSettingValues,
+		String type) {
+
+		List<String> externalReferenceCodes = new ArrayList<>();
 
 		try {
 			JSONArray jsonArray = jsonFactory.createJSONArray(
 				kaleoNodeSettingValues.get("tools"));
 
 			for (JSONObject jsonObject : (Iterable<JSONObject>)jsonArray) {
-				mcpServerExternalReferenceCodes.add(
-					jsonObject.getString("mcpServerExternalReferenceCode"));
+				if (!type.equals(jsonObject.getString("type"))) {
+					continue;
+				}
+
+				externalReferenceCodes.add(
+					jsonObject.getString("externalReferenceCode"));
 			}
 		}
 		catch (JSONException jsonException) {
@@ -41,7 +77,7 @@ public class ToolsUtil {
 			}
 		}
 
-		return mcpServerExternalReferenceCodes;
+		return externalReferenceCodes;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(ToolsUtil.class);

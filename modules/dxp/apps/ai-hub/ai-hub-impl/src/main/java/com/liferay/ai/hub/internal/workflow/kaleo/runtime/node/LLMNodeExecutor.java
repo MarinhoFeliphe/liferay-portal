@@ -120,18 +120,19 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			return;
 		}
 
-		AtomicReference<ChatResponse> chatResponseAtomicReference =
-			new AtomicReference<>();
-
 		Map<String, String> kaleoNodeSettingValues =
 			KaleoNodeSettingUtil.getKaleoNodeSettingValuesMap(
 				currentKaleoNode.getKaleoNodeId());
 
+		String userMessage = VariablesUtil.applyInputVariables(
+			executionContext, "userMessage", kaleoNodeSettingValues);
+
 		String prompt = PromptUtil.composePrompt(
 			kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
 			executionContext, kaleoNodeSettingValues, _objectEntryManager);
-		String userMessage = VariablesUtil.applyInputVariables(
-			executionContext, "userMessage", kaleoNodeSettingValues);
+
+		AtomicReference<ChatResponse> chatResponseAtomicReference =
+			new AtomicReference<>();
 
 		Callable<Void> completeResponseCallable =
 			new CompanyInheritableThreadLocalCallable<>(
@@ -203,6 +204,10 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 					kaleoInstanceToken.getKaleoInstanceId())
 			).systemMessageProviderFunction(
 				memoryId -> prompt
+			).tools(
+				ToolsUtil.getTools(
+					_jsonFactory, kaleoNodeSettingValues, getNodeType(),
+					_quotaManager, _workflowNodeManager)
 			).toolProvider(
 				MCPToolProviderUtil.create(
 					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
