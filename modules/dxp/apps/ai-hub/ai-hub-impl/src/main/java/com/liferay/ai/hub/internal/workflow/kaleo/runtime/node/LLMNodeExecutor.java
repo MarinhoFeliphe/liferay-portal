@@ -120,6 +120,9 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 			return;
 		}
 
+		AtomicReference<ChatResponse> chatResponseAtomicReference =
+			new AtomicReference<>();
+
 		Map<String, String> kaleoNodeSettingValues =
 			KaleoNodeSettingUtil.getKaleoNodeSettingValuesMap(
 				currentKaleoNode.getKaleoNodeId());
@@ -130,9 +133,6 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 		String prompt = PromptUtil.composePrompt(
 			kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
 			executionContext, kaleoNodeSettingValues, _objectEntryManager);
-
-		AtomicReference<ChatResponse> chatResponseAtomicReference =
-			new AtomicReference<>();
 
 		Callable<Void> completeResponseCallable =
 			new CompanyInheritableThreadLocalCallable<>(
